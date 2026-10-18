@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>解析2025LitCTF-math | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="LitCTF 2025 math方向RSA带噪声hint泄露攻击链,标准hint &#x3D; n + noise*(p+q+noise)形式,40位小素数Pollard-Rho分解+韦达定理还原p,q。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解析2025LitCTF-math">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%902025LitCTF-math/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="LitCTF 2025 math方向RSA带噪声hint泄露攻击链,标准hint &#x3D; n + noise*(p+q+noise)形式,40位小素数Pollard-Rho分解+韦达定理还原p,q。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="RSA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%902025LitCTF-math/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '解析2025LitCTF-math',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">解析2025LitCTF-math</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="解析2025LitCTF-math"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/278447.html">https://www.ctfiot.com/278447.html</a><br>ID: 278447</p>
+</blockquote>
+<p>一道”带噪声”RSA的系统化拆解</p>
+<p>本文通过一道巧妙的CTF题目，深入解析RSA加密系统中信息泄露的危险性。从异常发现到完整攻击链，带您领略数学分析在密码学攻击中的威力。</p>
+<p>今天我们来分析一道极具教学价值的CTF密码学题目。这道题目表面上看起来像是一个标准的RSA加密，但其中隐藏的hint信息却成了整个加密系统的”阿喀琉斯之踵”。</p>
+<p>题目设定：看似无害的额外信息</p>
+<p>让我们先来看题目给出的加密代码：</p>
+<p>fromCrypto.Util.numberimport<em>fromencimportflagm &#x3D; bytes_to_long(flag)e &#x3D;65537p,q &#x3D; getPrime(1024),getPrime(1024)n &#x3D; p</em>qnoise &#x3D; getPrime(40)tmp1 &#x3D; noise<em>p+noise</em>qtmp2 &#x3D; noise<em>noisehint &#x3D; p</em>q+tmp1+tmp2c &#x3D; pow(m,e,n)print(f”n &#x3D;{n}”)print(f”e &#x3D;{e}”)print(f”c &#x3D;{c}”)print(f”hint &#x3D;{hint}”)</p>
+<p>异常识别：hint的存在就是最大线索</p>
+<p>当我看到这道题目时，第一个疑问是：为什么题目要给出hint？</p>
+<p>在标准的RSA加密中，通常只给出：</p>
+<p>n（模数）</p>
+<p>e（公钥指数）</p>
+<p>c（密文）</p>
+<p>如果我能知道noise，就能计算p+q</p>
+<p>如果我知道p+q和n&#x3D;p×q，就能求解p和q</p>
+<p>一旦知道p和q，就能完全破解RSA</p>
+<p>noise是40位素数（相对较小）</p>
+<p>p和q都是1024位素数</p>
+<p>因此p + q + noise是一个巨大的数（约1025位）</p>
+<p>计算hint – n的值</p>
+<p>对这个数进行因数分解</p>
+<p>寻找40位左右的素数因子</p>
+<p>验证这个因子是否满足数学关系</p>
+<p>信息泄露：hint &#x3D; n + noise×(p + q + noise)直接关联了n和p+q</p>
+<p>可逆性：通过数学变换，可以从hint和n反推出p+q</p>
+<p>因数分解：noise的大小（40位）使得因数分解成为可能</p>
+<p>异常识别：hint的存在本身就是最大的线索</p>
+<p>数学建模：将代码逻辑转化为数学表达式</p>
+<p>模式识别：发现hint &#x3D; n + noise × (p + q + noise)的关键关系</p>
+<p>攻击设计：利用因数分解和韦达定理的完整攻击链</p>
+<p>验证确认：确保每个数学步骤的正确性</p>
+<p>数学敏感度：能够识别数学模式和恒等式</p>
+<p>代码分析能力：理解加密算法的实现细节</p>
+<p>攻击思维：从攻击者的角度思考漏洞</p>
+<p>验证习惯：确保每个计算步骤的正确性</p>
+<p>因数分解：对于包含较小因数的大数，可以尝试因数分解</p>
+<p>模运算：理解模运算的性质，特别是在RSA中的应用</p>
+<p>韦达定理：在已知p+q和p×q的情况下，可以求解p和q</p>
+<p>编程工具：熟练使用Python的数学库和大整数运算</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">fromCrypto.Util.numberimport*fromencimportflagm = bytes_to_long(flag)e =65537p,q = getPrime(1024),getPrime(1024)n = p*qnoise = getPrime(40)tmp1 = noise*p+noise*qtmp2 = noise*noisehint = p*q+tmp1+tmp2c = pow(m,e,n)print(f&quot;n =&#123;n&#125;&quot;)print(f&quot;e =&#123;e&#125;&quot;)print(f&quot;c =&#123;c&#125;&quot;)print(f&quot;hint =&#123;hint&#125;&quot;)</span><br><span class="line">noise = getPrime(40) # 生成40位随机素数tmp1 = noise*p + noise*q # noise×p + noise×qtmp2 = noise*noise # noise²hint = p*q + tmp1 + tmp2 # n + noise×p + noise×q + noise²</span><br><span class="line">hint = p*q + noise*p + noise*q + noise²hint = n + noise×(p + q + noise)hint - n = noise×(p + q + noise)</span><br><span class="line">hint - n = noise × (p + q + noise)</span><br><span class="line">n = 17532490684844499573962335739488728447047570856216948961588440767955512955473651897333925229174151614695264324340730480776786566348862857891246670588649327068340567882240999607182345833441113636475093894425780004013793034622954182148283517822177334733794951622433597634369648913113258689335969565066224724927142875488372745811265526082952677738164529563954987228906850399133238995317510054164641775620492640261304545177255239344267408541100183257566363663184114386155791750269054370153318333985294770328952530538998873255288249682710758780563400912097941615526239960620378046855974566511497666396320752739097426013141e = 65537c = 1443781085228809103260687286964643829663045712724558803386592638665188285978095387180863161962724216167963654290035919557593637853286347618612161170407578261345832596144085802169614820425769327958192208423842665197938979924635782828703591528369967294598450115818251812197323674041438116930949452107918727347915177319686431081596379288639254670818653338903424232605790442382455868513646425376462921686391652158186913416425784854067607352211587156772930311563002832095834548323381414409747899386887578746299577314595641345032692386684834362470575165392266454078129135668153486829723593489194729482511596288603515252196hint = 17532490684844499573962335739488728447047570856216948961588440767955512955473651897333925229174151614695264324340730480776786566348862857891246670588649327068340567882240999607182345833441113636475093894425780004013793034622954182148283517822177334733794951622433597634369648913113258689335969565315879035806034866363781260326863226820493638303543900551786806420978685834963920605455531498816171226961859405498825422799670404315599803610007692517859020686506546933013150302023167306580068646104886750772590407299332549746317286972954245335810093049085813683948329319499796034424103981702702886662008367017860043529164</span><br><span class="line">hint_minus_n = hint - n</span><br><span class="line">hint_minus_n = 249654310878891990875408514515597700737540960565379370987831819192071835435830681610138021444651529451341366765237520877622415164971332395068907509260292657023322432546857358551754112936426750312119591980443637876760333676491029037290243486555246692136987872068422089358879417987568129415191205220265687614278762617516023</span><br><span class="line">noise = 942430120937</span><br><span class="line">hint_minus_n ÷ noise = 264904851121137920947287086482326881385752688705374889409196246630630770102009950641809599308303022933372963797747735183944234823071639906681654992838707159246410571356707755892308435202955680710788529503317217548344168832053609281562447929541166386062570844327209330092595380642976752220867037217903512826079</span><br><span class="line">p + q = (hint - n - noise²) / noise</span><br><span class="line">p + q = 264904851121137920947287086482326881385752688705374889409196246630630770102009950641809599308303022933372963797747735183944234823071639906681654992838707159246410571356707755892308435202955680710788529503317217548344168832053609281562447929541166386062570844327209330092595380642976752220867037216961082705142</span><br><span class="line">(p - q)² = (p + q)² - 4pq = (p + q)² - 4np - q = √((p + q)² - 4n)</span><br><span class="line">p - q = 6679626346903583858189473293130401939213862668900267202829516782648865108956919922517185561785457297996525447593437616417964428399289554285058011603345933194327725800661333496177051400236044633644935835882584816430687119017695349792010391098947730072487636362235682233191812800379638330438772787858683368740</span><br><span class="line">p = (p + q + p - q) /2q = (p + q - (p - q)) /2</span><br><span class="line">p = 135792238734020752402738279887728641662483275687137578306012881706639817605483435282163392435044240115684744622670586400181099625735464730483356502221026546220369148578684544694242743301595862672216732669599901182387427975535652315677229160320057058067529240344722506162893596721678195275652905002409883036941q = 129112612387117168544548806594598239723269413018237311103183364923990952496526515359646206873258782817688219175077148783763135197336175176198298490617680613026041422778023211198065691901359818038571796833717316365956740856517956965885218769221109327995041603982486823929701783921298556945214132214551199668201</span><br><span class="line">p × q = n ✓p和q都是1024位素数 ✓</span><br><span class="line">phi = (p -1) × (q -1)d = e^(-1) mod phim = c^d mod nflag = long_to_bytes(m)</span><br><span class="line">LitCTF&#123;db6f52b9265971910b306754b9df8b76&#125;</span><br><span class="line">frommathimportgcd, isqrtimportrandom</span><br><span class="line"># ===== 输入：来自题面的数据 =====n =17532490684844499573962335739488728447047570856216948961588440767955512955473651897333925229174151614695264324340730480776786566348862857891246670588649327068340567882240999607182345833441113636475093894425780004013793034622954182148283517822177334733794951622433597634369648913113258689335969565066224724927142875488372745811265526082952677738164529563954987228906850399133238995317510054164641775620492640261304545177255239344267408541100183257566363663184114386155791750269054370153318333985294770328952530538998873255288249682710758780563400912097941615526239960620378046855974566511497666396320752739097426013141e =65537c =1443781085228809103260687286964643829663045712724558803386592638665188285978095387180863161962724216167963654290035919557593637853286347618612161170407578261345832596144085802169614820425769327958192208423842665197938979924635782828703591528369967294598450115818251812197323674041438116930949452107918727347915177319686431081596379288639254670818653338903424232605790442382455868513646425376462921686391652158186913416425784854067607352211587156772930311563002832095834548323381414409747899386887578746299577314595641345032692386684834362470575165392266454078129135668153486829723593489194729482511596288603515252196hint =17532490684844499573962335739488728447047570856216948961588440767955512955473651897333925229174151614695264324340730480776786566348862857891246670588649327068340567882240999607182345833441113636475093894425780004013793034622954182148283517822177334733794951622433597634369648913113258689335969565315879035806034866363781260326863226820493638303543900551786806420978685834963920605455531498816171226961859405498825422799670404315599803610007692517859020686506546933013150302023167306580068646104886750772590407299332549746317286972954245335810093049085813683948329319499796034424103981702702886662008367017860043529164</span><br><span class="line"># ===== 工具函数：MR 素性测试 + Pollard Rho + 模逆元等 =====defis_probable_prime(n, k=12): &quot;&quot;&quot;Miller-Rabin 素性测试&quot;&quot;&quot; ifn &lt;2: returnFalse small = [2,3,5,7,11,13,17,19,23,29,31,37] forpinsmall: ifn % p ==0: returnn == p d, s = n-1,0 whiled %2==0: d //=2 s +=1 for_inrange(k): a = random.randrange(2, n-2) x = pow(a, d, n) ifxin(1, n-1): continue for__inrange(s-1): x = (x*x) % n ifx == n-1: break else: returnFalse returnTruedefpollards_rho(n): &quot;&quot;&quot;Pollard Rho 因数分解算法&quot;&quot;&quot; ifn %2==0: return2 ifis_probable_prime(n): returnn whileTrue: c = random.randrange(1, n-1) f =lambdax: (x*x + c) % n x = y =2 d =1 whiled ==1: x = f(x) y = f(f(y)) d = gcd(abs(x-y), n) ifd != n: returnddefmodinv(a, m): &quot;&quot;&quot;扩展欧几里得算法求模逆元&quot;&quot;&quot; defegcd(a,b): ifb ==0:</span><br><span class="line">return(a,1,0) g,x1,y1 = egcd(b, a%b) return(g, y1, x1 - (a//b)*y1) g, x, _ = egcd(a, m) ifg !=1: raiseValueError(&quot;no inverse&quot;) returnx % mdefis_square(z): &quot;&quot;&quot;判断是否为完全平方数&quot;&quot;&quot; ifz &lt;0:</span><br><span class="line">returnFalse r = isqrt(z) returnr*r == z</span><br><span class="line"># ===== 解题步骤 =====print(&quot;=== 从hint到完整解密的系统化拆解 ===&quot;)print()</span><br><span class="line"># 1. 发现关键关系d = hint - n # = noise * (p+q+noise)print(f&quot;1. 计算hint - n:&#123;d.bit_length()&#125;位&quot;)</span><br><span class="line"># 2. 从(hint-n)中提取noise，并验证判别式noise =Nonefor_inrange(200): # 200次足够稳妥 f = pollards_rho(d) forcandin(f, d//f): # 因子 or 余因子 if30&lt;= cand.bit_length() &lt;=60andis_probable_prime(cand): S = d // cand ifis_square((S - cand)**2-4*n): noise = cand break ifnoise:</span><br><span class="line">breakassertnoiseisnotNoneprint(f&quot;2. 找到noise:&#123;noise&#125;(&#123;noise.bit_length()&#125;位)&quot;)</span><br><span class="line"># 3. 由p+q与pq求出(p,q)，还原RSA私钥并解密S = (hint - n) // noisespq = S - noiseD = spq*spq -4*nt = isqrt(D)p = (spq + t)//2q = (spq - t)//2print(f&quot;3. 验证p×q == n:&#123;p*q == n&#125;&quot;)</span><br><span class="line"># 4. 解密phi = (p-1)*(q-1)d_priv = modinv(e, phi)m = pow(c, d_priv, n)flag = m.to_bytes((m.bit_length()+7)//8,&#x27;big&#x27;)print(f&quot;4. 解密成功:&#123;flag.decode()&#125;&quot;)</span><br><span class="line">=== 从hint到完整解密的系统化拆解 ===1. 计算hint - n: 832位2. 找到noise: 942430120937 (40位)3. 验证p×q == n: True4. 解密成功: LitCTF&#123;db6f52b9265971910b306754b9df8b76&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/278447.html">https://www.ctfiot.com/278447.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E8%A7%A3%E6%9E%902025LitCTF-math.full.md">CTF大赛WP集合&#x2F;articles&#x2F;解析2025LitCTF-math.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/RSA/">RSA</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Crypto/%E8%85%BE%E8%AE%AF%E4%BA%91%E5%AE%89%E5%85%A8%E6%8C%91%E6%88%98%E8%B5%9B-COS%E6%8F%90%E6%9D%83%E4%B8%8E%E5%88%A9%E7%94%A8_WP/" title="腾讯云安全挑战赛·COS提权与利用 WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">腾讯云安全挑战赛·COS提权与利用 WP</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%902025LitCTF_leak/" title="解析2025LitCTF leak"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">解析2025LitCTF leak</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/01/01/ctf-kb/wp/Crypto/2022%E5%B9%B4%E5%B7%A5%E4%B8%9A%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-%E6%9C%9B%E5%B2%B3%E6%9D%AF-%E9%94%A6%E6%A0%87%E8%B5%9B_wp/" title="2022 工业信息安全技能大赛&quot;望岳杯&quot;锦标赛 WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">2022 工业信息安全技能大赛&quot;望岳杯&quot;锦标赛 WP</div></div></a></div><div><a href="/2024/01/01/ctf-kb/wp/Crypto/2024_%E7%BA%A2%E6%98%8E%E8%B0%B7_dualrsa/" title="红明谷 2024&#x2F;dualrsa"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">红明谷 2024&#x2F;dualrsa</div></div></a></div><div><a href="/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%90LitCTF_2025_-_Basic/" title="解析LitCTF 2025 – Basic"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-01</div><div class="title">解析LitCTF 2025 – Basic</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Misc/%E5%AE%89%E5%BE%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E6%94%BB%E9%98%B2%E8%B5%9BWriteUp/" title="安徽大学生攻防赛 WriteUp - EDI安全"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">安徽大学生攻防赛 WriteUp - EDI安全</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

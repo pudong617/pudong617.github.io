@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【一等奖方案】基于TPU平台实现人群密度估计赛题「SO-FAST」团队解题思路 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="2022 CCF BDCI TPU 密度估计冠军 SO-FAST：CSRNet + INT8 量化 + 4N Batch + 2×2 图片划分 + 推理加速。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【一等奖方案】基于TPU平台实现人群密度估计赛题「SO-FAST」团队解题思路">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Crypto/%E4%B8%80%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%9F%BA%E4%BA%8ETPU%E5%B9%B3%E5%8F%B0%E5%AE%9E%E7%8E%B0%E4%BA%BA%E7%BE%A4%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E8%B5%9B%E9%A2%98-SO-FAST-%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="2022 CCF BDCI TPU 密度估计冠军 SO-FAST：CSRNet + INT8 量化 + 4N Batch + 2×2 图片划分 + 推理加速。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="CCF BDCI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Crypto/%E4%B8%80%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%9F%BA%E4%BA%8ETPU%E5%B9%B3%E5%8F%B0%E5%AE%9E%E7%8E%B0%E4%BA%BA%E7%BE%A4%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E8%B5%9B%E9%A2%98-SO-FAST-%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【一等奖方案】基于TPU平台实现人群密度估计赛题「SO-FAST」团队解题思路',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【一等奖方案】基于TPU平台实现人群密度估计赛题「SO-FAST」团队解题思路</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="【一等奖方案】基于TPU平台实现人群密度估计赛题「SO-FAST」团队解题思路"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/124006.html">https://www.ctfiot.com/124006.html</a><br>ID: 124006</p>
+</blockquote>
+<p>2022 CCF BDCI</p>
+<p>第十届CCF大数据与计算智能大赛</p>
+<p>第十届CCF大数据与计算智能大赛（2022 CCF BDCI）已圆满结束。大赛官方竞赛平台DataFountain（简称DF平台）将陆续释出各赛题获奖队伍的方案思路。本方案为【基于TPU平台实现人群密度估计】赛题的一等奖获奖方案，赛题地址：</p>
+<p><a target="_blank" rel="noopener" href="https://www.datafountain.cn/competitions/583%EF%BC%88%E6%88%B3%E5%BA%95%E9%83%A8%E2%80%9C%E9%98%85%E8%AF%BB%E5%8E%9F%E6%96%87%E2%80%9D%E5%8F%AF%E7%9B%B4%E8%BE%BE%EF%BC%89">https://www.datafountain.cn/competitions/583（戳底部“阅读原文”可直达）</a></p>
+<p>获奖团队简介</p>
+<p>团队名称：SO-FAST</p>
+<p>团队成员：SO-FAST的团队成员共3人，包括来自京东科技的算法工程师宋礼，他主要从事人工智能算法在城市场景的工程化落地。柯嵩宇，来自上海交通大学的在读博士生，他的主要研究是人工智能和数据挖掘领域，他对计算机硬件和并行计算等有深入了解。 包锴楠来自西南交通大学的在读硕士生，他主要研究深度学习、自动机器学习的应用。团队成员在深度学习和人工智能的工程化落地工作中具有丰富的经验，支持了JRTC中智能降噪技术在音视频会议场景下的优化等。团队成员追求速度的极致，曾致力于自动机器学习技术在城市场景中的加速优化，完成面向时空数据的自动机器学习算法库EAST等。</p>
+<p>在本次竞赛的过程中，宋礼负责比赛方案的设计和模型的量化工作，柯嵩宇负责了模型量化后的模型优化工作，包锴楠负责模型部署过程中的推理加速工作。</p>
+<p>所获奖项：一等奖</p>
+<p>摘要</p>
+<p>基于TPU平台实现人群密度估计致力于人群密度估计任务在TPU平台的落地。人群密度估计是计算机视觉中的一项重要任务，在城市中的人群聚集预警、公共空间设计、城市规划等领域具有辅助意义。实际的应用场景通常面临功耗、成本、实时性等指标要求。基于TPU平台实现人群密度估计题目要求使用算能提供的低功耗的TPU算力实现精度更高、速度更快的人群密度估计算法。</p>
+<p>为实现人群密度估计算法在TPU平台的部署，我们的实施步骤主要包括以下5个流程。</p>
+<p>第一步，模型选择。通过对预训练模型的理论效果分析和实际模型推理效果在测试集上的指标评估，对比不同模型的最终得分，从而选定预训练模型。</p>
+<p>第二步，模型量化。为了使用TPU平台的强大计算能力，需要使用算能的量化工具对模型进行量化，并评估量化后模型的精度。</p>
+<p>第三步，精度调优。对量化后模型的精度进行调优，一般量化使用INT8类型的数据来替代FALOT32类型的数据从而加速计算，该过程会引入模型精度的损失。我们主要通过筛选图片构建用于量化的数据集来较少模型精度的损失。</p>
+<p>第四步，推理加速。实现模型部署过程中的推理加速，通过分析模型推理过程中的核心耗时部分，我们针对性地使用了4N Batch和图片划分等方式，提升模型的推理速度。</p>
+<p>最后，部署实测。我们将模型部署到BM1684平台，测试模型的实际性能，最终的评估结果表明我们的方案在A&#x2F;B榜的测试数据上均获得了第一名。</p>
+<p>关键词</p>
+<p>人群密度估计，TPU，模型量化，模型部署</p>
+<p>赛题介绍</p>
+<p>图1 ：人群密度估计任务</p>
+<p>基于TPU平台实现人群密度估计[1]要求参赛者使用预训练的模型，将模型部署到算能提供TPU平台[2]上。如图1所示人群密度估计，输入一个高质量的图片，然后通过人群密度估计模型实现人群密度的估计。人群密度估计是计算机视觉中的一项重要任务，在人群聚集预警、人群疏散、城市公共空间设计等任务中具有重要辅助作用。然而实际的模型部署依然面临很大的挑战，如推理的功耗、网络带宽、推理时延等。在模型部署的过程中需要兼顾模型的精度和模型的推理速度。本次任务采用以下综合评分：</p>
+<p>score &#x3D;（250 – maescore）* 0.2 +（500 – rmsescore）* 0.1+（0.4-naescore）* 200 +（2 – timescore）* 100</p>
+<p>其中， maescore、rmsescore、naescore是用于评估模型估计人群密度和真实人群密度的误差，要求误差越低越好。是模型的平均推理时间，要求推理时间越低越好。</p>
+<p>解题思路</p>
+<p>我们的实施方案一共包含5个步骤，下面我们将分别介绍每部分的内容。</p>
+<p>2.1 预训练模型评估</p>
+<p>我们首先从理论上分析每个模型的精度上限，并选择未量化的模型在测试数据集（A榜）评估模型的实际效果。测试结果如图2所示。</p>
+<p>图2 ：人群密度估计任务</p>
+<p>由于模型在部署的过程中除了要求考虑模型的精度，还要考虑模型的计算量，我们选择精度最高和精度最差的两个模型同时进行后续的量化和部署的过程。</p>
+<p>2.2 模型量化</p>
+<p>模型量化可以支持将模型量化成FLOAT32和INT8两种类型，其中，FLOAT32的数据类型可以实现更高的精度，但推理速度会慢很多。INT8的数据类型会损失一定的模型精度，但可以使用TPU提供的强大算力，极大的加速模型的推理过程。我们基于CSRNet[3]测试了模型量化成两种不同数据类型的最终评分情况，测试结果如图3 所示。从图中可以看出，虽然FP32模型的精度更高，但在实际的推理过程中消耗了太多的时间，导致最后评分不如INT8的模型。于是在后续的量化和优化过程中，我们选择使用INT8的数据类型。</p>
+<p>图3 ：量化为不同数据类型性能对比</p>
+<p>由于竞赛平台提供了模型量化的示例，我们不再赘述，具体的操作可以参考链接[4]。具体我们使用的量化和量化的过程参考链接[5]。值得注意的是，我们在量化过程中支持了4N Batch推理模型，其中量化使用的命令如下。4N Batch对于模型推理的加速效果参考2.4推理加速。</p>
+<p>图4 ：4N Batch量化指令</p>
+<p>2.3 模型优化</p>
+<p>由于将FLOAT32的数据类型，量化为了INT8的数据类型，这就导致计算过程中误差的累计，从而导致最终估计人群密度的精度降低。我们主要通过对量化图片的选择来提升量化后模型的性能。具体来说，传统的量化方式通过若干张图片作为输入，计算模型中间网络层的最大值和最小值，然后将该区间映射到INT8的范围内。由于可能选择的图片差距很大，这样会使得中间层网络需要表达的范围增大，从而使得在映射到INT8的时候数据的误差较大。基于上述考虑，我们在量化的过程中对输入的图片进行筛选，从而保证输入的图片尽可能相似。目前，我们主要通过手动的方式进行量化图片的选择（选择的准则是图片中包含大规模的人群，且具有更加广泛的色差），后续我们会考虑评估如何自动化的选择量化图片。具体来说，我们选择了NWPU-Crowd数据集中的第178张图片，如图5所示。我们评估了量化方式对人群密度估计精度的提升，结果如图6所示。可以看出，使用我们的量化方式，相比传统的量化方式具有明显的效果提升。</p>
+<p>图5 ：用于模型量化的图片</p>
+<p>图6 ：CSRNet使用不同量化数据集的效果对比</p>
+<p>2.4 推理加速</p>
+<p>我们首先分析在模型推理过程中核心耗时的部分，然后进行针对性的优化。根据我们的测试和观察推理过程中的耗时主要在多次调用TPU进行推理。基于此，我们主要进行两个方面的优化，优化需要调用TPU的推理次数和增加单次调用推理图片的数量。</p>
+<p>优化1：TPU的推理次数。如图7所示，由于原始的输出图片的尺寸很大，最大为2048×2048像素，而我们模型的输入张量的大小为576×768像素，所以我们需要将原始一张输入图片进行划分多个输入传入模型，然后融合多个子图片的结果，得到最终的人群密度估计数据。一方面对于单张输入图片需要推理的次数很多，如图 7需要至少进行9次模型推理调用；另一方面，由于对于图片的划分是存在重叠的（不能丢弃子图片，否则丢失子图片中的人群密度没有估计，可能造成较大的误差），而右边区域和下边区域的利用率是不高的。于是，我们首先对输入图片进行尺寸变换（Resize）。具体地，我们测试了尺寸变换为1张图片和2×2&#x3D;4张图片的评分变化，结果如图8所示，从图中可以看出，当尺寸变换为1时，模型的精度具有很大程度的损失。尺寸变换为4时可以取得较好的精度和推理时间的平衡，其中推理精度部分的得分从14.9分降低为7.11分，但推理时间从平均1.07s降低到平均0.5s，总体分数的提升约50分。</p>
+<p>图7 ：优化的图像划分方式</p>
+<p>图8 ：不同划分方式的精度对比</p>
+<p>优化2: 4N Batch推理模式。目前在人群密度估计时，对于每个子图均需要调用一次推理过程，其推理时间和调用次数是线性相关的。4N Batch模式利用INT8数据类型和INT32数据类型之间的关系，在推理的过程中一次使用4N个图片输入，加入模型的推理过程，其过程如图9所示。经测试相比于单次的4次推理，4N Batch一次推理4张图片约可以降低一半的时间（以CSRNet为例，4张图片的推理时间约为0.51s，4N Batch单次推理4张图片的时间为0.27s）。</p>
+<p>图9 ：4N Batch推理模式</p>
+<p>除了上述的核心优化点外，我们还尝试了对推理代码的其他部分进行优化，包括使用的输入数据类型、读取图片的库的使用、后处理逻辑的优化等，具体实现参考[5]。</p>
+<p>2.5 部署测试</p>
+<p>将编译完成的模型和推理代码上传到算能TPU平台，即可完成推理测试。我们最终获得了A&#x2F;B榜均为Top 1的性能，其中A榜得分229.73分，B榜得分263.78分。</p>
+<p>致谢</p>
+<p>感谢CCF大数据与计算智能大赛组委会、中国计算机学会和北京算能科技有限公司举办的第十届大赛，给我们提供了学习和实践的机会。感谢算能提供的TPU算力平台，让我们不断实践和完善想法。</p>
+<p>参考</p>
+<p>[1] DataFountain，基于TPU平台实现人群密度估计，<a target="_blank" rel="noopener" href="https://www.datafountain.cn/competitions/583">https://www.datafountain.cn/competitions/583</a></p>
+<p>[2]  算能，算能产品介绍，<a target="_blank" rel="noopener" href="https://sophon.cn/product/index.html">https://sophon.cn/product/index.html</a></p>
+<p>[3]  Li Yuhong and Zhang Xiaofan and Chen Deming, CSRNet: Dilated Convolutional Neural Networks for Understanding the Highly Congested Scenes, Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, 1091-1100, 2018.</p>
+<p>[4]  算能，CCF-Contest-Demo, <a target="_blank" rel="noopener" href="https://github.com/sophon-ai-algo/contest-demos">https://github.com/sophon-ai-algo/contest-demos</a></p>
+<p>[5]  SO-FAST， 基于TPU平台实现人群密度估计 SO-FAST 题解， <a target="_blank" rel="noopener" href="https://github.com/LeeSongt/SO-FAST">https://github.com/LeeSongt/SO-FAST</a></p>
+<p>—End—</p>
+<p>戳“阅读原文”，速来参赛办赛~</p>
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/124006.html">https://www.ctfiot.com/124006.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E3%80%90%E4%B8%80%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88%E3%80%91%E5%9F%BA%E4%BA%8ETPU%E5%B9%B3%E5%8F%B0%E5%AE%9E%E7%8E%B0%E4%BA%BA%E7%BE%A4%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E8%B5%9B%E9%A2%98%E3%80%8CSO-FAST%E3%80%8D%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF.full.md">CTF大赛WP集合&#x2F;articles&#x2F;【一等奖方案】基于TPU平台实现人群密度估计赛题「SO-FAST」团队解题思路.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CCF-BDCI/">CCF BDCI</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Crypto/m1z0r3CTF2022_%E4%BD%9C-%E5%95%8F%E9%A1%8C-writeup/" title="m1z0r3CTF 2022 作った問題 &amp; writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">m1z0r3CTF 2022 作った問題 &amp; writeup</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Crypto/%E4%B8%80%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%B7%A5%E4%B8%9A%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96-%E9%AB%98%E7%AB%AF%E8%A3%85%E5%A4%87%E5%88%B6%E9%80%A0%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E8%87%AA%E5%8A%A8%E5%8C%96%E6%9E%84%E5%BB%BA-%E9%BE%99%E7%9B%88%E6%88%98%E9%98%9F-%E5%9B%A2%E9%98%9F%E6%80%9D%E8%B7%AF/" title="【一等奖方案】工业知识图谱关系抽取-高端装备制造知识图谱自动化构建「龙盈战队」团队思路"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【一等奖方案】工业知识图谱关系抽取-高端装备制造知识图谱自动化构建「龙盈战队」团队思路</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/01/01/ctf-kb/wp/Crypto/%E4%B8%80%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%B7%A5%E4%B8%9A%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96-%E9%AB%98%E7%AB%AF%E8%A3%85%E5%A4%87%E5%88%B6%E9%80%A0%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E8%87%AA%E5%8A%A8%E5%8C%96%E6%9E%84%E5%BB%BA-%E9%BE%99%E7%9B%88%E6%88%98%E9%98%9F-%E5%9B%A2%E9%98%9F%E6%80%9D%E8%B7%AF/" title="【一等奖方案】工业知识图谱关系抽取-高端装备制造知识图谱自动化构建「龙盈战队」团队思路"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">【一等奖方案】工业知识图谱关系抽取-高端装备制造知识图谱自动化构建「龙盈战队」团队思路</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

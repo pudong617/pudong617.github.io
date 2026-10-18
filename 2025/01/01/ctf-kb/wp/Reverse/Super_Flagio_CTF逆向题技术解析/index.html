@@ -1,0 +1,349 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Super Flagio CTF 逆向题技术解析 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="Super Flagio CTF：cocos2d-x Android 游戏逆向，XXTEA 解 LuaJIT + 自定义 opcode VM 还原。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Super Flagio CTF 逆向题技术解析">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/Super_Flagio_CTF%E9%80%86%E5%90%91%E9%A2%98%E6%8A%80%E6%9C%AF%E8%A7%A3%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="Super Flagio CTF：cocos2d-x Android 游戏逆向，XXTEA 解 LuaJIT + 自定义 opcode VM 还原。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="cocos2d-x">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/Super_Flagio_CTF%E9%80%86%E5%90%91%E9%A2%98%E6%8A%80%E6%9C%AF%E8%A7%A3%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Super Flagio CTF 逆向题技术解析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Super Flagio CTF 逆向题技术解析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Super Flagio CTF 逆向题技术解析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/283888.html">https://www.ctfiot.com/283888.html</a><br>ID: 283888</p>
+</blockquote>
+<p>Super Flagio CTF逆向题技术解析</p>
+<p>题目概述</p>
+<p>本题是一道基于cocos2d-x游戏引擎开发的Android逆向题目，附件为flagio.apk。这是一个模仿超级马里奥风格的游戏，玩家需要通过逆向分析找出正确的flag输入。</p>
+<p>第一步：解压APK分析文件结构</p>
+<p>首先使用unzip解压APK文件，查看其内部结构：</p>
+<p>ounter(lineounter(linemkdir extracted &amp;&amp; cd extractedunzip ..&#x2F;flagio.apk</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineextracted&#x2F;├── assets&#x2F;│ ├── res&#x2F; # 游戏资源文件（图片、音效）│ └── src&#x2F; # 加密的Lua脚本│ ├── 1024446525&#x2F;│ ├── 1975478612&#x2F; # 包含核心检查逻辑│ │ └── 526018661 # checker脚本（1323字节）│ ├── 33309236&#x2F;│ ├── 3914622949&#x2F;│ └── 537350069├── lib&#x2F;│ └── arm64-v8a&#x2F;│ └── libgame.so # 游戏核心库（ARM64架构）├── classes.dex└── AndroidManifest.xml</p>
+<p>cocos2d-x框架：assets&#x2F;src目录下存放Lua脚本是cocos2d-x的典型特征</p>
+<p>脚本加密：文件名是数字哈希而非.lua扩展名，说明经过混淆处理</p>
+<p>64位架构：lib目录只有arm64-v8a，说明是64位应用</p>
+<p>核心逻辑在Native层：libgame.so是主要分析目标</p>
+<p>ounter(linestrings lib&#x2F;arm64-v8a&#x2F;libgame.so | grep -E “XXTEA|main.py|luajit|key”</p>
+<p>ounter(lineounter(lineounter(lineounter(linemain.py.&#x2F;?.py;&#x2F;usr&#x2F;local&#x2F;share&#x2F;luajit-2.1.0-beta3&#x2F;?.pyXXTEAxctf-flagio-2dx</p>
+<p>LuaJIT 2.1.0-beta3：使用的Lua引擎版本，这决定了字节码格式</p>
+<p>XXTEA：cocos2d-x框架常用的脚本加密算法</p>
+<p>xctf-flagio-2dx：这是XXTEA加密的密钥</p>
+<p>实现简单，代码量小</p>
+<p>加解密速度快</p>
+<p>安全性适中，足以防止简单的脚本窃取</p>
+<p>ounter(linexxd assets&#x2F;src&#x2F;1975478612&#x2F;526018661 | head -5</p>
+<p>ounter(lineounter(line00000000: ffff dbee 6600 0000 1f22 412c 0000 000000000010: 8e0d 0000 4f28 1291 20b2 5ac3 fee5 0c51</p>
+<p>字节0-1: 0xFFFF（签名标识）</p>
+<p>字节2-5: 0xDBEE66（加密标志，表示使用XXTEA）</p>
+<p>字节6+: 加密后的数据</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineAppDelegate::<br>applicationDidFinishLaunching └─&gt; LuaEngine::<br>executeScriptFile(“main.py”) └─&gt; LuaStack::<br>executeScriptFile └─&gt; FileUtils::<br>getDataFromFile &#x2F;&#x2F; 读取并解密文件 └─&gt; XXTEA解密 └─&gt; luaLoadBuffer &#x2F;&#x2F; 加载解密后的字节码</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line&#x2F;&#x2F; hook luaLoadBuffer，第二个参数即为解密后的字节码Interceptor.attach(Module.findExportByName(“libgame.so”, “luaL_loadbuffer”), { onEnter: function(args) { var size &#x3D; args[2].toInt32(); var bytecode &#x3D; Memory.readByteArray(args[1], size); &#x2F;&#x2F; 保存bytecode到文件 }});</p>
+<p>opcode顺序被修改：标准LuaJIT的opcode顺序被重新排列</p>
+<p>64位适配问题：需要处理LuaJIT64的双插槽机制</p>
+<p>参照LuaJIT官方GitHub项目的src&#x2F;vm_arm64.dasc汇编源码</p>
+<p>在IDA中找到LuaJIT的dispatch table</p>
+<p>逐个对照每条指令的处理函数</p>
+<p>建立修改后的opcode与标准opcode的映射关系</p>
+<p>重置opcode顺序映射表</p>
+<p>适配LuaJIT64的双插槽机制（64位环境下某些常量占用两个槽位）</p>
+<p>修改字节码解析逻辑</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineslot0.slot &#x3D; { {}, – slot[1]: 指令数组 {} – slot[2]: 内存数组（256字节）}slot0.slot[3] &#x3D; 0 – 寄存器1slot0.slot[4] &#x3D; 0 – 寄存器2slot0.slot[5] &#x3D; 1 – 指令指针(IP)slot0.slot[6] &#x3D; 0 – 栈指针(SP)</p>
+<p>slot[2][33-64]：用户输入的flag（32字节，对应ASCII字符）</p>
+<p>slot[2][129-160]：预设的密文数组（32字节，用于验证）</p>
+<p>slot[2][224-255]：加密后的结果存储区</p>
+<p>ounter(lineounter(line[94, 106, 91, 110, 86, 100, 82, 20, 32, 20, 80, 21, 83, 107, 88, 98,81, 19, 79, 10, 49, 117, 68, 120, 61, 13, 75, 115, 48, 8, 76, 123]</p>
+<p>Opcode</p>
+<p>十进制</p>
+<p>助记符</p>
+<p>操作数</p>
+<p>功能描述</p>
+<p>0x11</p>
+<p>17</p>
+<p>INC_INPUT</p>
+<p>n</p>
+<p>input[n]++ 输入字节自增</p>
+<p>0x12</p>
+<p>18</p>
+<p>DEC_INPUT</p>
+<p>n</p>
+<p>input[n]– 输入字节自减</p>
+<p>0x21</p>
+<p>33</p>
+<p>INC_REG</p>
+<p>r</p>
+<p>reg[r-8]++ 寄存器自增</p>
+<p>0x22</p>
+<p>34</p>
+<p>DEC_REG</p>
+<p>r</p>
+<p>reg[r-8]– 寄存器自减</p>
+<p>0x23</p>
+<p>35</p>
+<p>XOR_IMM</p>
+<p>r, imm</p>
+<p>reg[r-8] ^&#x3D; imm 与立即数异或</p>
+<p>0x24</p>
+<p>36</p>
+<p>XOR_REG</p>
+<p>r1, r2</p>
+<p>reg[r1-8] ^&#x3D; reg[r2-8] 寄存器间异或</p>
+<p>0x25</p>
+<p>37</p>
+<p>POP_REG</p>
+<p>r</p>
+<p>reg[r-8] &#x3D; pop() 弹栈到寄存器</p>
+<p>0x31</p>
+<p>49</p>
+<p>POP_OUT</p>
+<p>n</p>
+<p>output[n] &#x3D; pop() 弹栈到输出</p>
+<p>0x32</p>
+<p>50</p>
+<p>PUSH_IN</p>
+<p>n</p>
+<p>push(input[n]) 输入压栈</p>
+<p>0x41</p>
+<p>65</p>
+<p>PUSH_IMM</p>
+<p>imm</p>
+<p>push(imm) 立即数压栈</p>
+<p>0x42</p>
+<p>66</p>
+<p>PUSH_REG</p>
+<p>r</p>
+<p>push(reg[r-8]) 寄存器压栈</p>
+<p>0x90</p>
+<p>144</p>
+<p>RET</p>
+<p>–</p>
+<p>返回</p>
+<p>ili函数：实现二进制异或运算（逐位比较）</p>
+<p>lil函数：实现带溢出处理的加减运算</p>
+<p>oOo函数：验证加密结果是否与预设密文匹配</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineinst &#x3D; [65, 30, 37, 10, 50, 0, 37, 11, 36, 10, 11, 34, 10, 66, 10, 49, 0, …]vm_ip &#x3D; 0stack_ptr &#x3D; 0while vm_ip &lt; len(inst): opcode &#x3D; inst[vm_ip] operand1 &#x3D; inst[vm_ip + 1] if opcode &#x3D;&#x3D; 0x41: # PUSH_IMM stack_ptr +&#x3D; 1 print(f”push({operand1}) &#x2F;&#x2F; -&gt; stack[{stack_ptr}]”) vm_ip +&#x3D; 2 elif opcode &#x3D;&#x3D; 0x25: # POP_REG print(f”reg{operand1 - 8} &#x3D; pop() &#x2F;&#x2F; stack[{stack_ptr}]”) stack_ptr -&#x3D; 1 vm_ip +&#x3D; 2 elif opcode &#x3D;&#x3D; 0x32: # PUSH_IN stack_ptr +&#x3D; 1 print(f”push(input[{operand1}]) &#x2F;&#x2F; -&gt; stack[{stack_ptr}]”) vm_ip +&#x3D; 2 elif opcode &#x3D;&#x3D; 0x24: # XOR_REG operand2 &#x3D; inst[vm_ip + 2] print(f”reg{operand1 - 8} ^&#x3D; reg{operand2 - 8}”) vm_ip +&#x3D; 3 elif opcode &#x3D;&#x3D; 0x22: # DEC_REG print(f”reg{operand1 - 8}–”) vm_ip +&#x3D; 2 elif opcode &#x3D;&#x3D; 0x21: # INC_REG print(f”reg{operand1 - 8}++”) vm_ip +&#x3D; 2 elif opcode &#x3D;&#x3D; 0x42: # PUSH_REG stack_ptr +&#x3D; 1 print(f”push(reg{operand1 - 8}) &#x2F;&#x2F; -&gt; stack[{stack_ptr}]”) vm_ip +&#x3D; 2 elif opcode &#x3D;&#x3D; 0x31: # POP_OUT print(f”output[{operand1}] &#x3D; pop() &#x2F;&#x2F; stack[{stack_ptr}]”) stack_ptr -&#x3D; 1 vm_ip +&#x3D; 2 elif opcode &#x3D;&#x3D; 0x90: # RET print(“return”) vm_ip +&#x3D; 1 else: break</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(linepush(30) &#x2F;&#x2F; 常量30入栈reg2 &#x3D; pop() &#x2F;&#x2F; reg2 &#x3D; 30push(input[0]) &#x2F;&#x2F; 输入第一字节入栈reg3 &#x3D; pop() &#x2F;&#x2F; reg3 &#x3D; input[0]reg2 ^&#x3D; reg3 &#x2F;&#x2F; reg2 &#x3D; 30 ^ input[0]reg2– &#x2F;&#x2F; reg2 &#x3D; (30 ^ input[0]) - 1push(reg2)output[0] &#x3D; pop() &#x2F;&#x2F; output[0] &#x3D; (input[0] ^ 30) - 1</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(linepush(output[i-1]) &#x2F;&#x2F; 前一个输出入栈reg2 &#x3D; pop() &#x2F;&#x2F; reg2 &#x3D; output[i-1]push(input[i]) &#x2F;&#x2F; 当前输入入栈reg3 &#x3D; pop() &#x2F;&#x2F; reg3 &#x3D; input[i]reg2 ^&#x3D; reg3 &#x2F;&#x2F; reg2 &#x3D; output[i-1] ^ input[i]reg2++ 或 reg2– &#x2F;&#x2F; 根据位置奇偶性决定push(reg2)output[i] &#x3D; pop()</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line<br>def encrypt(plaintext): buf &#x3D; list(plaintext) # 32字节输入 # 第一个字节：与常量30异或后减1 buf[0] &#x3D; (buf[0] ^ 30) - 1 # 后续字节：链式加密 for i in range(1, 32): # 与前一个加密结果异或 buf[i] ^&#x3D; buf[i - 1] # 根据位置进行加减操作 if i % 2 &#x3D;&#x3D; 0 or i &#x3D;&#x3D; 31: buf[i] -&#x3D; 1 # 偶数位置和最后一位减1 else: buf[i] +&#x3D; 1 # 奇数位置加1 buf[i] &amp;&#x3D; 0xFF # 保持在字节范围内 return buf</p>
+<p>链式依赖：每个输出字节依赖于前一个输出字节，形成加密链</p>
+<p>异或混淆：使用XOR操作是对称加密的基础</p>
+<p>奇偶差异处理：奇数和偶数位置采用不同的加减操作，增加复杂性</p>
+<p>边界特殊处理：第一字节使用固定常量，最后一字节归类为”偶数”处理</p>
+<p>任意一个字节的错误都会导致后续所有字节错误（雪崩效应）</p>
+<p>无法单独破解某一位，必须从头开始</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line#!&#x2F;usr&#x2F;bin&#x2F;env python3”””Super Flagio CTF - Flag解密脚本”””# 密文数组（从反编译结果中提取）cipher &#x3D; [94, 106, 91, 110, 86, 100, 82, 20, 32, 20, 80, 21, 83, 107, 88, 98, 81, 19, 79, 10, 49, 117, 68, 120, 61, 13, 75, 115, 48, 8, 76, 123]def decrypt(ciphertext): result &#x3D; ciphertext.copy() # 关键：从后向前解密（逆序处理链式依赖） for i in range(31, 0, -1): # 逆向加减操作 if i % 2 &#x3D;&#x3D; 0 or i &#x3D;&#x3D; 31: result[i] &#x3D; (result[i] + 1) &amp; 0xFF # 原来-1，现在+1 else: result[i] &#x3D; (result[i] - 1) &amp; 0xFF # 原来+1，现在-1 # 逆向异或操作（与前一字节异或） result[i] ^&#x3D; result[i - 1] # 第一字节的逆向处理 result[0] &#x3D; ((result[0] + 1) ^ 30) &amp; 0xFF return result</p>
+<h1 id="执行解密decrypted-decrypt-cipher-flag-‘’-join-chr-c-for-c-in-decrypted-print-f”Flag-flag-”"><a href="#执行解密decrypted-decrypt-cipher-flag-‘’-join-chr-c-for-c-in-decrypted-print-f”Flag-flag-”" class="headerlink" title="执行解密decrypted &#x3D; decrypt(cipher)flag &#x3D; ‘’.join(chr(c) for c in decrypted)print(f”Flag: {flag}”)"></a>执行解密decrypted &#x3D; decrypt(cipher)flag &#x3D; ‘’.join(chr(c) for c in decrypted)print(f”Flag: {flag}”)</h1><p>为什么要从后向前？</p>
+<p>加密时buf[i]依赖buf[i-1]的加密结果</p>
+<p>解密时需要用密文的buf[i-1]来还原buf[i]</p>
+<p>从后向前可以保证每次使用的buf[i-1]都是原始密文值</p>
+<p>逆运算关系</p>
+<p>加密：+1 -&gt; 解密：-1</p>
+<p>加密：-1 -&gt; 解密：+1</p>
+<p>加密：XOR -&gt; 解密：XOR（异或运算是自逆的）</p>
+<p>第一字节特殊处理</p>
+<p>加密：(input ^ 30) – 1 &#x3D; cipher</p>
+<p>解密：(cipher + 1) ^ 30 &#x3D; input</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line密文数组:[94, 106, 91, 110, 86, 100, 82, 20, 32, 20, 80, 21, 83, 107, 88, 98,81, 19, 79, 10, 49, 117, 68, 120, 61, 13, 75, 115, 48, 8, 76, 123]解密结果（字节）:[65, 55, 54, 54, 57, 53, 55, 65, 53, 51, 69, 68, 65, 57, 50, 57,48, 67, 67, 70, 56, 69, 48, 51, 70, 49, 65, 57, 66, 55, 69, 48]Flag: A766957A53EDA9290CCF8E03F1A9B7E0验证成功！解密结果正确！</p>
+<p>游戏界面有两排砖块，上排对应flag的前16个字符，下排对应后16个字符</p>
+<p>玩家需要按照flag的顺序依次顶对应的砖块</p>
+<p>输入正确后，顶问号块会出现蘑菇</p>
+<p>吃掉蘑菇后碰板栗，墙壁消失</p>
+<p>触碰旗帜完成通关</p>
+<p>APK文件结构分析</p>
+<p>Native库（.so文件）静态分析</p>
+<p>字符串搜索和交叉引用</p>
+<p>cocos2d-x框架架构理解</p>
+<p>Lua脚本加载机制分析</p>
+<p>XXTEA加密算法识别与破解</p>
+<p>LuaJIT字节码格式理解</p>
+<p>自定义opcode映射还原</p>
+<p>反编译器修改适配64位</p>
+<p>自定义VM架构逆向</p>
+<p>指令集完整还原</p>
+<p>执行流程模拟与跟踪</p>
+<p>链式加密算法识别</p>
+<p>逆向算法数学推导</p>
+<p>解密脚本编写与验证</p>
+<p>技术：XXTEA加密Lua脚本</p>
+<p>目的：防止直接查看游戏逻辑</p>
+<p>破解：提取密钥后解密</p>
+<p>技术：修改LuaJIT opcode顺序</p>
+<p>目的：阻止标准反编译器工作</p>
+<p>破解：对照分析还原映射表</p>
+<p>技术：核心算法用自定义VM实现</p>
+<p>目的：增加逆向分析难度</p>
+<p>破解：还原指令集并模拟执行</p>
+<p>技术：JNI_OnLoad中包含检测</p>
+<p>目的：阻止动态调试</p>
+<p>破解：绕过或patch检测代码</p>
+<p>ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line#!&#x2F;usr&#x2F;bin&#x2F;env python3”””Super Flagio CTF - 完整解题脚本”””# 密文数组（从虚拟机分析中提取）cipher &#x3D; [94, 106, 91, 110, 86, 100, 82, 20, 32, 20, 80, 21, 83, 107, 88, 98, 81, 19, 79, 10, 49, 117, 68, 120, 61, 13, 75, 115, 48, 8, 76, 123]# 从后向前解密for i in range(31, 0, -1): # 逆向加减操作 if i % 2 &#x3D;&#x3D; 0 or i &#x3D;&#x3D; 31: cipher[i] +&#x3D; 1 else: cipher[i] -&#x3D; 1 cipher[i] &amp;&#x3D; 0xFF # 逆向异或操作 cipher[i] ^&#x3D; cipher[i - 1]# 第一字节cipher[0] &#x3D; (cipher[0] + 1) ^ 30</p>
+<h1 id="输出结果flag-‘’-join-chr-c-for-c-in-cipher-print-flag"><a href="#输出结果flag-‘’-join-chr-c-for-c-in-cipher-print-flag" class="headerlink" title="输出结果flag &#x3D; ‘’.join(chr(c) for c in cipher)print(flag)"></a>输出结果flag &#x3D; ‘’.join(chr(c) for c in cipher)print(flag)</h1><h1 id="A766957A53EDA9290CCF8E03F1A9B7E0"><a href="#A766957A53EDA9290CCF8E03F1A9B7E0" class="headerlink" title="A766957A53EDA9290CCF8E03F1A9B7E0"></a>A766957A53EDA9290CCF8E03F1A9B7E0</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">ounter(lineounter(linemkdir extracted &amp;&amp; cd extractedunzip ../flagio.apk</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineextracted/├── assets/│ ├── res/ # 游戏资源文件（图片、音效）│ └── src/ # 加密的Lua脚本│ ├── 1024446525/│ ├── 1975478612/ # 包含核心检查逻辑│ │ └── 526018661 # checker脚本（1323字节）│ ├── 33309236/│ ├── 3914622949/│ └── 537350069├── lib/│ └── arm64-v8a/│ └── libgame.so # 游戏核心库（ARM64架构）├── classes.dex└── AndroidManifest.xml</span><br><span class="line">ounter(linestrings lib/arm64-v8a/libgame.so | grep -E &quot;XXTEA|main.py|luajit|key&quot;</span><br><span class="line">ounter(lineounter(lineounter(lineounter(linemain.py./?.py;/usr/local/share/luajit-2.1.0-beta3/?.pyXXTEAxctf-flagio-2dx</span><br><span class="line">ounter(linexxd assets/src/1975478612/526018661 | head -5</span><br><span class="line">ounter(lineounter(line00000000: ffff dbee 6600 0000 1f22 412c 0000 000000000010: 8e0d 0000 4f28 1291 20b2 5ac3 fee5 0c51</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineAppDelegate::</span><br><span class="line">applicationDidFinishLaunching └─&gt; LuaEngine::</span><br><span class="line">executeScriptFile(&quot;main.py&quot;) └─&gt; LuaStack::</span><br><span class="line">executeScriptFile └─&gt; FileUtils::</span><br><span class="line">getDataFromFile // 读取并解密文件 └─&gt; XXTEA解密 └─&gt; luaLoadBuffer // 加载解密后的字节码</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line// hook luaLoadBuffer，第二个参数即为解密后的字节码Interceptor.attach(Module.findExportByName(&quot;libgame.so&quot;, &quot;luaL_loadbuffer&quot;), &#123; onEnter: function(args) &#123; var size = args[2].toInt32(); var bytecode = Memory.readByteArray(args[1], size); // 保存bytecode到文件 &#125;&#125;);</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineslot0.slot = &#123; &#123;&#125;, -- slot[1]: 指令数组 &#123;&#125; -- slot[2]: 内存数组（256字节）&#125;slot0.slot[3] = 0 -- 寄存器1slot0.slot[4] = 0 -- 寄存器2slot0.slot[5] = 1 -- 指令指针(IP)slot0.slot[6] = 0 -- 栈指针(SP)</span><br><span class="line">ounter(lineounter(line[94, 106, 91, 110, 86, 100, 82, 20, 32, 20, 80, 21, 83, 107, 88, 98,81, 19, 79, 10, 49, 117, 68, 120, 61, 13, 75, 115, 48, 8, 76, 123]</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineinst = [65, 30, 37, 10, 50, 0, 37, 11, 36, 10, 11, 34, 10, 66, 10, 49, 0, ...]vm_ip = 0stack_ptr = 0while vm_ip &lt; len(inst): opcode = inst[vm_ip] operand1 = inst[vm_ip + 1] if opcode == 0x41: # PUSH_IMM stack_ptr += 1 print(f&quot;push(&#123;operand1&#125;) // -&gt; stack[&#123;stack_ptr&#125;]&quot;) vm_ip += 2 elif opcode == 0x25: # POP_REG print(f&quot;reg&#123;operand1 - 8&#125; = pop() // stack[&#123;stack_ptr&#125;]&quot;) stack_ptr -= 1 vm_ip += 2 elif opcode == 0x32: # PUSH_IN stack_ptr += 1 print(f&quot;push(input[&#123;operand1&#125;]) // -&gt; stack[&#123;stack_ptr&#125;]&quot;) vm_ip += 2 elif opcode == 0x24: # XOR_REG operand2 = inst[vm_ip + 2] print(f&quot;reg&#123;operand1 - 8&#125; ^= reg&#123;operand2 - 8&#125;&quot;) vm_ip += 3 elif opcode == 0x22: # DEC_REG print(f&quot;reg&#123;operand1 - 8&#125;--&quot;) vm_ip += 2 elif opcode == 0x21: # INC_REG print(f&quot;reg&#123;operand1 - 8&#125;++&quot;) vm_ip += 2 elif opcode == 0x42: # PUSH_REG stack_ptr += 1 print(f&quot;push(reg&#123;operand1 - 8&#125;) // -&gt; stack[&#123;stack_ptr&#125;]&quot;) vm_ip += 2 elif opcode == 0x31: # POP_OUT print(f&quot;output[&#123;operand1&#125;] = pop() // stack[&#123;stack_ptr&#125;]&quot;) stack_ptr -= 1 vm_ip += 2 elif opcode == 0x90: # RET print(&quot;return&quot;) vm_ip += 1 else: break</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(linepush(30) // 常量30入栈reg2 = pop() // reg2 = 30push(input[0]) // 输入第一字节入栈reg3 = pop() // reg3 = input[0]reg2 ^= reg3 // reg2 = 30 ^ input[0]reg2-- // reg2 = (30 ^ input[0]) - 1push(reg2)output[0] = pop() // output[0] = (input[0] ^ 30) - 1</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(linepush(output[i-1]) // 前一个输出入栈reg2 = pop() // reg2 = output[i-1]push(input[i]) // 当前输入入栈reg3 = pop() // reg3 = input[i]reg2 ^= reg3 // reg2 = output[i-1] ^ input[i]reg2++ 或 reg2-- // 根据位置奇偶性决定push(reg2)output[i] = pop()</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line</span><br><span class="line">def encrypt(plaintext): buf = list(plaintext) # 32字节输入 # 第一个字节：与常量30异或后减1 buf[0] = (buf[0] ^ 30) - 1 # 后续字节：链式加密 for i in range(1, 32): # 与前一个加密结果异或 buf[i] ^= buf[i - 1] # 根据位置进行加减操作 if i % 2 == 0 or i == 31: buf[i] -= 1 # 偶数位置和最后一位减1 else: buf[i] += 1 # 奇数位置加1 buf[i] &amp;= 0xFF # 保持在字节范围内 return buf</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line#!/usr/bin/env python3&quot;&quot;&quot;Super Flagio CTF - Flag解密脚本&quot;&quot;&quot;# 密文数组（从反编译结果中提取）cipher = [94, 106, 91, 110, 86, 100, 82, 20, 32, 20, 80, 21, 83, 107, 88, 98, 81, 19, 79, 10, 49, 117, 68, 120, 61, 13, 75, 115, 48, 8, 76, 123]def decrypt(ciphertext): result = ciphertext.copy() # 关键：从后向前解密（逆序处理链式依赖） for i in range(31, 0, -1): # 逆向加减操作 if i % 2 == 0 or i == 31: result[i] = (result[i] + 1) &amp; 0xFF # 原来-1，现在+1 else: result[i] = (result[i] - 1) &amp; 0xFF # 原来+1，现在-1 # 逆向异或操作（与前一字节异或） result[i] ^= result[i - 1] # 第一字节的逆向处理 result[0] = ((result[0] + 1) ^ 30) &amp; 0xFF return result</span><br><span class="line"># 执行解密decrypted = decrypt(cipher)flag = &#x27;&#x27;.join(chr(c) for c in decrypted)print(f&quot;Flag: &#123;flag&#125;&quot;)</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line密文数组:[94, 106, 91, 110, 86, 100, 82, 20, 32, 20, 80, 21, 83, 107, 88, 98,81, 19, 79, 10, 49, 117, 68, 120, 61, 13, 75, 115, 48, 8, 76, 123]解密结果（字节）:[65, 55, 54, 54, 57, 53, 55, 65, 53, 51, 69, 68, 65, 57, 50, 57,48, 67, 67, 70, 56, 69, 48, 51, 70, 49, 65, 57, 66, 55, 69, 48]Flag: A766957A53EDA9290CCF8E03F1A9B7E0验证成功！解密结果正确！</span><br><span class="line">ounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(lineounter(line#!/usr/bin/env python3&quot;&quot;&quot;Super Flagio CTF - 完整解题脚本&quot;&quot;&quot;# 密文数组（从虚拟机分析中提取）cipher = [94, 106, 91, 110, 86, 100, 82, 20, 32, 20, 80, 21, 83, 107, 88, 98, 81, 19, 79, 10, 49, 117, 68, 120, 61, 13, 75, 115, 48, 8, 76, 123]# 从后向前解密for i in range(31, 0, -1): # 逆向加减操作 if i % 2 == 0 or i == 31: cipher[i] += 1 else: cipher[i] -= 1 cipher[i] &amp;= 0xFF # 逆向异或操作 cipher[i] ^= cipher[i - 1]# 第一字节cipher[0] = (cipher[0] + 1) ^ 30</span><br><span class="line"># 输出结果flag = &#x27;&#x27;.join(chr(c) for c in cipher)print(flag)</span><br><span class="line"># A766957A53EDA9290CCF8E03F1A9B7E0</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/283888.html">https://www.ctfiot.com/283888.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/Super_Flagio_CTF%E9%80%86%E5%90%91%E9%A2%98%E6%8A%80%E6%9C%AF%E8%A7%A3%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;Super_Flagio_CTF逆向题技术解析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/cocos2d-x/">cocos2d-x</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Reverse/SigMachine_CTF%E9%80%86%E5%90%91%E9%A2%98%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90-%E4%BB%8E%E9%9B%B6%E5%88%B0%E4%B8%80%E7%9A%84%E5%AE%8C%E6%95%B4%E8%A7%A3%E9%A2%98%E4%B9%8B%E6%97%85/" title="SigMachine CTF 逆向题深度解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">SigMachine CTF 逆向题深度解析</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Reverse/m0leCon_CTF_2025_Teaser_re_Embedded_encryption_RISCV_%E5%AF%B9%E7%A7%B0%E5%AF%86%E7%A0%81/" title="m0leCon CTF 2025 Teaser re Embedded encryption RISCV 对称密码"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">m0leCon CTF 2025 Teaser re Embedded encryption RISCV 对称密码</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E8%A7%A3%E5%AF%86decrypted-decrypt-cipher-flag-%E2%80%98%E2%80%99-join-chr-c-for-c-in-decrypted-print-f%E2%80%9DFlag-flag-%E2%80%9D"><span class="toc-number">1.</span> <span class="toc-text">执行解密decrypted &#x3D; decrypt(cipher)flag &#x3D; ‘’.join(chr(c) for c in decrypted)print(f”Flag: {flag}”)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E7%BB%93%E6%9E%9Cflag-%E2%80%98%E2%80%99-join-chr-c-for-c-in-cipher-print-flag"><span class="toc-number">2.</span> <span class="toc-text">输出结果flag &#x3D; ‘’.join(chr(c) for c in cipher)print(flag)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#A766957A53EDA9290CCF8E03F1A9B7E0"><span class="toc-number">3.</span> <span class="toc-text">A766957A53EDA9290CCF8E03F1A9B7E0</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

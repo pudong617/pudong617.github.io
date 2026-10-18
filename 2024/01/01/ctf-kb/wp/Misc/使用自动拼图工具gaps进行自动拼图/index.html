@@ -1,0 +1,203 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>使用自动拼图工具 gaps 进行自动拼图 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="MISC 拼图题 600 张 40×40：montage 拼接 + gaps 遗传算法自动拼图，--generations&#x3D;400 --population&#x3D;400 增加迭代。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用自动拼图工具 gaps 进行自动拼图">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Misc/%E4%BD%BF%E7%94%A8%E8%87%AA%E5%8A%A8%E6%8B%BC%E5%9B%BE%E5%B7%A5%E5%85%B7gaps%E8%BF%9B%E8%A1%8C%E8%87%AA%E5%8A%A8%E6%8B%BC%E5%9B%BE/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="MISC 拼图题 600 张 40×40：montage 拼接 + gaps 遗传算法自动拼图，--generations&#x3D;400 --population&#x3D;400 增加迭代。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="gaps">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Misc/%E4%BD%BF%E7%94%A8%E8%87%AA%E5%8A%A8%E6%8B%BC%E5%9B%BE%E5%B7%A5%E5%85%B7gaps%E8%BF%9B%E8%A1%8C%E8%87%AA%E5%8A%A8%E6%8B%BC%E5%9B%BE/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '使用自动拼图工具 gaps 进行自动拼图',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">使用自动拼图工具 gaps 进行自动拼图</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="使用自动拼图工具 gaps 进行自动拼图"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/162924.html">https://www.ctfiot.com/162924.html</a><br>ID: 162924</p>
+</blockquote>
+<p>拼图在手动的情况下还是有很多限制，以这一题为例，共计600张图片。</p>
+<p>图片名称没有任何规律。如果手动拼图的话，总的尝试次数会非常大，而且非常耗时，所以需要依赖自动拼图的工具。</p>
+<p>图片拼接</p>
+<p>首先需要将图片全部拼接到一张图片中，并且获取每张图片的尺寸，每张图的尺寸为40×40</p>
+<p>因为共计600张图片，所以猜测总图片应该是20×30的数量排列</p>
+<p>安装montage</p>
+<p>montage拼接图片</p>
+<p>常规命令只需要用到tile和geometry两个参数就可以。</p>
+<p>tile是拼成的大小，geometry为图片之间的缝隙大小。</p>
+<p>拼接完的效果</p>
+<p>拼图调整</p>
+<p>然后安装gaps自动拼图工具。</p>
+<p>首先安装poetry：</p>
+<p>可以看出图片的尺寸应该是30×20，调整后再运行一次</p>
+<p>图片还是有部分没有修改完成，修改gaps的参数，增加迭代</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line">apt-get install -y graphicsmagick-imagemagick-compat</span><br><span class="line">montage</span><br><span class="line">GraphicsMagick 1.3.28 2018-01-20 Q16 http://www.GraphicsMagick.org/</span><br><span class="line">Copyright (C) 2002-2018 GraphicsMagick Group.</span><br><span class="line">Additional copyrights and licenses apply to this software.</span><br><span class="line">See http://www.GraphicsMagick.org/www/Copyright.html for details.</span><br><span class="line">Usage: montage montage [options ...] file [ [options ...] file ...]</span><br><span class="line"></span><br><span class="line">Where options include:</span><br><span class="line"> -adjoin join images into a single multi-image file</span><br><span class="line"> -affine matrix affine transform matrix</span><br><span class="line"> -authenticate value decrypt image with this password</span><br><span class="line"> -background color background color</span><br><span class="line"> -blue-primary point chomaticity blue primary point</span><br><span class="line"> -blur factor apply a filter to blur the image</span><br><span class="line"> -bordercolor color border color</span><br><span class="line"> -borderwidth geometry</span><br><span class="line"> border width</span><br><span class="line"> -colors value preferred number of colors in the image</span><br><span class="line"> -colorspace type alternate image colorsapce</span><br><span class="line"> -comment string annotate image with comment</span><br><span class="line"> -compose operator composite operator</span><br><span class="line"> -compress type image compression type</span><br><span class="line"> -crop geometry preferred size and location of the cropped image</span><br><span class="line"> -debug events display copious debugging information</span><br><span class="line"> -define values Coder/decoder specific options</span><br><span class="line"> -density geometry horizontal and vertical density of the image</span><br><span class="line"> -depth value image depth</span><br><span class="line"> -display server query font from this X server</span><br><span class="line"> -dispose method Undefined, None, Background, Previous</span><br><span class="line"> -dither apply Floyd/Steinberg error diffusion to image</span><br><span class="line"> -draw string annotate the image with a graphic primitive</span><br><span class="line"> -encoding type text encoding type</span><br><span class="line"> -endian type multibyte word order (LSB, MSB, or Native)</span><br><span class="line"> -fill color color to use when filling a graphic primitive</span><br><span class="line"> -filter type use this filter when resizing an image</span><br><span class="line"> -flip flip image in the vertical direction</span><br><span class="line"> -flop flop image in the horizontal direction</span><br><span class="line"> -font name font to use when annotating with text</span><br><span class="line"> -format string output formatted image characteristics</span><br><span class="line"> -frame geometry surround image with an ornamental border</span><br><span class="line"> -gamma value level of gamma correction</span><br><span class="line"> -geometry geometry preferred tile and border sizes</span><br><span class="line"> -gravity direction which direction to gravitate towards</span><br><span class="line"> -green-primary point chomaticity green primary point</span><br><span class="line"> -help print program options</span><br><span class="line"> -interlace type None, Line, Plane, or Partition</span><br><span class="line"> -label name assign a label to an image</span><br><span class="line"> -limit type value Disk, File, Map, Memory, Pixels, Width, Height or</span><br><span class="line"> Threads resource limit</span><br><span class="line"> -log format format of debugging information</span><br><span class="line"> -matte store matte channel if the image has one</span><br><span class="line"> -mattecolor color color to be used with the -frame option</span><br><span class="line"> -mode type Frame, Unframe, or Concatenate</span><br><span class="line"> -monitor show progress indication</span><br><span class="line"> -monochrome transform image to black and white</span><br><span class="line"> -noop do not apply options to image</span><br><span class="line"> +page reset current page offsets to default</span><br><span class="line"> -page geometry size and location of an image canvas</span><br><span class="line"> -pointsize value font point size</span><br><span class="line"> -quality value JPEG/MIFF/PNG compression level</span><br><span class="line"> -red-primary point chomaticity red primary point</span><br><span class="line"> +repage reset current page offsets to default</span><br><span class="line"> -repage geometry adjust current page offsets by geometry</span><br><span class="line"> -resize geometry resize the image</span><br><span class="line"> -rotate degrees apply Paeth rotation to the image</span><br><span class="line"> -sampling-factor HxV[,...]</span><br><span class="line"> horizontal and vertical sampling factors</span><br><span class="line"> -scenes range image scene range</span><br><span class="line"> -set attribute value set image attribute</span><br><span class="line"> +set attribute unset image attribute</span><br><span class="line"> -shadow add a shadow beneath a tile to simulate depth</span><br><span class="line"> -sharpen geometry sharpen the image</span><br><span class="line"> -size geometry width and height of image</span><br><span class="line"> -strip strip all profiles and text attributes from image</span><br><span class="line"> -stroke color color to use when stroking a graphic primitive</span><br><span class="line"> -strokewidth value stroke (line) width</span><br><span class="line"> -texture filename name of texture to tile onto the image background</span><br><span class="line"> -thumbnail geometry resize the image (optimized for thumbnails)</span><br><span class="line"> -tile geometry number of tiles per row and column</span><br><span class="line"> -title string thumbnail title</span><br><span class="line"> -transform affine transform image</span><br><span class="line"> -transparent color make this color transparent within the image</span><br><span class="line"> -treedepth value color tree depth</span><br><span class="line"> -trim trim image edges</span><br><span class="line"> -type type image type</span><br><span class="line"> -verbose print detailed information about the image</span><br><span class="line"> -version print version information</span><br><span class="line"> -virtual-pixel method</span><br><span class="line"> Constant, Edge, Mirror, or Tile</span><br><span class="line"> -white-point point chomaticity white point</span><br><span class="line"></span><br><span class="line">In addition to those listed above, you can specify these standard X</span><br><span class="line">resources as command line options: -background, -bordercolor,</span><br><span class="line">-borderwidth, -font, -mattecolor, or -title</span><br><span class="line"></span><br><span class="line">By default, the image format of `file&#x27; is determined by its magic</span><br><span class="line">number. To specify a particular image format, precede the filename</span><br><span class="line">with an image format name and a colon (i.e. ps:</span><br><span class="line">image) or specify the</span><br><span class="line">image type as the filename suffix (i.e. image.ps). Specify &#x27;file&#x27; as</span><br><span class="line">&#x27;-&#x27; for standard input or output.</span><br><span class="line">montage montage: Improper arguments supplied, please see manual.</span><br><span class="line">montage ./files/*.png -tile 20X30 -geometry +0+0 flag.png</span><br><span class="line">curl -sSL https://install.python-poetry.org | python3 -</span><br><span class="line">sudo apt-get install python-tk</span><br><span class="line">git clone https://github.com/nemanja-m/gaps</span><br><span class="line">cd gaps</span><br><span class="line">pip install . -i https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line">Usage: gaps run [OPTIONS] PUZZLE SOLUTION</span><br><span class="line"></span><br><span class="line"> Run puzzle solver.</span><br><span class="line"></span><br><span class="line"> PUZZLE is the input puzzle image with square pieces.</span><br><span class="line"> SOLUTION is the output image file for solved puzzle.</span><br><span class="line"></span><br><span class="line"> Examples:</span><br><span class="line"></span><br><span class="line"> $ gaps run puzzle.jpg solution.jpg --size=32 --generations=100</span><br><span class="line"> --population=1000</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line"> -s, --size INTEGER Size of single square puzzle piece in pixels.</span><br><span class="line"> Autodetected if not specified.</span><br><span class="line"> -g, --generations INTEGER The number of generations for genetic algorithm.</span><br><span class="line"> [default: 20]</span><br><span class="line"> -p, --population INTEGER The size of the initial population for genetic</span><br><span class="line"> algorithm. [default: 200]</span><br><span class="line"> -d, --debug If enabled, shows the best individual after each</span><br><span class="line"> generation.</span><br><span class="line"> -h, --help Show this message and exit.</span><br><span class="line">gaps run ./flag.png resolve.png --generations=20 --population=200 --size=40</span><br><span class="line">montage ./files/*.png -tile 30X20 -geometry +0+0 flag.png  </span><br><span class="line">gaps run ./flag.png resolve.png --generations=20 --population=200 --size=40</span><br><span class="line">gaps run ./flag.png resolve.png --generations=400 --population=400 --size=40</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/162924.html">https://www.ctfiot.com/162924.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E4%BD%BF%E7%94%A8%E8%87%AA%E5%8A%A8%E6%8B%BC%E5%9B%BE%E5%B7%A5%E5%85%B7gaps%E8%BF%9B%E8%A1%8C%E8%87%AA%E5%8A%A8%E6%8B%BC%E5%9B%BE.full.md">CTF大赛WP集合&#x2F;articles&#x2F;使用自动拼图工具gaps进行自动拼图.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/gaps/">gaps</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Misc/%E4%BD%BF%E7%94%A8docker%E8%B0%83%E8%AF%95%E5%92%8C%E9%83%A8%E7%BD%B2pwn%E9%A2%98/" title="使用docker调试和部署pwn题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">使用docker调试和部署pwn题</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Misc/%E5%85%B3%E4%BA%8E%E8%BF%B7%E5%AE%AB%E9%A2%98%E7%9A%84%E4%B8%80%E4%BA%9B%E6%B1%82%E8%A7%A3%E6%80%9D%E8%B7%AF/" title="关于迷宫题的一些求解思路"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">关于迷宫题的一些求解思路</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>CakeCTF 2023 作問感想 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="CakeCTF 2023出题人感想，5题涵盖签名+15拼图+矩阵DLP+RSA-CRT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CakeCTF 2023 作問感想">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Crypto/CakeCTF_2023_%E4%BD%9C%E5%95%8F%E6%84%9F%E6%83%B3/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="CakeCTF 2023出题人感想，5题涵盖签名+15拼图+矩阵DLP+RSA-CRT">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="crypto">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Crypto/CakeCTF_2023_%E4%BD%9C%E5%95%8F%E6%84%9F%E6%83%B3/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'CakeCTF 2023 作問感想',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">CakeCTF 2023 作問感想</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="CakeCTF 2023 作問感想"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/145742.html">https://www.ctfiot.com/145742.html</a><br>ID: 145742</p>
+</blockquote>
+<p>こんにちは。公式writeupっぽいやつは早く出しすぎると参加者が「じゃあ自分はwriteup書かなくてもよいか……」と思ってしまうのでしばらく経ってから出したほうが良いと思っているので寝かせていました。まだ書いていない人でこれを読んでいる人はぜひ運営へのねぎらいだと思ってwriteup書いてください。</p>
+<p>你好。 如果你过早地把官方写的东西放出来，参与者会想，“好吧，我不必写写……”，所以我觉得过一会儿再写出来会更好，所以我把它放在床上。 如果您还没有写过并且正在阅读本文，请写下来作为对管理层的感谢。</p>
+<p>以下は解説というよりは感想です。出題した問題はGitHubで公開してます。solverも入っているので詳しい解き方を知りたい人はそちらを見てください（あと解いた人のwriteupを読んだりしてください）。</p>
+<p>以下更多的是印象而不是解释。 这些问题可在 GitHub 上找到。 它还包括一个求解器，所以如果你想知道如何详细解决它，请看一下那里（并阅读解决它的人的文章）。</p>
+<p>github.com</p>
+<p>[crypto&#x2F;warmup] simple signature (88 solves)</p>
+<p>[加密&#x2F;预热] 简单签名（88 解决）</p>
+<p>[rev] Cake Puzzle (56 solves)</p>
+<p>[修订版] 蛋糕拼图 （56 solves）</p>
+<p>[crypto] janken vs yoshiking 2(43 solves)</p>
+<p>[加密] Janken vs Yoshiking 2（43 解决）</p>
+<p>[crypto&#x2F;pwn] decryptyou (13 solves)</p>
+<p>[crypto&#x2F;pwn] 解密你 （13 solves）</p>
+<p>[crypto] Iron Door (8 solves)</p>
+<p>[加密] 铁门 （8 solves）</p>
+<p>感想</p>
+<p>[crypto&#x2F;warmup] simple signature (88 solves)</p>
+<p>[加密&#x2F;预热] 简单签名（88 解决）</p>
+<p>なんか昔つくった問題なのでよく憶えていません……。昔なんかいい問題を作ろうと思ってがちゃがちゃやっていたときにできた何やっても解ける問題を拾い上げてきました。</p>
+<p>我不太记得了，因为这是我很久以前编造的问题。 过去，当我试图提出一个好问题时，我捡到了一个无论我做什么都可以解决的问题。</p>
+<p>kanonさんがwriteupにいいことを書いてくれてるんですが、”基本的に、公開鍵と秘密鍵は何か数学的な関連性が必要であるから解けないわけで、今回はx,u�,�が公開鍵にしか使われていないため、なんでもおｋ”です。適当に値を決め打ちしてそれで辻褄が合うようにすると解ける。</p>
+<p>Kanon在writeup上写了一些不错的话，“基本上，公钥和私钥是无法解决的，因为它们需要某种数学关系，在这种情况下，只用于公钥， x,u�,� 所以它就是一切。 可以通过随机设置一个值并键入它以使其匹配来解决。</p>
+<p>一見難しそうに見えて普通に数学やると解けるのでwarmupです。</p>
+<p>乍一看，这看起来很困难，但可以通过做正常的数学来解决，所以它是热身。</p>
+<p>[rev] Cake Puzzle (56 solves)</p>
+<p>[修订版] 蛋糕拼图 （56 solves）</p>
+<p>これは非常にシンプルな15パズルで、さくっとreversingしてさくっとソルバ拾ってきて解くだけです。</p>
+<p>这是一个非常简单的 15 个谜题，您只需要快速反转，拿起求解器并解决它。</p>
+<p>reversing何もわからないのに無理やり何か作ろうとして結局このあたりに落ち着きました。特に面白いことはないので、出したことは多少以上に後悔してます。</p>
+<p>逆转：我什么都不知道，但我试图强迫自己做点什么，我最终在这个领域安顿下来。 它没有什么特别有趣的地方，所以我后悔把它放出来。</p>
+<p>[crypto] janken vs yoshiking 2(43 solves)</p>
+<p>[加密] Janken vs Yoshiking 2（43 解决）</p>
+<p>janken vsシリーズ、または vs yoshiking シリーズです。これまでの作品はzer0pts CTF 2021に出題したjanken vs yoshiking, SECCON CTF 2022 Qualsに出題したjanken vs kurenaifです。jankenは本当に便利な題材で、手の種類が3通りしかないのでweakなパターンを作りやすいですよね。</p>
+<p>Janken VS 系列，或 VS Yoshiking 系列。 之前的作品是 zer0pts CTF 2021 中的 janken vs yoshiking 和 SECCON CTF 2022 Quals 中的 janken vs kurenaif。 Janken 是一个非常有用的主题，由于只有三种类型的动作，因此很容易创建弱模式。</p>
+<p>さて、今回はyoshikingはFp��上の5×5のランダムな行列M�に対しMr��を計算してくれてrmod3�mod3がyoshikingの手です。p�はsmoothですが一般線形群GL5(Fp)��5(��)では特に嬉しくないです*1。どうにかして離散対数問題を解いてr�を求めたいですね。</p>
+<p>好吧，这一次 Yoshiking rmod3�mod3 计算 Mr�� Fp�� 了上面的 5×5 随机矩阵 M� 。 p� 很平滑，但我对一般线性群 *1 不是特别满意 GL5(Fp)��5(��) 。 我想以某种方式解决 r� 离散对数问题。</p>
+<p>そこで一般にdet(Ar)&#x3D;det(A)rdet(��)&#x3D;det(�)�だねということを思い出してdet(M),det(Mr)&#x3D;det(M)rdet(�),det(��)&#x3D;det(�)�を取るとdeterminantはFp��上の計算ですから、このdiscrete logはPohlig-Hellmanで楽に解けるのでじゃんけん勝ち放題という問題でした。</p>
+<p>所以，一般来说 det(Ar)&#x3D;det(A)rdet(��)&#x3D;det(�)� ，如果你 det(M),det(Mr)&#x3D;det(M)rdet(�),det(��)&#x3D;det(�)� 采用行列式计算 Fp�� ，这个离散的对数可以很容易地被 Pohlig-Hellman 求解，所以这是一个你可以在石头剪刀布中随心所欲地赢得的问题。</p>
+<p>行列の冪乗が出てきたときに行列式を考えたりジョルダン標準形を考えるのは典型だと思っているのでもうひと工夫しても良かったなと思います。あと、janken vs yoshikingを作問したときもp-1が3を位数に持っているとか持っていないとかで非想定の解法を作ったのに今回もそういう解き方のことを失念してたのも良くないですね*2。憶えてたらp�はランダムに生成してたと思います。まあでもpがsmoothなことでmod pで考えたくなるという誘導にはなったので別に良いか。良いような気もします</p>
+<p>我认为当矩阵的幂出来时，通常会考虑行列式或乔丹标准形式，所以我认为如果能多一点独创性就好了。 另外，当我提出 Janken vs Yoshiking 问题时，我根据 P-1 的订单号中是否有 3 提出了一个不起眼的解决方案，但这次我也忘记了这样的解决方案并不好*2。 如果我 p� 没记错的话，我认为它是随机生成的。 好吧，没关系，因为 P 是流畅的这一事实让我想用 mod P 来思考。 我觉得很好</p>
+<p>[crypto&#x2F;pwn] decryptyou (13 solves)</p>
+<p>[crypto&#x2F;pwn] 解密你 （13 solves）</p>
+<p>zer0pts CTF 2022に(ptr-yudaiが)出題したsignmeという問題は crypto + pwnの問題で、RSA-CRTによる署名時に一時変数を破壊できるので素因数分解できて……という問題でした。今回出題したdecryptyouはcrypto + pwnの問題でRSA-CRTによる復号をしてくれるのですが、pwn要素によって復号時に一時変数u&#x3D;pmodq�&#x3D;�mod�を破壊できます。</p>
+<p>zer0pts CTF 2022 中的 signme 问题（由 ptr-yudai 解决）是一个加密 + pwn 问题，可以分解，因为在使用 RSA-CRT 签名时可以销毁临时变量。 这就是问题所在。 这次出现的 decryptyou 是一个 crypto + pwn 问题，使用 RSA-CRT 解密，但 pwn 元素在解密过程中会破坏 u&#x3D;pmodq�&#x3D;�mod� 临时变量。</p>
+<p>RSA-CRTにおける復号ではmp&#x3D;cdpmodp&#x3D;mmodp,mq&#x3D;cdqmodq&#x3D;mmodq��&#x3D;���mod�&#x3D;�mod�,��&#x3D;���mod�&#x3D;�mod�としたあとgarnerのアルゴリズムでm&#x3D;((mp−mq)umodp)+mqmodn�&#x3D;((��−��)�mod�)+��mod�としてm�を復元します。このときu�が壊れているとして</p>
+<p>在 RSA-CRT 中，解码完成， mp&#x3D;cdpmodp&#x3D;mmodp,mq&#x3D;cdqmodq&#x3D;mmodq��&#x3D;���mod�&#x3D;�mod�,��&#x3D;���mod�&#x3D;�mod� 然后 m� 按照 garner 算法进行重建 m&#x3D;((mp−mq)umodp)+mqmodn�&#x3D;((��−��)�mod�)+��mod� 。 u� 假设此时已损坏</p>
+<p>m≤p�≤�であればmp��とmq��は同じ値になるのでmp−mq&#x3D;0��−��&#x3D;0となり、garnerのアルゴリズムの(mp−mq)umodp(��−��)�mod�の部分は0なのでu�が壊れていてもu�の影響はm�に届かないので復号に成功します</p>
+<p>m≤p�≤� mp�� 如果 的值 mq�� 与 相同，则为 ，并且 Garner 算法的部分为 0，因此即使 u� 被破解 mp−mq&#x3D;0��−��&#x3D;0 ， (mp−mq)umodp(��−��)�mod� 效果 m� 也达不到 ， u� 所以解密成功</p>
+<p>m&gt;p�&gt;�であればu�が壊れているので復号に失敗します</p>
+<p>m&gt;p�&gt;� 如果 u� 已损坏，解密将失败</p>
+<p>というオラクルが手に入るので、復号に成功するかをみつつ二分探索するとp�がわかるという解法を想定していました。しかしこんな解き方をしている人は誰もいなくて、u�が壊れているときその復号結果はmodpmod�ではm�かつmodqmod�では非m�となるような値m′�′なので、m−m′�−�′がn�でないp�の倍数になり得る*3ということを利用して解かれているようでした。</p>
+<p>既然你可以得到预言机，我假设解决方案是找出你是否搜索了两分钟，同时查看 p� 解密是否成功。 但是，没有人以这种方式解决它，并且当被破坏时，解码结果是一个值，例如 is 和 modqmod� u� non modpmod� m� ，因此 m−m′�−�′ 可以是 * n� m� m′�′ 的倍数 p� 它似乎通过使用数字 3 来解决。</p>
+<p>……これはsignmeの解法とほとんど一緒です。自分たちの過去問と同じ問題を出してしまった……が、ばれてないのでセーフ！！！！！*4</p>
+<p>…… 这与 signme 解决方案几乎相同。 我们给了他们和过去一样的问题…… 但它是安全的，因为它没有暴露!!! *4</p>
+<p>違う問題！（同じ問題だった……） 不同的问题！ （同样的问题…</p>
+<p>[crypto] Iron Door (8 solves)</p>
+<p>[加密] 铁门 （8 solves）</p>
+<p>今回のボス問題です。唯一lunaticタグがついていたpwnのbofwowは22 solvesあることを考えるとこの問題にlunaticがついてないのはおかしい。</p>
+<p>这是这次的老板问题。 考虑到唯一带有疯子标签的 PWN bofwow 有 22 个解决方案，这个问题没有疯子是很奇怪的。</p>
+<p>この問題については簡単に説明するのが難しいのですがCakeCTF 2022に出題したRock Doorの改題で、以前はDSAのr,k�,�が小さいのでLLLで解ける……という問題でした。今回はr�は小さく、k�は大きい、ただしk−1modq�−1mod�は小さいという問題設定になっています。</p>
+<p>这个问题很难简单解释，但随着 CakeCTF 2022 中出现的 Rock Door 的更名，它曾经是 DSA，因为它很小，所以 r,k�,� 可以用 LLL 解决…… 这就是问题所在。 r� 在这种情况下，很小，很大， k� 但 k−1modq�−1mod� 很小。</p>
+<p>とりあえずsjrik−1i−sirjk−1j������−1−������−1を考えると、両方の項にxrik−1irjk−1j�����−1����−1が登場するのでx�を消去でき、剰余の方に比べて小さい値になることが期待できるので、係数rik−1i,rjk−1j����−1,����−1をLLLで求めることができます。</p>
+<p>目前，我们可以 sjrik−1i−sirjk−1j������−1−������−1 消除 x� 因为两个项的 xrik−1irjk−1j�����−1����−1 出现，我们可以预期该值将小于余数，因此 rik−1i,rjk−1j����−1,����−1 我们可以用 LLL 找到系数。</p>
+<p>続いて、si≡zik−1i+xrik−1imodq��≡����−1+�����−1mod�という式はsi,zi,rik−1i��,��,����−1既知でx�は未知だがすべての式で共通、k−1i��−1が式ごとに異なる比較的小さな未知数なのでこれは典型的なHidden Number Problemのインスタンスです。</p>
+<p>随后，是隐藏数问题的典型实例，因为隐藏数是一个相对较小的未知数，它是已知的，但对所有表达式都是通用的， k−1i��−1 但 si≡zik−1i+xrik−1imodq��≡����−1+�����−1mod� si,zi,rik−1i��,��,����−1 x� 因表达式而异。</p>
+<p>したがってこれを解けばx�が求められる、という問題でした。2段階のLLLが登場してこれは難しいぞと思いましたが、実際にはただLLLなので難しいだけで、解かれた方は大体二段階目のLLLはやらずにrik−1i����−1を素因数分解するという方針で解かれていたようでした</p>
+<p>因此，这是一个问题，如果你解决了这个问题， x� 你将被要求。 我以为当两阶段LLL出现时，这会很困难，但实际上它只是因为它只是LLL，而解决它的人似乎是用分解的策略来解决的， rik−1i����−1 而不做第二阶段LLL</p>
+<p>感想</p>
+<p>毎年「このCTFで持ちネタ全部尽きたぁ。終わりだぁ……」と思っているけど、実際にやってみると簡単な問題もそこそこ難しい問題も作れているような気がします。……が、これは罠で、よく見るとjanken vs yoshiking 2もdecryptyouもIron Doorも過去の問題の焼き直しです。もう本当にだめ</p>
+<p>每年，我都会想，“这个 CTF 的材料已经用完了，结束了……”，但当我真正尝试它时，我觉得我能够创建简单和中等难度的问题。 …… 但这是一个陷阱，如果你仔细观察，janken vs yoshiking 2、decryptyou 和 Iron Door 都是过去问题的重演。 我真的做不到了</p>
+<p>インプットを怠った結果アウトプットが枯渇している状態だと思うので、来年のCakeCTF開催のためにもいろいろなCTFに参加していきたいですね（口だけオバケ）。</p>
+<p>我认为由于忽视了投入，产出正在耗尽，所以我想参加明年 CakeCTF 的各种 CTF（只是一口）。</p>
+<p>あとReversingとWebは本当に作れないので協力してくれる人を募集しています</p>
+<p>另外，我无法真正创建 Reversing 和 Web，所以我正在寻找帮助我的人</p>
+<p>それではさようなら 再见</p>
+<p>原文始发于Hatena Blog：CakeCTF 2023 作問感想</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/145742.html">https://www.ctfiot.com/145742.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/CakeCTF_2023_%E4%BD%9C%E5%95%8F%E6%84%9F%E6%83%B3.full.md">CTF大赛WP集合&#x2F;articles&#x2F;CakeCTF_2023_作問感想.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/crypto/">crypto</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Crypto/2023_%E7%BE%8A%E5%9F%8E%E6%9D%AF/" title="2023 羊城杯"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2023 羊城杯</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Crypto/DATALOG%E9%AD%94%E5%B9%BB%E4%B9%8B%E5%8A%9B-N1CTF_2023_guess_writeup/" title="DATALOG 魔幻之力，N1CTF 2023 guess writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">DATALOG 魔幻之力，N1CTF 2023 guess writeup</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/01/01/ctf-kb/wp/Crypto/CTF%E8%BF%9E%E5%88%86%E6%95%B0%E5%AE%9E%E6%88%98%E8%AF%A6%E8%A7%A3/" title="CTF连分数实战详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">CTF连分数实战详解</div></div></a></div><div><a href="/2020/01/01/ctf-kb/wp/Crypto/Coppersmith-s_Attack/" title="Coppersmith&#39;s Attack"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-01</div><div class="title">Coppersmith&#39;s Attack</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Crypto/DownUnderCTF_2022_Writeups/" title="DownUnderCTF 2022 Writeups"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">DownUnderCTF 2022 Writeups</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Crypto/HKCERT_CTF_2022_Postmortem_-II-_Harder_Crypto_Challenges/" title="HKCERT CTF 2022 Postmortem (II): Harder Crypto Challenges"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">HKCERT CTF 2022 Postmortem (II): Harder Crypto Challenges</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Crypto/HKCERT_CTF_2022_Postmortem_-I-_Easier_Crypto_Challenges/" title="HKCERT CTF 2022 Postmortem (I): Easier Crypto Challenges"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">HKCERT CTF 2022 Postmortem (I): Easier Crypto Challenges</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Crypto/HackerGame_2022_%E5%87%BA%E9%A2%98%E8%AE%B0/" title="HackerGame 2022 出题记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">HackerGame 2022 出题记</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

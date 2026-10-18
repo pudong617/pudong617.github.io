@@ -1,0 +1,253 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>腾讯游戏安全大赛初赛题解 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="腾讯游戏安全初赛：CE 找 base64 表 + 找明文 + DLL 注入 PATCH 内存让 Base64 密文改明文，NOP 关键指令 + 修复 inline hook。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="腾讯游戏安全大赛初赛题解">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Reverse/%E8%85%BE%E8%AE%AF%E6%B8%B8%E6%88%8F%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E5%88%9D%E8%B5%9B%E9%A2%98%E8%A7%A3/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="腾讯游戏安全初赛：CE 找 base64 表 + 找明文 + DLL 注入 PATCH 内存让 Base64 密文改明文，NOP 关键指令 + 修复 inline hook。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Base64">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Reverse/%E8%85%BE%E8%AE%AF%E6%B8%B8%E6%88%8F%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E5%88%9D%E8%B5%9B%E9%A2%98%E8%A7%A3/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '腾讯游戏安全大赛初赛题解',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">腾讯游戏安全大赛初赛题解</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="腾讯游戏安全大赛初赛题解"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/115172.html">https://www.ctfiot.com/115172.html</a><br>ID: 115172</p>
+</blockquote>
+<p>1.在64位Windows10系统上运行contest.exe, 找到明文的信息，作为答案提交（1分）。</p>
+<p>答案：catchmeifyoucan</p>
+<p>正常运行会在当前目录下的 contest.txt 去写入一个ImVkImx9JG12OGtlImV+。</p>
+<p>CE打开，先通过CE的memory view找到一串一直在变化的内存。</p>
+<p>虽然不确定，找到了 contest.txt 这个明文，但是catchmeifyoucan不确定它是不是flag，还得进一步确定，于是查找是谁访问了这个地址。</p>
+<p>在第三项中，发现后面有一个读取r10所指示的内存的操作。</p>
+<p>同样memory view查找7FF713657190地址，结果找到一串 base 表：</p>
+<p>QRSTUVWXYZabcdefABCDEFGHIJKLMNOPwxyz0123456789+&#x2F;ghijklmnopqrstuv</p>
+<p>于是果断拿密文解密，发现得到了正确答案。</p>
+<p>2.编写程序，运行时修改尽量少的contest.exe内存，让contest.exe 由写入密文信息变为写入明文信息成功。（满分2分）</p>
+<p>Base64编码的一组中，三个原文对应四个密文。第一个密文和第四个密文只会被原文第一个字符和第三个字符影响。第二个字符会被第一个原文和第二个原文字符影响，第三个字符会被第二个原文和第三个原文字符影响。</p>
+<p>对 base 表进行访问查询，找到三个地址，对三个地址分析。</p>
+<p>查看第一项访问地址</p>
+<p>右移两位进行查表，很明显就是对第一个密文的操作，因此把中间的操作全部NOP，只剩读取和写入操作。</p>
+<p>再对第二个项目分析，很明显看到了对第四个密文的操作：</p>
+<p>这里的and 0x3f就是取得最低的六位，很明显是最后一位，同样也把中间的指令全部NOP掉。</p>
+<p>不仅如此，同时注意到赋值的时候，对 r14+1了，并且r14的值在后面+1。这里有一个很头疼的点就是明文密文长度不一致，三个原文对应四个密文，因此这里可以为这个点考虑起来了。如果我 r14 的值不给他 +1，直接给 r14 的值赋值，结果会怎样呢？也就是对应指令修改为：</p>
+<p>mov [r14],al<br>add r14,0</p>
+<p>发现输出文件的内容果然变短了。</p>
+<p>并且此时，我们再处理中间的一位，就能得到明文输出了。</p>
+<p>我们来看第三个项目：</p>
+<p>这里同样把 BA5D-BA68的代码段NOP掉，做完之后，发现contest输出明文了。</p>
+<p>总结一下：</p>
+<p>◆contest.exe+BA39~BA41 全部NOP掉</p>
+<p>◆contest.exe+B9FD~BA04 全部NOP掉</p>
+<p>◆contest.exe+BA5D~BA68 全部NOP掉</p>
+<p>◆contest.exe+BA05开始，把指令变成：</p>
+<p>mov [r14],al<br>add r14,0</p>
+<p>编写dll进行一次性修改：</p>
+<p>但是在写内存的时候，发现VirtualProtect一直调用失败，拿火绒剑扫了一下，发现VirtualProtect被下了钩子。</p>
+<p>尝试修复一下这个钩子，写一个注入器和dll。</p>
+<p>DLL不能直接使用 VirtualProtect 去修改内存属性，所以我们需要在注入之前，使用VirtualProtectEx先修改内存权限，再通过WriteProcessMemory函数修复程序在API处下的一个钩子，这里是inline hook，因此直接遍历模块寻找ZwProtectVirtualMemory函数把钩子取消。</p>
+<p>取消之后，即可使用远程线程注入的方式去注入dll，远程注入的思路就是开辟一块远程内存，写入dll路径，创建远程线程回调LoadLibraryA函数去加载 DLL。</p>
+<p>DLL主要就是作上面分析的一些PATCH内存的操作。</p>
+<p>下面是源码：</p>
+<p>#include&lt;windows.h&gt;<br>#include<br>#include&lt;time.h&gt;<br>#include&lt;stdlib.h&gt;<br>#include&lt;TlHelp32.h&gt;<br>DWORD old;<br>SIZE_T written;<br>DWORD FindProcess() {<br> HANDLE hSnap &#x3D; CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);<br> PROCESSENTRY32 pe32;<br> pe32 &#x3D; { sizeof(pe32) };<br> BOOL ret &#x3D; Process32First(hSnap, &amp;pe32);<br> while (ret)<br> {<br> if (!wcsncmp(pe32.szExeFile, L”contest.exe”, 11)) {<br> printf(“Find contest.exe Process %dn”, pe32.th32ProcessID);<br> return pe32.th32ProcessID;<br> }<br> ret &#x3D; Process32Next(hSnap, &amp;pe32);<br> }<br> return 0;<br>}<br>void InjectModule(DWORD ProcessId, const char* szPath)<br>{<br> HANDLE hProcess &#x3D; OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);<br> printf(“进程句柄:%pn”, hProcess);<br> LPVOID lpAddress &#x3D; VirtualAllocEx(hProcess, NULL, 0x100, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);<br> SIZE_T dwWriteLength &#x3D; 0;<br> WriteProcessMemory(hProcess, lpAddress, szPath, strlen(szPath), &amp;dwWriteLength);<br> HANDLE hThread &#x3D; CreateRemoteThread(hProcess, NULL, NULL, (LPTHREAD_START_ROUTINE)LoadLibraryA, lpAddress, NULL, NULL);<br> WaitForSingleObject(hThread, -1);<br> VirtualFreeEx(hProcess, lpAddress, 0, MEM_RELEASE);<br> CloseHandle(hProcess);<br> CloseHandle(hThread);<br>}<br>void UNHOOK(DWORD ProcessId) {<br> BYTE INS[] &#x3D; {0x4C,0x8B,0xD1,0xB8,0x50};<br> HANDLE ths &#x3D; CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, ProcessId);<br> MODULEENTRY32 me;<br> me.dwSize &#x3D; sizeof(me);<br> UINT64 addr&#x3D;0;<br> if (Module32First(ths, &amp;me))<br> {<br> do<br> {<br> if (addr&#x3D;(UINT64)GetProcAddress(me.hModule, “ZwProtectVirtualMemory”))<br> {<br> printf(“addr:%pn”, addr);<br> break;<br> }</p>
+<p> } while (Module32Next(ths, &amp;me));<br> }<br> CloseHandle(ths);<br> HANDLE hProcess &#x3D; OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);<br> VirtualProtectEx(hProcess, (void *)addr, 0x5, PAGE_EXECUTE_READWRITE, &amp;old);<br> WriteProcessMemory(hProcess, (void <em>)addr, INS, 0x5, &amp;written);<br> printf(“written:%dn”, written);<br> VirtualProtectEx(hProcess, (void</em>)addr, 0x5, old, &amp;old);<br> CloseHandle(hProcess);<br>}<br>int main() {<br> DWORD ProcessId &#x3D; FindProcess();<br> while (!ProcessId) {<br> printf(“未找到contest程序，等待两秒中再试n”);<br> Sleep(2000);<br> ProcessId &#x3D; FindProcess();<br> }<br> printf(“尝试去除钩子…n”);<br> UNHOOK(ProcessId);&#x2F;&#x2F;去除钩子<br> printf(“开始注入进程…n”);<br> InjectModule(ProcessId, “C:\Users\xia0ji233\source\repos\T-contest\x64\Debug\T-contest.dll”);<br> printf(“注入完毕n”);<br>}</p>
+<p>#include&lt;Windows.h&gt;<br>#include&lt;time.h&gt;<br>#include&lt;stdio.h&gt;<br>DWORD oldprot,ret;<br>PROC HookedFunction;<br>UINT64 Offset[3] &#x3D; { 0xBA39 ,0xB9FD ,0xBA5D }, Len[3] &#x3D; { 9,8,12 };&#x2F;&#x2F;PATCH偏移和PATCH长度，这里皆patch为0x90(NOP)<br>BYTE Ins[] &#x3D; {<br> 0x41,0x88,0x06, &#x2F;&#x2F;mov [r14],al<br> 0x90, &#x2F;&#x2F;nop<br> 0x49,0x83,0xC6,0x00 &#x2F;&#x2F;add r14, 0<br>};</p>
+<p>UINT64 InsOffset &#x3D; 0xBA05,InsLen&#x3D;sizeof(Ins);<br>SIZE_T num;<br>BYTE buf &#x3D; 0x90;<br>BYTE NOP[] &#x3D; { 0x90,0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };<br>void patch() {<br> UINT64 Base &#x3D; (UINT64)GetModuleHandle(nullptr);<br> for (int i &#x3D; 0; i &lt; 3; i++) {<br> UINT64 addr &#x3D; Base + Offset[i];<br> VirtualProtect((void <em>)addr, Len[i], PAGE_EXECUTE_READWRITE, &amp;oldprot);<br> memcpy((void <em>)addr, NOP, Len[i]);<br> VirtualProtect((void</em>)addr, Len[i], oldprot, &amp;oldprot);<br> }<br> printf(“NOP donen”);<br> VirtualProtect((void</em>)(Base + InsOffset), InsLen,PAGE_EXECUTE_READWRITE, &amp;oldprot);<br> memcpy((void <em>)(Base + InsOffset), Ins, InsLen);<br> VirtualProtect((void</em>)(Base + InsOffset), InsLen, oldprot, &amp;oldprot);<br> printf(“Instruction Patch Done!n”);<br>}</p>
+<p>BOOL APIENTRY DllMain(HMODULE hModule,<br> DWORD ul_reason_for_call,<br> LPVOID lpReserved<br>)<br>{<br> switch (ul_reason_for_call)<br> {<br> case DLL_PROCESS_ATTACH:<br> patch();<br> case DLL_THREAD_ATTACH:<br> case DLL_THREAD_DETACH:<br> case DLL_PROCESS_DETACH:<br> break;<br> }<br> return TRUE;<br>}</p>
+<p>在一开始的时候我们在内存看到了contest.txt，于是尝试直接修改，发现可以成功更改写入的文件，因此为了达到目的我们可以直接修改这里的内存，但是因为它一直在变化，因此可以查看什么写了这个内存。</p>
+<p>主要是做了一个异或运算，直接 NOP即可。</p>
+<p>需要注意在把指令patch掉之后，一定要写一下这里存储 Name 的地方，把 Name 替换为自己想要的名字即可。</p>
+<p>但是发现 flag 写进去时而变化，究其原因还是因为flag内存一直在变化，因此patch修改flag的内存让它也不再变化即可。</p>
+<p>注入器不变，DLL 需要稍微改变一下。</p>
+<p>#include&lt;Windows.h&gt;<br>#include&lt;time.h&gt;<br>#include&lt;stdio.h&gt;<br>DWORD oldprot,ret;<br>PROC HookedFunction;<br>UINT64 Offset[3] &#x3D; { 0xBA39 ,0xB9FD ,0xBA5D }, Len[3] &#x3D; { 9,8,12 };&#x2F;&#x2F;PATCH偏移和PATCH长度，这里皆patch为0x90(NOP)<br>BYTE Ins[] &#x3D; {<br> 0x41,0x88,0x06, &#x2F;&#x2F;mov [r14],al<br> 0x90, &#x2F;&#x2F;nop<br> 0x49,0x83,0xC6,0x00 &#x2F;&#x2F;add r14, 0<br>};</p>
+<p>UINT64 InsOffset &#x3D; 0xBA05,InsLen&#x3D;sizeof(Ins);<br>SIZE_T num;<br>BYTE buf &#x3D; 0x90;<br>BYTE NOP[] &#x3D; { 0x90,0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };<br>void patch() {<br> UINT64 Base &#x3D; (UINT64)GetModuleHandle(nullptr);<br> for (int i &#x3D; 0; i &lt; 3; i++) {&#x2F;&#x2F;把三个点位的指令NOP掉<br> UINT64 addr &#x3D; Base + Offset[i];<br> VirtualProtect((void <em>)addr, Len[i], PAGE_EXECUTE_READWRITE, &amp;oldprot);<br> memcpy((void <em>)addr, NOP, Len[i]);<br> VirtualProtect((void</em>)addr, Len[i], oldprot, &amp;oldprot);<br> }<br> printf(“NOP donen”);<br> VirtualProtect((void</em>)(Base + InsOffset), InsLen,PAGE_EXECUTE_READWRITE, &amp;oldprot);<br> memcpy((void <em>)(Base + InsOffset), Ins, InsLen);&#x2F;&#x2F;替换对应的指令<br> VirtualProtect((void</em>)(Base + InsOffset), InsLen, oldprot, &amp;oldprot);<br> printf(“Instruction Patch Done!n”);<br>}</p>
+<p>void patchname() {<br> UINT64 Base &#x3D; (UINT64)GetModuleHandle(nullptr);<br> UINT64 Offset1 &#x3D; 0xC8F3,Offset2&#x3D;0xC5C6,NameOffset&#x3D;0x772FA,Len1&#x3D;4,Len2&#x3D;5,flagOffset &#x3D; 0x772E9;<br> char NewName[] &#x3D; “test.txt”;&#x2F;&#x2F;新文件名<br> char flag[] &#x3D; “catchmeifyoucan”;<br> VirtualProtect((void*)(Base + Offset1), Len1, PAGE_EXECUTE_READWRITE, &amp;oldprot);<br> memcpy((void*)(Base + Offset1), NOP, Len1);&#x2F;&#x2F;指令Nop掉防止写的时机不对发生变化<br> VirtualProtect((void*)(Base + Offset1), Len1, oldprot, &amp;oldprot);</p>
+<p> VirtualProtect((void*)(Base + Offset2), Len2, PAGE_EXECUTE_READWRITE, &amp;oldprot);<br> memcpy((void*)(Base + Offset2), NOP, Len2);&#x2F;&#x2F;指令Nop掉防止写的时机不对发生变化<br> VirtualProtect((void*)(Base + Offset2), Len2, oldprot, &amp;oldprot);</p>
+<p> VirtualProtect((void*)(Base + NameOffset), sizeof(NewName), PAGE_EXECUTE_READWRITE, &amp;oldprot);<br> memcpy((void*)(Base + NameOffset), NewName, sizeof(NewName));&#x2F;&#x2F;把名字写到内存中<br> VirtualProtect((void*)(Base + NameOffset), sizeof(NewName), oldprot, &amp;oldprot);</p>
+<p> VirtualProtect((void*)(Base + flagOffset), sizeof(flag), PAGE_EXECUTE_READWRITE, &amp;oldprot);<br> memcpy((void*)(Base + flagOffset), flag, sizeof(flag));&#x2F;&#x2F;把flag写到内存中<br> VirtualProtect((void*)(Base + flagOffset), sizeof(flag), oldprot, &amp;oldprot);</p>
+<p> printf(“Change Name Successn”);<br>}</p>
+<p>BOOL APIENTRY DllMain(HMODULE hModule,<br> DWORD ul_reason_for_call,<br> LPVOID lpReserved<br>)<br>{<br> switch (ul_reason_for_call)<br> {<br> case DLL_PROCESS_ATTACH:<br> patch();<br> patchname();<br> case DLL_THREAD_ATTACH:<br> case DLL_THREAD_DETACH:<br> case DLL_PROCESS_DETACH:<br> break;<br> }<br> return TRUE;<br>}</p>
+<p>看雪ID：xi@0ji233</p>
+<p><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/user-home-919002.htm">https://bbs.kanxue.com/user-home-919002.htm</a></p>
+<p>*本文由看雪论坛 xi@0ji233 原创，转载请注明来自看雪社区</p>
+<h1 id="往期推荐"><a href="#往期推荐" class="headerlink" title="往期推荐"></a>往期推荐</h1><p>1、在 Windows下搭建LLVM 使用环境</p>
+<p>2、深入学习smali语法</p>
+<p>3、安卓加固脱壳分享</p>
+<p>4、Flutter 逆向初探</p>
+<p>5、一个简单实践理解栈空间转移</p>
+<p>6、记一次某盾手游加固的脱壳与修复</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br></pre></td><td class="code"><pre><span class="line">mov [r14],al</span><br><span class="line">add r14,0</span><br><span class="line">mov [r14],al</span><br><span class="line">add r14,0</span><br><span class="line">    #include&lt;windows.h&gt;</span><br><span class="line">    #include</span><br><span class="line">    #include&lt;time.h&gt;</span><br><span class="line">    #include&lt;stdlib.h&gt;</span><br><span class="line">    #include&lt;TlHelp32.h&gt;</span><br><span class="line">DWORD old;</span><br><span class="line">SIZE_T written;</span><br><span class="line">DWORD FindProcess() &#123;</span><br><span class="line"> HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);</span><br><span class="line"> PROCESSENTRY32 pe32;</span><br><span class="line"> pe32 = &#123; sizeof(pe32) &#125;;</span><br><span class="line"> BOOL ret = Process32First(hSnap, &amp;pe32);</span><br><span class="line"> while (ret)</span><br><span class="line"> &#123;</span><br><span class="line"> if (!wcsncmp(pe32.szExeFile, L&quot;contest.exe&quot;, 11)) &#123;</span><br><span class="line"> printf(&quot;Find contest.exe Process %dn&quot;, pe32.th32ProcessID);</span><br><span class="line"> return pe32.th32ProcessID;</span><br><span class="line"> &#125;</span><br><span class="line"> ret = Process32Next(hSnap, &amp;pe32);</span><br><span class="line"> &#125;</span><br><span class="line"> return 0;</span><br><span class="line">&#125;</span><br><span class="line">void InjectModule(DWORD ProcessId, const char* szPath)</span><br><span class="line">&#123;</span><br><span class="line"> HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);</span><br><span class="line"> printf(&quot;进程句柄:%pn&quot;, hProcess);</span><br><span class="line"> LPVOID lpAddress = VirtualAllocEx(hProcess, NULL, 0x100, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);</span><br><span class="line"> SIZE_T dwWriteLength = 0;</span><br><span class="line"> WriteProcessMemory(hProcess, lpAddress, szPath, strlen(szPath), &amp;dwWriteLength);</span><br><span class="line"> HANDLE hThread = CreateRemoteThread(hProcess, NULL, NULL, (LPTHREAD_START_ROUTINE)LoadLibraryA, lpAddress, NULL, NULL);</span><br><span class="line"> WaitForSingleObject(hThread, -1);</span><br><span class="line"> VirtualFreeEx(hProcess, lpAddress, 0, MEM_RELEASE);</span><br><span class="line"> CloseHandle(hProcess);</span><br><span class="line"> CloseHandle(hThread);</span><br><span class="line">&#125;</span><br><span class="line">void UNHOOK(DWORD ProcessId) &#123;</span><br><span class="line"> BYTE INS[] = &#123;0x4C,0x8B,0xD1,0xB8,0x50&#125;;</span><br><span class="line"> HANDLE ths = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, ProcessId);</span><br><span class="line"> MODULEENTRY32 me;</span><br><span class="line"> me.dwSize = sizeof(me);</span><br><span class="line"> UINT64 addr=0;</span><br><span class="line"> if (Module32First(ths, &amp;me))</span><br><span class="line"> &#123;</span><br><span class="line"> do</span><br><span class="line"> &#123;</span><br><span class="line"> if (addr=(UINT64)GetProcAddress(me.hModule, &quot;ZwProtectVirtualMemory&quot;))</span><br><span class="line"> &#123;</span><br><span class="line"> printf(&quot;addr:%pn&quot;, addr);</span><br><span class="line"> break;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> &#125; while (Module32Next(ths, &amp;me));</span><br><span class="line"> &#125;</span><br><span class="line"> CloseHandle(ths);</span><br><span class="line"> HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, ProcessId);</span><br><span class="line"> VirtualProtectEx(hProcess, (void *)addr, 0x5, PAGE_EXECUTE_READWRITE, &amp;old);</span><br><span class="line"> WriteProcessMemory(hProcess, (void *)addr, INS, 0x5, &amp;written);</span><br><span class="line"> printf(&quot;written:%dn&quot;, written);</span><br><span class="line"> VirtualProtectEx(hProcess, (void*)addr, 0x5, old, &amp;old);</span><br><span class="line"> CloseHandle(hProcess);</span><br><span class="line">&#125;</span><br><span class="line">int main() &#123;</span><br><span class="line"> DWORD ProcessId = FindProcess();</span><br><span class="line"> while (!ProcessId) &#123;</span><br><span class="line"> printf(&quot;未找到contest程序，等待两秒中再试n&quot;);</span><br><span class="line"> Sleep(2000);</span><br><span class="line"> ProcessId = FindProcess();</span><br><span class="line"> &#125;</span><br><span class="line"> printf(&quot;尝试去除钩子...n&quot;);</span><br><span class="line"> UNHOOK(ProcessId);//去除钩子</span><br><span class="line"> printf(&quot;开始注入进程...n&quot;);</span><br><span class="line"> InjectModule(ProcessId, &quot;C:\Users\xia0ji233\source\repos\T-contest\x64\Debug\T-contest.dll&quot;);</span><br><span class="line"> printf(&quot;注入完毕n&quot;);</span><br><span class="line">&#125;</span><br><span class="line">    #include&lt;Windows.h&gt;</span><br><span class="line">    #include&lt;time.h&gt;</span><br><span class="line">    #include&lt;stdio.h&gt;</span><br><span class="line">DWORD oldprot,ret;</span><br><span class="line">PROC HookedFunction;</span><br><span class="line">UINT64 Offset[3] = &#123; 0xBA39 ,0xB9FD ,0xBA5D &#125;, Len[3] = &#123; 9,8,12 &#125;;//PATCH偏移和PATCH长度，这里皆patch为0x90(NOP)</span><br><span class="line">BYTE Ins[] = &#123;</span><br><span class="line"> 0x41,0x88,0x06, //mov [r14],al</span><br><span class="line"> 0x90, //nop</span><br><span class="line"> 0x49,0x83,0xC6,0x00 //add r14, 0</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">UINT64 InsOffset = 0xBA05,InsLen=sizeof(Ins);</span><br><span class="line">SIZE_T num;</span><br><span class="line">BYTE buf = 0x90;</span><br><span class="line">BYTE NOP[] = &#123; 0x90,0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 &#125;;</span><br><span class="line">void patch() &#123;</span><br><span class="line"> UINT64 Base = (UINT64)GetModuleHandle(nullptr);</span><br><span class="line"> for (int i = 0; i &lt; 3; i++) &#123;</span><br><span class="line"> UINT64 addr = Base + Offset[i];</span><br><span class="line"> VirtualProtect((void *)addr, Len[i], PAGE_EXECUTE_READWRITE, &amp;oldprot);</span><br><span class="line"> memcpy((void *)addr, NOP, Len[i]);</span><br><span class="line"> VirtualProtect((void*)addr, Len[i], oldprot, &amp;oldprot);</span><br><span class="line"> &#125;</span><br><span class="line"> printf(&quot;NOP donen&quot;);</span><br><span class="line"> VirtualProtect((void*)(Base + InsOffset), InsLen,PAGE_EXECUTE_READWRITE, &amp;oldprot);</span><br><span class="line"> memcpy((void *)(Base + InsOffset), Ins, InsLen);</span><br><span class="line"> VirtualProtect((void*)(Base + InsOffset), InsLen, oldprot, &amp;oldprot);</span><br><span class="line"> printf(&quot;Instruction Patch Done!n&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">BOOL APIENTRY DllMain(HMODULE hModule,</span><br><span class="line"> DWORD ul_reason_for_call,</span><br><span class="line"> LPVOID lpReserved</span><br><span class="line">)</span><br><span class="line">&#123;</span><br><span class="line"> switch (ul_reason_for_call)</span><br><span class="line"> &#123;</span><br><span class="line"> case DLL_PROCESS_ATTACH:</span><br><span class="line"> patch();</span><br><span class="line"> case DLL_THREAD_ATTACH:</span><br><span class="line"> case DLL_THREAD_DETACH:</span><br><span class="line"> case DLL_PROCESS_DETACH:</span><br><span class="line"> break;</span><br><span class="line"> &#125;</span><br><span class="line"> return TRUE;</span><br><span class="line">&#125;</span><br><span class="line">    #include&lt;Windows.h&gt;</span><br><span class="line">    #include&lt;time.h&gt;</span><br><span class="line">    #include&lt;stdio.h&gt;</span><br><span class="line">DWORD oldprot,ret;</span><br><span class="line">PROC HookedFunction;</span><br><span class="line">UINT64 Offset[3] = &#123; 0xBA39 ,0xB9FD ,0xBA5D &#125;, Len[3] = &#123; 9,8,12 &#125;;//PATCH偏移和PATCH长度，这里皆patch为0x90(NOP)</span><br><span class="line">BYTE Ins[] = &#123;</span><br><span class="line"> 0x41,0x88,0x06, //mov [r14],al</span><br><span class="line"> 0x90, //nop</span><br><span class="line"> 0x49,0x83,0xC6,0x00 //add r14, 0</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">UINT64 InsOffset = 0xBA05,InsLen=sizeof(Ins);</span><br><span class="line">SIZE_T num;</span><br><span class="line">BYTE buf = 0x90;</span><br><span class="line">BYTE NOP[] = &#123; 0x90,0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 &#125;;</span><br><span class="line">void patch() &#123;</span><br><span class="line"> UINT64 Base = (UINT64)GetModuleHandle(nullptr);</span><br><span class="line"> for (int i = 0; i &lt; 3; i++) &#123;//把三个点位的指令NOP掉</span><br><span class="line"> UINT64 addr = Base + Offset[i];</span><br><span class="line"> VirtualProtect((void *)addr, Len[i], PAGE_EXECUTE_READWRITE, &amp;oldprot);</span><br><span class="line"> memcpy((void *)addr, NOP, Len[i]);</span><br><span class="line"> VirtualProtect((void*)addr, Len[i], oldprot, &amp;oldprot);</span><br><span class="line"> &#125;</span><br><span class="line"> printf(&quot;NOP donen&quot;);</span><br><span class="line"> VirtualProtect((void*)(Base + InsOffset), InsLen,PAGE_EXECUTE_READWRITE, &amp;oldprot);</span><br><span class="line"> memcpy((void *)(Base + InsOffset), Ins, InsLen);//替换对应的指令</span><br><span class="line"> VirtualProtect((void*)(Base + InsOffset), InsLen, oldprot, &amp;oldprot);</span><br><span class="line"> printf(&quot;Instruction Patch Done!n&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void patchname() &#123;</span><br><span class="line"> UINT64 Base = (UINT64)GetModuleHandle(nullptr);</span><br><span class="line"> UINT64 Offset1 = 0xC8F3,Offset2=0xC5C6,NameOffset=0x772FA,Len1=4,Len2=5,flagOffset = 0x772E9;</span><br><span class="line"> char NewName[] = &quot;test.txt&quot;;//新文件名</span><br><span class="line"> char flag[] = &quot;catchmeifyoucan&quot;;</span><br><span class="line"> VirtualProtect((void*)(Base + Offset1), Len1, PAGE_EXECUTE_READWRITE, &amp;oldprot);</span><br><span class="line"> memcpy((void*)(Base + Offset1), NOP, Len1);//指令Nop掉防止写的时机不对发生变化</span><br><span class="line"> VirtualProtect((void*)(Base + Offset1), Len1, oldprot, &amp;oldprot);</span><br><span class="line"></span><br><span class="line"> VirtualProtect((void*)(Base + Offset2), Len2, PAGE_EXECUTE_READWRITE, &amp;oldprot);</span><br><span class="line"> memcpy((void*)(Base + Offset2), NOP, Len2);//指令Nop掉防止写的时机不对发生变化</span><br><span class="line"> VirtualProtect((void*)(Base + Offset2), Len2, oldprot, &amp;oldprot);</span><br><span class="line"></span><br><span class="line"> VirtualProtect((void*)(Base + NameOffset), sizeof(NewName), PAGE_EXECUTE_READWRITE, &amp;oldprot);</span><br><span class="line"> memcpy((void*)(Base + NameOffset), NewName, sizeof(NewName));//把名字写到内存中</span><br><span class="line"> VirtualProtect((void*)(Base + NameOffset), sizeof(NewName), oldprot, &amp;oldprot);</span><br><span class="line"></span><br><span class="line"> VirtualProtect((void*)(Base + flagOffset), sizeof(flag), PAGE_EXECUTE_READWRITE, &amp;oldprot);</span><br><span class="line"> memcpy((void*)(Base + flagOffset), flag, sizeof(flag));//把flag写到内存中</span><br><span class="line"> VirtualProtect((void*)(Base + flagOffset), sizeof(flag), oldprot, &amp;oldprot);</span><br><span class="line"></span><br><span class="line"> printf(&quot;Change Name Successn&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">BOOL APIENTRY DllMain(HMODULE hModule,</span><br><span class="line"> DWORD ul_reason_for_call,</span><br><span class="line"> LPVOID lpReserved</span><br><span class="line">)</span><br><span class="line">&#123;</span><br><span class="line"> switch (ul_reason_for_call)</span><br><span class="line"> &#123;</span><br><span class="line"> case DLL_PROCESS_ATTACH:</span><br><span class="line"> patch();</span><br><span class="line"> patchname();</span><br><span class="line"> case DLL_THREAD_ATTACH:</span><br><span class="line"> case DLL_THREAD_DETACH:</span><br><span class="line"> case DLL_PROCESS_DETACH:</span><br><span class="line"> break;</span><br><span class="line"> &#125;</span><br><span class="line"> return TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/115172.html">https://www.ctfiot.com/115172.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E8%85%BE%E8%AE%AF%E6%B8%B8%E6%88%8F%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E5%88%9D%E8%B5%9B%E9%A2%98%E8%A7%A3.full.md">CTF大赛WP集合&#x2F;articles&#x2F;腾讯游戏安全大赛初赛题解.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Base64/">Base64</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Reverse/%E8%85%BE%E8%AE%AF%E6%B8%B8%E6%88%8F%E5%AE%89%E5%85%A8%E6%8A%80%E6%9C%AF%E7%AB%9E%E8%B5%9B2023_%E5%AE%89%E5%8D%93%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%88%9D%E8%B5%9B%E9%A2%98%E8%A7%A3/" title="腾讯游戏安全技术竞赛2023 安卓客户端初赛题解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">腾讯游戏安全技术竞赛2023 安卓客户端初赛题解</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Reverse/%E8%B4%B5%E9%98%B3%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%8F%8A%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E7%B2%BE%E8%8B%B1%E5%AF%B9%E6%8A%97%E8%B5%9BReverse_EZRE_0%E8%A7%A3%E9%A2%98/" title="贵阳大数据及网络安全精英对抗赛 Reverse EZRE_0 解题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">贵阳大数据及网络安全精英对抗赛 Reverse EZRE_0 解题</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%80%E6%9C%9F%E6%8E%A8%E8%8D%90"><span class="toc-number">1.</span> <span class="toc-text">往期推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

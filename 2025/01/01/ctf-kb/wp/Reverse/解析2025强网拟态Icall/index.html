@@ -1,0 +1,333 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>解析2025强网拟态Icall | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="强网拟态2025 Icall多层加密+反调试对抗,pthread_create+prctl监控+TracerPid检测+kill自杀,绕反调试后三轮加密(多轮RC4+仿射+Enc1yp7)逐层解密。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解析2025强网拟态Icall">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81Icall/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="强网拟态2025 Icall多层加密+反调试对抗,pthread_create+prctl监控+TracerPid检测+kill自杀,绕反调试后三轮加密(多轮RC4+仿射+Enc1yp7)逐层解密。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="anti-debug">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81Icall/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '解析2025强网拟态Icall',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">解析2025强网拟态Icall</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="解析2025强网拟态Icall"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/277428.html">https://www.ctfiot.com/277428.html</a><br>ID: 277428</p>
+</blockquote>
+<p>Icall – 多层加密与反调试的攻防对抗</p>
+<p>前言</p>
+<p>本文详细记录了一道名为”Icall”的CTF逆向题目的完整分析过程。作为一道综合性逆向题目，它涉及反调试技术、自定义RC4流密码、仿射密码等多项技术，非常适合学习现代逆向工程的思路和方法。</p>
+<p>题目提示：Icall call where?</p>
+<p>目标：通过逆向分析获取隐藏的flag</p>
+<p>一、初步侦察 – 了解目标</p>
+<p>1.1 文件基本信息</p>
+<p>首先对目标文件进行基础信息收集：</p>
+<p>file Icall</p>
+<p>输出结果：</p>
+<p>Icall: ELF 64-bit LSB executable, x86-64, version 1 (SYSV),dynamically linked, interpreter &#x2F;lib64&#x2F;ld-linux-x86-64.so.2,for GNU&#x2F;Linux 3.2.0, stripped</p>
+<p>关键信息解读：</p>
+<p>ELF 64-bit：Linux平台64位可执行文件</p>
+<p>stripped：符号表已被移除，增加了分析难度，函数名、变量名等信息不可见</p>
+<p>dynamically linked：使用动态链接，会调用外部库函数</p>
+<p>.init_array：初始化函数数组，在main之前执行</p>
+<p>.data：数据段，可能包含密文</p>
+<p>.rodata：只读数据段，可能包含S-box</p>
+<p>pthread_create：创建线程</p>
+<p>prctl：进程控制，常用于反调试</p>
+<p>getpid+kill：可能用于自杀式反调试</p>
+<p>0x401120</p>
+<p>0x401130← 这是我们的重点</p>
+<p>主线程在init阶段创建一个子线程</p>
+<p>子线程调用prctl(PR_SET_PTRACER, …)设置跟踪权限</p>
+<p>读取&#x2F;proc&#x2F;self&#x2F;status文件检查TracerPid字段</p>
+<p>如果TracerPid不为0，说明正在被调试，程序调用kill自杀</p>
+<p>return命令会让函数立即返回，跳过所有反调试检测代码</p>
+<p>这比修改二进制文件更灵活，且不会破坏程序完整性</p>
+<p>第一次：参数为0x0C(12)</p>
+<p>第二次：参数为0x1E(30)</p>
+<p>第三次：参数为0x2A(42)</p>
+<p>轮次</p>
+<p>循环次数</p>
+<p>十六进制</p>
+<p>第1轮</p>
+<p>12</p>
+<p>0x0C</p>
+<p>第2轮</p>
+<p>30</p>
+<p>0x1E</p>
+<p>第3轮</p>
+<p>42</p>
+<p>0x2A</p>
+<p>字符类型</p>
+<p>基准</p>
+<p>模数(m)</p>
+<p>乘数(a)</p>
+<p>加数(b)</p>
+<p>逆元(a⁻¹)</p>
+<p>数字 0-9</p>
+<p>‘0’</p>
+<p>10</p>
+<p>7</p>
+<p>11</p>
+<p>3</p>
+<p>大写 A-Z</p>
+<p>‘A’</p>
+<p>26</p>
+<p>17</p>
+<p>11</p>
+<p>15</p>
+<p>小写 a-z</p>
+<p>‘a’</p>
+<p>26</p>
+<p>17</p>
+<p>11</p>
+<p>15</p>
+<p>r0uNd_Rc4：多轮（Round）RC4加密</p>
+<p>Aff1ne：仿射（Affine）密码</p>
+<p>Enc1yp7：加密（Encrypt）的1337写法</p>
+<p>使用pthread_create在主线程启动前创建监控线程</p>
+<p>监控线程通过prctl和读取&#x2F;proc&#x2F;self&#x2F;status检测调试状态</p>
+<p>检测到调试器时使用kill终止进程</p>
+<p>方法1（推荐）：GDB的return命令直接跳过函数</p>
+<p>方法2：Hook系统调用（LD_PRELOAD）</p>
+<p>方法3：修改二进制文件，NOP掉检测代码</p>
+<p>反调试函数通常在.init_array段注册</p>
+<p>多线程反调试比单线程更难绕过</p>
+<p>动态绕过比静态patch更灵活</p>
+<p>查找256字节数组（S-box）</p>
+<p>寻找典型的交换操作</p>
+<p>观察模256运算</p>
+<p>识别XOR操作</p>
+<p>自定义S-box初始值</p>
+<p>多轮PRGA生成单个密钥流字节</p>
+<p>CFB模式的链式XOR</p>
+<p>三轮独立加密</p>
+<p>多轮PRGA大幅增强了密钥流的随机性</p>
+<p>CFB模式消除了相同明文的模式特征</p>
+<p>三轮加密增加了暴力破解的复杂度</p>
+<p>模运算</p>
+<p>乘法逆元（扩展欧几里得算法）</p>
+<p>同余方程</p>
+<p>快速识别仿射变换（imul+add+idiv）</p>
+<p>验证互质性（gcd(a, m) &#x3D; 1）</p>
+<p>计算乘法逆元</p>
+<p>作为预处理层增加分析难度</p>
+<p>保持字符类型不变（数字仍是数字）</p>
+<p>与强加密算法结合使用</p>
+<p>文件信息收集（file, readelf, strings）</p>
+<p>段结构分析</p>
+<p>反汇编关键函数</p>
+<p>提取硬编码数据</p>
+<p>运行程序观察行为</p>
+<p>GDB设置断点跟踪执行流</p>
+<p>观察寄存器和内存变化</p>
+<p>Hook关键函数</p>
+<p>结合静态和动态信息</p>
+<p>识别算法特征</p>
+<p>编写验证脚本</p>
+<p>迭代优化理解</p>
+<p>使用内核级反调试（ptrace自身）</p>
+<p>添加时间检测（RDTSC指令）</p>
+<p>检测虚拟机环境</p>
+<p>实现代码完整性校验</p>
+<p>使用真正的密钥派生函数（PBKDF2）</p>
+<p>添加HMAC完整性保护</p>
+<p>实现白盒加密</p>
+<p>使用更复杂的分组密码</p>
+<p>控制流平坦化</p>
+<p>虚假控制流注入</p>
+<p>字符串加密</p>
+<p>虚拟机保护（VMProtect）</p>
+<p>工具</p>
+<p>用途</p>
+<p>命令示例</p>
+<p>file</p>
+<p>文件类型识别</p>
+<p>readelf</p>
+<p>ELF文件分析</p>
+<p>objdump</p>
+<p>反汇编</p>
+<p>strings</p>
+<p>字符串提取</p>
+<p>GDB</p>
+<p>动态调试</p>
+<p>Python</p>
+<p>脚本编写</p>
+<p>《Practical Reverse Engineering》</p>
+<p>《The IDA Pro Book》</p>
+<p>《Reversing: Secrets of Reverse Engineering》</p>
+<p>《Applied Cryptography》- Bruce Schneier</p>
+<p>《Cryptography Engineering》</p>
+<p>RFC 4345 (RC4)</p>
+<p>CrackMe网站</p>
+<p>CTFtime – CTF竞赛平台</p>
+<p>GitHub上的逆向工程工具集</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">file Icall</span><br><span class="line">Icall: ELF 64-bit LSB executable, x86-64, version 1 (SYSV),dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2,for GNU/Linux 3.2.0, stripped</span><br><span class="line">readelf -h Icall</span><br><span class="line">入口点地址：0x401040</span><br><span class="line">readelf -S Icall | grep -E&quot;Name|init_array|data|rodata&quot;</span><br><span class="line">strings Icall | head -30</span><br><span class="line">pthread_createpthread_detachprctlgetpidkill</span><br><span class="line">readelf -x .init_array Icall</span><br><span class="line">&quot;.init_array&quot;节的十六进制输出： 0x00405dd0 20114000 00000000 30114000 00000000</span><br><span class="line">objdump -d Icall | grep&quot;401130:&quot;-A 50</span><br><span class="line">401130: push %rbp401131: mov %rsp,%rbp401134: sub $0x40,%rsp...401173: movabs $0x401290,%r8 # 线程函数地址...40118b: call *%r8 # pthread_create调用</span><br><span class="line">objdump -d Icall | grep&quot;401290:&quot;-A 80</span><br><span class="line">4012ce: mov $0x4,%edi # PR_SET_TRACER4012e9: call *%r9 # prctl调用</span><br><span class="line">set pagination offset confirm off</span><br><span class="line"># 在反调试函数入口设置断点b *0x401130run &lt;&lt;&lt; &quot;test_input&quot;# 直接返回，不执行反调试代码return</span><br><span class="line"># 继续执行到mainb *0x402000continuequit</span><br><span class="line">gdb -x bypass_antidebug.gdb Icall</span><br><span class="line">objdump -d Icall | grep -A 30&quot;^0000000000401040&quot;</span><br><span class="line">401061: mov $0x402000,%rdi # main函数地址401068: call *0x4f6a(%rip) # __libc_start_main</span><br><span class="line">objdump -d Icall | grep&quot;402000:&quot;-A 200 | head -250</span><br><span class="line">1. 函数序言（保存栈帧）2. 调用scanf/fgets读取用户输入3. 调用strlen计算输入长度4. 多次调用同一个函数（疑似加密函数）5. 调用memcmp比较结果6. 根据比较结果输出成功/失败信息</span><br><span class="line">readelf -x .data Icall</span><br><span class="line">406020 f788c329 36646329 c77f1cab 71e00349 ...)6dc)....q..I406030 73cb0aaf 0c87848e 5a64c7ac 2a670000 s.......Zd..*g..</span><br><span class="line">enc = [0xF7,0x88,0xC3,0x29,0x36,0x64,0x63,0x29,0xC7,0x7F, 0x1C,0xAB,0x71,0xE0,0x03,0x49,0x73,0xCB,0x0A,0xAF, 0x0C,0x87,0x84,0x8E,0x5A,0x64,0xC7,0xAC,0x2A,0x67]</span><br><span class="line"># 绕过反调试b *0x401130runreturn</span><br><span class="line"># 在可能的加密调用处断点b *0x402073b *0x402102b *0x40219bcontinue</span><br><span class="line"># 访问256字节数组mov (%rax,%rcx,1),%dl # S[i]mov (%rax,%rdx,1),%r8b # S[j]</span><br><span class="line">xchg %dl,%r8b # swap(S[i], S[j])</span><br><span class="line">add %dl,%r8b # t = S[i] + S[j]movzbl %r8b,%edxmov (%rax,%rdx,1),%cl # K = S[t]</span><br><span class="line">xor %cl,%bl # plaintext ^ keystream</span><br><span class="line">s_box = [ 0xCD,0xE1,0x65,0xC6,0xB3,0x05,0x63,0x50,0x07,0x36, 0x0B,0x10,0x87,0x49,0x40,0x0F,0xF0,0xB5,0xE9,0xD2, # ... 共256个字节 0x62,0xA3,0x79,0x4C,0xFE,0xFF]</span><br><span class="line">defget_keystream_byte(n_rounds): for_inrange(n_rounds): # 重复n次 i = (i +1) %256 j = (j + s_box[i]) %256 s_box[i], s_box[j] = s_box[j], s_box[i] k = s_box[(s_box[i] + s_box[j]) %256] returnk # 只返回最后一次的结果</span><br><span class="line"># 第一个字节特殊处理C[0] = P[0] ^ S_box[0] ^ K[0]# 后续字节形成链式依赖foriinrange(1, len(P)): C[i] = P[i] ^ C[i-1] ^ K[i]</span><br><span class="line">输入： AAAA AAAA ...RC4前： LLLL LLLL ... # 字符已经改变！</span><br><span class="line"># 判断字符类型cmp $&#x27;0&#x27;,%aljl .not_digitcmp $&#x27;9&#x27;,%aljg .not_digit</span><br><span class="line"># 对数字进行变换movzbl %al,%eaxsub $0x30,%eax # x = c - &#x27;0&#x27;imul $0x7,%eax,%edx # y = 7 * xadd $0xb,%edx # y = y + 11mov $0xa,%ecxcdqidiv %ecx # y = y % 10add $0x30,%edx # result = y + &#x27;0&#x27;</span><br><span class="line">E(x) = (a * x + b) mod m</span><br><span class="line">D(y) = a^(-1) * (y - b) mod m</span><br><span class="line"># 对于数字：7 * 3 = 21 ≡ 1 (mod 10) ✓# 对于字母：17 * 15 = 255 ≡ 1 (mod 26) ✓</span><br><span class="line">原始flag → [仿射变换] → [RC4轮1(0x0C)] → [RC4轮2(0x1E)] → [RC4轮3(0x2A)] → 密文</span><br><span class="line">密文 → [RC4轮3逆(0x2A)] → [RC4轮2逆(0x1E)] → [RC4轮1逆(0x0C)] → [仿射逆变换] → 原始flag</span><br><span class="line">#!/usr/bin/env python3</span><br><span class="line"># -*- coding: utf-8 -*-# 密文数据（从0x406020提取）new_enc = [0xF7,0x88,0xC3,0x29,0x36,0x64,0x63,0x29,0xC7,0x7F, 0x1C,0xAB,0x71,0xE0,0x03,0x49,0x73,0xCB,0x0A,0xAF, 0x0C,0x87,0x84,0x8E,0x5A,0x64,0xC7,0xAC,0x2A,0x67]defget_key(a4): &quot;&quot;&quot; 生成RC4密钥流 参数a4: PRGA循环次数 &quot;&quot;&quot; # 自定义S-box初始值（256字节） s_box = [ 0xCD,0xE1,0x65,0xC6,0xB3,0x05,0x63,0x50,0x07,0x36, 0x0B,0x10,0x87,0x49,0x40,0x0F,0xF0,0xB5,0xE9,0xD2, 0x14,0x15,0x16,0x17,0xED,0xDB,0x77,0xE4,0x1C,0x57, 0xC7,0x6D,0x66,0xA9,0xB2,0x3E,0x24,0xCB,0xDC,0xC0, 0xA8,0x29,0xFD,0xF6,0x76,0x2D,0x92,0x8F,0xF9,0x68, 0xEE,0x64,0x34,0x7C,0x71,0xCA,0xB1,0x52,0x3A,0x98, 0xE7,0x4D,0x5D,0x03,0x82,0x37,0x9B,0x91,0x6F,0x55, 0xE8,0xEA,0x43,0x74,0x0D,0x38,0x4B,0xFC,0x67,0x0E, 0x47,0x94,0x7E,0x78,0x54,0x61,0xB9,0xB6,0x33,0x09, 0xDD,0x5B,0x26,0x7A,0x83,0x7B,0x3F,0xF5,0x02,0xD6, 0xDA,0xD1,0xA0,0x80,0x4E,0xAE,0x6A,0x6B,0x8E,0xCC, 0x39,0x44,0x5A,0x48,0x72,0xC4,0x20,0x13,0x2C,0x8B, 0xE0,0x32,0x7F,0x89,0x19,0x0A,0x1F,0x22,0x31,0x04, 0xDF,0xE6,0xA2,0x85,0x86,0x30,0x06,0x12,0xBE,0x51, 0x8D,0x8C,0xD5,0x2B,0x90,0x18,0xB8,0x0C,0xD4,0x95, 0x96,0x9A,0xD9,0x9C,0x2F,0xEF,0x99,0xE3,0x9E,0xB0, 0x70,0xAD,0xB7,0x1E,0x28,0x45,0xF3,0xCE,0x27,0x69, 0xAA,0xF2,0xE5,0xA5,0xD3,0xE2,0xAF,0x9D,0x35,0x3D, 0xB4,0xAB,0xC8,0xA4,0x9F,0x6E,0xBA,0x2A,0xBC,0x84, 0x97,0x08,0xA7,0xD7,0xC2,0x2E,0x6C,0x81,0x4A,0x5F, 0xA1,0xC9,0xFA,0x21,0x73,0x00,0xC3,0x11,0x58,0x60, 0x56,0x4F,0x1A,0xFB,0x1B,0x01,0xA6,0x88,0x59,0xD0, 0x5C,0xC1,0x3C,0xAC,0xC5,0x7D,0xF1,0x41,0xBB,0x8A, 0x75,0xDE,0x42,0xEC,0x93,0xEB,0xBD,0x3B,0x53,0x46, 0xBF,0x1D,0x5E,0xD8,0xF4,0xCF,0x23,0xF7,0xF8,0x25, 0x62,0xA3,0x79,0x4C,0xFE,0xFF ] xor = [] i =0 j =0 v7 =0 # 对每个字节生成密钥流 forbyte_posinrange(30): # 执行a4次PRGA循环 for_inrange(a4): i = (i +1) %256 j = (j + s_box[i]) %256 # 交换S[i]和S[j] s_box[i], s_box[j] = s_box[j], s_box[i] # 生成密钥流字节 t_idx = (s_box[i] + s_box[j]) %256 v7 = s_box[t_idx] xor.append(v7) returnxor</span><br><span class="line"># 三轮解密（逆序：从0x2A开始）rounds = [0x2a,0x1e,0xc]print(&quot;=&quot;*60)print(&quot;开始RC4三轮解密&quot;)print(&quot;=&quot;*60)forround_numinrange(3): print(f&quot;n【第&#123;round_num +1&#125;轮解密】&quot;) print(f&quot; 循环次数:&#123;rounds[round_num]&#125;(0x&#123;rounds[round_num]:</span><br><span class="line">02x&#125;)&quot;) # 生成本轮密钥流 xor = get_key(rounds[round_num]) print(f&quot; 第一个密钥流字节: 0x&#123;xor[0]:</span><br><span class="line">02x&#125;&quot;) # 逆向链式XOR：从后往前解密 foriinrange(len(new_enc) -1,-1,-1): ifi !=0: # C[i] = P[i] ^ C[i-1] ^ K[i] # 解密：P[i] = C[i] ^ C[i-1] ^ K[i] new_enc[i] = new_enc[i] ^ new_enc[i -1] ^ xor[i] else: # 第一个字节特殊处理 new_enc[i] = new_enc[i] ^0xCD^ xor[i] print(f&quot; 解密后前10字节:&#123;bytes(new_enc[:10])&#125;&quot;)print(&quot;n&quot;+&quot;=&quot;*60)print(&quot;RC4解密完成！&quot;)print(&quot;=&quot;*60)print(f&quot;n仿射密文:&#123;bytes(new_enc)&#125;&quot;)print(f&quot;十六进制:&#123;bytes(new_enc).hex()&#125;&quot;)</span><br><span class="line">==============================================================开始RC4三轮解密==============================================================【第1轮解密】 循环次数: 42 (0x2a) 第一个密钥流字节: 0x83 解密后前10字节: b&#x27;x08x9ex11Vx1c&#x27;【第2轮解密】 循环次数: 30 (0x1e) 第一个密钥流字节: 0x97 解密后前10字节: b&#x27;=6Gx08x1d&#x27;【第3轮解密】 循环次数: 12 (0x0c) 第一个密钥流字节: 0x5b 解密后前10字节: b&#x27;uklb&#123;a1vYg&#x27;==============================================================RC4解密完成！==============================================================仿射密文: b&#x27;uklb&#123;a1vYg_Az9_Luu8ynNyz8xm0!&#125;&#x27;十六进制: 756b6c627b61317659675f417a395f4c757538796e4e797a38786d30217d</span><br><span class="line">#!/usr/bin/env python3</span><br><span class="line"># -*- coding: utf-8 -*-defdecrypt_char(c): &quot;&quot;&quot; 解密单个字符 使用仿射密码的逆变换 &quot;&quot;&quot; if&#x27;0&#x27;&lt;= c &lt;=&#x27;9&#x27;: # 数字：a=7, b=11, m=10, a^(-1)=3 base, mod, inv = ord(&#x27;0&#x27;),10,3 elif&#x27;A&#x27;&lt;= c &lt;=&#x27;Z&#x27;: # 大写字母：a=17, b=11, m=26, a^(-1)=15 base, mod, inv = ord(&#x27;A&#x27;),26,15 elif&#x27;a&#x27;&lt;= c &lt;=&#x27;z&#x27;: # 小写字母：a=17, b=11, m=26, a^(-1)=15 base, mod, inv = ord(&#x27;a&#x27;),26,15 else: # 非字母数字字符不变（如花括号、感叹号） returnc # 解密公式：x = a^(-1) * (y - b) mod m y = ord(c) - base x = (inv * (y -11)) % mod returnchr(x + base)defdecrypt_string(s): &quot;&quot;&quot;解密整个字符串&quot;&quot;&quot; return&#x27;&#x27;.join(decrypt_char(c)forcins)if__name__ ==&quot;__main__&quot;: # 从RC4解密得到的仿射密文 shifted_flag =&quot;uklb&#123;a1vYg_Az9_Luu8ynNyz8xm0!&#125;&quot; print(&quot;=&quot;*60) print(&quot;仿射密码解密&quot;) print(&quot;=&quot;*60) print(f&quot;n输入（仿射密文）：&#123;shifted_flag&#125;&quot;) # 解密 final_flag = decrypt_string(shifted_flag) print(f&quot;n输出（最终flag）：&#123;final_flag&#125;&quot;) print(&quot;n&quot;+&quot;=&quot;*60) print(&quot;解密成功！&quot;) print(&quot;=&quot;*60)</span><br><span class="line">==============================================================仿射密码解密==============================================================输入（仿射密文）：uklb&#123;a1vYg_Az9_Luu8ynNyz8xm0!&#125;输出（最终flag）：flag&#123;r0uNd_Rc4_Aff1neEnc1yp7!&#125;==============================================================解密成功！==============================================================</span><br><span class="line">flag&#123;r0uNd_Rc4_Aff1neEnc1yp7!&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/277428.html">https://www.ctfiot.com/277428.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81Icall.full.md">CTF大赛WP集合&#x2F;articles&#x2F;解析2025强网拟态Icall.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/anti-debug/">anti-debug</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9Beasyre/" title="解析2025强网拟态决赛easyre"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">解析2025强网拟态决赛easyre</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%9D%AFtradre/" title="解析2025强网杯tradre"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">解析2025强网杯tradre</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

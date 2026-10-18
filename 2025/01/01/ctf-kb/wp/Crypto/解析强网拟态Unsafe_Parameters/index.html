@@ -1,0 +1,268 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>解析强网拟态 Unsafe Parameters - 共享私钥指数 RSA 攻击 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="强网拟态 2025 Unsafe Parameters：5 组 RSA 共享 d 触发 LLL 攻击，构造 6×6 矩阵恢复 d 分解模数解 AES。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解析强网拟态 Unsafe Parameters - 共享私钥指数 RSA 攻击">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%90%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81Unsafe_Parameters/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="强网拟态 2025 Unsafe Parameters：5 组 RSA 共享 d 触发 LLL 攻击，构造 6×6 矩阵恢复 d 分解模数解 AES。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="RSA-shared-d">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%90%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81Unsafe_Parameters/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '解析强网拟态 Unsafe Parameters - 共享私钥指数 RSA 攻击',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">解析强网拟态 Unsafe Parameters - 共享私钥指数 RSA 攻击</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="解析强网拟态 Unsafe Parameters - 共享私钥指数 RSA 攻击"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/277005.html">https://www.ctfiot.com/277005.html</a><br>ID: 277005</p>
+</blockquote>
+<p>Unsafe Parameters – 共享私钥指数的RSA攻击</p>
+<p>题目信息</p>
+<p>题目描述：多点n真的会更安全吗，我有种不好的预感……（Is having more n really safer? I have a bad feeling）</p>
+<p>知识点：RSA、共享私钥攻击、LLL格基规约算法</p>
+<p>一、题目分析</p>
+<p>1.1 题目代码解析</p>
+<p>首先，我们来看题目给出的加密代码（task.py）：</p>
+<p>fromCrypto.Util.numberimport<em>fromCrypto.Util.PaddingimportpadfromCrypto.CipherimportAESfromhashlibimportsha3_512fromsecretimport</em>defgenParams(): ns &#x3D; [] es &#x3D; [] ps &#x3D; [] d &#x3D; getPrime(425) # 生成一个425位的素数作为私钥指数 for_in’flag{‘: # 循环5次（’flag{‘有5个字符） p, q, r &#x3D; [getPrime(512)for_inrange(3)] # 生成3个512位素数 ps.append((p, q, r)) n &#x3D; p * q * r # n是三个素数的乘积 totient &#x3D; (p -1) * (q -1) * (r -1) # 计算欧拉函数 es.append(inverse(d, totient)) # e是d在模totient下的逆元 ns.append(n) return(ns, es), (d, ps)</p>
+<p>1.2 加密流程分析</p>
+<p>让我们逐步分析这个加密过程：</p>
+<p>生成唯一的私钥指数d：程序首先生成一个425位的素数d，这将作为所有RSA系统的共享私钥指数</p>
+<p>生成5组RSA参数：循环5次，每次执行以下操作：</p>
+<p>生成3个512位的素数 p、q、r</p>
+<p>计算模数n &#x3D; p × q × r（约1536位）</p>
+<p>计算欧拉函数φ(n) &#x3D; (p-1) × (q-1) × (r-1)</p>
+<p>计算公钥指数e &#x3D; d^(-1) mod φ(n)</p>
+<p>AES密钥生成：</p>
+<p>将所有素数求和：sum &#x3D; Σ(p + q + r)</p>
+<p>使用SHA3-512哈希后取前16字节作为AES密钥</p>
+<p>用AES-ECB模式加密flag</p>
+<p>e_i是已知的公钥指数</p>
+<p>d是未知的共享私钥指数（我们要求的）</p>
+<p>k_i是未知的整数系数</p>
+<p>φ(n_i)近似等于n_i（因为p、q、r都是大素数）</p>
+<p>格（Lattice）可以想象成多维空间中的一个点阵</p>
+<p>LLL算法能帮我们在这个点阵中找到长度较短的向量</p>
+<p>我们可以构造一个特殊的格，使得”短向量”恰好包含我们想要的d</p>
+<p>M &#x3D; 2^1024是一个大数（用于平衡）</p>
+<p>e_i是各个公钥指数</p>
+<p>n_i是各个模数</p>
+<p>创建6×6的格矩阵</p>
+<p>使用LLL算法找到短向量（Mat.LLL()）</p>
+<p>规约后的矩阵第一行通常包含最短向量</p>
+<p>从短向量的第一个分量除以M得到d</p>
+<p>由于e × d ≡ 1 (mod φ(n))，所以e × d - 1是φ(n)的倍数</p>
+<p>设e × d - 1 &#x3D; 2^s × t（其中t是奇数）</p>
+<p>对随机选择的g，计算g^t, g^(2t), g^(4t), …</p>
+<p>当某个值减1后与n的最大公约数不为1且不为n时，我们找到了n的一个因子</p>
+<p>不同的RSA系统必须使用不同的密钥对</p>
+<p>本题错误地在多个RSA系统中共享了私钥指数d</p>
+<p>这创造了可被利用的数学关系</p>
+<p>密钥生成的独立性</p>
+<p>每个RSA密钥对都应该独立生成</p>
+<p>即使是相关的系统，也不应共享任何密钥材料</p>
+<p>共享私钥攻击（如本题）</p>
+<p>低加密指数攻击（如e&#x3D;3的广播攻击）</p>
+<p>Coppersmith攻击（当部分明文已知时）</p>
+<p>背包密码攻击</p>
+<p>分解难度理论上更高</p>
+<p>相同安全级别下n可以更小</p>
+<p>计算效率降低</p>
+<p>实际安全性提升有限</p>
+<p>如果实现不当（如本题），反而引入新漏洞</p>
+<p>私钥d的特征：</p>
+<p>比特长度：425 bits（符合题目设定）</p>
+<p>是素数：True（验证通过）</p>
+<p>LLL算法从规约后矩阵的第3行成功提取</p>
+<p>模数分解结果：</p>
+<p>每个n成功分解为3个512位的素数</p>
+<p>总共分解出15个素数（5组，每组3个）</p>
+<p>所有素数的比特长度都正确（512 bits）</p>
+<p>最终验证：</p>
+<p>成功解密AES密文</p>
+<p>获得格式正确的flag</p>
+<p>完整攻击流程验证成功</p>
+<p>如果只有3组RSA系统共享d，LLL攻击是否仍然有效？</p>
+<p>可能有效，但成功率会降低。LLL攻击的成功率与方程组数量相关。</p>
+<p>如果每个n使用不同的e值，但仍共享d，攻击是否仍然可行？</p>
+<p>是的，仍然可行。关键漏洞是共享d，而不是e的选择。</p>
+<p>如果加密指数e很小（如e&#x3D;3），但每个系统使用不同的d，会有什么问题？</p>
+<p>如果对相同明文加密多次，可能遭受Håstad广播攻击。</p>
+<p>漏洞本质：多个RSA系统共享私钥指数d创造了可利用的数学关系</p>
+<p>攻击方法：利用LLL格基规约算法从公开参数中恢复共享的私钥</p>
+<p>数学原理：e_i × d ≈ k_i × n_i这一近似关系是攻击的基础</p>
+<p>安全教训：密钥独立性是密码系统安全的基本原则</p>
+<p>RSA的安全性建立在大数分解的困难性上</p>
+<p>但如果实现不当，数学关系会泄露密钥信息</p>
+<p>LLL算法是格密码学中的强大工具</p>
+<p>理解攻击原理有助于构建更安全的系统</p>
+<p>RSA密码系统原理</p>
+<p>LLL格基规约算法</p>
+<p>多素数RSA标准（Multi-Prime RSA）</p>
+<p>密码学最佳实践指南</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">fromCrypto.Util.numberimport*fromCrypto.Util.PaddingimportpadfromCrypto.CipherimportAESfromhashlibimportsha3_512fromsecretimport*defgenParams(): ns = [] es = [] ps = [] d = getPrime(425) # 生成一个425位的素数作为私钥指数 for_in&#x27;flag&#123;&#x27;: # 循环5次（&#x27;flag&#123;&#x27;有5个字符） p, q, r = [getPrime(512)for_inrange(3)] # 生成3个512位素数 ps.append((p, q, r)) n = p * q * r # n是三个素数的乘积 totient = (p -1) * (q -1) * (r -1) # 计算欧拉函数 es.append(inverse(d, totient)) # e是d在模totient下的逆元 ns.append(n) return(ns, es), (d, ps)</span><br><span class="line">e × d ≡ 1 (mod φ(n))</span><br><span class="line">e × d = 1 + k × φ(n)</span><br><span class="line">e_i × d = 1 + k_i × φ(n_i)</span><br><span class="line">e_i × d ≡ 1 (mod φ(n_i))</span><br><span class="line">e_i × d = 1 + k_i × φ(n_i)</span><br><span class="line">e_i × d ≈ k_i × n_i</span><br><span class="line">e_i × d - k_i × n_i ≈ 0</span><br><span class="line">┌ ┐│ M e₀ e₁ e₂ e₃ e₄ ││ 0 -n₀ 0 0 0 0 ││ 0 0 -n₁ 0 0 0 ││ 0 0 0 -n₂ 0 0 ││ 0 0 0 0 -n₃ 0 ││ 0 0 0 0 0 -n₄ │└ ┘</span><br><span class="line">v × Mat = (M×d + k₀×0 + k₁×0 + k₂×0 + k₃×0 + k₄×0, d×e₀ + k₀×(-n₀) + 0 + 0 + 0 + 0, d×e₁ + 0 + k₁×(-n₁) + 0 + 0 + 0, d×e₂ + 0 + 0 + k₂×(-n₂) + 0 + 0, d×e₃ + 0 + 0 + 0 + k₃×(-n₃) + 0, d×e₄ + 0 + 0 + 0 + 0 + k₄×(-n₄))</span><br><span class="line">v × Mat = (M×d, d×e₀ - k₀×n₀, d×e₁ - k₁×n₁, d×e₂ - k₂×n₂, d×e₃ - k₃×n₃, d×e₄ - k₄×n₄)</span><br><span class="line">fromsage.allimport*fromCrypto.Util.numberimport*importgmpy2</span><br><span class="line"># 已知的公开参数ns = [...] # 5个模数es = [...] # 5个公钥指数</span><br><span class="line"># 构造格矩阵M =2**1024</span><br><span class="line"># 选择一个足够大的数a = [0] *6a[0] = [M, es[0], es[1], es[2], es[3], es[4]]a[1] = [0, -ns[0],0,0,0,0]a[2] = [0,0, -ns[1],0,0,0]a[3] = [0,0,0, -ns[2],0,0]a[4] = [0,0,0,0, -ns[3],0]a[5] = [0,0,0,0,0, -ns[4]]# 创建矩阵并进行LLL规约Mat = matrix(ZZ, a)Mat_LLL = Mat.LLL()</span><br><span class="line"># 从规约后的矩阵中提取dd = abs(Mat_LLL[3][0]) // M</span><br><span class="line">defgetpq(n, e, d): &quot;&quot;&quot; 利用e和d分解模数n 原理：e×d - 1是φ(n)的倍数 &quot;&quot;&quot; whileTrue: k = e * d -1 g = randint(0, n) # 随机选择一个g whilek %2==0: k = k //2 temp = gmpy2.powmod(g, k, n) -1 p = gmpy2.gcd(temp, n) ifp &gt;1andisPrime(p): returnp</span><br><span class="line">key =0forn, einzip(ns, es): # 分解第一个素数p p = int(getpq(n, e, d)) # 分解第二个素数q q = int(getpq(n // p, e, d)) # 计算第三个素数r r = n // p // q # 累加所有素数 key += p + q + r</span><br><span class="line">fromCrypto.CipherimportAESfromhashlibimportsha3_512</span><br><span class="line"># 计算AES密钥key = sha3_512(str(key).encode()).digest()[:16]# 已知的密文ct =b&#x27;Jx08x0cxfe...&#x27;# 解密获得flagflag = AES.new(key, AES.MODE_ECB).decrypt(ct)print(flag)</span><br><span class="line">fromsage.allimport*fromCrypto.Util.numberimport*importgmpy2</span><br><span class="line"># 公开参数ns = [729626364576206469704240917876675932841677846807662743683194531189219993605123671836962855605283722577718230552963049472251011326675202612492908848548419883361685662678347011887752523869081347313358470192291106167923273619672010347904232948623232956703976722596246251219832472749781700661621717970912452690860710243752051416797956410009096107757901714990018414837758557784033898837218196380413347278999394220278929595840196278059116531409774355756772349502091527,1905432596115201099512716986634374621489368222604315919606798930577721863294916275385323430940054377575273762764157350871093106918016952598143825002497857813393515175754983371150373414986745909170502391681896252141058196242286758315439213464335711981585004206505072743627148478873299089587473670712150938286701206231734068594554186483978059254161949801153805752489828395472590106405761648181381945795038085612905557546907903561767813822101495476457137965288880829,1364349980724204783960363890369037262456777329397270902364257972605993939460160766530889520645888701966401869980072151818996346007664249855901114579605632358191242379651843548926065735575249122023543206153088606751338328933651430885645444839242513718915066302971957689904414300766000572990594260836480347717506097403302570129593533017205416936506156113683938133811098995666977893386015199252455279325252257306124895958614122639652100229863446635612470942945471629,801368910415539931617837996119032301790585643652894417707002521182569449104238101253556548156062846942011258499343192564944616333555000780965111384091131074358231330717413121484815002612991437436336271715078003900216545055505405363415778086330672269759661284535787363323398929120499505051378299467980018690275341014026390376705451595348674549031968858607633947674244014656615045639930798213161815130251215148286379903187335369475976106390101774566278602818405563,966507016385573035667733231340091844033410158675175976938028218854439065352997895173668326599042719776214706325758565722305289931861889759808022284179479582700755314576250841330755684569639628012527976286442288571350327307582007959428925460653350857512795573323486273071975979456828134582982048746188934676698845075430701350305713747666370252912970653968385390246217234899448990236850880873105998296512557366752267827688836849041157572772272378435636367162425013]es = [271264973728317298627822473902975461834475616151421882685140849409171660245987005602120200976835072966082573357282000859946014645129524701781302678299643424924092704444611429422064341444927220441684375194952864825982915148126084102832224731498348832396834993134927447743362540828447462072582023959357845229307404791804881057335208287771899121154533179273274029972648764343120454360366227609296867085751393693129946684282269737380796082741762647814800935844443493,1003585299728442138241618739786172474341836074346983356412903232651178484164007865852681323340512406956827176253325249434459143223478630158795320316445722303141000749369087588146876087005139101967705654538148200848735795226715484701026716263131990473014248826031226350016169675911701420383849573743077161936130739955632072650333006768068396767746102320645544271946493533626477749495460960365939362830334782483616521427745117179433129272929291131199903349977861093,528794486797786998573050589647661205854628331390578568482905276781799068613879068393786314280307765489986817827366340249545226369795434498075653554440390174127680889163962386407937584138342055553885382937486807537913781141805602397908008361192107987266566035872632130183102501118938531330140154852996630732644530954025739132771439783366022539476194754352734861357158197716623228211860189868592877935421689151152269864018399507621324672725433395533000425391708101,63082374875671578481986217433413118060930080658278695174993640397998104913203950822096713822227514918774669078130439943184022889683633824002111416144422250644695809731240622289790840695469043596475009958463780096705571401137513331089894183226911665633164170027318352120002851940432163291498705806239158684141492080194438572549164494596965748695244152843943149994989589419519395650481254722496058552304954140980743159877918387972030837603120258130045817858729621,120373323462979513980656435521004077312964483601298713849302793507801996545855844801219890178210569842943901523332883574699699439655256681068585396438543716728771762620808023696864023456625376138578749985774885652016790204471223404504866831356254849552890279653807176865165230965065842479979722094076544915080001416276324550993965426099480075249719779502220020343237480355441663501565965298776708377675024327374331823503627493136287447543537154779812201209689733]defgetpq(n, e, d): &quot;&quot;&quot;使用e和d分解模数n的因子&quot;&quot;&quot; whileTrue: k = e * d -1 g = randint(0, n) whilek %2==0: k = k //2 temp = gmpy2.powmod(g, k, n) -1 p = gmpy2.gcd(temp, n) ifp &gt;1andisPrime(p): returnp</span><br><span class="line"># 第一步：使用LLL算法恢复私钥dM =2**1024a = [0] *6a[0] = [M, es[0], es[1], es[2], es[3], es[4]]a[1] = [0, -ns[0],0,0,0,0]a[2] = [0,0, -ns[1],0,0,0]a[3] = [0,0,0, -ns[2],0,0]a[4] = [0,0,0,0, -ns[3],0]a[5] = [0,0,0,0,0, -ns[4]]Mat = matrix(ZZ, a)Mat_LLL = Mat.LLL()d = abs(Mat_LLL[3][0]) // Mprint(f&quot;[+] 恢复的私钥d的比特长度:&#123;d.bit_length()&#125;&quot;)print(f&quot;[+] d是否为素数:&#123;isPrime(d)&#125;&quot;)print(f&quot;[+] d =&#123;d&#125;&quot;)</span><br><span class="line"># 第二步：分解所有模数并计算密钥key =0fori, (n, e)inenumerate(zip(ns, es)): print(f&quot;n[*] 正在分解第&#123;i+1&#125;个模数...&quot;) p = int(getpq(n, e, d)) q = int(getpq(n // p, e, d)) r = n // p // q print(f&quot; p =&#123;p&#125;&quot;) print(f&quot; q =&#123;q&#125;&quot;) print(f&quot; r =&#123;r&#125;&quot;) key += p + q + rprint(f&quot;n[+] 所有素数之和:&#123;key&#125;&quot;)</span><br><span class="line"># 第三步：解密flagfromCrypto.CipherimportAESfromhashlibimportsha3_512key = sha3_512(str(key).encode()).digest()[:16]ct =b&#x27;Jx08x0cxfex0eCnx96!xb3x05xa9x9bxf9nxe3-xf2mxdb&amp;.xb5hxe1x0exd6x89x14x87Zx0b0pxbbxd9x93xd7x1cTxa2xf36x02x8e:\x92&#x27;flag = AES.new(key, AES.MODE_ECB).decrypt(ct)print(f&quot;n[+] FLAG:&#123;flag.decode()&#125;&quot;)</span><br><span class="line">======================================================================CTF题目: Unsafe Parameters - 共享私钥指数的RSA攻击======================================================================[*] 步骤1: 使用LLL算法恢复私钥d... [*] 正在执行LLL规约... [+] 成功恢复私钥d [+] d的比特长度: 425 [+] d是否为素数: True [+] d = 79707249059210800427586261608616662408613108106616463837006013556788454508274558925787023296092333364088239266520329780878389357[*] 步骤2: 分解所有模数... [*] 正在分解第1个模数... [+] 找到p (长度: 512 bits) [+] 找到q (长度: 512 bits) [+] 计算r (长度: 512 bits) [*] 正在分解第2个模数... [+] 找到p (长度: 512 bits) [+] 找到q (长度: 512 bits) [+] 计算r (长度: 512 bits) [*] 正在分解第3个模数... [+] 找到p (长度: 512 bits) [+] 找到q (长度: 512 bits) [+] 计算r (长度: 512 bits) [*] 正在分解第4个模数... [+] 找到p (长度: 512 bits) [+] 找到q (长度: 512 bits) [+] 计算r (长度: 512 bits) [*] 正在分解第5个模数... [+] 找到p (长度: 512 bits) [+] 找到q (长度: 512 bits) [+] 计算r (长度: 512 bits) [+] 所有素数之和: 156153497594247358765396179613649056293308992681241616288376609821218999176612095856686173629609505210284936141678187878288723742318272771805218987444978987[*] 步骤3: 解密flag... [+] AES密钥已生成 [+] 正在解密...======================================================================FLAG: flag&#123;9b31dd3e-aa6a-4c4d-b796-bff4e4dfe0cc&#125;======================================================================</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/277005.html">https://www.ctfiot.com/277005.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E8%A7%A3%E6%9E%90%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81Unsafe_Parameters.full.md">CTF大赛WP集合&#x2F;articles&#x2F;解析强网拟态Unsafe_Parameters.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/RSA-shared-d/">RSA-shared-d</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%90n1ctf2025_-n1/" title="n1ctf 2025 Crypto (n1)³ 张量分解攻击"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">n1ctf 2025 Crypto (n1)³ 张量分解攻击</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Crypto/%E9%87%8F%E5%AD%90%E5%AE%89%E5%85%A8_quantum_ctf_Qlotto_Hack_the_box/" title="量子安全 quantum ctf Qlotto Hack the box"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">量子安全 quantum ctf Qlotto Hack the box</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

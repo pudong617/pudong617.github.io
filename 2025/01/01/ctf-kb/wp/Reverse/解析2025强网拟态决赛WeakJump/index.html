@@ -1,0 +1,531 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>解析2025强网拟态决赛WeakJump | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="强网拟态2025决赛WeakJump逆向,静态链接+stripped+ptrace反调试(用GDB catch syscall ptrace改$rax&#x3D;0绕过)+控制流平坦化(将函数视为黑盒+动态分析)+TEA Feistel(8字节块+4组+8轮+delta&#x3D;0x9E3779B9)。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解析2025强网拟态决赛WeakJump">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9BWeakJump/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="强网拟态2025决赛WeakJump逆向,静态链接+stripped+ptrace反调试(用GDB catch syscall ptrace改$rax&#x3D;0绕过)+控制流平坦化(将函数视为黑盒+动态分析)+TEA Feistel(8字节块+4组+8轮+delta&#x3D;0x9E3779B9)。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="statically-linked">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9BWeakJump/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '解析2025强网拟态决赛WeakJump',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">解析2025强网拟态决赛WeakJump</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="解析2025强网拟态决赛WeakJump"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/285718.html">https://www.ctfiot.com/285718.html</a><br>ID: 285718</p>
+</blockquote>
+<p>WeakJump CTF 逆向题深度解析：从零到完整攻破的技术之路</p>
+<p>一、题目初识</p>
+<p>1.1 题目背景</p>
+<p>WeakJump 是一道综合性的 CTF 逆向工程题目，融合了多种现代软件保护技术。题目提供了一个名为weakjump的二进制可执行文件，要求找到正确的 flag 输入。</p>
+<p>1.2 文件基础分析</p>
+<p>首先使用file命令查看文件类型：</p>
+<p>$ file weakjumpweakjump: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, BuildID[sha1]&#x3D;0adf2873eac656282618b5479e72ec35e4f33ec9,forGNU&#x2F;Linux 3.2.0, stripped</p>
+<p>关键信息解读：</p>
+<p>ELF 64-bit：Linux 平台的 64 位可执行文件</p>
+<p>statically linked：静态链接，所有库函数都编译进了可执行文件中，文件较大但不依赖外部库</p>
+<p>stripped：符号表已被移除，函数名、变量名等调试信息不存在，大幅增加分析难度</p>
+<p>提示输入 flag</p>
+<p>验证输入</p>
+<p>输出成功或失败信息</p>
+<p>将机器码转换为可读的汇编代码</p>
+<p>识别函数和数据结构</p>
+<p>动态观察程序运行时的行为</p>
+<p>radare2：开源的逆向工程框架，提供反汇编、分析、调试等功能</p>
+<p>binutils：包含 objdump、readelf 等二进制分析工具</p>
+<p>gdb：GNU 调试器，用于动态分析和调试</p>
+<p>strace：系统调用追踪工具，可以观察程序与操作系统的交互</p>
+<p>当进程调用ptrace(PTRACE_TRACEME, 0, 0, 0)时，表示该进程请求被追踪</p>
+<p>一个进程只能被一个调试器追踪</p>
+<p>如果进程已经被 gdb 等调试器追踪，再次调用 PTRACE_TRACEME 会失败</p>
+<p>catch syscall ptrace：捕获所有 ptrace 系统调用</p>
+<p>commands … end：为 catchpoint 设置自动执行的命令</p>
+<p>set $rax &#x3D; 0：将返回值寄存器 rax 设置为 0（表示成功）</p>
+<p>continue：继续执行程序</p>
+<p>x86-64 架构中，系统调用的返回值存储在 rax 寄存器中</p>
+<p>我们强制将返回值改为 0（成功），程序就会认为 ptrace 调用成功了</p>
+<p>程序继续正常执行，不会触发反调试的退出逻辑</p>
+<p>r2 -q：以安静模式运行 radare2</p>
+<p>aaa：自动分析（Analyze All）</p>
+<p>iz：列出所有字符串</p>
+<p>~WeakJump：过滤包含 “WeakJump” 的行</p>
+<p>失败提示：Nope, WeakJump resists you.</p>
+<p>输入提示：Provide the flag for WeakJump:</p>
+<p>成功提示：WeakJump clear, congratulations!</p>
+<p>axt @地址：查找引用指定地址的代码（Where is this address used）</p>
+<p>输出显示在0x401639处有代码引用了这个字符串</p>
+<p>黄金分割比在数学上有特殊性质，能产生良好的伪随机序列</p>
+<p>避免密钥调度中出现周期性和对称性</p>
+<p>这是 TEA 算法发明者经过数学分析选择的最优值</p>
+<p>32 字节输入 ÷ 8 字节 &#x3D; 4 组数据</p>
+<p>每组数据处理 8 轮</p>
+<p>总共 4 × 8 &#x3D; 32 次操作</p>
+<p>数据分割：将数据块分为左右两部分（L, R）</p>
+<p>轮函数：设计一个函数 F，接受一半数据和轮密钥作为输入</p>
+<p>迭代变换：重复多轮以下操作：</p>
+<p>L[i+1] &#x3D; R[i]R[i+1] &#x3D; L[i] ⊕ F(R[i], K[i])</p>
+<p>其中 ⊕ 表示异或运算，K[i] 是第 i 轮的密钥</p>
+<p>加密解密对称：</p>
+<p>加密和解密使用完全相同的结构</p>
+<p>只需反向使用密钥序列即可解密</p>
+<p>硬件实现时可以复用同一电路</p>
+<p>轮函数无需可逆：</p>
+<p>F 函数可以是任意复杂的单向函数</p>
+<p>即使 F 不可逆，整个密码也是可逆的</p>
+<p>这给设计者很大的灵活性</p>
+<p>安全性经过验证：</p>
+<p>DES 使用了 Feistel 结构，经过几十年的密码分析</p>
+<p>理论基础扎实，安全性可分析</p>
+<p>被广泛研究和理解</p>
+<p>数据块大小：8 字节（64 位）</p>
+<p>左右分割：各 4 字节（32 位）</p>
+<p>轮数：8 轮</p>
+<p>数据组数：4 组（总共 32 字节）</p>
+<p>高度混淆：</p>
+<p>大量的跳转指令</p>
+<p>switch-case 结构</p>
+<p>许多看似无意义的计算</p>
+<p>控制流平坦化：</p>
+<p>正常的顺序执行被打乱</p>
+<p>通过分发器（dispatcher）控制执行顺序</p>
+<p>代码块之间的逻辑关系被隐藏</p>
+<p>增加逆向分析难度</p>
+<p>防止算法被快速识别和提取</p>
+<p>模拟真实恶意软件的保护手段</p>
+<p>考察逆向工程师应对复杂代码的能力</p>
+<p>不要深入分析混淆细节</p>
+<p>混淆代码通常有数百甚至数千条指令</p>
+<p>手动分析每条指令会消耗大量时间</p>
+<p>混淆的目的就是让你陷入细节</p>
+<p>采用动态分析</p>
+<p>将函数视为黑盒</p>
+<p>只关注输入和输出</p>
+<p>使用调试器获取运行时数据</p>
+<p>使用自动化工具</p>
+<p>符号执行（angr、Triton）</p>
+<p>去混淆工具（D810 IDA 插件）</p>
+<p>二进制模拟器（Unicorn、Qiling）</p>
+<p>sub_404D10 函数经过严重混淆，静态分析极其困难</p>
+<p>即使分析出代码逻辑，手动实现也容易出错</p>
+<p>时间成本太高，不适合 CTF 比赛</p>
+<p>直接观察函数的实际输入输出</p>
+<p>绕过代码混淆，获取真实数据</p>
+<p>快速验证假设</p>
+<p>可以在关键点暂停程序，查看状态</p>
+<p>调用地址：0x401796</p>
+<p>返回地址：0x40179b（call 指令的下一条指令）</p>
+<p>jne的机器码：75 3c（2 字节）</p>
+<p>nop的机器码：90 90（2 字节）</p>
+<p>GDB 允许修改进程的内存</p>
+<p>我们只是修改了运行时内存，不影响原始文件</p>
+<p>Patch 后程序即使比对失败也不会跳转，会继续处理剩余的数据</p>
+<p>绕过反调试：捕获 ptrace 调用，修改返回值</p>
+<p>Patch 比对：将比对失败的跳转改为 nop</p>
+<p>捕获调用：在函数调用处保存参数</p>
+<p>捕获返回：在函数返回处记录返回值</p>
+<p>rdi：传递给轮函数的第一个参数（右半部分数据）</p>
+<p>rcx：轮数（0-7）</p>
+<p>ret：函数返回值（轮函数输出）</p>
+<p>Round 1-8：第 1 组数据（8 字节）的 8 轮</p>
+<p>Round 9-16：第 2 组数据的 8 轮</p>
+<p>Round 17-24：第 3 组数据的 8 轮</p>
+<p>Round 25-32：第 4 组数据的 8 轮</p>
+<p>轮函数的输出依赖于输入数据</p>
+<p>解密时的数据状态与加密时不同</p>
+<p>我们获取的测试数据不能直接用于解密真实密文</p>
+<p>密文是正确 flag 加密后的结果</p>
+<p>解密密文时的中间状态完全不同</p>
+<p>不能直接使用测试数据的轮函数输出</p>
+<p>从密文开始</p>
+<p>对于每一轮解密：</p>
+<p>计算当前轮需要调用轮函数的参数</p>
+<p>使用 GDB 设置条件断点，当参数匹配时记录返回值</p>
+<p>使用返回值进行这一轮的解密</p>
+<p>重复 32 次</p>
+<p>提取 sub_404D10 函数的机器码</p>
+<p>使用 Unicorn 或 Qiling 等模拟器加载代码</p>
+<p>编写脚本在需要时调用模拟器执行函数</p>
+<p>自动化整个解密过程</p>
+<p>使用 angr 等符号执行框架</p>
+<p>从密文开始符号执行</p>
+<p>添加约束：输出应该是合法的 ASCII 字符</p>
+<p>让求解器自动找到满足条件的输入</p>
+<p>轮函数混淆严重，完全自动化解密需要较多工具和时间</p>
+<p>CTF 比赛有时间限制</p>
+<p>我们已经掌握了核心技术（动态获取轮函数数据）</p>
+<p>理解加密算法的整体结构</p>
+<p>通过观察密文和程序行为，结合动态调试</p>
+<p>逐步获取必要的中间值</p>
+<p>手动或脚本辅助完成解密</p>
+<p>b10ck→ block：分组（分组加密）</p>
+<p>vm→ virtual machine：虚拟机（代码混淆&#x2F;虚拟化）</p>
+<p>plu5→ plus：加上</p>
+<p>3xtr4→ extra：额外的（额外的保护）</p>
+<p>1337→ leet：精英（黑客文化中的经典数字）</p>
+<p>分组加密（Feistel + TEA）</p>
+<p>代码混淆（控制流平坦化）</p>
+<p>额外保护（反调试）</p>
+<p>利用进程只能被一个调试器追踪的特性</p>
+<p>主动请求被追踪，如果失败说明已被调试</p>
+<p>检测调试器进程：查找 gdb、IDA 等进程</p>
+<p>时间检测：使用 rdtsc 指令，调试时执行速度变慢</p>
+<p>断点检测：扫描代码段查找 INT3（0xCC）指令</p>
+<p>TracerPid 检测：读取&#x2F;proc&#x2F;self&#x2F;status检查 TracerPid 字段</p>
+<p>数据分治：分为两半独立处理</p>
+<p>交替变换：左右交换 + 函数变换</p>
+<p>多轮迭代：通过重复提升安全性</p>
+<p>加密解密对称</p>
+<p>轮函数设计灵活</p>
+<p>安全性经过验证</p>
+<p>DES（Data Encryption Standard）：16 轮</p>
+<p>3DES：三倍 DES</p>
+<p>Blowfish：16 轮，密钥 32-448 位</p>
+<p>Twofish：AES 候选算法之一</p>
+<p>理论基础坚实（经过大量密码学研究）</p>
+<p>实现简单高效</p>
+<p>硬件友好（加密解密共用电路）</p>
+<p>安全性可调节（增加轮数提升安全性）</p>
+<p>代码流程变得非线性</p>
+<p>难以识别基本块之间的关系</p>
+<p>静态分析复杂度大幅增加</p>
+<p>大量的 switch-case 结构</p>
+<p>频繁的跳转</p>
+<p>状态变量控制流程</p>
+<p>不深入分析混淆细节</p>
+<p>采用动态分析绕过</p>
+<p>使用去混淆工具（如 D810 IDA 插件）</p>
+<p>符号执行自动化分析</p>
+<p>内存修改：</p>
+<p>条件断点：</p>
+<p>自动化命令：</p>
+<p>catchpoint（捕获点）：</p>
+<p>内存修改可以绕过保护机制</p>
+<p>条件断点减少不必要的中断</p>
+<p>自动化命令提高调试效率</p>
+<p>catchpoint 捕获特殊事件</p>
+<p>TEA&#x2F;XTEA：0x9E3779B1（黄金分割）</p>
+<p>MD5：0x67452301,0xEFCDAB89…</p>
+<p>SHA-1：0x67452301,0xEFCDAB89…</p>
+<p>RC4：无特征常数，看 256 字节数组</p>
+<p>Feistel：左右分割、交换模式</p>
+<p>SPN（Substitution-Permutation Network）：S-box、P-box</p>
+<p>ARX（Add-Rotate-XOR）：只用加法、循环移位、异或</p>
+<p>DES：16 轮</p>
+<p>AES：10&#x2F;12&#x2F;14 轮（不同密钥长度）</p>
+<p>TEA：32 轮（标准）</p>
+<p>本题：8 轮（变种）</p>
+<p>IDA findcrypt 插件</p>
+<p>Binary Ninja 的密码识别</p>
+<p>radare2 的签名匹配</p>
+<p>使用file查看文件类型</p>
+<p>使用checksec检查保护措施</p>
+<p>运行程序观察行为</p>
+<p>使用strace追踪系统调用</p>
+<p>查找字符串定位关键代码</p>
+<p>识别函数和基本块</p>
+<p>理解程序整体结构</p>
+<p>识别算法特征</p>
+<p>绕过反调试保护</p>
+<p>在关键点设置断点</p>
+<p>观察运行时数据</p>
+<p>验证静态分析的假设</p>
+<p>识别加密&#x2F;混淆算法</p>
+<p>理解数据流向</p>
+<p>提取关键参数</p>
+<p>实现逆向算法</p>
+<p>验证正确性</p>
+<p>优化和自动化</p>
+<p>解密或生成正确输入</p>
+<p>验证结果</p>
+<p>总结经验</p>
+<p>转向动态分析</p>
+<p>寻找算法特征</p>
+<p>参考类似题目</p>
+<p>使用自动化工具</p>
+<p>不要试图理解每一行代码</p>
+<p>采用黑盒方法（只看输入输出）</p>
+<p>使用动态调试获取数据</p>
+<p>考虑符号执行</p>
+<p>优先使用已知工具</p>
+<p>善用搜索引擎</p>
+<p>参考他人的解法</p>
+<p>专注于核心问题</p>
+<p>快速学习基本概念</p>
+<p>查找相关文档和示例</p>
+<p>尝试简单的测试</p>
+<p>逐步深入理解</p>
+<p>strace：追踪系统调用</p>
+<p>ltrace：追踪库函数调用</p>
+<p>objdump：反汇编</p>
+<p>readelf：查看 ELF 文件结构</p>
+<p>hexdump&#x2F;xxd：查看十六进制</p>
+<p>《逆向工程权威指南》（Dennis Yurichev）</p>
+<p>《加密与解密》（段钢）</p>
+<p>《深入理解计算机系统》（CSAPP）</p>
+<p>《Practical Reverse Engineering》</p>
+<p>CTF Wiki：<a target="_blank" rel="noopener" href="https://ctf-wiki.org/">https://ctf-wiki.org</a></p>
+<p>看雪论坛：<a target="_blank" rel="noopener" href="https://bbs.kanxue.com/">https://bbs.kanxue.com</a></p>
+<p>LiveOverflow YouTube 频道</p>
+<p>Reverse Engineering for Beginners（免费电子书）</p>
+<p>Crackmes.one：逆向练习</p>
+<p>Root-Me：综合安全挑战</p>
+<p>RingZer0 CTF：持续更新</p>
+<p>PicoCTF：适合新手</p>
+<p>radare2 官方文档</p>
+<p>GDB 官方手册</p>
+<p>IDA Pro 教程（Hex-Rays 官网）</p>
+<p>Binary Ninja 文档</p>
+<p>反调试技术：</p>
+<p>理解了 ptrace 反调试的原理</p>
+<p>掌握了使用 GDB 绕过反调试的方法</p>
+<p>学会了动态修改程序行为</p>
+<p>密码学基础：</p>
+<p>深入理解了 Feistel 网络结构</p>
+<p>认识了 TEA 算法及其特征</p>
+<p>学习了分组密码的基本原理</p>
+<p>代码混淆对抗：</p>
+<p>识别了控制流平坦化技术</p>
+<p>学会了采用动态分析绕过混淆</p>
+<p>理解了混淆与去混淆的对抗</p>
+<p>动态调试技能：</p>
+<p>掌握了 GDB 的高级用法</p>
+<p>学会了程序 patch 技术</p>
+<p>提升了调试脚本编写能力</p>
+<p>综合分析能力：</p>
+<p>静态与动态分析相结合</p>
+<p>工具的灵活运用</p>
+<p>问题的分解和解决</p>
+<p>恶意软件通常使用反调试、代码混淆</p>
+<p>需要动态调试获取解密密钥</p>
+<p>理解加密算法还原恶意配置</p>
+<p>了解软件保护技术的实现</p>
+<p>学习如何加固自己的软件</p>
+<p>评估保护方案的有效性</p>
+<p>逆向分析闭源软件</p>
+<p>理解程序内部逻辑</p>
+<p>发现潜在的安全问题</p>
+<p>验证加密实现的正确性</p>
+<p>检查是否使用了弱密码</p>
+<p>评估代码的安全性</p>
+<p>理解 ptrace 的工作机制，才能有效绕过反调试</p>
+<p>理解 Feistel 的数学原理，才能正确实现解密</p>
+<p>理解汇编语言，才能准确分析程序行为</p>
+<p>静态分析理解整体结构</p>
+<p>动态分析验证假设和获取数据</p>
+<p>两者互补，效率更高</p>
+<p>混淆代码难以静态分析，就用动态方法</p>
+<p>程序有保护机制，就 patch 绕过</p>
+<p>一种方法行不通，尝试其他方法</p>
+<p>编写 GDB 脚本自动化调试</p>
+<p>使用 Python 处理数据</p>
+<p>开发工具辅助分析</p>
+<p>新的保护技术不断出现</p>
+<p>工具和方法持续演进</p>
+<p>保持学习，跟上技术发展</p>
+<p>扎实学习汇编语言（x86&#x2F;x64）</p>
+<p>熟练使用一款反汇编工具（IDA 或 Ghidra）</p>
+<p>掌握调试器基本操作（GDB 或 x64dbg）</p>
+<p>学习常见的算法和数据结构</p>
+<p>多做 CTF 练习题积累经验</p>
+<p>代码虚拟化：研究 VM 保护（VMProtect、Themida）</p>
+<p>符号执行：学习 angr、Triton 等工具</p>
+<p>二进制插桩：使用 Pin、DynamoRIO、Frida</p>
+<p>固件分析：IoT 设备、路由器固件逆向</p>
+<p>恶意软件分析：分析真实的恶意样本</p>
+<p>自动化去混淆技术</p>
+<p>机器学习在二进制分析中的应用</p>
+<p>新型代码保护技术研究</p>
+<p>漏洞自动化挖掘</p>
+<p>程序分析理论研究</p>
+<p>复杂的保护机制</p>
+<p>混淆的代码</p>
+<p>未知的算法</p>
+<p>时间的压力</p>
+<p>扎实的基础知识</p>
+<p>灵活的思维方式</p>
+<p>丰富的工具储备</p>
+<p>坚持不懈的精神</p>
+<p>GDB 官方手册：<a target="_blank" rel="noopener" href="https://sourceware.org/gdb/documentation/">https://sourceware.org/gdb/documentation/</a></p>
+<p>radare2 文档：<a target="_blank" rel="noopener" href="https://book.rada.re/">https://book.rada.re/</a></p>
+<p>NASM 汇编手册：<a target="_blank" rel="noopener" href="https://www.nasm.us/docs.php">https://www.nasm.us/docs.php</a></p>
+<p>CTF Wiki：<a target="_blank" rel="noopener" href="https://ctf-wiki.org/">https://ctf-wiki.org</a></p>
+<p>看雪论坛：<a target="_blank" rel="noopener" href="https://bbs.kanxue.com/">https://bbs.kanxue.com</a></p>
+<p>Reverse Engineering Stack Exchange</p>
+<p>LiveOverflow YouTube 频道</p>
+<p>radare2：<a target="_blank" rel="noopener" href="https://github.com/radareorg/radare2">https://github.com/radareorg/radare2</a></p>
+<p>IDA Free：<a target="_blank" rel="noopener" href="https://hex-rays.com/ida-free/">https://hex-rays.com/ida-free/</a></p>
+<p>Ghidra：<a target="_blank" rel="noopener" href="https://ghidra-sre.org/">https://ghidra-sre.org/</a></p>
+<p>Binary Ninja：<a target="_blank" rel="noopener" href="https://binary.ninja/">https://binary.ninja/</a></p>
+<p>CTFtime：<a target="_blank" rel="noopener" href="https://ctftime.org/">https://ctftime.org</a></p>
+<p>Crackmes.one：<a target="_blank" rel="noopener" href="https://crackmes.one/">https://crackmes.one</a></p>
+<p>Root-Me：<a target="_blank" rel="noopener" href="https://www.root-me.org/">https://www.root-me.org</a></p>
+<p>PicoCTF：<a target="_blank" rel="noopener" href="https://picoctf.org/">https://picoctf.org</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">$ file weakjumpweakjump: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, BuildID[sha1]=0adf2873eac656282618b5479e72ec35e4f33ec9,forGNU/Linux 3.2.0, stripped</span><br><span class="line">$ ./weakjumpProvide the flagforWeakJump:</span><br><span class="line">testNope, WeakJump resists you.</span><br><span class="line">$ sudo apt-get update$ sudo apt-get install -y radare2 binutils gdb strace</span><br><span class="line">$echo&quot;test&quot;| strace ./weakjump 2&gt;&amp;1 | grep ptraceptrace(PTRACE_TRACEME) = -1 EPERM (不允许的操作)</span><br><span class="line">// 程序中的反调试代码（伪代码）if(ptrace(PTRACE_TRACEME,0,0,0) ==-1) &#123; // ptrace 调用失败，说明已被调试器追踪 exit(1); // 直接退出&#125;// 继续正常执行</span><br><span class="line">set debuginfod enabled offcatch syscall ptracecommands set $rax = 0 continueendrun</span><br><span class="line">$echo&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&quot;| gdb -batch -x bypass_ptrace.gdb ./weakjumpProvide the flagforWeakJump:</span><br><span class="line">Nope, WeakJump resists you.</span><br><span class="line">$ r2 -q -c&quot;aaa; iz~WeakJump&quot;weakjump5 0x0007a289 0x0047a289 27 28 .rodata ascii Nope, WeakJump resists you.482 0x0007c3b8 0x0047c3b8 30 31 .rodata ascii Provide the flagforWeakJump:</span><br><span class="line">483 0x0007c3e0 0x0047c3e0 32 33 .rodata ascii WeakJump clear, congratulations!</span><br><span class="line">$ r2 -q -c&quot;aaa; axt @0x0047c3b8&quot;weakjump(nofunc) 0x401639 [DATA] lea rdi, str.Provide_the_flag_for_WeakJump:</span><br><span class="line">$ r2 -q -c&quot;s 0x401639; pd 30&quot;weakjump</span><br><span class="line">cmp rdx, 0x20 ; 比较长度是否等于 0x20 (32 字节)</span><br><span class="line">mov r12d, dword [0x004a9b10]</span><br><span class="line">imul r9d, r15d, 0x9e3779b1</span><br><span class="line">黄金分割比 φ = (√5 - 1) / 2 ≈ 0.618...0x9E3779B1 = φ × 2^32 ≈ 2654435769</span><br><span class="line">cmp ebx, 8 ; 比较计数器与 8jne 0x401788 ; 不等于则跳转（继续循环）</span><br><span class="line">cmp r15, 4 ; 比较计数器与 4jne 0x4016c1 ; 不等于则跳转（继续循环）</span><br><span class="line">$ r2 -q -c&quot;s 0x47a120; px 32&quot;weakjump60 91 f3 93 32cddf b8 23 43 55 2f 9f d4 fe e88e 7b 5a 36 de b6 7f d7 97 38 ee 43 b6 8d b0 b2</span><br><span class="line">importstructcipher_bytes = [ 96,145,243,147,50,205,223,184, 35,67,85,47,159,212,254,232, 142,123,90,54,222,182,127,215, 151,56,238,67,182,141,176,178]# 按 4 字节分组，转换为小端序 32 位整数foriinrange(0,32,4): val = struct.unpack(&#x27;= 32 quit end continueendrun</span><br><span class="line">$echo&quot;AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&quot;&gt; /tmp/test_input.txt</span><br><span class="line">$ gdb -batch -x capture_all_patched.gdb ./weakjump &lt; /tmp/test_input.txt</span><br><span class="line">Round 1: rdi=0x3c9e357e rcx=0 ret=0x40e53d0dRound 2: rdi=0xdee065ab rcx=1 ret=0x5086bb49Round 3: rdi=0x6c188e37 rcx=2 ret=0xd372ccbaRound 4: rdi=0x0d92a911 rcx=3 ret=0xb86a6af5Round 5: rdi=0xd472e4c2 rcx=4 ret=0x4cc67e1cRound 6: rdi=0x4154d70d rcx=5 ret=0x6675d070Round 7: rdi=0xb20734b2 rcx=6 ret=0x6a8fac89Round 8: rdi=0x2bdb7b84 rcx=7 ret=0x7f2909b9Round 9: rdi=0xbb139490 rcx=0 ret=0x4842ad4bRound 10: rdi=0xf399f8b9 rcx=1 ret=0x2cf2f60fRound 11: rdi=0x97e1629f rcx=2 ret=0x91a9774cRound 12: rdi=0x62308ff5 rcx=3 ret=0x5829d108Round 13: rdi=0xcfc8b397 rcx=4 ret=0xc5914d28Round 14: rdi=0xa7a1c2dd rcx=5 ret=0x18f02e64Round 15: rdi=0xd7389df3 rcx=6 ret=0x32e0bc6aRound 16: rdi=0x95417eb7 rcx=7 ret=0xa5a636ecRound 17: rdi=0x378b66a2 rcx=0 ret=0x7b18e8a7Round 18: rdi=0x29042c2b rcx=1 ret=0x7d83623cRound 19: rdi=0x4a08049e rcx=2 ret=0x949a4c03Round 20: rdi=0xbd9e6028 rcx=3 ret=0xfb2067deRound 21: rdi=0xb1286340 rcx=4 ret=0xba3358d3Round 22: rdi=0x07ad38fb rcx=5 ret=0xf96b33f9Round 23: rdi=0x484350b9 rcx=6 ret=0x9df34c7cRound 24: rdi=0x9a5e7487 rcx=7 ret=0x7a3be100Round 25: rdi=0xb27e5850 rcx=0 ret=0x1e92c816Round 26: rdi=0xf0eb9953 rcx=1 ret=0x3a4b0511Round 27: rdi=0x88355d41 rcx=2 ret=0x9b6b3adcRound 28: rdi=0x6b80a38f rcx=3 ret=0x4f048ce7Round 29: rdi=0xc731d1a6 rcx=4 ret=0xa7d8fce5Round 30: rdi=0xcc585f6a rcx=5 ret=0x7a605b9aRound 31: rdi=0xbd518a3c rcx=6 ret=0xcaddaf2aRound 32: rdi=0x0685f040 rcx=7 ret=0x4002ff6b</span><br><span class="line">加密：L[i+1] = R[i], R[i+1] = L[i] ⊕ F(R[i], K[i])解密：L[i] = R[i+1] ⊕ F(L[i+1], K[i]), R[i] = L[i+1]</span><br><span class="line">输入 32 字节 ↓分成 4 组，每组 8 字节 ↓每组分为左右各 4 字节 ↓进行初始 XOR ↓8 轮 Feistel 变换 ↓进行最终 XOR ↓与密文比对</span><br><span class="line">flag&#123;b10ck_vm_plu5_3xtr4_1337!!&#125;</span><br><span class="line">$echo&quot;flag&#123;b10ck_vm_plu5_3xtr4_1337!!&#125;&quot;| ./weakjumpProvide the flagforWeakJump:</span><br><span class="line">WeakJump clear, congratulations!</span><br><span class="line">if(ptrace(PTRACE_TRACEME,0,0,0) ==-1) &#123; exit(1);&#125;</span><br><span class="line">catch syscall ptracecommands set $rax = 0 # 修改返回值 continueend</span><br><span class="line">L[i+1] = R[i]R[i+1] = L[i] ⊕ F(R[i], K[i])</span><br><span class="line">// 原始代码a = x +1;b = a *2;c = b -3;returnc;// 混淆后intstate =1;while(true) &#123; switch(state) &#123; case1: a = x +1; state =2; break; case2: b = a *2; state =3; break; case3: c = b -3; state =4; break; case4: returnc; &#125;&#125;</span><br><span class="line">set &#123;unsigned char&#125;0x401828 = 0x90</span><br><span class="line">break *0x401796 if $rdi == 0x12345678</span><br><span class="line">commands silent printf &quot;value: 0x%xn&quot;, $rax continueend</span><br><span class="line">catch syscall ptracecatch signal SIGTRAP</span><br><span class="line"># 基础命令aaa # 自动分析afl # 列出函数iz # 查看字符串axt @addr # 交叉引用pdf @func # 反汇编函数px 100 # 十六进制查看VV # 可视化模式</span><br><span class="line"># 高级用法/c 0x9e3779b1 # 搜索常数afvd # 显示函数变量agf # 生成函数调用图</span><br><span class="line"># 基础命令break*0x401234 # 下断点run &lt; input.txt # 运行continue # 继续stepi / nexti # 单步执行info registers # 查看寄存器x/32xw$rsp # 查看内存</span><br><span class="line"># 高级用法catch syscall ptrace # 捕获系统调用commands ... end # 自动化命令set$rax= 0 # 修改寄存器set&#123;char&#125;0x401234 = 0x90 # 修改内存</span><br><span class="line">set debuginfod enabled offset pagination off</span><br><span class="line"># 绕过 ptrace 反调试catch syscall ptracecommands silent set $rax = 0 continueend</span><br><span class="line"># Patch 比对失败的跳转break *0x401639commands silent set &#123;unsigned char&#125;0x401828 = 0x90 set &#123;unsigned char&#125;0x401829 = 0x90 continueend</span><br><span class="line"># 捕获轮函数调用break *0x401796set $call_count = 0commands silent set $call_count = $call_count + 1 set $saved_rdi = $rdi set $saved_rcx = $rcx continueend</span><br><span class="line"># 捕获轮函数返回值break *0x40179bcommands silent printf &quot;Round %2d: rdi=0x%08x rcx=%d ret=0x%08xn&quot;, $call_count, $saved_rdi, $saved_rcx, $eax if $call_count &gt;= 32 quit end continueendrun</span><br><span class="line"># 基础分析r2 -q -c&quot;命令&quot;文件名 # 安静模式执行命令aaa # 自动分析（Analyze All）afl # 列出所有函数afll # 列出函数及其大小</span><br><span class="line"># 字符串和数据iz # 列出所有字符串izz # 列出所有字符串（包括数据段）iz~关键字 # 过滤字符串px 100 # 十六进制显示 100 字节pxj 32 # JSON 格式显示 32 字节</span><br><span class="line"># 代码分析s 地址 # 跳转到地址pd 20 # 反汇编 20 行pdf @函数 # 反汇编整个函数axt @地址 # 查找地址的引用axf @地址 # 查找地址引用的其他地址</span><br><span class="line"># 搜索/x 909090 # 搜索十六进制/c 0x9e3779b1 # 搜索常数/R # 搜索 ROP gadgets</span><br><span class="line"># 可视化V # 可视化模式VV # 可视化图形模式agf # 生成函数调用图</span><br><span class="line"># 断点相关break*0x401234 # 在地址下断点breakmain # 在函数下断点（需要符号）tbreak *0x401234 # 临时断点（触发一次自动删除）delete 1 # 删除断点 1info breakpoints # 列出所有断点</span><br><span class="line"># 执行控制run # 运行程序run &lt; input.txt # 从文件读取输入continue # 继续执行stepi # 单步执行一条指令nexti # 单步执行（跳过函数调用）finish # 执行到当前函数返回</span><br><span class="line"># 查看数据info registers # 查看所有寄存器info registers rax # 查看特定寄存器x/32xw$rsp # 以十六进制显示栈上 32 个字x/s 0x401234 # 以字符串显示内存print$rax # 打印寄存器值print/x$rax # 以十六进制打印</span><br><span class="line"># 修改数据set$rax= 0 # 修改寄存器set&#123;int&#125;0x401234 = 0 # 修改内存set&#123;char&#125;0x401234 = 0x90 # 修改单字节</span><br><span class="line"># 高级功能catch syscall ptrace # 捕获系统调用commands ... end # 为断点设置命令define 命令名 ... end # 定义自定义命令python ... end # 执行 Python 脚本</span><br><span class="line">importstruct</span><br><span class="line"># 从二进制文件提取的密文cipher_bytes = [ 96,145,243,147,50,205,223,184, 35,67,85,47,159,212,254,232, 142,123,90,54,222,182,127,215, 151,56,238,67,182,141,176,178]print(&quot;密文（32 字节）：&quot;)fori, binenumerate(cipher_bytes): print(f&quot;&#123;b:</span><br><span class="line">02x&#125;&quot;, end=&quot; &quot;) if(i +1) %8==0: print()print(&quot;n转换为 32 位小端序整数：&quot;)foriinrange(0,32,4): val = struct.unpack(&#x27;&lt;I&#x27;, bytes(cipher_bytes[i:i+4]))[0] print(f&quot;0x&#123;val:</span><br><span class="line">08x&#125;&quot;, end=&quot; &quot;) if(i +4) %16==0: print()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/285718.html">https://www.ctfiot.com/285718.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9BWeakJump.full.md">CTF大赛WP集合&#x2F;articles&#x2F;解析2025强网拟态决赛WeakJump.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/statically-linked/">statically-linked</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81HyperJump/" title="解析2025强网拟态HyperJump"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">解析2025强网拟态HyperJump</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9Beasyre/" title="解析2025强网拟态决赛easyre"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">解析2025强网拟态决赛easyre</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

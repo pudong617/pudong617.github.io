@@ -1,0 +1,269 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Nep CTF password RC4 + 换表 base64 算法分析 (Android JNI) | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="Nep CTF password: Android JNI verify + 自定义 base64 字符表 (小写字母+数字+大写字母+符号) + RC4 加密, v30 数组反推算法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nep CTF password RC4 + 换表 base64 算法分析 (Android JNI)">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Reverse/Nep_CTF_password-rc4%E5%92%8C%E6%8D%A2%E8%A1%A8base64%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="Nep CTF password: Android JNI verify + 自定义 base64 字符表 (小写字母+数字+大写字母+符号) + RC4 加密, v30 数组反推算法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Android APK">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Reverse/Nep_CTF_password-rc4%E5%92%8C%E6%8D%A2%E8%A1%A8base64%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Nep CTF password RC4 + 换表 base64 算法分析 (Android JNI)',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Nep CTF password RC4 + 换表 base64 算法分析 (Android JNI)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Nep CTF password RC4 + 换表 base64 算法分析 (Android JNI)"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/167920.html">https://www.ctfiot.com/167920.html</a><br>ID: 167920</p>
+</blockquote>
+<p>一</p>
+<p>背景</p>
+<p>这题考查的主要对base64底层算法的了解，如果不了解他的实现原理，破解它还是相当有难度的。它在so层主要考察了base64算法的实现流程，在java层考察了rc4加密算法，接下来我们详细分析算法还原的过程。</p>
+<p>二</p>
+<p>代码分析</p>
+<p>打开APP先简单试玩下，发现首页有输入key和密码两个输入框，把代码拖入到jadx中。我们从代码找到首页代码。</p>
+<p>从代码中可以看出，他有2块验证，verify(String str) &#x3D;&#x3D; 0 ，file(byte[] bArr, String str) &#x3D;&#x3D; true。第一个验证肯定是在so文件进行了加密，第二个在是一个加密比较，满足 iArr2 &#x3D; {139, 210, 217, 93, 149, 255, 126, 95, 41, 86, 18, 185, 239, 236, 139, 208, 69}的元素比较，就可以得到明文。</p>
+<p>将APK解压，找到目标文件，拖入到IDA中。在导出表中我们很容易发现目标函数Java_com_nepnep_app_MainActivity_verify。</p>
+<p>代码逻辑：</p>
+<p>1.初始化变量和数组：首先，代码声明了一些变量和数组，其中包括字符串指针 a3_val、整数变量 a3_len、循环计数变量 v7 和 v8，以及一些用于存储中间结果的数组 v28 和 v30。</p>
+<p>2.获取系统寄存器的值：通过 _ReadStatusReg 函数，代码从系统寄存器中获取一个值，并将其存储在变量 v33 中。</p>
+<p>3.获取字符串的 UTF-8 表示：通过 JNI 函数 GetStringUTFChars 和 GetStringUTFLength，代码获取了从 Java 传递进来的字符串 a3 的 UTF-8 表示，并将其分别存储在 a3_val 和 a3_len 中。</p>
+<p>4.字符串处理：代码接下来对字符串进行了一系列的处理。首先，它初始化了一个用于存储结果的数组 s，并通过两个函数调用 sub_77C 和 sub_8A4 对字符串进行了进一步的处理。</p>
+<p>5.循环处理字符串的每个字符：代码通过循环处理字符串的每个字符，按照一定的规则进行转换，并将结果存储在数组 v28 中。这个循环分为两个阶段：首先处理每个三个字符的块，然后处理剩余的字符。</p>
+<p>6.释放字符串的 UTF-8 表示：在处理完字符串后，通过 JNI 函数 ReleaseStringUTFChars，释放从 Java 获取的字符串的 UTF-8 表示。</p>
+<p>7.比较字符串：最后，代码使用 strcmp 比较处理后的字符串是否与硬编码的字符串 “3g6L2PWL2PXFmR+7ise7iq&#x3D;&#x3D;” 相匹配。如果匹配，函数返回 1LL，否则返回 0LL。</p>
+<p>从逆向的思维来考虑：既然要满足 v28 &#x3D; 3g6L2PWL2PXFmR+7ise7iq&#x3D;&#x3D;的逻辑，我们就反向推算生成的算法。</p>
+<p>aAbcdefghijklmn : “abcdefghijklmnopqrstuvwxyz0123456789+&#x2F;ABCDEFGHIJKLMNOPQRSTUVWXYZ”</p>
+<p>看着像base64用到的对应表字符串，但是顺序好像也不对。先来反推 v28的值。以第一个值为例：3<br>v28[0] &#x3D;3<br>aAbcdefghijklmn[v30[0]] &#x3D; 3<br>v30[0] &#x3D; 29<br>那么：<br>v30[1] &#x3D; 6<br>v30[2] &#x3D; 32<br>.<br>.<br>.<br>以此类似我们用python还原他的算法：</p>
+<p>aAb_str &#x3D; “abcdefghijklmnopqrstuvwxyz0123456789+&#x2F;ABCDEFGHIJKLMNOPQRSTUVWXYZ” # aAbcdefghijklmn 的定义</p>
+<p>def get_aAb_str_len(ab_str):<br> i &#x3D; 0<br> for ab in aAb_str:<br> if ab &#x3D;&#x3D; ab_str:<br> return i<br> i &#x3D; i + 1</p>
+<h1 id="反向求解出-v12-的值"><a href="#反向求解出-v12-的值" class="headerlink" title="反向求解出 v12 的值"></a>反向求解出 v12 的值</h1><p>s1 &#x3D; “3g6L2PWL2PXFmR+7ise7iq&#x3D;&#x3D;”<br>s1_one &#x3D; “3g6L2PWL2PXFmR+7ise7iq”<br>if <strong>name</strong> &#x3D;&#x3D; ‘<strong>main</strong>‘:<br> v30&#x3D; []<br> v5 &#x3D; 0<br> for one in s1_one:</p>
+<h1 id="aAbcdefghijklmn-v30-v5-one"><a href="#aAbcdefghijklmn-v30-v5-one" class="headerlink" title="aAbcdefghijklmn[v30[v5]] &#x3D; one"></a>aAbcdefghijklmn[v30[v5]] &#x3D; one</h1><p> get_len &#x3D; get_aAb_str_len(one)<br> v30.append(get_len)</p>
+<h1 id="print-get-len"><a href="#print-get-len" class="headerlink" title="print(get_len)"></a>print(get_len)</h1><p> print(“v30”,v30)</p>
+<p>v30 &#x3D; [29, 6, 32, 49, 28, 53, 60, 49, 28, 53, 61, 43, 12, 55, 36, 33, 8, 18, 4, 33, 8, 16]</p>
+<p>再还原他的算法，我们再将v30带入其中，验证：</p>
+<p>aAb_str &#x3D; “abcdefghijklmnopqrstuvwxyz0123456789+&#x2F;ABCDEFGHIJKLMNOPQRSTUVWXYZ” # aAbcdefghijklmn 的定义<br>s1 &#x3D; “3g6L2PWL2PXFmR+7ise7iq&#x3D;&#x3D;”<br>v30 &#x3D; [29, 6, 32, 49, 28, 53, 60, 49, 28, 53, 61, 43, 12, 55, 36, 33, 8, 18, 4, 33, 8, 16]<br>print(“v30 “,v30)<br>v7 &#x3D; 16<br>v5 &#x3D; 0<br>s1_arr &#x3D; [“”] * (len(s1))<br>while v7 &gt;&#x3D; 1:<br> if v7 &lt; 3:<br> s1_arr[v5] &#x3D; aAb_str[v30[v5]]<br> s1_arr[v5 + 1] &#x3D; aAb_str[v30[v5 + 1]]<br> print(“s1_arr[v5 + 1] “, s1_arr[v5 + 1], v5 + 1, v30[v5 + 1])<br> if v7 &#x3D;&#x3D; 1:<br> v9 &#x3D; “&#x3D;”<br> s1_arr[v5 + 2] &#x3D; “&#x3D;”<br> v8 &#x3D; v5 + 3<br> else:<br> print(“ s1_arr[v5 + 2] “, s1_arr[v5 + 2], v5 + 2)<br> v8 &#x3D; v5 + 3<br> v9 &#x3D; “&#x3D;”<br> v5 &#x3D; v8<br> else:<br> s1_arr[v5] &#x3D; aAb_str[v30[v5]]<br> s1_arr[v5 + 1] &#x3D; aAb_str[v30[v5 + 1]]<br> s1_arr[v5 + 2] &#x3D; aAb_str[v30[v5 + 2]]<br> v8 &#x3D; v5 + 3<br> v5 &#x3D; v5 + 4<br> v9 &#x3D; aAb_str[v30[v8]]<br> print(“v8 &#x3D; “, v8)<br> s1_arr[v8] &#x3D; v9<br> print(s1_arr)<br> print(“v7 : “, v7)<br> v7 &#x3D; v7 - 3<br> print(“v7 : “, v7)<br>print(“s1_arr “, s1_arr)<br>print(v30)</p>
+<p>s1_arr &#x3D; [‘3’, ‘g’, ‘6’, ‘L’, ‘2’, ‘P’, ‘W’, ‘L’, ‘2’, ‘P’, ‘X’, ‘F’, ‘m’, ‘R’, ‘+’, ‘7’, ‘i’, ‘s’, ‘e’, ‘7’, ‘i’, ‘q’, ‘&#x3D;’, ‘&#x3D;’]</p>
+<p>到此：<br>v30&#x3D;[29, 6, 32, 49, 28, 53, 60, 49, 28, 53, 61, 43, 12, 55, 36, 33, 8, 18, 4, 33, 8, 16]</p>
+<p>现在关键是这2个函数：<br>sub_77C(a3_val, (__int64)s, a3_len % 3);<br>sub_8A4(s, (__int64)v30);</p>
+<p>先来看：sub_77C</p>
+<p>这段代码的作用是将输入字符串中的每个字符进行一系列位运算和转换，然后将处理后的结果按照 8 字节对齐的方式存储在指定的内存地址中。同时，根据额外情况，可能还需要在存储结果的内存地址后面追加两个或四个字节的数值。</p>
+<p>frida hook sub_77C</p>
+<p>function hook_so() {<br> Java.perform(function () {</p>
+<p> var syms_addr &#x3D; Process.getModuleByName(“libart.so”).enumerateSymbols();<br> var GetStringUTFChars_addr &#x3D; NULL;<br> for (var index &#x3D; 0; index &lt; syms_addr.length; index++) {<br> const sym_addr &#x3D; syms_addr[index];<br> if (sym_addr.name.indexOf(“Check”) &#x3D;&#x3D; -1 &amp;&amp; sym_addr.name.indexOf(“GetStringUTFChars”) &gt;&#x3D; 0) {<br> GetStringUTFChars_addr &#x3D; sym_addr.address;<br> }<br> }</p>
+<p> Interceptor.attach(GetStringUTFChars_addr, {<br> onEnter: function (args) {<br> &#x2F;&#x2F; console.log(“GetStringUTFChars_addr args : “, ptr(args[1]).readCString())<br> }, onLeave: function (retval) {<br> &#x2F;&#x2F; console.log(“GetStringUTFChars_addr retval “, hexdump(retval))<br> }<br> })</p>
+<p> var module_addr &#x3D; Module.findBaseAddress(“libnative-lib.so”);<br> console.log(“module_addr “, module_addr);<br> var sub_8A4 &#x3D; module_addr.add(0x8A4);<br> var sub_77C &#x3D; module_addr.add(0x77C);<br> console.log(“sub_92C “, sub_77C)<br> var v127 &#x3D; NULL<br> Interceptor.attach(sub_77C, {<br> onEnter: function (args) {<br> console.log(“sub_77C arg[0”, args[0].readCString(), hexdump(args[0]))<br> console.log(“sub_77C arg[1”, args[1].readCString(), hexdump(args[1]))<br> &#x2F;&#x2F; console.log(“sub_77C arg[2”,args[2].readCString(),hexdump(args[2]))<br> &#x2F;&#x2F; console.log(“arg[2”, args[2])<br> v127 &#x3D; args[1]<br> }, onLeave: function (retval) {<br> console.log(“retval “, v127.readCString())<br> console.log(“retval “, hexdump(v127))<br> &#x2F;&#x2F;011000010110001001100011011100100110010101110111011101110110010100<br> }<br> })</p>
+<p> var v12 &#x3D; NULL<br> Interceptor.attach(sub_8A4, {<br> onEnter: function (args) {<br> console.log(“sub_8A4 arg[0”, args[0].readCString(), hexdump(args[0]))<br> v12 &#x3D; args[1]<br> console.log(“sub_8A4 v12 args[1] &#x3D; “, args[1])<br> }, onLeave: function (retval) {<br> console.log(“sub_8A4 retval v12 &#x3D; “, v12)<br> console.log(“sub_8A4 retval v12 s &#x3D; “, ptr(v12).readByteArray(64))<br> console.log(“sub_8A4retval “, v12.readCString())<br> console.log(“sub_8A4 retval “, hexdump(v12))<br> }<br> })<br> })<br>}</p>
+<p>输入字串，最终得到的是一个二进制的字符。</p>
+<p>说明 输入的字符串 经过sub_77C() 转成了二进制。</p>
+<p>再来看看sub_8A4(s, (__int64)v30)</p>
+<p>根据目前的线索：s是二进制字符，v30也知道。推到出s就破案了。</p>
+<p>代码逻辑：</p>
+<p>1.初始化变量：声明了几个变量，其中包括整数变量 v4、循环计数变量 i、结果变量 result、字符指针 v7、整数变量 v8，以及字符变量 v9。</p>
+<p>2.循环处理字符串中的每个块：<br>（1）进入一个无限循环，循环变量 i 从 0 开始递增。<br>（2）获取字符串 s 的长度，将结果存储在 result 中。<br>（3）如果 i 大于等于字符串长度除以 6 的结果，说明已经处理完字符串，跳出循环。<br>（4）计算 v7，指向字符串 s 中当前块的起始位置。<br>（5）计算 v8，将 v4 按照 2 字节对齐的方式，即将最低位清零。<br>（6）v4 每次递增 6，表示处理一个块的六个字符。<br>（7） 对于每个字符块，执行一系列位运算：将当前字符块的第一个字符与 *(_BYTE *)(a2 + i) 相加，并将结果存储在 *(_BYTE *)(a2+ i) 中。将第二个字符与 v8 相加，并将结果存储在 *(_BYTE *)(a2 + i) 中。</p>
+<p>分析到这我来看下base64：</p>
+<p>Base64编码过程：(1). 将原数据每三个字节作为一组，一共是24个二进制位；(2). 将这24个二进制位分为四组，每个组有6个二进制；(3). 在每组前面加两个00扩展成32个二进制位，即四个字节；(4). 根据下图中的Base64索引表，得到扩展后的每个字节对应的符号：</p>
+<p>从上面分析的种种迹象表明，sub_77C、sub_8A4应该就是字符串经过base64编码的过程，v30是base64的索引。既然如此，我们对着正常编码表映射出v30的对应的编码：dGgxc18xc19rM3khISEhIQ&#x3D;&#x3D;<br>进行解密：key &#x3D; th1s_1s_k3y!!!!!</p>
+<p>总结 : key 加密流程就是：base64编码后，和自定义的编码表换位。如果熟悉base64编码的底层原理，应该是一眼就能看穿其中的道理。</p>
+<p>从这段代码我们可以分析出来：<br>iArr &#x3D; iArr2</p>
+<p>接下来我们用分别还原这2个函数：en1(iArr, str, str.length());en2(iArr, bArr, bArr.length);</p>
+<p>en1</p>
+<p>def Rc4_init(S, K): # S盒初始化置换,K为密钥<br> j &#x3D; 0<br> k &#x3D; []<br> for i in range(256):<br> S.append(256 - i)<br> k.append(K[i % len(K)])<br> for i in range(256):<br> j &#x3D; (j + S[i] + ord(k[i])) % 256<br> S[i], S[j] &#x3D; S[j], S[i] # 交换S[i],S[j]</p>
+<p>en2</p>
+<p>def rc4_Decrypt1(S, D):<br> i &#x3D; j &#x3D; 0<br> result &#x3D; ‘’<br> for a in D:<br> i &#x3D; (i + 1) % 256<br> j &#x3D; (j + S[i]) % 256<br> S[i], S[j] &#x3D; S[j], S[i]<br> t &#x3D; (S[i] + S[j]) % 256<br> k &#x3D; chr(a ^ S[(S[i] + S[j]) % 256])<br> result +&#x3D; k<br> return result</p>
+<p>三</p>
+<p>完整的算法还原</p>
+<p>综合所有的分析，我们写出完整的算法：</p>
+<p>import base64<br>import binascii</p>
+<p>s1 &#x3D; “abcdefghijklmnopqrstuvwxyz0123456789+&#x2F;ABCDEFGHIJKLMNOPQRSTUVWXYZ”<br>s2 &#x3D; ‘ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+&#x2F;‘</p>
+<h1 id="abcdefghijklmnopqrstuvwxyz0123456789-ABCDEFGHIJKLMNOPQRSTUVWXYZ"><a href="#abcdefghijklmnopqrstuvwxyz0123456789-ABCDEFGHIJKLMNOPQRSTUVWXYZ" class="headerlink" title="abcdefghijklmnopqrstuvwxyz0123456789+&#x2F;ABCDEFGHIJKLMNOPQRSTUVWXYZ"></a>abcdefghijklmnopqrstuvwxyz0123456789+&#x2F;ABCDEFGHIJKLMNOPQRSTUVWXYZ</h1><p>data &#x3D; “3g6L2PWL2PXFmR+7ise7iq&#x3D;&#x3D;”</p>
+<p>data_y &#x3D; “dGgxc18xc19rM3khISEhIQ&#x3D;&#x3D;”</p>
+<p>print(str.maketrans(s1, s2))<br>print(data.translate(str.maketrans(s1, s2)).encode(‘utf-8’))<br>key &#x3D; str(base64.b64decode(data.translate(str.maketrans(s1, s2)).encode(‘utf-8’)), encoding&#x3D;”utf-8”)<br>print(“ key &#x3D; “,key)</p>
+<p>def Rc4_init(S, K): # S盒初始化置换,K为密钥<br> j &#x3D; 0<br> k &#x3D; []<br> for i in range(256):<br> S.append(256 - i)<br> k.append(K[i % len(K)])<br> for i in range(256):<br> j &#x3D; (j + S[i] + ord(k[i])) % 256<br> S[i], S[j] &#x3D; S[j], S[i] # 交换S[i],S[j]</p>
+<p>def rc4_Decrypt1(S, D):<br> i &#x3D; j &#x3D; 0<br> result &#x3D; ‘’<br> for a in D:<br> i &#x3D; (i + 1) % 256<br> j &#x3D; (j + S[i]) % 256<br> S[i], S[j] &#x3D; S[j], S[i]<br> t &#x3D; (S[i] + S[j]) % 256<br> k &#x3D; chr(a ^ S[(S[i] + S[j]) % 256])<br> result +&#x3D; k<br> return result</p>
+<p>bb &#x3D; [139, 210, 217, 93, 149, 255, 126, 95, 41, 86, 18, 185, 239, 236, 139, 208, 69]<br>print(“key: “ + key)<br>s &#x3D; []<br>Rc4_init(s, key)<br>z &#x3D; rc4_Decrypt1(s, bb)<br>print(“Decrypt:” + z)</p>
+<p>明文：Y0uG3tTheP4ssw0rd</p>
+<p>验证：</p>
+<p>看雪ID：西贝巴巴</p>
+<p><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/user-home-961239.htm">https://bbs.kanxue.com/user-home-961239.htm</a></p>
+<p>*本文为看雪论坛优秀文章，由 西贝巴巴 原创，转载请注明来自看雪社区</p>
+<h1 id="往期推荐"><a href="#往期推荐" class="headerlink" title="往期推荐"></a>往期推荐</h1><p>1、摘除MiniFilter回调的正确姿势</p>
+<p>2、bpf在android逆向中的辅助效果</p>
+<p>3、NDK集成OLLVM模块流程记录</p>
+<p>4、【NKCTF】babyHeap-Off by one&amp;Tcache Attack</p>
+<p>5、Qemu源码浅析之v0.1.6</p>
+<p>6、堆利用学习：the house of einherjar</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<p>点击阅读原文查看更多</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br></pre></td><td class="code"><pre><span class="line">一</span><br><span class="line">背景</span><br><span class="line">二</span><br><span class="line">代码分析</span><br><span class="line">aAb_str = &quot;abcdefghijklmnopqrstuvwxyz0123456789+/ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot; # aAbcdefghijklmn 的定义</span><br><span class="line"></span><br><span class="line">def get_aAb_str_len(ab_str):</span><br><span class="line"> i = 0</span><br><span class="line"> for ab in aAb_str:</span><br><span class="line"> if ab == ab_str:</span><br><span class="line"> return i</span><br><span class="line"> i = i + 1</span><br><span class="line"></span><br><span class="line"># 反向求解出 v12 的值</span><br><span class="line">s1 = &quot;3g6L2PWL2PXFmR+7ise7iq==&quot;</span><br><span class="line">s1_one = &quot;3g6L2PWL2PXFmR+7ise7iq&quot;</span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line"> v30= []</span><br><span class="line"> v5 = 0</span><br><span class="line"> for one in s1_one:</span><br><span class="line"> # aAbcdefghijklmn[v30[v5]] = one</span><br><span class="line"> get_len = get_aAb_str_len(one)</span><br><span class="line"> v30.append(get_len)</span><br><span class="line"> # print(get_len)</span><br><span class="line"> print(&quot;v30&quot;,v30)</span><br><span class="line">aAb_str = &quot;abcdefghijklmnopqrstuvwxyz0123456789+/ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot; # aAbcdefghijklmn 的定义</span><br><span class="line">s1 = &quot;3g6L2PWL2PXFmR+7ise7iq==&quot;</span><br><span class="line">v30 = [29, 6, 32, 49, 28, 53, 60, 49, 28, 53, 61, 43, 12, 55, 36, 33, 8, 18, 4, 33, 8, 16]</span><br><span class="line">print(&quot;v30 &quot;,v30)</span><br><span class="line">v7 = 16</span><br><span class="line">v5 = 0</span><br><span class="line">s1_arr = [&quot;&quot;] * (len(s1))</span><br><span class="line">while v7 &gt;= 1:</span><br><span class="line"> if v7 &lt; 3:</span><br><span class="line"> s1_arr[v5] = aAb_str[v30[v5]]</span><br><span class="line"> s1_arr[v5 + 1] = aAb_str[v30[v5 + 1]]</span><br><span class="line"> print(&quot;s1_arr[v5 + 1] &quot;, s1_arr[v5 + 1], v5 + 1, v30[v5 + 1])</span><br><span class="line"> if v7 == 1:</span><br><span class="line"> v9 = &quot;=&quot;</span><br><span class="line"> s1_arr[v5 + 2] = &quot;=&quot;</span><br><span class="line"> v8 = v5 + 3</span><br><span class="line"> else:</span><br><span class="line"> print(&quot; s1_arr[v5 + 2] &quot;, s1_arr[v5 + 2], v5 + 2)</span><br><span class="line"> v8 = v5 + 3</span><br><span class="line"> v9 = &quot;=&quot;</span><br><span class="line"> v5 = v8</span><br><span class="line"> else:</span><br><span class="line"> s1_arr[v5] = aAb_str[v30[v5]]</span><br><span class="line"> s1_arr[v5 + 1] = aAb_str[v30[v5 + 1]]</span><br><span class="line"> s1_arr[v5 + 2] = aAb_str[v30[v5 + 2]]</span><br><span class="line"> v8 = v5 + 3</span><br><span class="line"> v5 = v5 + 4</span><br><span class="line"> v9 = aAb_str[v30[v8]]</span><br><span class="line"> print(&quot;v8 = &quot;, v8)</span><br><span class="line"> s1_arr[v8] = v9</span><br><span class="line"> print(s1_arr)</span><br><span class="line"> print(&quot;v7 : &quot;, v7)</span><br><span class="line"> v7 = v7 - 3</span><br><span class="line"> print(&quot;v7 : &quot;, v7)</span><br><span class="line">print(&quot;s1_arr &quot;, s1_arr)</span><br><span class="line">print(v30)</span><br><span class="line">function hook_so() &#123;</span><br><span class="line"> Java.perform(function () &#123;</span><br><span class="line"></span><br><span class="line"> var syms_addr = Process.getModuleByName(&quot;libart.so&quot;).enumerateSymbols();</span><br><span class="line"> var GetStringUTFChars_addr = NULL;</span><br><span class="line"> for (var index = 0; index &lt; syms_addr.length; index++) &#123;</span><br><span class="line"> const sym_addr = syms_addr[index];</span><br><span class="line"> if (sym_addr.name.indexOf(&quot;Check&quot;) == -1 &amp;&amp; sym_addr.name.indexOf(&quot;GetStringUTFChars&quot;) &gt;= 0) &#123;</span><br><span class="line"> GetStringUTFChars_addr = sym_addr.address;</span><br><span class="line"> &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> Interceptor.attach(GetStringUTFChars_addr, &#123;</span><br><span class="line"> onEnter: function (args) &#123;</span><br><span class="line"> // console.log(&quot;GetStringUTFChars_addr args : &quot;, ptr(args[1]).readCString())</span><br><span class="line"> &#125;, onLeave: function (retval) &#123;</span><br><span class="line"> // console.log(&quot;GetStringUTFChars_addr retval &quot;, hexdump(retval))</span><br><span class="line"> &#125;</span><br><span class="line"> &#125;)</span><br><span class="line"></span><br><span class="line"> var module_addr = Module.findBaseAddress(&quot;libnative-lib.so&quot;);</span><br><span class="line"> console.log(&quot;module_addr &quot;, module_addr);</span><br><span class="line"> var sub_8A4 = module_addr.add(0x8A4);</span><br><span class="line"> var sub_77C = module_addr.add(0x77C);</span><br><span class="line"> console.log(&quot;sub_92C &quot;, sub_77C)</span><br><span class="line"> var v127 = NULL</span><br><span class="line"> Interceptor.attach(sub_77C, &#123;</span><br><span class="line"> onEnter: function (args) &#123;</span><br><span class="line"> console.log(&quot;sub_77C arg[0&quot;, args[0].readCString(), hexdump(args[0]))</span><br><span class="line"> console.log(&quot;sub_77C arg[1&quot;, args[1].readCString(), hexdump(args[1]))</span><br><span class="line"> // console.log(&quot;sub_77C arg[2&quot;,args[2].readCString(),hexdump(args[2]))</span><br><span class="line"> // console.log(&quot;arg[2&quot;, args[2])</span><br><span class="line"> v127 = args[1]</span><br><span class="line"> &#125;, onLeave: function (retval) &#123;</span><br><span class="line"> console.log(&quot;retval &quot;, v127.readCString())</span><br><span class="line"> console.log(&quot;retval &quot;, hexdump(v127))</span><br><span class="line"> //011000010110001001100011011100100110010101110111011101110110010100</span><br><span class="line"> &#125;</span><br><span class="line"> &#125;)</span><br><span class="line"></span><br><span class="line"> var v12 = NULL</span><br><span class="line"> Interceptor.attach(sub_8A4, &#123;</span><br><span class="line"> onEnter: function (args) &#123;</span><br><span class="line"> console.log(&quot;sub_8A4 arg[0&quot;, args[0].readCString(), hexdump(args[0]))</span><br><span class="line"> v12 = args[1]</span><br><span class="line"> console.log(&quot;sub_8A4 v12 args[1] = &quot;, args[1])</span><br><span class="line"> &#125;, onLeave: function (retval) &#123;</span><br><span class="line"> console.log(&quot;sub_8A4 retval v12 = &quot;, v12)</span><br><span class="line"> console.log(&quot;sub_8A4 retval v12 s = &quot;, ptr(v12).readByteArray(64))</span><br><span class="line"> console.log(&quot;sub_8A4retval &quot;, v12.readCString())</span><br><span class="line"> console.log(&quot;sub_8A4 retval &quot;, hexdump(v12))</span><br><span class="line"> &#125;</span><br><span class="line"> &#125;)</span><br><span class="line"> &#125;)</span><br><span class="line">&#125;</span><br><span class="line">def Rc4_init(S, K): # S盒初始化置换,K为密钥</span><br><span class="line"> j = 0</span><br><span class="line"> k = []</span><br><span class="line"> for i in range(256):</span><br><span class="line"> S.append(256 - i)</span><br><span class="line"> k.append(K[i % len(K)])</span><br><span class="line"> for i in range(256):</span><br><span class="line"> j = (j + S[i] + ord(k[i])) % 256</span><br><span class="line"> S[i], S[j] = S[j], S[i] # 交换S[i],S[j]</span><br><span class="line">def rc4_Decrypt1(S, D):</span><br><span class="line"> i = j = 0</span><br><span class="line"> result = &#x27;&#x27;</span><br><span class="line"> for a in D:</span><br><span class="line"> i = (i + 1) % 256</span><br><span class="line"> j = (j + S[i]) % 256</span><br><span class="line"> S[i], S[j] = S[j], S[i]</span><br><span class="line"> t = (S[i] + S[j]) % 256</span><br><span class="line"> k = chr(a ^ S[(S[i] + S[j]) % 256])</span><br><span class="line"> result += k</span><br><span class="line"> return result</span><br><span class="line">三</span><br><span class="line">完整的算法还原</span><br><span class="line">import base64</span><br><span class="line">import binascii</span><br><span class="line"></span><br><span class="line">s1 = &quot;abcdefghijklmnopqrstuvwxyz0123456789+/ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><br><span class="line">s2 = &#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&#x27;</span><br><span class="line"></span><br><span class="line"># abcdefghijklmnopqrstuvwxyz0123456789+/ABCDEFGHIJKLMNOPQRSTUVWXYZ</span><br><span class="line"></span><br><span class="line">data = &quot;3g6L2PWL2PXFmR+7ise7iq==&quot;</span><br><span class="line"></span><br><span class="line">data_y = &quot;dGgxc18xc19rM3khISEhIQ==&quot;</span><br><span class="line"></span><br><span class="line">print(str.maketrans(s1, s2))</span><br><span class="line">print(data.translate(str.maketrans(s1, s2)).encode(&#x27;utf-8&#x27;))</span><br><span class="line">key = str(base64.b64decode(data.translate(str.maketrans(s1, s2)).encode(&#x27;utf-8&#x27;)), encoding=&quot;utf-8&quot;)</span><br><span class="line">print(&quot; key = &quot;,key)</span><br><span class="line"></span><br><span class="line">def Rc4_init(S, K): # S盒初始化置换,K为密钥</span><br><span class="line"> j = 0</span><br><span class="line"> k = []</span><br><span class="line"> for i in range(256):</span><br><span class="line"> S.append(256 - i)</span><br><span class="line"> k.append(K[i % len(K)])</span><br><span class="line"> for i in range(256):</span><br><span class="line"> j = (j + S[i] + ord(k[i])) % 256</span><br><span class="line"> S[i], S[j] = S[j], S[i] # 交换S[i],S[j]</span><br><span class="line"></span><br><span class="line">def rc4_Decrypt1(S, D):</span><br><span class="line"> i = j = 0</span><br><span class="line"> result = &#x27;&#x27;</span><br><span class="line"> for a in D:</span><br><span class="line"> i = (i + 1) % 256</span><br><span class="line"> j = (j + S[i]) % 256</span><br><span class="line"> S[i], S[j] = S[j], S[i]</span><br><span class="line"> t = (S[i] + S[j]) % 256</span><br><span class="line"> k = chr(a ^ S[(S[i] + S[j]) % 256])</span><br><span class="line"> result += k</span><br><span class="line"> return result</span><br><span class="line"></span><br><span class="line">bb = [139, 210, 217, 93, 149, 255, 126, 95, 41, 86, 18, 185, 239, 236, 139, 208, 69]</span><br><span class="line">print(&quot;key: &quot; + key)</span><br><span class="line">s = []</span><br><span class="line">Rc4_init(s, key)</span><br><span class="line">z = rc4_Decrypt1(s, bb)</span><br><span class="line">print(&quot;Decrypt:&quot; + z)</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/167920.html">https://www.ctfiot.com/167920.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/Nep_CTF_password%EF%BC%9Arc4%E5%92%8C%E6%8D%A2%E8%A1%A8base64%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;Nep_CTF_password：rc4和换表base64算法分析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Android-APK/">Android APK</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Reverse/LEVERAGING_BINARY_NINJA_IL_TO_REVERSE_A_CUSTOM_ISA-_CRACKING_THE_-POT_OF_GOLD-_3/" title="LEVERAGING BINARY NINJA IL TO REVERSE A CUSTOM ISA: CRACKING POT OF GOLD 37C3"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">LEVERAGING BINARY NINJA IL TO REVERSE A CUSTOM ISA: CRACKING POT OF GOLD 37C3</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Reverse/NepnepxCATCTF-CatPaw%E9%A2%98%E7%9B%AE%E8%AF%A6%E8%A7%A3/" title="NepnepxCATCTF CatPaw 题目详解 (Android 小米备份 + 触摸事件)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">NepnepxCATCTF CatPaw 题目详解 (Android 小米备份 + 触摸事件)</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/01/01/ctf-kb/wp/Reverse/N1CTF-ezapk_%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" title="N1CTF 2024 ezapk 解题思路 (Android + JNI Frida hook)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">N1CTF 2024 ezapk 解题思路 (Android + JNI Frida hook)</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%8D%E5%90%91%E6%B1%82%E8%A7%A3%E5%87%BA-v12-%E7%9A%84%E5%80%BC"><span class="toc-number">1.</span> <span class="toc-text">反向求解出 v12 的值</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#aAbcdefghijklmn-v30-v5-one"><span class="toc-number">2.</span> <span class="toc-text">aAbcdefghijklmn[v30[v5]] &#x3D; one</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-get-len"><span class="toc-number">3.</span> <span class="toc-text">print(get_len)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#abcdefghijklmnopqrstuvwxyz0123456789-ABCDEFGHIJKLMNOPQRSTUVWXYZ"><span class="toc-number">4.</span> <span class="toc-text">abcdefghijklmnopqrstuvwxyz0123456789+&#x2F;ABCDEFGHIJKLMNOPQRSTUVWXYZ</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%80%E6%9C%9F%E6%8E%A8%E8%8D%90"><span class="toc-number">5.</span> <span class="toc-text">往期推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">5.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

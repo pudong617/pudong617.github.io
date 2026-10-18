@@ -1,0 +1,230 @@
+/* ==========================================================
+   交互配色与动效统一
+   主色：石油蓝 #2A6F97（白底 5.5:1，可同时作为文字色与按钮底色）
+   规则：
+   - 一个交互色，青绿只保留在 banner 渐变里做装饰
+   - 文字高亮 = 变色 + 下划线淡入；块状高亮 = 10~16% 主色浅底
+   - 只过渡颜色相关属性，不用 transition: all
+   ========================================================== */
+
+:root {
+  --hover-ease: cubic-bezier(.4, 0, .2, 1);
+  --hover-time: .26s;
+
+  --accent: #2A6F97;
+  --accent-strong: #235C7E;
+  --accent-soft: rgba(42, 111, 151, .10);
+
+  /* 覆盖主题变量，让内置组件自动跟随 */
+  --btn-bg: var(--accent);
+  --btn-hover-color: var(--accent-strong);
+  --pseudo-hover: var(--accent);
+  --scrollbar-color: var(--accent);
+  --default-bg-color: var(--accent);
+  --text-bg-hover: var(--accent-soft);
+
+  --card-box-shadow: 0 3px 8px 6px rgba(16, 42, 67, .06);
+  --card-hover-box-shadow: 0 8px 20px 4px rgba(16, 42, 67, .14);
+}
+
+/* 暗色：文字用更亮的蓝，按钮仍用可辨识的实心蓝 */
+html[data-theme='dark'] {
+  --accent: #5FA8D3;
+  --accent-strong: #4E96BF;
+  --accent-soft: rgba(95, 168, 211, .16);
+
+  --btn-bg: #2A6F97;
+  --btn-hover-color: #347FA8;
+  --pseudo-hover: #5FA8D3;
+  --text-bg-hover: rgba(95, 168, 211, .16);
+
+  --card-box-shadow: 0 3px 10px 2px rgba(0, 0, 0, .45);
+  --card-hover-box-shadow: 0 10px 26px 4px rgba(0, 0, 0, .55);
+}
+
+/* ---------- 1. 正文链接：下划线淡入 ---------- */
+#article-container a:not(.headerlink):not(.btn-beautify) {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: color var(--hover-time) var(--hover-ease),
+              text-decoration-color var(--hover-time) var(--hover-ease);
+}
+
+#article-container a:not(.headerlink):not(.btn-beautify):hover {
+  color: var(--accent-strong);
+  text-decoration-color: currentColor;
+}
+
+html[data-theme='dark'] #article-container a:not(.headerlink):not(.btn-beautify):hover {
+  color: var(--accent);
+}
+
+/* 阅读模式保持主题原本的灰蓝色 */
+.read-mode #article-container a:not(.headerlink):not(.btn-beautify):hover {
+  color: #99a9bf;
+}
+
+/* 标题锚点不显示下划线 */
+#article-container a.headerlink,
+#article-container a.headerlink:hover {
+  text-decoration: none;
+}
+
+/* ---------- 2. 文章信息行（日期 / 分类 / 标签） ---------- */
+.article-meta-wrap a,
+#post-meta a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color var(--hover-time) var(--hover-ease),
+              text-decoration-color var(--hover-time) var(--hover-ease);
+}
+
+.article-meta-wrap a:hover,
+#post-meta a:hover {
+  color: var(--accent-strong);
+  text-decoration-color: currentColor;
+}
+
+html[data-theme='dark'] .article-meta-wrap a:hover,
+html[data-theme='dark'] #post-meta a:hover {
+  color: var(--accent);
+}
+
+/* ---------- 3. 文章底部标签胶囊 ---------- */
+#post .tag_share .post-meta__tags {
+  border-color: var(--accent);
+  color: var(--accent);
+  transition: color var(--hover-time) var(--hover-ease),
+              background-color var(--hover-time) var(--hover-ease),
+              border-color var(--hover-time) var(--hover-ease);
+}
+
+#post .tag_share .post-meta__tags:hover {
+  background: var(--btn-bg);
+  border-color: var(--btn-bg);
+  color: #fff;
+}
+
+/* ---------- 4. 标签云：单一色系，用字号表达热度 ---------- */
+.tag-cloud-list a {
+  color: var(--accent) !important;
+  border-radius: 6px;
+  transition: color var(--hover-time) var(--hover-ease),
+              background-color var(--hover-time) var(--hover-ease);
+}
+
+.tag-cloud-list a:hover {
+  color: var(--accent-strong) !important;
+  background-color: var(--accent-soft);
+  transform: none;
+}
+
+html[data-theme='dark'] .tag-cloud-list a:hover {
+  color: var(--accent) !important;
+}
+
+.card-tag-cloud a {
+  transition: color var(--hover-time) var(--hover-ease);
+}
+
+.card-tag-cloud a:hover {
+  color: var(--accent) !important;
+}
+
+/* ---------- 5. 目录：激活项与分页、按钮同一实心色 ---------- */
+.toc-link {
+  transition: color var(--hover-time) var(--hover-ease),
+              background-color var(--hover-time) var(--hover-ease);
+}
+
+.toc-link:hover {
+  color: var(--accent);
+}
+
+#aside-content #card-toc .toc-content .toc-link.active {
+  background: var(--btn-bg);
+  color: #fff;
+}
+
+html[data-theme='dark'] #aside-content #card-toc .toc-content .toc-link.active {
+  background: rgba(95, 168, 211, .22);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(95, 168, 211, .35);
+}
+
+/* ---------- 6. 分页：当前页与按钮同一实心色 ---------- */
+html #pagination .page-number.current,
+html[data-theme='dark'] #pagination .page-number.current {
+  background: var(--btn-bg);
+  color: #fff;
+}
+
+.layout > .recent-posts .pagination > *,
+.layout > div:not(.recent-posts) .pagination .page-number {
+  transition: background-color var(--hover-time) var(--hover-ease),
+              color var(--hover-time) var(--hover-ease),
+              box-shadow var(--hover-time) var(--hover-ease);
+}
+
+/* ---------- 7. 分类列表圆点 ---------- */
+.category-lists ul li:before {
+  border-color: var(--accent);
+}
+
+/* ---------- 8. 卡片：暗色下补足层次，去掉 transition: all ---------- */
+.card-widget,
+.recent-post-item {
+  transition: box-shadow .3s var(--hover-ease),
+              background-color .3s var(--hover-ease);
+}
+
+/* ---------- 9. 右下角按钮：暗色下可辨识，只过渡颜色 ---------- */
+#rightside > div > button,
+#rightside > div > a,
+#rightside > div > div > button {
+  transition: background-color var(--hover-time) var(--hover-ease),
+              color var(--hover-time) var(--hover-ease);
+}
+
+/* ---------- 10. 标题与导航文字 ---------- */
+.recent-post-item .post-title a,
+.article-sort-item-title a {
+  transition: color var(--hover-time) var(--hover-ease);
+}
+
+.recent-post-item .post-title a:hover,
+.article-sort-item-title a:hover {
+  color: var(--accent);
+}
+
+#nav .site-page:not(.child):after {
+  background-color: var(--accent);
+}
+
+#nav .menus_items .menus_item_child li {
+  transition: background-color var(--hover-time) var(--hover-ease);
+}
+
+/* ---------- 11. 站点字标：深色字标在深色 banner 上看不见 ---------- */
+#blog-info img.site-icon {
+  filter: none;
+  transition: filter var(--hover-time) var(--hover-ease);
+}
+
+/* banner 上（深色底）与暗色模式：转成白色字标 */
+html #page-header:not(.nav-fixed) #blog-info img.site-icon,
+html[data-theme='dark'] #blog-info img.site-icon {
+  filter: brightness(0) invert(1);
+}
+
+/* 浅色模式滚动后的磨砂导航（浅底）以及无头图页面：保留原本的深色字标 */
+html:not([data-theme='dark']) #page-header.nav-fixed #blog-info img.site-icon,
+html:not([data-theme='dark']) #page-header.not-top-img #blog-info img.site-icon {
+  filter: none;
+}

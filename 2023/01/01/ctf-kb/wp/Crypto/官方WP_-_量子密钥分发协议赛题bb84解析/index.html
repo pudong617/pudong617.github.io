@@ -1,0 +1,226 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>量子密钥分发协议赛题bb84官方WP - 第十六届信安国赛 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="安徽问天量子设计信安国赛BB84量子密钥分发赛题:偏振对基+误码筛+线性同余取密钥+流密码异或。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="量子密钥分发协议赛题bb84官方WP - 第十六届信安国赛">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Crypto/%E5%AE%98%E6%96%B9WP_-_%E9%87%8F%E5%AD%90%E5%AF%86%E9%92%A5%E5%88%86%E5%8F%91%E5%8D%8F%E8%AE%AE%E8%B5%9B%E9%A2%98bb84%E8%A7%A3%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="安徽问天量子设计信安国赛BB84量子密钥分发赛题:偏振对基+误码筛+线性同余取密钥+流密码异或。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="量子密钥分发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Crypto/%E5%AE%98%E6%96%B9WP_-_%E9%87%8F%E5%AD%90%E5%AF%86%E9%92%A5%E5%88%86%E5%8F%91%E5%8D%8F%E8%AE%AE%E8%B5%9B%E9%A2%98bb84%E8%A7%A3%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '量子密钥分发协议赛题bb84官方WP - 第十六届信安国赛',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">量子密钥分发协议赛题bb84官方WP - 第十六届信安国赛</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="量子密钥分发协议赛题bb84官方WP - 第十六届信安国赛"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/119468.html">https://www.ctfiot.com/119468.html</a><br>ID: 119468</p>
+</blockquote>
+<p>编者荐语：</p>
+<p>量子通信是一种运用量子力学原理来传输和加密信息的先进技术，其中的关键技术包含量子密钥分发。BB84协议是1984年首次提出来的量子密钥分发安全协议，它能够在不可靠的信道上为通信双方建立一个随机的密钥，从而保障信息的机密性和完整性。</p>
+<p>本文分享了第十六届全国大学生信息安全竞赛初赛基于量子密钥分发协议而设计的bb84赛题的解析。</p>
+<p>“bb84”赛题已部署在伽玛实验场，欢迎前去挑战。</p>
+<p>BB84偏振协议解析</p>
+<p>作者：安徽问天量子科技股份有限公司-量子信息教育创新平台产品团队<br>量子信息已经被《“十四五”国家信息化规划》视为重要的前沿领域之一，属于国家重点发展的具备引领新兴产业发展潜力的前沿技术。其中，量子密码和量子计算与网络空间安全有较紧密的关联，也为网络空间安全的发展提供新的机遇和挑战。量子密钥分发是量子密码研究中的重点。BB84协议于1984年提出，该协议是量子密钥技术发展的开端，是最经典也是当前广泛应用的协议，具有非常重要的意义。在本届大学生“国赛”初赛出一道量子信息相关的题目，也是为了让选手以比赛的这种方式，能了解到一些量子相关的知识和最新的进展。</p>
+<p>BB84赛题要求选手快速熟悉BB84偏振协议流程，了解其有效探测、对基过程、安全密钥、误码率等相关知识。此外，选手还需掌握根据线性同余理论从已得到的安全密钥序列中，选取生成最终用于加密的安全密钥。</p>
+<p>题目考察的是选手对基于BB84偏振编码协议的量子密钥分发技术原理的快速学习和理解，为了节省选手网上搜索相关知识的时间，便于选手更高效地学习BB84协议流程，我们提供了参考资料（参考资料.docx）以及配套的BB84偏振编码协议的web参考软件（Qsim-CTF.exe）。</p>
+<p>根据参考资料，解析csv文件，获取安全密钥序列；</p>
+<p>根据线性同余理论从已得到的安全密钥序列中，获取最终用于加密的安全密钥。</p>
+<p>解题步骤如下：</p>
+<p>EPC1：为Alice端根据四个偏振量子态调制编码的随机数序列（1,2,3,4），序列长度为n；</p>
+<p>APD1-APD4：为Bob端四个探测器响应序列（0,1），每组序列长度为n，共四组，序列编号分别为1,2,3,4；</p>
+<p>如图所示，对于每列数据，只保留APD1-APD4有且只有一个1 的情况，不符合的舍弃，有效探测序列长度为</p>
+<p>；</p>
+<p>对基成功判定条件如下：</p>
+<p>EPC1为1，APD1或APD2为1；</p>
+<p>EPC1为2，APD1或APD2为1；</p>
+<p>EPC1为3，APD3或APD4为1；</p>
+<p>EPC1为4，APD3或APD4为1；</p>
+<p>符合的数据保留，不符合的数据丢弃，对基成功序列的长度为</p>
+<p>；</p>
+<p>首先，在对基成功前提下，筛选误码，误码判定条件如下：</p>
+<p>EPC1为1，APD2为1；</p>
+<p>EPC1为2，APD1为1；</p>
+<p>EPC1为3，APD4为1；</p>
+<p>EPC1为4，APD3为1；</p>
+<p>得到此时错误的比特数为，计算出误码率为：</p>
+<p>根据公式，计算出安全密钥量。</p>
+<p>成码率&#x2F;安全密钥量计算公式：</p>
+<p>；</p>
+<p>表示二进制香农熵；</p>
+<p>出于对题目难度均衡化的考量，我们在题干参数信息中潜藏关键信息“我们默认实现最理想的100%纠错”，选手提取到此条关键信息后，即可简化算法过程。</p>
+<p>根据“一次一密”关键词，可知悉：密钥长度&#x3D;明文长度；</p>
+<p>根据“流密码”关键词，可知悉：加密采用对称加密方式，加密和解密时使用同一密钥，且进行异或运算；</p>
+<p>根据“UTF8编码方式”关键词，可知悉：最终需通过UTF8进行编码得到明文。</p>
+<p>然后根据密文（16进制）长度乘以4为二进制密文的长度，也就是从安全密钥序列中最终获取的密钥长度，根据线性同余的方式去取索引，示例代码（C#语言）如下：</p>
+<p>异或运算得到01比特数组，再进行UTF8进行编码得到明文，示例代码（C#语言）如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">// ciphertext密文，srcLen明文长度</span><br><span class="line">string ciphertext = &quot;自定义的密文信息&quot;;</span><br><span class="line">char[] charArr = ciphertext.ToArray();</span><br><span class="line">int srcLen = ciphertext.Length / 2;</span><br><span class="line">byte[] byteData = new byte[srcLen];</span><br><span class="line"></span><br><span class="line">OriInfoLen = srcLen * 8;</span><br><span class="line">// hexArr：将十六进制数据两两一组，便于后面的异或运算</span><br><span class="line">List&lt;string&gt; hexArr = new List&lt;string&gt;();</span><br><span class="line">for (int i = 0; i &lt; srcLen; i++)</span><br><span class="line">&#123;</span><br><span class="line">  string tempStr = $&quot;&#123;charArr[i * 2]&#125;&#123;charArr[i * 2 + 1]&#125;&quot;;</span><br><span class="line">  hexArr.Add(tempStr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// orderKeys线性同余得到二进制数组</span><br><span class="line">int[] orderKeys = GetRandomKey(tmp).ToArray();</span><br><span class="line">// OriInfoLen为密文长度的4倍</span><br><span class="line">for (int i = 0; i &lt; OriInfoLen; i++)</span><br><span class="line">&#123;</span><br><span class="line">  int value = orderKeys[i * 8 + 7] + orderKeys[i * 8 + 6] * 2 + orderKeys[i * 8 + 5] * 4 + orderKeys[i * 8 + 4] * 8 + orderKeys[i * 8 + 3] * 16 + orderKeys[i * 8 + 2] * 32 + orderKeys[i * 8 + 1] * 64 + orderKeys[i * 8] * 128;</span><br><span class="line">  nums.Add(value);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// &lt;summary&gt;</span><br><span class="line">/// 线性同余得到密钥</span><br><span class="line">/// &lt;/summary&gt;</span><br><span class="line">/// </span><br><span class="line">/// &lt;returns&gt;&lt;/returns&gt;</span><br><span class="line">List GetRandomKey(int[] keyPool)</span><br><span class="line">&#123;</span><br><span class="line">  int A = 1709;</span><br><span class="line">  int B = 2003;</span><br><span class="line">  int M = keyPool.Length;</span><br><span class="line">  int indexBegin = 17;</span><br><span class="line">  // newKey： 经线性同余计算得到的索引所对应的的数据</span><br><span class="line">  List newKey = new List();</span><br><span class="line">  newKey.Add(keyPool[indexBegin]);</span><br><span class="line">  for (int i = 1; i &lt; OriInfoByteLen; i++)</span><br><span class="line">  &#123;</span><br><span class="line">    int res = (A * indexBegin + B) % M;</span><br><span class="line">    newKey.Add(keyPool[res]);</span><br><span class="line">    indexBegin = res;</span><br><span class="line">  &#125;</span><br><span class="line">  return newKey;</span><br><span class="line">&#125;</span><br><span class="line">for (int i = 0; i &lt; OriInfoLen; i++)</span><br><span class="line">&#123;</span><br><span class="line">  int value = Convert.ToInt32(hexArr[i], 16);</span><br><span class="line">  int res = value ^ nums[i];</span><br><span class="line">  byteData[i] = Convert.ToByte(res);</span><br><span class="line">&#125;</span><br><span class="line">var plaintext = Encoding.UTF8.GetString(byteData);</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/119468.html">https://www.ctfiot.com/119468.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E5%AE%98%E6%96%B9WP_-_%E9%87%8F%E5%AD%90%E5%AF%86%E9%92%A5%E5%88%86%E5%8F%91%E5%8D%8F%E8%AE%AE%E8%B5%9B%E9%A2%98bb84%E8%A7%A3%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;官方WP_-_量子密钥分发协议赛题bb84解析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E9%87%8F%E5%AD%90%E5%AF%86%E9%92%A5%E5%88%86%E5%8F%91/">量子密钥分发</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Crypto/%E5%A5%BD%E9%A2%98%E5%88%86%E4%BA%AB%E7%B3%BB%E5%88%97_-_2023_N1CTF_Junior_-_n1lucky/" title="2023 N1CTF Junior n1lucky - LLL格密码恢复secret"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2023 N1CTF Junior n1lucky - LLL格密码恢复secret</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Crypto/%E5%AE%98%E6%96%B9WP_-_%E5%85%B3%E4%BA%8E-%E5%8F%AF%E4%BF%A1%E5%BA%A6%E9%87%8F-%E8%B5%9B%E9%A2%98%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E6%80%9D%E8%80%83/" title="可信度量赛题官方WP - TCM PCR寄存器+SM3摘要+可信报告防重放"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">可信度量赛题官方WP - TCM PCR寄存器+SM3摘要+可信报告防重放</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

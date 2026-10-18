@@ -1,0 +1,318 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2025 强网拟态 FMS - LCG PRNG 状态恢复攻击 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="LCG 后门泄露参数 + 128 字节低 8 位泄漏用 LLL 格基规约恢复 128 位种子，复现 admin 密码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2025 强网拟态 FMS - LCG PRNG 状态恢复攻击">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81FMS/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="LCG 后门泄露参数 + 128 字节低 8 位泄漏用 LLL 格基规约恢复 128 位种子，复现 admin 密码。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="LCG">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81FMS/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2025 强网拟态 FMS - LCG PRNG 状态恢复攻击',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2025 强网拟态 FMS - LCG PRNG 状态恢复攻击</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2025 强网拟态 FMS - LCG PRNG 状态恢复攻击"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/277011.html">https://www.ctfiot.com/277011.html</a><br>ID: 277011</p>
+</blockquote>
+<p>FMS – CTF密码学题目详解</p>
+<p>一、题目概述</p>
+<p>1.1 题目背景</p>
+<p>题目描述: Flag管理系统的开发者似乎给这个系统植入了一个后门，作为测试人员，你能找到后门并获得flag吗？</p>
+<p>The developer of the Flag management system seems to have implanted a backdoor into this system. As a tester, can you find the backdoor and obtain the flag?</p>
+<p>1.2 题目文件分析</p>
+<p>题目提供了一个Python编写的Flag管理系统main.py，系统功能包括：</p>
+<p>[L]ogin: 用户登录</p>
+<p>[G]et Public Key: 获取公钥（实际是PRNG参数）</p>
+<p>[R]ead Flag: 读取加密的flag（需要admin权限）</p>
+<p>[E]xit: 退出系统</p>
+<p>这是一个线性同余生成器（Linear Congruential Generator, LCG）</p>
+<p>递推公式:<br>state_{n+1} &#x3D; (a × state_n + b) mod p</p>
+<p>状态空间：128位素数p</p>
+<p>admin密码由PRNG生成的32个随机字符组成</p>
+<p>如果能恢复PRNG的初始状态，就能重现admin密码</p>
+<p>guest账户密码已知（hash值），但权限不够读取flag</p>
+<p>每次调用randbytes都会输出PRNG状态的低8位</p>
+<p>登录失败不影响PRNG状态继续前进</p>
+<p>可以通过多次尝试登录收集大量的低8位信息</p>
+<p>X_n: 第n个状态</p>
+<p>a: 乘数（multiplier）</p>
+<p>b: 增量（increment）</p>
+<p>m: 模数（modulus）</p>
+<p>可预测性: 如果知道参数和当前状态，可以预测所有未来输出</p>
+<p>状态恢复: 通过连续的输出可以恢复内部状态</p>
+<p>低位相关性: 低位比高位更不随机</p>
+<p>我们知道LCG参数：a, b, p</p>
+<p>我们不知道初始种子（seed）</p>
+<p>我们能观察到每个状态的低8位（即 state mod 256）</p>
+<p>s&#x3D; 初始种子（未知）</p>
+<p>state_i&#x3D; 第i个状态值（未知）</p>
+<p>T_i&#x3D; 第i个观察到的低8位（已知）</p>
+<p>h_i&#x3D; 第i个状态的高位部分（未知）</p>
+<p>给定一组格的基向量（可能很”长”很”歪斜”）</p>
+<p>LLL算法输出一组”更好”的基向量（更短、更正交）</p>
+<p>规约后的短向量往往包含我们要找的解</p>
+<p>格中的短向量对应于方程组的解</p>
+<p>未知数的界限对应于向量的长度约束</p>
+<p>正确的解会产生一个短向量：因为所有方程都满足（结果为0或很小）</p>
+<p>错误的猜测会产生长向量：因为不满足模p的约束</p>
+<p>LLL能找到短向量：从而找到正确解</p>
+<p>Get Public Key功能是后门，直接泄露了完整的LCG参数</p>
+<p>有了a, b, p，我们就知道了PRNG的所有公开信息</p>
+<p>信息理论: 初始种子约128位，需要足够的约束才能唯一确定</p>
+<p>格基规约要求: 更多的方程意味着更强的约束，更容易找到短向量</p>
+<p>实践经验: 128个样本足以可靠地恢复128位的种子</p>
+<p>输入:</p>
+<p>多项式方程组</p>
+<p>每个变量的取值范围</p>
+<p>内部流程:</p>
+<p>a) 将多项式方程组转换为格基矩阵b) 每个方程对应矩阵的一行c) 每个变量对应一列d) 使用变量界限调整矩阵尺度e) 执行LLL格基规约f) 从短向量中提取变量的值</p>
+<p>输出:</p>
+<p>满足所有方程且在界限内的解</p>
+<p>虽然我们收集了128个字节（128次next调用）</p>
+<p>但格求解器求解的变量s定义为”第一次观测之前”的状态</p>
+<p>这个s正好是”生成admin密码之后”的时间点</p>
+<p>伪随机数生成器是确定性的</p>
+<p>相同的种子 + 相同的算法 &#x3D; 相同的输出序列</p>
+<p>我们完美复刻了题目的密码生成过程</p>
+<p>线性方程组求解</p>
+<p>格基规约</p>
+<p>中国剩余定理</p>
+<p>截断LCG攻击</p>
+<p>低位的周期比高位短</p>
+<p>连续输出之间存在线性相关</p>
+<p>不满足密码学安全的”不可区分性”</p>
+<p>所有可能的猜测构成一个格</p>
+<p>正确的解对应一个特别短的向量</p>
+<p>LLL算法能高效找到这样的短向量</p>
+<p>如果x_i满足约束，对应的向量分量很小</p>
+<p>如果不满足，分量会很大（接近模数p）</p>
+<p>所以满足所有约束的解 &#x3D; 最短的向量</p>
+<p>因为p是素数，且 gcd(a, p) &#x3D; 1</p>
+<p>根据费马小定理: a^(p-1) ≡ 1 (mod p)</p>
+<p>所以: a^(-1) ≡ a^(p-2) (mod p)</p>
+<p>在本地运行题目，添加日志</p>
+<p>对比本地和远程</p>
+<p>二分查找同步点</p>
+<p>伪随机数生成器 (PRNG)</p>
+<p>线性同余生成器 (LCG)</p>
+<p>LCG的数学性质</p>
+<p>密码学安全的PRNG</p>
+<p>数论</p>
+<p>模运算</p>
+<p>模逆 (Modular Inverse)</p>
+<p>费马小定理</p>
+<p>格理论 (Lattice Theory)</p>
+<p>格的定义</p>
+<p>格基规约</p>
+<p>LLL算法</p>
+<p>短向量问题 (SVP)</p>
+<p>密码分析</p>
+<p>截断输出攻击</p>
+<p>隐藏数问题 (HNP)</p>
+<p>格攻击在密码学中的应用</p>
+<p>编程技巧</p>
+<p>Socket编程 (pwntools)</p>
+<p>SageMath使用</p>
+<p>状态同步</p>
+<p>发现后门：Get Public Key 泄露LCG参数</p>
+<p>信息收集：通过多次登录收集低位信息</p>
+<p>数学建模：将问题转化为多变量多项式方程组</p>
+<p>格基规约：使用LLL算法求解</p>
+<p>状态回溯：逆向LCG到初始种子</p>
+<p>精确同步：追踪PRNG的每次调用</p>
+<p>先理解LCG的工作原理</p>
+<p>手动计算小例子（如模数m&#x3D;100）</p>
+<p>学习基本的模运算和模逆</p>
+<p>理解为什么LCG不安全</p>
+<p>深入学习格理论基础</p>
+<p>实现简单的LLL算法</p>
+<p>研究其他PRNG的攻击方法</p>
+<p>学习Coppersmith方法</p>
+<p>阅读相关论文</p>
+<p>研究更复杂的格攻击</p>
+<p>学习其他密码学攻击技术</p>
+<p>参与CTF比赛实践</p>
+<p>Frieze, A. et al. “Reconstructing Truncated Integer Variables Satisfying Linear Congruences” (1988)</p>
+<p>Nguyen, P. Q. “The LLL Algorithm” (2010)</p>
+<p>SageMath: <a target="_blank" rel="noopener" href="https://www.sagemath.org/">https://www.sagemath.org/</a></p>
+<p>crypto-attacks: <a target="_blank" rel="noopener" href="https://github.com/jvdsn/crypto-attacks">https://github.com/jvdsn/crypto-attacks</a></p>
+<p>pwntools: <a target="_blank" rel="noopener" href="https://github.com/Gallopsled/pwntools">https://github.com/Gallopsled/pwntools</a></p>
+<p>“Lattice-based Attacks in Cryptography” – Tutorial</p>
+<p>“The Hidden Number Problem” – Survey Paper</p>
+<p>手动计算LCG</p>
+<p>给定: a&#x3D;7, b&#x3D;3, m&#x3D;100, seed&#x3D;12计算前10个输出</p>
+<p>模逆计算</p>
+<p>计算 7^(-1) mod 100验证: 7 × 7^(-1) ≡ 1 (mod 100)</p>
+<p>LCG逆向</p>
+<p>给定: state_10 &#x3D; 45, a&#x3D;7, b&#x3D;3, m&#x3D;100求: state_9</p>
+<p>实现简单的LCG破解</p>
+<h1 id="已知a-b-p-和连续的两个输出"><a href="#已知a-b-p-和连续的两个输出" class="headerlink" title="已知a, b, p 和连续的两个输出"></a>已知a, b, p 和连续的两个输出</h1><h1 id="恢复种子defbreak-lcg-a-b-p-output1-output2-your-code-here-pass"><a href="#恢复种子defbreak-lcg-a-b-p-output1-output2-your-code-here-pass" class="headerlink" title="恢复种子defbreak_lcg(a, b, p, output1, output2): # your code here pass"></a>恢复种子defbreak_lcg(a, b, p, output1, output2): # your code here pass</h1><p>实现验证码收集器</p>
+<h1 id="自动化收集多次登录的验证码defauto-collect-num-attempts-your-code-here-pass"><a href="#自动化收集多次登录的验证码defauto-collect-num-attempts-your-code-here-pass" class="headerlink" title="自动化收集多次登录的验证码defauto_collect(num_attempts): # your code here pass"></a>自动化收集多次登录的验证码defauto_collect(num_attempts): # your code here pass</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">classPRNG: def__init__(self, a=None, b=None, p=None, seed=None): self.p = pifpelsegetPrime(128) # 128位素数 self.a = aifaelserandrange(1, self.p) self.b = bifbelserandrange(0, self.p) self.state = seedifseedelserandrange(0, self.p) defnext(self): self.state = (self.a * self.state + self.b) % self.p returnself.state</span><br><span class="line">prng = PRNG()Account = &#123; &quot;admin&quot;: sha256((&quot;&quot;.join(prng.choices(ascii_letters + digits,32))).encode()).hexdigest(), &quot;guest&quot;:&quot;84983c60f7daadc1cb8698621f802c0d9f9a3c3c295c810748fb048115c186ec&quot;&#125;</span><br><span class="line">vcode = prng.randbytes(4).hex().rjust(8,&#x27;0&#x27;)</span><br><span class="line">elifop ==&quot;G&quot;orop ==&quot;GET PUBLIC KEY&quot;: print(prng) # 泄露 a, b, p 参数！</span><br><span class="line">defrandbytes(self, n): out =b&#x27;&#x27; for_inrange(n): out += bytes([self.next() %256]) # 只取低8位！ returnout</span><br><span class="line">X_&#123;n+1&#125; = (a × X_n + b) mod m</span><br><span class="line">初始种子: X_0 = 12345参数: a = 7, b = 3, m = 100X_1 = (7 × 12345 + 3) mod 100 = 86418 mod 100 = 18X_2 = (7 × 18 + 3) mod 100 = 129 mod 100 = 29X_3 = (7 × 29 + 3) mod 100 = 206 mod 100 = 6...</span><br><span class="line">state_i = h_i × 256 + T_i</span><br><span class="line">state_1 = (a × s + b) mod pstate_2 = (a × state_1 + b) mod pstate_3 = (a × state_2 + b) mod p...</span><br><span class="line">state_i = a^i × s + b × (a^(i-1) + a^(i-2) + ... + 1) mod p</span><br><span class="line">h_i × 256 + T_i = a^i × s + b × Σ(a^j) mod p</span><br><span class="line">h_i × 256 + T_i - a^i × s - b × Σ(a^j) ≡ 0 (mod p)</span><br><span class="line">基向量: v1 = (1, 0), v2 = (0, 1)格点: 所有整数坐标点 (a, b)，其中 a, b ∈ ℤ基向量: v1 = (2, 1), v2 = (1, 3)格点: &#123;a×(2,1) + b×(1,3) | a, b ∈ ℤ&#125;</span><br><span class="line">每一行对应一个方程每一列对应一个变量矩阵元素是方程的系数</span><br><span class="line">变量: s, h_1, h_2, ..., h_n界限: - s ∈ [0, 2^128] - h_i ∈ [0, 2^120] (因为 state &lt; p ≈ 2^128, state = h_i × 256 + T_i)</span><br><span class="line">[开始] ↓[1. 连接服务器] ↓[2. 获取LCG参数: a, b, p] ← Get Public Key ↓[3. 收集验证码数据] ← 多次尝试登录（32次） | ├→ 每次登录生成4字节验证码 ├→ 每字节是PRNG的一次输出 mod 256 └→ 共收集 32×4 = 128 个低8位样本 ↓[4. 构建多项式方程组] | ├→ 定义变量: s (种子), h_0, h_1, ..., h_127 (高位) ├→ 约束: state_i = h_i × 256 + T_i └→ LCG递推: state_i = a^i × s + ... (mod p) ↓[5. 格基规约求解] | ├→ 使用 find_small_roots() 或 LLL ├→ 设置变量界限 └→ 求解得到种子 s ↓[6. 回溯到初始种子] | └→ 逆向32次: s = (s - b) × a^(-1) mod p ↓[7. 重现admin密码生成] | ├→ 使用恢复的种子初始化PRNG └→ 生成32字符的admin密码 ↓[8. 登录admin账户] | ├→ 获取当前验证码 └→ 使用恢复的密码登录 ↓[9. 读取加密flag] | ├→ 继续推进PRNG状态（33次×4字节） ├→ 生成AES密钥和IV └→ 解密flag ↓[获得flag!]</span><br><span class="line"># 安装依赖pip install pycryptodomepip install pwntools</span><br><span class="line"># SageMath（用于格基规约）# 下载地址: https://www.sagemath.org/</span><br><span class="line">frompwnimportremote</span><br><span class="line"># 连接到远程服务器r = remote(&quot;pwn-xxx.challenge.xctf.org.cn&quot;,9999, ssl=True)</span><br><span class="line"># 获取LCG参数r.sendlineafter(b&#x27;&gt;&gt;&gt; &#x27;,b&#x27;G&#x27;)a = int(r.recvline().strip().split(b&#x27; = &#x27;)[1])b = int(r.recvline().strip().split(b&#x27; = &#x27;)[1])p = int(r.recvline().strip().split(b&#x27; = &#x27;)[1])print(f&quot;LCG参数获取成功:&quot;)print(f&quot;a =&#123;a&#125;&quot;)print(f&quot;b =&#123;b&#125;&quot;)print(f&quot;p =&#123;p&#125;(&#123;p.bit_length()&#125;bits)&quot;)</span><br><span class="line">T = [] # 存储所有收集到的低8位defcollect_verification_code(): &quot;&quot;&quot;收集一次登录的验证码（4字节）&quot;&quot;&quot; globalT r.sendlineafter(b&#x27;&gt;&gt;&gt; &#x27;,b&#x27;L&#x27;) # 接收验证码 vcode_hex = r.recvline().strip().split(b&#x27;: &#x27;)[1].decode() # 转换为字节列表 vcode_bytes = [int(vcode_hex[2*i:2*i+2],16)foriinrange(len(vcode_hex)//2)] T.extend(vcode_bytes) # 随便输入用户名密码（登录失败，但PRNG状态已前进） r.sendlineafter(b&#x27;Username: &#x27;,b&#x27;guest&#x27;) r.sendlineafter(b&#x27;Password: &#x27;,b&#x27;wrong&#x27;) r.sendlineafter(b&#x27;Verification code: &#x27;,b&#x27;wrong&#x27;)</span><br><span class="line"># 收集32次，共128个字节foriinrange(32): collect_verification_code() print(f&quot;已收集&#123;len(T)&#125;个字节...&quot;)print(f&quot;\n总共收集到&#123;len(T)&#125;个PRNG输出的低8位&quot;)</span><br><span class="line">fromsage.allimport*# 定义多项式环</span><br><span class="line"># 变量: s (种子) + h0, h1, ..., h127 (每个输出的高位)var_names = [&#x27;s&#x27;] + [f&#x27;h&#123;i&#125;&#x27;foriinrange(len(T))]R = PolynomialRing(GF(p), var_names)</span><br><span class="line"># 提取变量s = R.gen(0) # 种子hs = [R.gen(i+1)foriinrange(len(T))] # 高位</span><br><span class="line"># 构建方程F = [] # 方程列表state = s # 当前状态从种子开始foriinrange(len(T)): # LCG 递推 state = a * state + b # 约束方程: h_i × 256 + T_i - state = 0 equation = hs[i] *256+ T[i] - state F.append(equation)print(f&quot;构建了&#123;len(F)&#125;个多项式方程&quot;)</span><br><span class="line">state_i = (a × state_&#123;i-1&#125; + b) mod pstate_i = h_i × 256 + T_i因此:</span><br><span class="line">h_i × 256 + T_i ≡ a × state_&#123;i-1&#125; + b (mod p)</span><br><span class="line">fromcusoimportfind_small_roots</span><br><span class="line"># 定义变量的界限bounds = &#123;s: (0,2**128)&#125; # 种子范围forhinhs: bounds[h] = (0,2**120) # 高位范围</span><br><span class="line"># 求解小根print(&quot;开始格基规约求解...&quot;)solutions = find_small_roots(F, bounds)</span><br><span class="line"># 提取种子recovered_seed = solutions[0][s]print(f&quot;恢复的种子 (after 32 vcodes):&#123;recovered_seed&#125;&quot;)print(f&quot;种子位长:&#123;recovered_seed.bit_length()&#125;bits&quot;)</span><br><span class="line">a) 将多项式方程组转换为格基矩阵b) 每个方程对应矩阵的一行c) 每个变量对应一列d) 使用变量界限调整矩阵尺度e) 执行LLL格基规约f) 从短向量中提取变量的值</span><br><span class="line"># 关键理解：格求解器返回的seed是&quot;开始收集验证码之前&quot;的状态</span><br><span class="line"># 这个状态正好是&quot;生成admin密码之后&quot;的状态</span><br><span class="line"># 只需要回溯生成admin密码时的32次next()调用</span><br><span class="line"># LCG 逆向公式:# 如果 state_&#123;n+1&#125; = (a × state_n + b) mod p</span><br><span class="line"># 则 state_n = (state_&#123;n+1&#125; - b) × a^(-1) mod pa_inv = inverse_mod(a, p) # 计算a的模逆original_seed = recovered_seedfor_inrange(32): # 逆向32次（不是128次！） original_seed = (original_seed - b) * a_inv % pprint(f&quot;\n原始初始种子:&#123;original_seed&#125;&quot;)print(f&quot;位长:&#123;original_seed.bit_length()&#125;bits&quot;)</span><br><span class="line">[程序启动] seed_0 ↓ ↓ choices(seq, 32) → 32次next()调用 ↓[生成admin后] ← 格求解器返回的就是这里！ ↓ ↓ 32次randbytes(4) → 128次next()调用 ↓[收集完成]</span><br><span class="line">fromstringimportascii_letters, digitsclassPRNG: # ... (与题目相同的实现)</span><br><span class="line"># 使用恢复的初始种子重新初始化prng = PRNG(a, b, p, original_seed)</span><br><span class="line"># 生成admin密码（与题目代码完全一致）admin_password =&quot;&quot;.join(prng.choices(ascii_letters + digits,32))print(f&quot;\nAdmin密码:&#123;admin_password&#125;&quot;)</span><br><span class="line"># 登录adminr.sendlineafter(b&#x27;&gt;&gt;&gt; &#x27;,b&#x27;L&#x27;)current_vcode = r.recvline().strip().split(b&#x27;: &#x27;)[1]r.sendlineafter(b&#x27;Username: &#x27;,b&#x27;admin&#x27;)r.sendlineafter(b&#x27;Password: &#x27;, admin_password.encode())r.sendlineafter(b&#x27;Verification code: &#x27;, current_vcode)print(r.recvline()) # 应该显示 &quot;Welcome, admin!&quot;# 此时PRNG又前进了4次（验证码），需要同步prng.randbytes(4)</span><br><span class="line">fromCrypto.CipherimportAES</span><br><span class="line"># 再前进33次（4字节），到达生成密钥的位置</span><br><span class="line"># 这个次数需要根据实际程序流程调整for_inrange(33): prng.randbytes(4)</span><br><span class="line"># 生成AES密钥和IV（与题目代码一致）key = prng.randbytes(16)iv = prng.randbytes(16)print(f&quot;AES Key:&#123;key.hex()&#125;&quot;)print(f&quot;AES IV: &#123;iv.hex()&#125;&quot;)</span><br><span class="line"># 读取加密的flagr.sendlineafter(b&#x27;&gt;&gt;&gt; &#x27;,b&#x27;R&#x27;)enc_flag = bytes.fromhex(r.recvline().decode().strip())</span><br><span class="line"># 解密aes = AES.new(key, AES.MODE_CBC, iv)flag = aes.decrypt(enc_flag)print(f&quot;\n🚩 Flag:&#123;flag.decode()&#125;&quot;)</span><br><span class="line">时间线:[初始种子] → 生成admin密码 (32次choices) → [我们的交互开始] → 32次登录验证码 (128次next) → 最后一次登录验证码 (4次next) → ??? 次未知操作 → 生成AES key (16次next) → 生成AES iv (16次next) → 加密flag</span><br><span class="line">#!/usr/bin/env python3</span><br><span class="line"># -*- coding: utf-8 -*-fromsage.allimport*fromCrypto.Util.numberimport*fromCrypto.CipherimportAESfromstringimportascii_letters, digitsfrompwnimportprocess, remotefromcusoimportfind_small_roots</span><br><span class="line"># ============== 配置 ==============REMOTE =TrueifREMOTE: r = remote(&quot;pwn-xxx.challenge.xctf.org.cn&quot;,9999, ssl=True)else: r = process([&#x27;python3&#x27;,&#x27;main.py&#x27;])</span><br><span class="line"># ============== 第1步: 获取LCG参数 ==============print(&quot;[*] 步骤1: 获取LCG参数...&quot;)r.sendlineafter(b&#x27;&gt;&gt;&gt; &#x27;,b&#x27;G&#x27;)a = int(r.recvline().strip().split(b&#x27; = &#x27;)[1])b = int(r.recvline().strip().split(b&#x27; = &#x27;)[1])p = int(r.recvline().strip().split(b&#x27; = &#x27;)[1])print(f&quot;[+] a =&#123;a&#125;&quot;)print(f&quot;[+] b =&#123;b&#125;&quot;)print(f&quot;[+] p =&#123;p&#125;(&#123;p.bit_length()&#125;bits)&quot;)</span><br><span class="line"># ============== 第2步: 收集验证码 ==============print(&quot;\n[*] 步骤2: 收集验证码...&quot;)T = []defcollect_vcode(): globalT r.sendlineafter(b&#x27;&gt;&gt;&gt; &#x27;,b&#x27;L&#x27;) vcode_hex = r.recvline().strip().split(b&#x27;: &#x27;)[1].decode() vcode_bytes = [int(vcode_hex[2*i:2*i+2],16)foriinrange(len(vcode_hex)//2)] T.extend(vcode_bytes) r.sendlineafter(b&#x27;Username: &#x27;,b&#x27;guest&#x27;) r.sendlineafter(b&#x27;Password: &#x27;,b&#x27;wrong&#x27;) r.sendlineafter(b&#x27;Verification code: &#x27;,b&#x27;wrong&#x27;)foriinrange(32): collect_vcode() print(f&quot; 进度:&#123;i+1&#125;/32&quot;, end=&#x27;\r&#x27;)print(f&quot;\n[+] 收集完成! 共&#123;len(T)&#125;个字节&quot;)</span><br><span class="line"># ============== 第3步: 构建方程组 ==============print(&quot;\n[*] 步骤3: 构建多项式方程组...&quot;)l = len(T)R = PolynomialRing(GF(p), names=[&#x27;s&#x27;] + [f&#x27;h&#123;i&#125;&#x27;foriinrange(l)])s, *hs = R.gens()F = []state = sforiinrange(l): state = a * state + b F.append(hs[i] *256+ T[i] - state)print(f&quot;[+] 已构建&#123;len(F)&#125;个方程&quot;)</span><br><span class="line"># ============== 第4步: 格基规约求解 ==============print(&quot;\n[*] 步骤4: 格基规约求解...&quot;)bounds = &#123;s: (0,2**128)&#125;forhinhs: bounds[h] = (0,2**120)seed_after_collection = find_small_roots(F, bounds)[0][s]print(f&quot;[+] 恢复种子:&#123;seed_after_collection&#125;&quot;)</span><br><span class="line"># ============== 第5步: 回溯初始种子 ==============print(&quot;\n[*] 步骤5: 回溯到初始种子...&quot;)a_inv = inverse_mod(a, p)original_seed = seed_after_collection</span><br><span class="line"># 只需回溯32次（生成admin密码时的32次choices调用）for_inrange(32): original_seed = (original_seed - b) * a_inv % pprint(f&quot;[+] 初始种子:&#123;original_seed&#125;&quot;)print(f&quot;[+] 位长:&#123;original_seed.bit_length()&#125;bits&quot;)</span><br><span class="line"># ============== 第6步: 生成admin密码 ==============print(&quot;\n[*] 步骤6: 生成admin密码...&quot;)classPRNG: def__init__(self, a, b, p, seed): self.p = p self.a = a self.b = b self.state = seed defnext(self): self.state = (self.a * self.state + self.b) % self.p returnself.state defrandbytes(self, n): out =b&#x27;&#x27; for_inrange(n): out += bytes([self.next() %256]) returnout defchoices(self, seq, k): return[seq[self.next() % len(seq)]for_inrange(k)]prng = PRNG(a, b, p, original_seed)admin_password =&quot;&quot;.join(prng.choices(ascii_letters + digits,32))print(f&quot;[+] Admin密码:&#123;admin_password&#125;&quot;)</span><br><span class="line"># ============== 第7步: 登录admin ==============print(&quot;\n[*] 步骤7: 登录admin账户...&quot;)r.sendlineafter(b&#x27;&gt;&gt;&gt; &#x27;,b&#x27;L&#x27;)vcode = r.recvline().strip().split(b&#x27;: &#x27;)[1]r.sendlineafter(b&#x27;Username: &#x27;,b&#x27;admin&#x27;)r.sendlineafter(b&#x27;Password: &#x27;, admin_password.encode())r.sendlineafter(b&#x27;Verification code: &#x27;, vcode)response = r.recvline()print(f&quot;[+]&#123;response.decode()&#125;&quot;)</span><br><span class="line"># 同步PRNG状态（刚才用了4字节的验证码）prng.randbytes(4)</span><br><span class="line"># ============== 第8步: 解密flag ==============print(&quot;\n[*] 步骤8: 读取并解密flag...&quot;)</span><br><span class="line"># 根据实际情况调整这个次数for_inrange(33): prng.randbytes(4)key = prng.randbytes(16)iv = prng.randbytes(16)r.sendlineafter(b&#x27;&gt;&gt;&gt; &#x27;,b&#x27;R&#x27;)enc = bytes.fromhex(r.recvline().decode().strip())aes = AES.new(key, AES.MODE_CBC, iv)flag = aes.decrypt(enc)print(f&quot;\n&#123;&#x27;=&#x27;*50&#125;&quot;)print(f&quot;🚩 Flag:&#123;flag.decode()&#125;&quot;)print(f&quot;&#123;&#x27;=&#x27;*50&#125;\n&quot;)r.close()</span><br><span class="line"># 已知参数和一个状态，可以预测所有未来state_1 = ... # 观察到的某个状态state_2 = (a * state_1 + b) % p # 可以计算state_3 = (a * state_2 + b) % p # 可以计算</span><br><span class="line"># ... 所有未来状态都能计算</span><br><span class="line">原问题: 找 x_1, x_2, ..., x_n 使得 f_1(x_1, ..., x_n) ≡ 0 (mod p) f_2(x_1, ..., x_n) ≡ 0 (mod p) ... 且 x_i ∈ [L_i, U_i]格问题: 找向量 v = (x_1, x_2, ..., x_n) 使得 ||v|| 很小（短向量） v 在由方程定义的格中</span><br><span class="line">deffind_small_roots(polynomials, bounds): # 1. 提取变量和参数 vars = extract_variables(polynomials) n = len(vars) # 2. 构建格基矩阵 M = build_lattice_matrix(polynomials, bounds) # M 的每一行对应一个多项式 # M 的每一列对应一个变量 # 3. 缩放（根据变量界限） fori, varinenumerate(vars): lower, upper = bounds[var] scale_factor = upper - lower M[:, i] *= scale_factor # 4. LLL 规约 B = M.LLL() # 调用 SageMath 的 LLL 实现 # 5. 从短向量提取解 shortest_vector = B[0] # 通常第一行是最短的 solution = &#123;&#125; fori, varinenumerate(vars): # 逆缩放 lower, upper = bounds[var] value = shortest_vector[i] // scale_factor + lower solution[var] = value # 6. 验证解 ifverify_solution(polynomials, solution): return[solution] else: # 尝试其他短向量 returntry_other_vectors(B, bounds)</span><br><span class="line">a_inv = inverse_mod(a, p)</span><br><span class="line">a × a_inv ≡ 1 (mod p)</span><br><span class="line">正向: state_&#123;n+1&#125; = (a × state_n + b) mod p逆向: state_n = (state_&#123;n+1&#125; - b) × a^(-1) mod p</span><br><span class="line">(a × state_n + b - b) × a^(-1)= a × state_n × a^(-1)= state_n × (a × a^(-1))= state_n × 1= state_n ✓</span><br><span class="line">defnext(self): self.state = (self.a * self.state + self.b) % self.p print(f&quot;[DEBUG] PRNG.next() called, state =&#123;self.state&#125;&quot;) # 添加 returnself.state</span><br><span class="line"># 本地local_prng = PRNG(a, b, p, seed)local_key = local_prng.randbytes(16)</span><br><span class="line"># 远程r.sendlineafter(b&#x27;&gt;&gt;&gt; &#x27;,b&#x27;R&#x27;)remote_enc = r.recvline()</span><br><span class="line"># 如果解密失败，说明PRNG状态不同步</span><br><span class="line"># 尝试不同的前进次数forskipinrange(0,100): test_prng = PRNG(a, b, p, seed) # ... 生成admin密码等 for_inrange(skip): test_prng.randbytes(4) test_key = test_prng.randbytes(16) test_iv = test_prng.randbytes(16) iftry_decrypt(enc, test_key, test_iv): print(f&quot;找到正确的skip次数:&#123;skip&#125;&quot;) break</span><br><span class="line">给定: a=7, b=3, m=100, seed=12计算前10个输出</span><br><span class="line">计算 7^(-1) mod 100验证: 7 × 7^(-1) ≡ 1 (mod 100)</span><br><span class="line">给定: state_10 = 45, a=7, b=3, m=100求: state_9</span><br><span class="line"># 已知a, b, p 和连续的两个输出</span><br><span class="line"># 恢复种子defbreak_lcg(a, b, p, output1, output2): # your code here pass</span><br><span class="line"># 自动化收集多次登录的验证码defauto_collect(num_attempts): # your code here pass</span><br><span class="line"># cuso.py - 格基规约求解多变量多项式小根fromsage.allimport*deffind_small_roots(polynomials, bounds, m=1, t=None, debug=False): &quot;&quot;&quot; 使用格基规约寻找多变量多项式的小根 参数: polynomials: 多项式列表 (在 GF(p) 上定义) bounds: 字典 &#123;variable: (lower, upper)&#125; m: 格参数 t: 格参数 debug: 是否输出调试信息 返回: 解的列表，每个解是一个字典 &#123;variable: value&#125; &quot;&quot;&quot; if not polynomials: return [] R = polynomials[0].parent() vars_list = R.gens() p = R.characteristic() if debug: print(f&quot;Variables: &#123;vars_list&#125;&quot;) print(f&quot;Modulus p: &#123;p&#125; (&#123;p.bit_length()&#125; bits)&quot;) print(f&quot;Number of polynomials: &#123;len(polynomials)&#125;&quot;) # 构建格 # ... (实现细节) # 这里可以根据具体需求实现 # 或者使用 SageMath 的内置函数 pass # 完整实现略，参考相关文献</span><br><span class="line"># 使用示例</span><br><span class="line"># solutions = find_small_roots(F, bounds, debug=True)</span><br><span class="line"># 多项式环R = PolynomialRing(GF(p), [&#x27;x&#x27;,&#x27;y&#x27;,&#x27;z&#x27;])x, y, z = R.gens()</span><br><span class="line"># 矩阵M = Matrix(ZZ, [[1,2], [3,4]])B = M.LLL() # LLL 规约</span><br><span class="line"># 模逆a_inv = inverse_mod(a, p)</span><br><span class="line"># 求幂result = power_mod(a, b, p) # a^b mod p</span><br><span class="line"># 解方程solve([x + y ==5, x - y ==1], [x, y])</span><br><span class="line"># 1. 打印中间状态print(f&quot;[DEBUG] Current state:&#123;state&#125;&quot;)</span><br><span class="line"># 2. 保存和加载PRNG状态defsave_prng_state(prng): return&#123; &#x27;a&#x27;: prng.a, &#x27;b&#x27;: prng.b, &#x27;p&#x27;: prng.p, &#x27;state&#x27;: prng.state &#125;defload_prng_state(saved): returnPRNG(saved[&#x27;a&#x27;], saved[&#x27;b&#x27;], saved[&#x27;p&#x27;], saved[&#x27;state&#x27;])</span><br><span class="line"># 3. 单元测试deftest_lcg_inverse(): prng = PRNG(seed=12345) state0 = prng.state state1 = prng.next() # 逆向 a_inv = inverse_mod(prng.a, prng.p) recovered = (state1 - prng.b) * a_inv % prng.p assertrecovered == state0,&quot;LCG inverse failed&quot; print(&quot;✓ LCG inverse test passed&quot;)test_lcg_inverse()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/277011.html">https://www.ctfiot.com/277011.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81FMS.full.md">CTF大赛WP集合&#x2F;articles&#x2F;解析2025强网拟态FMS.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LCG/">LCG</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Crypto/%E7%AC%AC%E4%B8%89%E5%B1%8A-%E9%99%87%E5%89%91%E6%9D%AF-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E5%88%9D%E8%B5%9B-%E5%A4%BA%E6%97%97%E9%97%AF%E5%85%B3%E8%B5%9BWriteUp/" title="第三届&quot;陇剑杯&quot;网络安全大赛初赛-夺旗闯关赛WriteUp"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第三届&quot;陇剑杯&quot;网络安全大赛初赛-夺旗闯关赛WriteUp</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%90LitCTF_2025_-_Basic/" title="解析LitCTF 2025 – Basic"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">解析LitCTF 2025 – Basic</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2025/01/01/ctf-kb/wp/Crypto/%E5%BC%BA%E7%BD%91%E6%9D%AF2025%E5%86%B3%E8%B5%9B%E5%A4%8D%E7%8E%B0/" title="强网杯2025决赛复现 - somebox LCG密码流+shellcode限制"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-01</div><div class="title">强网杯2025决赛复现 - somebox LCG密码流+shellcode限制</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B7%B2%E7%9F%A5a-b-p-%E5%92%8C%E8%BF%9E%E7%BB%AD%E7%9A%84%E4%B8%A4%E4%B8%AA%E8%BE%93%E5%87%BA"><span class="toc-number">1.</span> <span class="toc-text">已知a, b, p 和连续的两个输出</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%81%A2%E5%A4%8D%E7%A7%8D%E5%AD%90defbreak-lcg-a-b-p-output1-output2-your-code-here-pass"><span class="toc-number">2.</span> <span class="toc-text">恢复种子defbreak_lcg(a, b, p, output1, output2): # your code here pass</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E5%8C%96%E6%94%B6%E9%9B%86%E5%A4%9A%E6%AC%A1%E7%99%BB%E5%BD%95%E7%9A%84%E9%AA%8C%E8%AF%81%E7%A0%81defauto-collect-num-attempts-your-code-here-pass"><span class="toc-number">3.</span> <span class="toc-text">自动化收集多次登录的验证码defauto_collect(num_attempts): # your code here pass</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

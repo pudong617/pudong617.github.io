@@ -1,0 +1,352 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2016 腾讯游戏安全技术竞赛题 PC 第一题 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="腾讯 GS Lab MFC 注册机：用户名 + 二次加密 + 自定义 base64 码表">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2016 腾讯游戏安全技术竞赛题 PC 第一题">
+<meta property="og:url" content="https://pudong617.github.io/2016/01/01/ctf-kb/wp/Reverse/2016%E8%85%BE%E8%AE%AF%E6%B8%B8%E6%88%8F%E5%AE%89%E5%85%A8%E6%8A%80%E6%9C%AF%E7%AB%9E%E8%B5%9B%E9%A2%98PC%E7%AC%AC%E4%B8%80%E9%A2%98/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="腾讯 GS Lab MFC 注册机：用户名 + 二次加密 + 自定义 base64 码表">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2015-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2015-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="腾讯游戏安全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2016/01/01/ctf-kb/wp/Reverse/2016%E8%85%BE%E8%AE%AF%E6%B8%B8%E6%88%8F%E5%AE%89%E5%85%A8%E6%8A%80%E6%9C%AF%E7%AB%9E%E8%B5%9B%E9%A2%98PC%E7%AC%AC%E4%B8%80%E9%A2%98/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2016 腾讯游戏安全技术竞赛题 PC 第一题',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2016-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2016 腾讯游戏安全技术竞赛题 PC 第一题</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2015-12-31T16:00:00.000Z" title="发表于 2016-01-01 00:00:00">2016-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2015-12-31T16:00:00.000Z" title="更新于 2016-01-01 00:00:00">2016-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2016 腾讯游戏安全技术竞赛题 PC 第一题"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/44316.html">https://www.ctfiot.com/44316.html</a><br>ID: 44316</p>
+</blockquote>
+<p>2016腾讯游戏安全技术竞赛PC第一题</p>
+<p>（<a target="_blank" rel="noopener" href="https://gslab.qq.com/competition/firstTurn.shtml%EF%BC%89">https://gslab.qq.com/competition/firstTurn.shtml）</a></p>
+<p>结论：</p>
+<p>纵观全局，才知道原来序列号就是把用户名两次加密后，再Base64编码为字符串。只是不同于一般常用的64个字符串罢了。</p>
+<p>这里输出”helloworld”，计算出来的序列号是”VASdBcsKGhNDMRwPXv85%61MNQR”。</p>
+<p>实际上，最后一个字符改成Q&#x2F;R&#x2F;S&#x2F;T都是可以的。因为长度不是4的整数倍，使用了’*’填充。</p>
+<p>事后来看，尽量写得有条不紊，井井有条。实际调试的时候，总是注意看寄存器的变化，真是非常的耗费精力。</p>
+<p>注册机啥的，还真没接触过，毕竟没有加密，也没加壳的程序，直接爆破可轻松多了。不动手操作，只停留理论，觉得自己掌握了方法，就能一番风顺，无异于纸上谈兵，是不会有进步的。</p>
+<p>我们随便输入，点击注册，发现没有提示框之类的，只是单纯的提示注册失败。</p>
+<p>使用OD一搜索，也没有相应的字符。唯一有用的，或许就是这个了。</p>
+<p>64个字符，出现了好几次。猜想或许会使用base64编码的方式。</p>
+<p>既然没有直接有用的信息，就只能从API下手了。</p>
+<p>使用PE工具一看，好几个和text相关的API。</p>
+<p>0x29304 0x2AB SetWindowTextA0x29270 0xC6 DrawTextExA0x29264 0xC5 DrawTextA0x29252 0x2C6 TabbedTextOutA0x2923A 0x18D GetWindowTextLengthA0x29228 0x18C GetWindowTextA0x29632 0x29F TextOutA0x296A4 0x258 ScaleViewportExtEx0x29690 0x28F SetViewportExtEx0x295CE 0x28D SetTextColor0x2963E 0x122 ExtTextOutA</p>
+<p>感觉能用的就是GetWindowTextA，下断点一测试，毫无反应。</p>
+<p>至于其他没导入的API，比如GetDlgItemTextA之类的，在一一尝试后，都没断下。说明获取文本不是用的这类API。</p>
+<p>考虑到这是一个很明显的MFC程序，于是百度一搜索：MFC程序获取文本控件。</p>
+<p>MFC控件编程之按钮编辑框（<a target="_blank" rel="noopener" href="https://www.cnblogs.com/iBinary/p/9652668.html%EF%BC%89">https://www.cnblogs.com/iBinary/p/9652668.html）</a></p>
+<p>这一篇可谓非常详尽了。这个注册机就用的GetDlgItem和消息循环的方式。</p>
+<p>果然，在输入文本以后，点击注册，就断在了user32.GetDlgItem里面。</p>
+<p>直接返回即可。</p>
+<p>返回到获取句柄的地方，啥也没干就返回了，返回后继续看。</p>
+<p>果然，就是这样获取文本的。（获取控件句柄，再使用消息循环）。</p>
+<p>接下来，同样的方式获取序列号的文本。然后esp+0x9C是用户名文本，esp+0x1A0是序列号文本。</p>
+<p>获取了文本，就开始准备注册结果的字符串。</p>
+<p>分别是注册00000失败成功。等下就把结果复制到前面4个0那里，组成最终的注册结果。</p>
+<p>紧接着就是获取用户名的长度，限定为6-20位。</p>
+<p>紧随其后，就是对用户名的加密。开辟了0x14个字节的空间。</p>
+<p>从esp+0x88开始，也就是用户名前面的0x14个字节。</p>
+<p>这一段还是好理解的，原样的翻译了以下，虽然其中一些数据不知道来源，但是我们直接写死也是不影响结果。</p>
+<p>void encrystUsernameFirst(string username){ unsigned char data[0x14]; memset(data, 0, 0x14); int eax &#x3D; 0; int ebp &#x3D; 0x1339E7E; int esp &#x3D; (int)&amp;data - 0x88; int edx &#x3D; (int)&data; int ecx &#x3D; 0; int edi &#x3D; username.length(); int* esi &#x3D; 0; ebp &#x3D; ebp - edx; while (ecx&lt;0x10) { eax &#x3D; ecx; edx &#x3D; eax%edi; esi &#x3D; (int*)&amp;data[ecx]; ecx++; eax &#x3D; username[edx]; edx &#x3D; (int)esi + ebp; eax &#x3D; eax<em>edx; eax &#x3D; eax</em>edi; (*esi) &#x3D; (*esi) + eax; } for (int i &#x3D; 0; i&lt;0x14; i++) { printf(“%2X “, data[i]); if ((i + 1) % 16 &#x3D;&#x3D; 0) { cout &lt;&lt; endl; } }}</p>
+<p>随便输入文本试了试，算出来和注册机的结果是一样的，那就问题不大。</p>
+<p>继续F8步过，发现获取密码长度的地方以及一些call，先不急着看call，直接走下去。</p>
+<p>走到这里，来了一个大跳转。</p>
+<p>通过观察寄存器的值，可以看见直接拼凑成了字符串注册失败。</p>
+<p>没有任何其他的判断，直接 xor eax,eax，将eax置为0，就是注册失败。</p>
+<p>因为成功在失败的后面，所以eax为1的时候，就显示注册成功。</p>
+<p>走到取字符的地方，看见从其他地方跳转到这里，正巧 mov eax,1，也就是说那条路才是成功的道路，而我们之前跳转的地方，是没有任何回头的死路。</p>
+<p>不用调试，直接往上查看反汇编。</p>
+<p>可见好几个到同一目的地的跳转，然后跳转以后，都没有包含 mov eax,1的指令，可见，都是失败的。也就是这些jne，一个都不能跳。</p>
+<p>翻译一下，也就是好几个并列条件。</p>
+<p>if(a&amp;&amp;b&amp;&amp;c&amp;&amp;d&amp;&amp;e){ success;}else{ fail;}</p>
+<p>失败重来。这次注意看edx是如何来的。</p>
+<p>edx &#x3D; 0x2f65824，edi &#x3D; 0x2f65820，感觉应该是两个地址，看下内存。</p>
+<p>猜测这一段也是类似于取文本长度一样，从字节数组结尾的地方减去字节数组开始的地方，也就是字节数组的长度。</p>
+<p>刚才输入的序列号是123456。我们直接Ctrl+F2重新启动，多输入几个字符，但是前面还是123456。</p>
+<p>同样观察一下地址上的数据，可见前面部分保持一致。输入变长，这一段也变长，但是还不到0x14.我们继续加长。</p>
+<p>当长度来到27位的时候，终于能继续正常往下走了。也就是限定密码长度为27。</p>
+<p>正确跳转以后，就来到了这里。</p>
+<p>这一段的手法和第一次加密用户名类似啊，开辟0x24个字节的空间。</p>
+<p>看循环里面，有用到之前加密过的用户名，也就是再次加密。</p>
+<p>观察里面的数据。</p>
+<p>mov eax,dword ptr ds:[esi+edi]</p>
+<p>这里面的数据，和我们之前判断序列号长度看见的数据很相似。于是再次重新运行。</p>
+<p>cmp edx,14</p>
+<p>在判断长度的地方断下，并进去查看esi地址上的数据（只需要看0x14个字节即可），可见，和循环里面的数据是一样的。</p>
+<p>当然，其实也不用看，因为中间没有修改edi的值，而esi也是从0开始，随着循环增大而变化。</p>
+<p>这一段，还是可以翻译成C++代码的形式。</p>
+<p>void imul(int&amp; eax, int &amp;ecx, int &amp;edx){ long long tmp &#x3D; eax; tmp &#x3D; tmp<em>ecx; eax &#x3D; tmp &amp; 0xffffffff; edx &#x3D; tmp &gt;&gt; 32;}void encrystUsernameSecond(unsigned char data[0x14]){ unsigned char total[0x92]; memcpy(total + 0x88, data, 0x14); memset(total + 0x30, 0, 0x24); memset(total + 0x2c, 0, 0x14); int esi &#x3D; 0; int ecx &#x3D; 0; int eax &#x3D; 0; int edx &#x3D; 0x14; int i24 &#x3D; 0x2995c04; unsigned char ediData[0x14] &#x3D; { 0xD7,0x6D,0xF8,0xE7,0xAE,0xFC,0xF7,0x4D,0x76,0xDF,0x8E,0x7A,0xEF,0xCF,0x74,0xD7,0x6D,0xF8,0xE7,0xAE };&#x2F;&#x2F;这个只和输入的序列号有关系。 int</em> edi &#x3D; (int*)&ediData; int unknowndata &#x3D; 0x3156c04; while (esi&lt;0x14) { ecx &#x3D; <em>(int*)&amp;data[esi]; eax &#x3D; 0x66666667; imul(eax, ecx, edx); edx &gt;&gt;&#x3D; 2; &#x2F;&#x2F;sar eax,2 ecx &#x3D; edx; unsigned int tmp &#x3D; ecx; tmp &gt;&gt;&#x3D; 31; &#x2F;&#x2F;shr ecx,0x1f &#x2F;&#x2F;__asm { &#x2F;&#x2F; shr tmp,0x1F &#x2F;&#x2F;} ecx &#x3D; tmp; ecx +&#x3D; edx; edx &#x3D; 0x14; &#x2F;&#x2F;合并起来，固定为0x14 printf(“ecx &#x3D; %Xn”, ecx); memcpy(total + 0x2c + esi, (unsigned char</em>)&amp;ecx, 4); if (esi&lt;edx) { eax &#x3D; <em>(int</em>)&amp;ediData[esi]; memcpy(total + 0x40 + esi, (unsigned char*)&amp;eax, 4); esi +&#x3D; 4; } cout &lt;&lt; endl; }}</p>
+<p>虽然中间也有一些不知道是什么的数据，但是观察运行后，发现写死就能正常运行，也就不管了。完全的翻译了一下，虽然后来发现，复制的数据完全没用到。</p>
+<p>这个imux还挺麻烦的，直接写成一个函数了。</p>
+<p>加密完成，来到了决胜的地方。要同时满足这些条件，才能注册成功，还是习惯性的翻译成高级语言吧。</p>
+<p>把第二段加密后的total作为esp的开端，当作参数传进去。</p>
+<p>first:</p>
+<p>void test3(unsigned char data[]){ int ecx &#x3D; 0; int eax &#x3D; 0; int edx &#x3D; 0; int esi &#x3D; 0; ecx &#x3D; <em>(int</em>)&amp;data[0x2c]; eax &#x3D; <em>(int</em>)&amp;data[0x50]; edx &#x3D; eax + ecx; ecx &#x3D; <em>(int</em>)&amp;data[0x48]; if (edx &#x3D;&#x3D; ecx) { edx &#x3D; <em>(int</em>)&amp;data[0x30]; edx +&#x3D; ecx; eax +&#x3D; eax; if (edx &#x3D;&#x3D; eax) { ecx &#x3D; <em>(int</em>)&amp;data[0x4c]; eax &#x3D; <em>(int</em>)&amp;data[0x34]; edx &#x3D; <em>(int</em>)&amp;data[0x40]; esi &#x3D; ecx + eax; if (esi &#x3D;&#x3D; edx) { esi &#x3D; <em>(int</em>)&amp;data[0x38]; esi +&#x3D; edx; ecx +&#x3D; ecx; if (esi &#x3D;&#x3D; ecx) { edx &#x3D; <em>(int</em>)&amp;data[0x3c]; ecx &#x3D; <em>(int</em>)&amp;data[0x44]; ecx +&#x3D; edx; edx &#x3D; eax + eax * 2; if (ecx &#x3D;&#x3D; edx) { cout &lt;&lt; “successn”; return; } } } } } cout &lt;&lt; “fail1n”;}</p>
+<p>second:<br>精简一下。</p>
+<p>void test4(unsigned char data[]){ int arr1[5]; int arr2[5]; memcpy((unsigned char*)&amp;arr1, data + 0x2c, 0x14); memcpy((unsigned char*)&amp;arr2, data + 0x40, 0x14); int ecx &#x3D; 0; int eax &#x3D; 0; int edx &#x3D; 0; int esi &#x3D; 0; ecx &#x3D; arr1[0]; eax &#x3D; arr2[4]; edx &#x3D; ecx + eax; ecx &#x3D; arr2[2]; if (edx &#x3D;&#x3D; ecx)&#x2F;&#x2F;(a[0] + b[4] &#x3D;&#x3D; b[2]) { edx &#x3D; arr1[1]; edx +&#x3D; ecx; eax +&#x3D; eax; if (edx &#x3D;&#x3D; eax)&#x2F;&#x2F;(a[1] + b[2] &#x3D;&#x3D; 2<em>b[4]) { ecx &#x3D; arr2[3]; eax &#x3D; arr1[2]; edx &#x3D; arr2[0]; esi &#x3D; ecx + eax; if (esi &#x3D;&#x3D; edx)&#x2F;&#x2F;(a[2] + b[3] &#x3D;&#x3D; b[0]) { esi &#x3D; arr1[3]; esi +&#x3D; edx; ecx +&#x3D; ecx; if (esi &#x3D;&#x3D; ecx)&#x2F;&#x2F;(a[3] + b[0] &#x3D;&#x3D; 2</em>b[3]) { edx &#x3D; arr1[4]; ecx &#x3D; arr2[1]; ecx +&#x3D; edx; edx &#x3D; eax + eax * 2; if (ecx &#x3D;&#x3D; edx) &#x2F;&#x2F; (a[4] + b[1] &#x3D;&#x3D; 3*a[2]) { cout &lt;&lt; “successn”; return; } } } } } cout&lt;&lt;”failn”;}</p>
+<p>last:</p>
+<p>void test5(unsigned char data[]){ int a[5]; int b[5]; memcpy((unsigned char*)&amp;a, data + 0x2c, 0x14); memcpy((unsigned char*)&amp;b, data + 0x40, 0x14); &#x2F;&#x2F;if (((a[0] + b[4])&#x3D;&#x3D; b[2]) &amp;&amp; ((a[1] + b[2]) &#x3D;&#x3D; (2 * b[4])) &amp;&amp; ((a[2] + b[3]) &#x3D;&#x3D; b[0]) &amp;&amp; ((a[3] + b[0]) &#x3D;&#x3D; (2 * b[3])) &amp;&amp; ((a[4] + b[1]) &#x3D;&#x3D; (3 * a[2]))) if((2<em>a[2]+a[3]&#x3D;&#x3D;b[0])&amp;&amp;(3</em>a[2]-a[4]&#x3D;&#x3D;b[1])&amp;&amp;(2*a[0]+a[1]&#x3D;&#x3D;b[2])&amp;&amp;(a[2]+a[3]&#x3D;&#x3D;b[3])&amp;&amp;(a[0]+a[1]&#x3D;&#x3D;b[4])) { cout &lt;&lt; “successn”; } else { cout &lt;&lt; “failn”; }}</p>
+<p>精简再精简，最终可以通过二次加密的用户名求出正确的字节数组。都到这里了，显然未知的那一部分就是和密码有关的东西。</p>
+<p>到这里，在二次加密的末尾，添加上这一段，就可以求出正确的加密后的序列号数组。</p>
+<p>if (true) { &#x2F;&#x2F;if ((2 * a[2] + a[3] &#x3D;&#x3D; b[0]) &amp;&amp; (3 * a[2] - a[4] &#x3D;&#x3D; b[1]) &amp;&amp; (2 * a[0] + a[1] &#x3D;&#x3D; b[2]) &amp;&amp; (a[2] + a[3] &#x3D;&#x3D; b[3]) &amp;&amp; (a[0] + a[1] &#x3D;&#x3D; b[4])) int a[5]; int b[5]; memcpy((unsigned char*)&amp;a, total + 0x2c, 0x14); memcpy((unsigned char*)&amp;b, total + 0x40, 0x14); b[0] &#x3D; 2 * a[2] + a[3]; b[1] &#x3D; 3 * a[2] - a[4]; b[2] &#x3D; 2 * a[0] + a[1]; b[3] &#x3D; a[2] + a[3]; b[4] &#x3D; a[0] + a[1]; memcpy(total + 0x2c, (unsigned char*)&amp;a, 0x14); memcpy(total + 0x40, (unsigned char*)&amp;b, 0x14); } cout &lt;&lt; endl; cout &lt;&lt; “after 0x40” &lt;&lt; endl; for (int i &#x3D; 0; i&lt;0x14; i++) { printf(“%02X,”, total[i + 0x40]); }</p>
+<p>实践是检测真理的唯一标准。回到调试器里面，在用户名加密完成以后，用这一段替换esp+0x40后面的0x14字节，运行结束，注册成功。</p>
+<p>到这里，离成功就很近了，接下来就需要分析序列号是如何加密的就好了。</p>
+<p>首先，要找到在哪里用到了序列号。可以直接在序列号那里使用硬件访问断点。</p>
+<p>不过没必要一上来就断下，因为在取序列号长度的地方会反复断下。</p>
+<p>等运行到图示的位置，再使用硬件断点即可。</p>
+<p>直接F9运行，来到了不知道是哪里。</p>
+<p>通过观察，分析，知道这一段用来拷贝序列号。那么，拷贝后的内存地址就是我们需要关注的地方。</p>
+<p>不断的F8或者直接运行到函数结束，不断的出CALL，终于回到了取长度后第一个CALL的下一句。所以，这个call就是用来拷贝序列号的。</p>
+<p>留给我们的call也不多了，就这两个。</p>
+<p>需要注意的是，这个程序函数调用采取C的调用方式，堆栈由调用方进行平衡。</p>
+<p>对堆栈的相关内容，可以参见MASM32汇编中关于栈的总结 – 念秋 – 博客园 (cnblogs.com)（<a target="_blank" rel="noopener" href="https://www.cnblogs.com/dayq/p/15994441.html%EF%BC%89">https://www.cnblogs.com/dayq/p/15994441.html）</a></p>
+<p>虽然这里面没有关于清理堆栈的内容，对这两个函数分别查看参数和运行结果。</p>
+<p>第一个不太明显，但是第2个，从结果看来，貌似就是清理了一下内存。也就是清除了之前复制的序列号。清除，那就是善后工作了。</p>
+<p>最后，也就剩这一个call可以加密序列号了。这里面call很多，然后一堆循环。</p>
+<p>进入这个call，也没有什么好的思路，一开始，追踪寄存器的值，反而搞得头昏脑涨。</p>
+<p>不知从何处下手，那就先F8一步一步看看。</p>
+<p>走到这里，发现ebx指向复制后的序列号。然后对eax和ecx的操作都是对称的。</p>
+<p>从ebx那个字节数组里面取出一个字节保存到(unsigned char*)(esp+0x18)[eax]处。</p>
+<p>有比较，又有跳转，可以猜测是不是进入了循环。</p>
+<p>这个复制完值，往下走，紧接着两个很远的跳转，暂时不清楚是什么。</p>
+<p>走到这里，发现参数来自序列号。</p>
+<p>int littleProc(unsigned char ch){ unsigned char data[0x100] &#x3D; {0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x28,0x00,0x28,0x00,0x28,0x00,0x28,0x00,0x28,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x48,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x81,0x00,0x81,0x00,0x81,0x00,0x81,0x00,0x81,0x00,0x81,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x82,0x00,0x82,0x00,0x82,0x00,0x82,0x00,0x82,0x00,0x82,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x20,0x00}; int eax &#x3D; ch; short<em>p &#x3D; (short</em>)&data; unsigned short temp &#x3D; (unsigned short)<em>((unsigned char</em>)p + eax*2); eax &#x3D; temp; eax&amp;&#x3D;0x107; return eax;}</p>
+<p>这个小的函数调用，不知道有什么用。翻译了一下，最后还是没用上。</p>
+<p>一直F8走吧，走吧。又走到了上面那个对称的地方。</p>
+<p>多走几次，发现esp+0x18上面变成了从序列号拷贝的4个字节。</p>
+<p>此时，来到了 cmp eax,4 而eax&#x3D;4。就不会再进行刚才的循环了。</p>
+<p>走下去，发现又是一个循环。</p>
+<p>也就是每次一个字符，进入call进行变化。也就是读取一个字节，修改，然后写回去。</p>
+<p>这个进去以后，一堆常量还是什么的。</p>
+<p>在这个call之前，完全不知道是在干什么。</p>
+<p>通过堆栈，可以发现，这是一个3个参数的函数。其中两个参数是base64字符串和要转换的字符，另一个不知道是什么。</p>
+<p>进去看看，不长，而且末尾非常类似。那就可能是根据运算结果从数组里面选择一个值回去。</p>
+<p>尝试翻译，但是感觉有点费劲，而且翻译出来也没用。</p>
+<p>void change(char base64[64],char ch,char flag){ int eax &#x3D; flag; int edx &#x3D; (int)&base64; unsigned int ebx &#x3D; 0; ebx &#x3D; ch; int edi &#x3D; 0; unsigned int ecx; if(edx&amp;&amp;3) { eax-&#x3D;4; edi &#x3D; ebx; ebx&lt;&lt;&#x3D;8; ebx+&#x3D;edi; edi &#x3D; ebx; ebx&lt;&lt;&#x3D;16; ebx+&#x3D;edi; edx &#x3D; 0; { ecx &#x3D; *(int*)&amp;base64[edx]; ecx^&#x3D;ebx; edi &#x3D; 0x7EFEFEFF; edi+&#x3D;ecx; ecx^&#x3D;0xffffffff; ecx^&#x3D;edi; edx+&#x3D;4; while(ecx&amp;0x81010100) { loop: eax-&#x3D;4; ecx &#x3D; *(int*)&amp;base64[edx]; ecx^&#x3D;ebx; edi &#x3D; 0x7EFEFEFF; edi+&#x3D;ecx; ecx^&#x3D;0xffffffff; ecx^&#x3D;edi; edx+&#x3D;4; } ecx &#x3D; *(int*)&amp;base64[edx-4]; if((char)ecx^(char)ebx) { eax &#x3D; *(int*)&amp;base64[edx-4]; } else if((char)(ecx&gt;&gt;8)^(char)ebx) { eax &#x3D; <em>(int</em>)&amp;base64[edx-3]; } else if((char)(ecx&gt;&gt;16)^(char)ebx) { eax &#x3D; <em>(int</em>)&amp;base64[edx-2]; } else if((char)(ecx&gt;&gt;24)^(char)ebx) { } else { goto loop; } } }}</p>
+<p>虽然这个汇编代码是从高级语言编译出来的，但是再从汇编转为C++，就感觉翻译不出来啊。</p>
+<p>不知道写得对不对，翻译出来都不想验证一下了。直接返回，发现转换的字符重新写回去了。</p>
+<p>循环运行吧，循环结束，走到了这里。</p>
+<p>发现刚才的4个字节已经全部改变了。</p>
+<p>继续往下走。</p>
+<p>发现这一段，主要改变了3个字节的数据。</p>
+<p>非常的眼熟啊，之前已经看了好几遍了。</p>
+<p>0xD7,0x6D,0xF8,0xE7,0xAE,0xFC,0xF7,0x4D,0x76,0xDF,0x8E,0x7A,0xEF,0xCF,0x74,0xD7,0x6D,0xF8,0xE7,0xAE</p>
+<p>正是第二次用户名加密中拷贝的加密后的序列号。</p>
+<p>既然出现再这里，那就代表没有别的地方来加密序列号了。至于这个数据写到哪里，我们不用管了。</p>
+<p>我们只需要关心是不是每次运行到这里，出现的数据都是最后的加密结果。</p>
+<p>直接在xor edi,edi的地方下个断点，直接F9运行。可以看见加密后的序列号不断的出现，每次都是转换为3个字节。</p>
+<p>前有64个字符串的字符替换，后有4字节到3字节的压缩。我们可以猜测是否为base64解码的过程。</p>
+<p>总结一下序列号的加密，就是4个字节，先转换一下，再经过上面的各种位操作，就得到了最终结果。</p>
+<p>这一段的移位操作虽然有点长，但是输入输出都是明显的，也就很好翻译，翻译的同时注意看二进制串，希望就是期待的编码规则，这样可以省点力气。</p>
+<p>#include#include&lt;string.h&gt;#include<map>#include&lt;time.h&gt;using namespace std;<br>void encode(unsigned char data[4]){ unsigned int ecx &#x3D; <em>(int</em>)&data; unsigned char al &#x3D; data[0]; al+&#x3D;al; unsigned char dl &#x3D; data[1]; dl&gt;&gt;&#x3D;4; dl&amp;&#x3D;3; al+&#x3D;al; dl+&#x3D;al; al &#x3D; data[2]; unsigned char result[4]; memset(result,0,4); result[0] &#x3D; dl; dl &#x3D; al; dl&gt;&gt;&#x3D;2; unsigned char cl &#x3D; data[1]; al&lt;&lt;&#x3D;6; al+&#x3D;data[3]; dl&amp;&#x3D;0xf; cl&lt;&lt;&#x3D;4; dl^&#x3D;cl; result[1] &#x3D; dl; result[2] &#x3D; al; for(int i&#x3D;0;i&lt;3;i++) { printf(“%2Xn”,result[i]); char tmp[16]; itoa(result[i],tmp,2); printf(“%sn”,tmp); }}int main(){ unsigned char data[4] &#x3D; {0x35,0x36,0x37,0x38}; encode(data); cout&lt;&lt;”datan”; for(int i&#x3D;0;i&lt;4;i++) { char tmp[16]; itoa(data[i],tmp,2); printf(“%sn”,tmp); printf(“%Xn”,data[i]); }}</p>
+<p>运行结果。</p>
+<p>D711010111 6D01101101 F811111000 data 11010135 11011036 11011137 11100038</p>
+<p>成功的把0x35 0x36 0x37 0x38转换为了 0xD7 0x6D 0xF8。</p>
+<p>通过观察二进制，可以发现。输入的4字节和输出的3字节恰好满足base64编码的中间规则。38bit转换为46bit，每个bit高2位取0。</p>
+<p>再不断的带入注册机的内存结果到程序，发现转换没问题，说明程序翻译得没错。</p>
+<p>且都满足base64编解码的中间过程，也就是上述的运算结果可以互相转换。</p>
+<p>我们可以把之前自己求出来的加密后的字节数组带进去，反推出经过第一次字符转换后的字节数组。</p>
+<p>也就是：字符串“1234” 字符转换为 “5678” ，再编码成了 0xD7 0x6D 0xF8。</p>
+<p>现在我们已经有了D7 6D F8 ，可以推出 “5678”，接下来只需要观察字节转换的函数，看下如何变回”1234″即可。</p>
+<p>不过也可以不用看了，这里已经确定是base64编码的一部分。那么之前那个函数大概率就是在base64字符串里面找下标的。</p>
+<p>直接写个完整的base64编码，把我们求出来的加密后序列号带进去看看。</p>
+<p>base64转换：</p>
+<p>#include#include&lt;string.h&gt;#include<map>#include&lt;time.h&gt;using namespace std;<br>char base64str[] &#x3D; “ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@%&#x3D;”;map m;<br>void encode(unsigned char str[],int len){ string s &#x3D; “”; unsigned char tmp[3]; unsigned char t[4]; for(int i&#x3D;0;i&lt;&#x3D;len;i+&#x3D;3) { memcpy(tmp,str+i,3); char a[10]; memset(t,0,4); itoa(tmp[0],a,2); itoa(tmp[1],a,2); itoa(tmp[2],a,2); t[0] &#x3D; tmp[0]&gt;&gt;2; itoa(t[0],a,2); unsigned char f1 &#x3D; tmp[0]&lt;&lt;6; f1&gt;&gt;&#x3D;2; t[1] &#x3D; (f1)^(tmp[1]&gt;&gt;4); itoa(t[1],a,2); f1 &#x3D; tmp[1]&lt;&lt;4; f1&gt;&gt;&#x3D;2; t[2] &#x3D; (f1)^(tmp[2]&gt;&gt;6); itoa(t[2],a,2); f1 &#x3D; tmp[2]&lt;&lt;2; f1 &gt;&gt;&#x3D;2; t[3] &#x3D; f1; itoa(t[3],a,2); t[0] &#x3D; base64str[t[0]]; t[1] &#x3D; base64str[t[1]]; t[2] &#x3D; base64str[t[2]]; t[3] &#x3D; base64str[t[3]]; for(int i&#x3D;0;i&lt;4;i++) { s+&#x3D;t[i]; } }&#x2F;&#x2F; cout&lt;&lt;s.length()&lt;&lt;endl; for(int i&#x3D;0;i&lt;27;i++) { printf(“%c”,s[i]); } cout&lt;&lt;endl;} int main(){ for(int i&#x3D;0;i&lt;64;i++) { m[base64str[i]]&#x3D;i; } unsigned char data[21] &#x3D; {0xD7,0x6D,0xF8,0xE7,0xAE,0xFC,0xF7,0x4D,0x76,0xDF,0x8E,0x7A,0xEF,0xCF,0x74,0xD7,0x6D,0xF8,0xE7,0xAE,0x0}; encode(data,21); return 0;}</p>
+<p>123456789012345678901234564</p>
+<p>程序从”123456789012345678901234567″转换的字节数组，经过我们的逆转，基本已经接近了我们的输入，那么几乎可以确定可以逆转回去了。也可以确定对序列号的操作就是base64解码的操作，因为我们是从字节数组编码到字符串，而注册机是从明文字符串解码为字节数组。</p>
+<p>经过这次转换，程序对序列号的加密已经拿捏了。可以推断：通过正确的加密的序列号字节数组，就能转到原本的序列号上。</p>
+<p>我们将用户名为”helloworld”的密码数组求出来。</p>
+<p>0x54,0x04,0x9D,0x05,0xCB,0x0A,0x1A,0x13,0x43,0x31,0x1C,0x0F,0x5E,0xFF,0x39,0xFF,0xAD,0x4C,0x35,0x04</p>
+<p>再代入转换一下：</p>
+<p>VASdBcsKGhNDMRwPXv85%61MNQQ</p>
+<p>终于成功了。此时，再回头看这个加密函数。一开始不懂的地方也渐渐豁然开朗。</p>
+<p>平时我们用的base64字符串，涉及到需要补位的时候，都是用的’&#x3D;’，而这个程序，应该是用的”*”吧。</p>
+<p>所以每次都会判断输入的字符是不是0x2A，来判断长度之类的。完善下上面的程序，我们就设定第21个字符为 0x2A 即可。</p>
+<p>再看一下，发现ecx的值随着循环的进行，也慢慢变大，也就是ecx代表大循环。eax代表小循环。</p>
+<p>for(ecx &#x3D; 0;ecx&lt;0x1B;){ for(eax &#x3D; 0;eax&lt;4;eax++) { change() }}</p>
+<p>大概类似于这样吧，虽然求出来了结果，但是仍有一些地方不太理解。不过本就是逆向关键算法，也就没必要什么都弄懂。</p>
+<p>本来就调试得头昏眼花了，就不想再多看了。大家有兴趣可以带着整体思路来看一下程序的完整流程。</p>
+<p>总的代码：</p>
+<p>#include#include&lt;string.h&gt;#include<map>#include&lt;time.h&gt;using namespace std;<br>char base64str[] &#x3D; “ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@%<em>“;map m;&#x2F;<em>2c 0x14 保存对用户名二次加密的数据40 0x14 保存对序列号加密的数据88 0x14 存储第一次用户名加密的数据9C 用户名1A0 密码</em>&#x2F;void encode(unsigned char str[],int len){ string s &#x3D; “”; unsigned char tmp[3]; unsigned char t[4]; for(int i&#x3D;0;i&lt;&#x3D;len;i+&#x3D;3) { memcpy(tmp,str+i,3); char a[10]; memset(t,0,4); itoa(tmp[0],a,2); itoa(tmp[1],a,2); itoa(tmp[2],a,2); t[0] &#x3D; tmp[0]&gt;&gt;2; itoa(t[0],a,2); unsigned char f1 &#x3D; tmp[0]&lt;&lt;6; f1&gt;&gt;&#x3D;2; t[1] &#x3D; (f1)^(tmp[1]&gt;&gt;4); itoa(t[1],a,2); f1 &#x3D; tmp[1]&lt;&lt;4; f1&gt;&gt;&#x3D;2; t[2] &#x3D; (f1)^(tmp[2]&gt;&gt;6); itoa(t[2],a,2); f1 &#x3D; tmp[2]&lt;&lt;2; f1 &gt;&gt;&#x3D;2; t[3] &#x3D; f1; itoa(t[3],a,2); t[0] &#x3D; base64str[t[0]]; t[1] &#x3D; base64str[t[1]]; t[2] &#x3D; base64str[t[2]]; t[3] &#x3D; base64str[t[3]]; for(int i&#x3D;0;i&lt;4;i++) { s+&#x3D;t[i]; } } cout&lt;&lt;”序列号”&lt;&lt;endl; for(int i&#x3D;0;i&lt;27;i++) { printf(“%c”,s[i]); } cout&lt;&lt;endl;}void imul(int&amp; eax, int &amp;ecx, int &amp;edx){ long long tmp &#x3D; eax; tmp &#x3D; tmp*ecx; eax &#x3D; tmp &amp; 0xffffffff; edx &#x3D; tmp &gt;&gt; 32;}void test5(unsigned char data[]){ int a[5]; int b[5]; memcpy((unsigned char</em>)&amp;a, data + 0x2c, 0x14); memcpy((unsigned char*)&amp;b, data + 0x40, 0x14); &#x2F;&#x2F;if (((a[0] + b[4])&#x3D;&#x3D; b[2]) &amp;&amp; ((a[1] + b[2]) &#x3D;&#x3D; (2 * b[4])) &amp;&amp; ((a[2] + b[3]) &#x3D;&#x3D; b[0]) &amp;&amp; ((a[3] + b[0]) &#x3D;&#x3D; (2 * b[3])) &amp;&amp; ((a[4] + b[1]) &#x3D;&#x3D; (3 * a[2]))) if((2<em>a[2]+a[3]&#x3D;&#x3D;b[0])&amp;&amp;(3</em>a[2]-a[4]&#x3D;&#x3D;b[1])&amp;&amp;(2<em>a[0]+a[1]&#x3D;&#x3D;b[2])&amp;&amp;(a[2]+a[3]&#x3D;&#x3D;b[3])&amp;&amp;(a[0]+a[1]&#x3D;&#x3D;b[4])) { cout &lt;&lt; “successn”; } else { cout &lt;&lt; “failn”; }} void encyptUsernameSecond(unsigned char data[0x14]){ unsigned char total[0x92]; memcpy(total + 0x88, data, 0x14); memset(total + 0x30, 0, 0x24); memset(total + 0x2c, 0, 0x14); int esi &#x3D; 0; int ecx &#x3D; 0; int eax &#x3D; 0; int edx &#x3D; 0x14; int i24 &#x3D; 0x2995c04; unsigned char ediData[0x14] &#x3D; { 0xD7,0x6D,0xF8,0xE7,0xAE,0xFC,0xF7,0x4D,0x76,0xDF,0x8E,0x7A,0xEF,0xCF,0x74,0xD7,0x6D,0xF8,0xE7,0xAE };&#x2F;&#x2F;这个只要只和输入的序列号有关系。 memset(ediData,0,0x14); int* edi &#x3D; (int*)&ediData; int unknowndata &#x3D; 0x3156c04; while (esi&lt;0x14) { ecx &#x3D; *(int*)&amp;data[esi]; eax &#x3D; 0x66666667; imul(eax, ecx, edx); edx &gt;&gt;&#x3D; 2; &#x2F;&#x2F;sar eax,2 ecx &#x3D; edx; unsigned int tmp &#x3D; ecx; tmp &gt;&gt;&#x3D; 31; &#x2F;&#x2F;基础要打好，总是一知半解的，用的时候还要重新查。移位很多，涉及到符号之类的。 &#x2F;&#x2F;shr ecx,0x1f &#x2F;&#x2F;__asm { &#x2F;&#x2F; shr tmp,0x1F &#x2F;&#x2F;} ecx &#x3D; tmp; ecx +&#x3D; edx; edx &#x3D; 0x14; &#x2F;&#x2F;合并起来，固定为0x14 memcpy(total + 0x2c + esi, (unsigned char</em>)&amp;ecx, 4); if (esi&lt;edx) { eax &#x3D; <em>(int</em>)&amp;ediData[esi]; memcpy(total + 0x40 + esi, (unsigned char*)&amp;eax, 4); esi +&#x3D; 4; } } if (true) { &#x2F;&#x2F;if ((2 * a[2] + a[3] &#x3D;&#x3D; b[0]) &amp;&amp; (3 * a[2] - a[4] &#x3D;&#x3D; b[1]) &amp;&amp; (2 * a[0] + a[1] &#x3D;&#x3D; b[2]) &amp;&amp; (a[2] + a[3] &#x3D;&#x3D; b[3]) &amp;&amp; (a[0] + a[1] &#x3D;&#x3D; b[4])) int a[5]; int b[5]; memcpy((unsigned char*)&amp;a, total + 0x2c, 0x14); memcpy((unsigned char*)&amp;b, total + 0x40, 0x14); b[0] &#x3D; 2 * a[2] + a[3]; b[1] &#x3D; 3 * a[2] - a[4]; b[2] &#x3D; 2 * a[0] + a[1]; b[3] &#x3D; a[2] + a[3]; b[4] &#x3D; a[0] + a[1]; memcpy(total + 0x2c, (unsigned char*)&amp;a, 0x14); memcpy(total + 0x40, (unsigned char*)&amp;b, 0x14); } cout &lt;&lt; “after 0x40” &lt;&lt; endl; for (int i &#x3D; 0; i&lt;0x14; i++) { printf(“0x%02X,”, total[i + 0x40]); } cout&lt;&lt;endl; total[0x54] &#x3D; 0x2A; encode(total+0x40,21);&#x2F;&#x2F; test5(total);}void encyptUsernameFirst(string username){ unsigned char data[0x14]; memset(data, 0, 0x14); int eax &#x3D; 0; int ebp &#x3D; 0x1339E7E; int esp &#x3D; (int)&amp;data - 0x88; int edx &#x3D; (int)&data; int ecx &#x3D; 0; int edi &#x3D; username.length(); int* esi &#x3D; 0; ebp &#x3D; ebp - edx; while (ecx&lt;0x10) { eax &#x3D; ecx; edx &#x3D; eax%edi; esi &#x3D; (int*)&amp;data[ecx]; ecx++; eax &#x3D; username[edx]; edx &#x3D; (int)esi + ebp; eax &#x3D; eax<em>edx; eax &#x3D; eax</em>edi; (*esi) &#x3D; (*esi) + eax; } encyptUsernameSecond(data);}int main(){ for(int i&#x3D;0;i&lt;64;i++) { m[base64str[i]]&#x3D;i; } cout &lt;&lt; “请输入username” &lt;&lt; endl; string str &#x3D; “helloworld”; cout&lt;&lt;”username &#x3D; “&lt;&lt;str&lt;&lt;endl; encyptUsernameFirst(str); system(“pause”); }</p>
+<p>看雪ID：yyjeqhc</p>
+<p><a target="_blank" rel="noopener" href="https://bbs.pediy.com/user-home-951761.htm">https://bbs.pediy.com/user-home-951761.htm</a></p>
+<p>*本文由看雪论坛 yyjeqhc 原创，转载请注明来自看雪社区</p>
+<h1 id="往期推荐"><a href="#往期推荐" class="headerlink" title="往期推荐"></a>往期推荐</h1><p>1.Android APP漏洞之战——调试与反调试详解</p>
+<p>2.Fuzzm: 针对WebAssembly内存错误的模糊测试</p>
+<p>3.0rays战队2021圣诞校内招新赛题解</p>
+<p>4.2022腾讯游戏安全初赛一题解析</p>
+<p>5.一文读懂PE文件签名并手工验证签名有效性</p>
+<p>6.CNVD-2018-01084 漏洞复现报告（service.cgi 远程命令执行漏洞）</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<p>点击“阅读原文”，了解更多！</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">0x29304 0x2AB SetWindowTextA0x29270 0xC6 DrawTextExA0x29264 0xC5 DrawTextA0x29252 0x2C6 TabbedTextOutA0x2923A 0x18D GetWindowTextLengthA0x29228 0x18C GetWindowTextA0x29632 0x29F TextOutA0x296A4 0x258 ScaleViewportExtEx0x29690 0x28F SetViewportExtEx0x295CE 0x28D SetTextColor0x2963E 0x122 ExtTextOutA</span><br><span class="line">void encrystUsernameFirst(string username)&#123; unsigned char data[0x14]; memset(data, 0, 0x14); int eax = 0; int ebp = 0x1339E7E; int esp = (int)&amp;data - 0x88; int edx = (int)&amp;data; int ecx = 0; int edi = username.length(); int* esi = 0; ebp = ebp - edx; while (ecx&lt;0x10) &#123; eax = ecx; edx = eax%edi; esi = (int*)&amp;data[ecx]; ecx++; eax = username[edx]; edx = (int)esi + ebp; eax = eax*edx; eax = eax*edi; (*esi) = (*esi) + eax; &#125; for (int i = 0; i&lt;0x14; i++) &#123; printf(&quot;%2X &quot;, data[i]); if ((i + 1) % 16 == 0) &#123; cout &lt;&lt; endl; &#125; &#125;&#125;</span><br><span class="line">if(a&amp;&amp;b&amp;&amp;c&amp;&amp;d&amp;&amp;e)&#123; success;&#125;else&#123; fail;&#125;</span><br><span class="line">mov eax,dword ptr ds:[esi+edi]</span><br><span class="line">cmp edx,14</span><br><span class="line">void imul(int&amp; eax, int &amp;ecx, int &amp;edx)&#123; long long tmp = eax; tmp = tmp*ecx; eax = tmp &amp; 0xffffffff; edx = tmp &gt;&gt; 32;&#125;void encrystUsernameSecond(unsigned char data[0x14])&#123; unsigned char total[0x92]; memcpy(total + 0x88, data, 0x14); memset(total + 0x30, 0, 0x24); memset(total + 0x2c, 0, 0x14); int esi = 0; int ecx = 0; int eax = 0; int edx = 0x14; int i24 = 0x2995c04; unsigned char ediData[0x14] = &#123; 0xD7,0x6D,0xF8,0xE7,0xAE,0xFC,0xF7,0x4D,0x76,0xDF,0x8E,0x7A,0xEF,0xCF,0x74,0xD7,0x6D,0xF8,0xE7,0xAE &#125;;//这个只和输入的序列号有关系。 int* edi = (int*)&amp;ediData; int unknowndata = 0x3156c04; while (esi&lt;0x14) &#123; ecx = *(int*)&amp;data[esi]; eax = 0x66666667; imul(eax, ecx, edx); edx &gt;&gt;= 2; //sar eax,2 ecx = edx; unsigned int tmp = ecx; tmp &gt;&gt;= 31; //shr ecx,0x1f //__asm &#123; // shr tmp,0x1F //&#125; ecx = tmp; ecx += edx; edx = 0x14; //合并起来，固定为0x14 printf(&quot;ecx = %Xn&quot;, ecx); memcpy(total + 0x2c + esi, (unsigned char*)&amp;ecx, 4); if (esi&lt;edx) &#123; eax = *(int*)&amp;ediData[esi]; memcpy(total + 0x40 + esi, (unsigned char*)&amp;eax, 4); esi += 4; &#125; cout &lt;&lt; endl; &#125;&#125;</span><br><span class="line">void test3(unsigned char data[])&#123; int ecx = 0; int eax = 0; int edx = 0; int esi = 0; ecx = *(int*)&amp;data[0x2c]; eax = *(int*)&amp;data[0x50]; edx = eax + ecx; ecx = *(int*)&amp;data[0x48]; if (edx == ecx) &#123; edx = *(int*)&amp;data[0x30]; edx += ecx; eax += eax; if (edx == eax) &#123; ecx = *(int*)&amp;data[0x4c]; eax = *(int*)&amp;data[0x34]; edx = *(int*)&amp;data[0x40]; esi = ecx + eax; if (esi == edx) &#123; esi = *(int*)&amp;data[0x38]; esi += edx; ecx += ecx; if (esi == ecx) &#123; edx = *(int*)&amp;data[0x3c]; ecx = *(int*)&amp;data[0x44]; ecx += edx; edx = eax + eax * 2; if (ecx == edx) &#123; cout &lt;&lt; &quot;successn&quot;; return; &#125; &#125; &#125; &#125; &#125; cout &lt;&lt; &quot;fail1n&quot;;&#125;</span><br><span class="line">void test4(unsigned char data[])&#123; int arr1[5]; int arr2[5]; memcpy((unsigned char*)&amp;arr1, data + 0x2c, 0x14); memcpy((unsigned char*)&amp;arr2, data + 0x40, 0x14); int ecx = 0; int eax = 0; int edx = 0; int esi = 0; ecx = arr1[0]; eax = arr2[4]; edx = ecx + eax; ecx = arr2[2]; if (edx == ecx)//(a[0] + b[4] == b[2]) &#123; edx = arr1[1]; edx += ecx; eax += eax; if (edx == eax)//(a[1] + b[2] == 2*b[4]) &#123; ecx = arr2[3]; eax = arr1[2]; edx = arr2[0]; esi = ecx + eax; if (esi == edx)//(a[2] + b[3] == b[0]) &#123; esi = arr1[3]; esi += edx; ecx += ecx; if (esi == ecx)//(a[3] + b[0] == 2*b[3]) &#123; edx = arr1[4]; ecx = arr2[1]; ecx += edx; edx = eax + eax * 2; if (ecx == edx) // (a[4] + b[1] == 3*a[2]) &#123; cout &lt;&lt; &quot;successn&quot;; return; &#125; &#125; &#125; &#125; &#125; cout&lt;&lt;&quot;failn&quot;;&#125;</span><br><span class="line">void test5(unsigned char data[])&#123; int a[5]; int b[5]; memcpy((unsigned char*)&amp;a, data + 0x2c, 0x14); memcpy((unsigned char*)&amp;b, data + 0x40, 0x14); //if (((a[0] + b[4])== b[2]) &amp;&amp; ((a[1] + b[2]) == (2 * b[4])) &amp;&amp; ((a[2] + b[3]) == b[0]) &amp;&amp; ((a[3] + b[0]) == (2 * b[3])) &amp;&amp; ((a[4] + b[1]) == (3 * a[2]))) if((2*a[2]+a[3]==b[0])&amp;&amp;(3*a[2]-a[4]==b[1])&amp;&amp;(2*a[0]+a[1]==b[2])&amp;&amp;(a[2]+a[3]==b[3])&amp;&amp;(a[0]+a[1]==b[4])) &#123; cout &lt;&lt; &quot;successn&quot;; &#125; else &#123; cout &lt;&lt; &quot;failn&quot;; &#125;&#125;</span><br><span class="line">if (true) &#123; //if ((2 * a[2] + a[3] == b[0]) &amp;&amp; (3 * a[2] - a[4] == b[1]) &amp;&amp; (2 * a[0] + a[1] == b[2]) &amp;&amp; (a[2] + a[3] == b[3]) &amp;&amp; (a[0] + a[1] == b[4])) int a[5]; int b[5]; memcpy((unsigned char*)&amp;a, total + 0x2c, 0x14); memcpy((unsigned char*)&amp;b, total + 0x40, 0x14); b[0] = 2 * a[2] + a[3]; b[1] = 3 * a[2] - a[4]; b[2] = 2 * a[0] + a[1]; b[3] = a[2] + a[3]; b[4] = a[0] + a[1]; memcpy(total + 0x2c, (unsigned char*)&amp;a, 0x14); memcpy(total + 0x40, (unsigned char*)&amp;b, 0x14); &#125; cout &lt;&lt; endl; cout &lt;&lt; &quot;after 0x40&quot; &lt;&lt; endl; for (int i = 0; i&lt;0x14; i++) &#123; printf(&quot;%02X,&quot;, total[i + 0x40]); &#125;</span><br><span class="line">int littleProc(unsigned char ch)&#123; unsigned char data[0x100] = &#123;0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x28,0x00,0x28,0x00,0x28,0x00,0x28,0x00,0x28,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x20,0x00,0x48,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x84,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x81,0x00,0x81,0x00,0x81,0x00,0x81,0x00,0x81,0x00,0x81,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x82,0x00,0x82,0x00,0x82,0x00,0x82,0x00,0x82,0x00,0x82,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x02,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x10,0x00,0x20,0x00&#125;; int eax = ch; short*p = (short*)&amp;data; unsigned short temp = (unsigned short)*((unsigned char*)p + eax*2); eax = temp; eax&amp;=0x107; return eax;&#125;</span><br><span class="line">void change(char base64[64],char ch,char flag)&#123; int eax = flag; int edx = (int)&amp;base64; unsigned int ebx = 0; ebx = ch; int edi = 0; unsigned int ecx; if(edx&amp;&amp;3) &#123; eax-=4; edi = ebx; ebx&lt;&lt;=8; ebx+=edi; edi = ebx; ebx&lt;&lt;=16; ebx+=edi; edx = 0; &#123; ecx = *(int*)&amp;base64[edx]; ecx^=ebx; edi = 0x7EFEFEFF; edi+=ecx; ecx^=0xffffffff; ecx^=edi; edx+=4; while(ecx&amp;0x81010100) &#123; loop: eax-=4; ecx = *(int*)&amp;base64[edx]; ecx^=ebx; edi = 0x7EFEFEFF; edi+=ecx; ecx^=0xffffffff; ecx^=edi; edx+=4; &#125; ecx = *(int*)&amp;base64[edx-4]; if((char)ecx^(char)ebx) &#123; eax = *(int*)&amp;base64[edx-4]; &#125; else if((char)(ecx&gt;&gt;8)^(char)ebx) &#123; eax = *(int*)&amp;base64[edx-3]; &#125; else if((char)(ecx&gt;&gt;16)^(char)ebx) &#123; eax = *(int*)&amp;base64[edx-2]; &#125; else if((char)(ecx&gt;&gt;24)^(char)ebx) &#123; &#125; else &#123; goto loop; &#125; &#125; &#125;&#125;</span><br><span class="line">0xD7,0x6D,0xF8,0xE7,0xAE,0xFC,0xF7,0x4D,0x76,0xDF,0x8E,0x7A,0xEF,0xCF,0x74,0xD7,0x6D,0xF8,0xE7,0xAE</span><br><span class="line">    #include#include&lt;string.h&gt;#include&lt;map&gt;#include&lt;time.h&gt;using namespace std;</span><br><span class="line">void encode(unsigned char data[4])&#123; unsigned int ecx = *(int*)&amp;data; unsigned char al = data[0]; al+=al; unsigned char dl = data[1]; dl&gt;&gt;=4; dl&amp;=3; al+=al; dl+=al; al = data[2]; unsigned char result[4]; memset(result,0,4); result[0] = dl; dl = al; dl&gt;&gt;=2; unsigned char cl = data[1]; al&lt;&lt;=6; al+=data[3]; dl&amp;=0xf; cl&lt;&lt;=4; dl^=cl; result[1] = dl; result[2] = al; for(int i=0;i&lt;3;i++) &#123; printf(&quot;%2Xn&quot;,result[i]); char tmp[16]; itoa(result[i],tmp,2); printf(&quot;%sn&quot;,tmp); &#125;&#125;int main()&#123; unsigned char data[4] = &#123;0x35,0x36,0x37,0x38&#125;; encode(data); cout&lt;&lt;&quot;datan&quot;; for(int i=0;i&lt;4;i++) &#123; char tmp[16]; itoa(data[i],tmp,2); printf(&quot;%sn&quot;,tmp); printf(&quot;%Xn&quot;,data[i]); &#125;&#125;</span><br><span class="line">D711010111 6D01101101 F811111000 data 11010135 11011036 11011137 11100038</span><br><span class="line">    #include#include&lt;string.h&gt;#include&lt;map&gt;#include&lt;time.h&gt;using namespace std;</span><br><span class="line">char base64str[] = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@%=&quot;;map m;</span><br><span class="line">void encode(unsigned char str[],int len)&#123; string s = &quot;&quot;; unsigned char tmp[3]; unsigned char t[4]; for(int i=0;i&lt;=len;i+=3) &#123; memcpy(tmp,str+i,3); char a[10]; memset(t,0,4); itoa(tmp[0],a,2); itoa(tmp[1],a,2); itoa(tmp[2],a,2); t[0] = tmp[0]&gt;&gt;2; itoa(t[0],a,2); unsigned char f1 = tmp[0]&lt;&lt;6; f1&gt;&gt;=2; t[1] = (f1)^(tmp[1]&gt;&gt;4); itoa(t[1],a,2); f1 = tmp[1]&lt;&lt;4; f1&gt;&gt;=2; t[2] = (f1)^(tmp[2]&gt;&gt;6); itoa(t[2],a,2); f1 = tmp[2]&lt;&lt;2; f1 &gt;&gt;=2; t[3] = f1; itoa(t[3],a,2); t[0] = base64str[t[0]]; t[1] = base64str[t[1]]; t[2] = base64str[t[2]]; t[3] = base64str[t[3]]; for(int i=0;i&lt;4;i++) &#123; s+=t[i]; &#125; &#125;// cout&lt;&lt;s.length()&lt;&lt;endl; for(int i=0;i&lt;27;i++) &#123; printf(&quot;%c&quot;,s[i]); &#125; cout&lt;&lt;endl;&#125; int main()&#123; for(int i=0;i&lt;64;i++) &#123; m[base64str[i]]=i; &#125; unsigned char data[21] = &#123;0xD7,0x6D,0xF8,0xE7,0xAE,0xFC,0xF7,0x4D,0x76,0xDF,0x8E,0x7A,0xEF,0xCF,0x74,0xD7,0x6D,0xF8,0xE7,0xAE,0x0&#125;; encode(data,21); return 0;&#125;</span><br><span class="line">0x54,0x04,0x9D,0x05,0xCB,0x0A,0x1A,0x13,0x43,0x31,0x1C,0x0F,0x5E,0xFF,0x39,0xFF,0xAD,0x4C,0x35,0x04</span><br><span class="line">VASdBcsKGhNDMRwPXv85%61MNQQ</span><br><span class="line">for(ecx = 0;ecx&lt;0x1B;)&#123; for(eax = 0;eax&lt;4;eax++) &#123; change() &#125;&#125;</span><br><span class="line">    #include#include&lt;string.h&gt;#include&lt;map&gt;#include&lt;time.h&gt;using namespace std;</span><br><span class="line">char base64str[] = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@%*&quot;;map m;/*2c 0x14 保存对用户名二次加密的数据40 0x14 保存对序列号加密的数据88 0x14 存储第一次用户名加密的数据9C 用户名1A0 密码*/void encode(unsigned char str[],int len)&#123; string s = &quot;&quot;; unsigned char tmp[3]; unsigned char t[4]; for(int i=0;i&lt;=len;i+=3) &#123; memcpy(tmp,str+i,3); char a[10]; memset(t,0,4); itoa(tmp[0],a,2); itoa(tmp[1],a,2); itoa(tmp[2],a,2); t[0] = tmp[0]&gt;&gt;2; itoa(t[0],a,2); unsigned char f1 = tmp[0]&lt;&lt;6; f1&gt;&gt;=2; t[1] = (f1)^(tmp[1]&gt;&gt;4); itoa(t[1],a,2); f1 = tmp[1]&lt;&lt;4; f1&gt;&gt;=2; t[2] = (f1)^(tmp[2]&gt;&gt;6); itoa(t[2],a,2); f1 = tmp[2]&lt;&lt;2; f1 &gt;&gt;=2; t[3] = f1; itoa(t[3],a,2); t[0] = base64str[t[0]]; t[1] = base64str[t[1]]; t[2] = base64str[t[2]]; t[3] = base64str[t[3]]; for(int i=0;i&lt;4;i++) &#123; s+=t[i]; &#125; &#125; cout&lt;&lt;&quot;序列号&quot;&lt;&lt;endl; for(int i=0;i&lt;27;i++) &#123; printf(&quot;%c&quot;,s[i]); &#125; cout&lt;&lt;endl;&#125;void imul(int&amp; eax, int &amp;ecx, int &amp;edx)&#123; long long tmp = eax; tmp = tmp*ecx; eax = tmp &amp; 0xffffffff; edx = tmp &gt;&gt; 32;&#125;void test5(unsigned char data[])&#123; int a[5]; int b[5]; memcpy((unsigned char*)&amp;a, data + 0x2c, 0x14); memcpy((unsigned char*)&amp;b, data + 0x40, 0x14); //if (((a[0] + b[4])== b[2]) &amp;&amp; ((a[1] + b[2]) == (2 * b[4])) &amp;&amp; ((a[2] + b[3]) == b[0]) &amp;&amp; ((a[3] + b[0]) == (2 * b[3])) &amp;&amp; ((a[4] + b[1]) == (3 * a[2]))) if((2*a[2]+a[3]==b[0])&amp;&amp;(3*a[2]-a[4]==b[1])&amp;&amp;(2*a[0]+a[1]==b[2])&amp;&amp;(a[2]+a[3]==b[3])&amp;&amp;(a[0]+a[1]==b[4])) &#123; cout &lt;&lt; &quot;successn&quot;; &#125; else &#123; cout &lt;&lt; &quot;failn&quot;; &#125;&#125; void encyptUsernameSecond(unsigned char data[0x14])&#123; unsigned char total[0x92]; memcpy(total + 0x88, data, 0x14); memset(total + 0x30, 0, 0x24); memset(total + 0x2c, 0, 0x14); int esi = 0; int ecx = 0; int eax = 0; int edx = 0x14; int i24 = 0x2995c04; unsigned char ediData[0x14] = &#123; 0xD7,0x6D,0xF8,0xE7,0xAE,0xFC,0xF7,0x4D,0x76,0xDF,0x8E,0x7A,0xEF,0xCF,0x74,0xD7,0x6D,0xF8,0xE7,0xAE &#125;;//这个只要只和输入的序列号有关系。 memset(ediData,0,0x14); int* edi = (int*)&amp;ediData; int unknowndata = 0x3156c04; while (esi&lt;0x14) &#123; ecx = *(int*)&amp;data[esi]; eax = 0x66666667; imul(eax, ecx, edx); edx &gt;&gt;= 2; //sar eax,2 ecx = edx; unsigned int tmp = ecx; tmp &gt;&gt;= 31; //基础要打好，总是一知半解的，用的时候还要重新查。移位很多，涉及到符号之类的。 //shr ecx,0x1f //__asm &#123; // shr tmp,0x1F //&#125; ecx = tmp; ecx += edx; edx = 0x14; //合并起来，固定为0x14 memcpy(total + 0x2c + esi, (unsigned char*)&amp;ecx, 4); if (esi&lt;edx) &#123; eax = *(int*)&amp;ediData[esi]; memcpy(total + 0x40 + esi, (unsigned char*)&amp;eax, 4); esi += 4; &#125; &#125; if (true) &#123; //if ((2 * a[2] + a[3] == b[0]) &amp;&amp; (3 * a[2] - a[4] == b[1]) &amp;&amp; (2 * a[0] + a[1] == b[2]) &amp;&amp; (a[2] + a[3] == b[3]) &amp;&amp; (a[0] + a[1] == b[4])) int a[5]; int b[5]; memcpy((unsigned char*)&amp;a, total + 0x2c, 0x14); memcpy((unsigned char*)&amp;b, total + 0x40, 0x14); b[0] = 2 * a[2] + a[3]; b[1] = 3 * a[2] - a[4]; b[2] = 2 * a[0] + a[1]; b[3] = a[2] + a[3]; b[4] = a[0] + a[1]; memcpy(total + 0x2c, (unsigned char*)&amp;a, 0x14); memcpy(total + 0x40, (unsigned char*)&amp;b, 0x14); &#125; cout &lt;&lt; &quot;after 0x40&quot; &lt;&lt; endl; for (int i = 0; i&lt;0x14; i++) &#123; printf(&quot;0x%02X,&quot;, total[i + 0x40]); &#125; cout&lt;&lt;endl; total[0x54] = 0x2A; encode(total+0x40,21);// test5(total);&#125;void encyptUsernameFirst(string username)&#123; unsigned char data[0x14]; memset(data, 0, 0x14); int eax = 0; int ebp = 0x1339E7E; int esp = (int)&amp;data - 0x88; int edx = (int)&amp;data; int ecx = 0; int edi = username.length(); int* esi = 0; ebp = ebp - edx; while (ecx&lt;0x10) &#123; eax = ecx; edx = eax%edi; esi = (int*)&amp;data[ecx]; ecx++; eax = username[edx]; edx = (int)esi + ebp; eax = eax*edx; eax = eax*edi; (*esi) = (*esi) + eax; &#125; encyptUsernameSecond(data);&#125;int main()&#123; for(int i=0;i&lt;64;i++) &#123; m[base64str[i]]=i; &#125; cout &lt;&lt; &quot;请输入username&quot; &lt;&lt; endl; string str = &quot;helloworld&quot;; cout&lt;&lt;&quot;username = &quot;&lt;&lt;str&lt;&lt;endl; encyptUsernameFirst(str); system(&quot;pause&quot;); &#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/44316.html">https://www.ctfiot.com/44316.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2016%E8%85%BE%E8%AE%AF%E6%B8%B8%E6%88%8F%E5%AE%89%E5%85%A8%E6%8A%80%E6%9C%AF%E7%AB%9E%E8%B5%9B%E9%A2%98PC%E7%AC%AC%E4%B8%80%E9%A2%98.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2016腾讯游戏安全技术竞赛题PC第一题.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%85%BE%E8%AE%AF%E6%B8%B8%E6%88%8F%E5%AE%89%E5%85%A8/">腾讯游戏安全</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2016/01/01/ctf-kb/wp/Pwn/%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E4%B9%8BPWN-HITCON_CTF_2016-Secret_Holder/" title="HITCON CTF 2016 Secret Holder - Unsafe Unlink PWN"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">HITCON CTF 2016 Secret Holder - Unsafe Unlink PWN</div></div></a></div><div class="next-post pull-right"><a href="/2015/01/01/ctf-kb/wp/Reverse/CTF_-2015%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8%E6%8C%91%E6%88%98%E8%B5%9B-%E7%AC%AC%E4%BA%8C%E9%A2%98_AliCrackme_2_%E9%80%86%E5%90%91/" title="CTF 《2015 移动安全挑战赛》第二题 AliCrackme_2 逆向"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">CTF 《2015 移动安全挑战赛》第二题 AliCrackme_2 逆向</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%80%E6%9C%9F%E6%8E%A8%E8%8D%90"><span class="toc-number">1.</span> <span class="toc-text">往期推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

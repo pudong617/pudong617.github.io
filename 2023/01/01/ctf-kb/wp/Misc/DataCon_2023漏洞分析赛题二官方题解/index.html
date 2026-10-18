@@ -1,0 +1,422 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>DataCon 2023漏洞分析赛题二官方题解 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="DataCon 2023漏洞分析题二：OpenWrt魔改+CodeQL参数特征查询">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DataCon 2023漏洞分析赛题二官方题解">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/DataCon_2023%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E8%B5%9B%E9%A2%98%E4%BA%8C%E5%AE%98%E6%96%B9%E9%A2%98%E8%A7%A3/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="DataCon 2023漏洞分析题二：OpenWrt魔改+CodeQL参数特征查询">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="openwrt">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/DataCon_2023%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E8%B5%9B%E9%A2%98%E4%BA%8C%E5%AE%98%E6%96%B9%E9%A2%98%E8%A7%A3/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'DataCon 2023漏洞分析赛题二官方题解',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">DataCon 2023漏洞分析赛题二官方题解</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="DataCon 2023漏洞分析赛题二官方题解"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/148134.html">https://www.ctfiot.com/148134.html</a><br>ID: 148134</p>
+</blockquote>
+<p>一</p>
+<p>前  言</p>
+<p>本题目是漏洞分析赛道的第二题，来源于对openwrt项目源码（<a target="_blank" rel="noopener" href="https://github.com/openwrt/openwrt%EF%BC%89%E9%AD%94%E6%94%B9%E3%80%82%E5%9F%BA%E4%BA%8E%E5%AE%9E%E6%88%98%E4%B8%AD%E7%9A%84%E5%9C%BA%E6%99%AF%EF%BC%8C%E5%9C%A8%E9%A2%98%E7%9B%AE%E4%B8%AD%E8%AE%BE%E7%BD%AE%E4%BA%86%E4%B8%89%E7%A7%8D%E7%9B%B8%E5%AF%B9%E5%9B%BA%E5%AE%9A%E4%B8%94%E5%B8%B8%E8%A7%81%E7%9A%84%E6%BC%8F%E6%B4%9E%E6%A8%A1%E5%BC%8F%EF%BC%8C%E5%B8%8C%E6%9C%9B%E9%80%89%E6%89%8B%E4%BB%AC%E5%9C%A8%E5%AF%B9%E5%9B%BA%E5%AE%9A%E6%BC%8F%E6%B4%9E%E6%A8%A1%E5%BC%8F%E7%90%86%E8%A7%A3%E7%9A%84%E5%9F%BA%E7%A1%80%E4%B8%8A%EF%BC%8C%E5%8F%AF%E4%BB%A5%E5%88%A9%E7%94%A8%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E8%BE%85%E5%8A%A9%E8%BF%9B%E8%A1%8C%E5%88%86%E6%9E%90%EF%BC%8C%E6%8E%A2%E7%B4%A2%E5%90%84%E7%A7%8D%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7%E4%B8%8E%E4%BA%BA%E5%B7%A5%E5%88%86%E6%9E%90%E7%9B%B8%E7%BB%93%E5%90%88%E7%9A%84%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98%E6%A8%A1%E5%BC%8F%EF%BC%8C%E5%87%8F%E5%B0%91%E4%B8%80%E5%AE%9A%E9%87%8F%E7%9A%84%E9%87%8D%E5%A4%8D%E4%BA%BA%E5%B7%A5%E5%AE%A1%E8%AE%A1%E3%80%82">https://github.com/openwrt/openwrt）魔改。基于实战中的场景，在题目中设置了三种相对固定且常见的漏洞模式，希望选手们在对固定漏洞模式理解的基础上，可以利用静态分析工具辅助进行分析，探索各种漏洞分析工具与人工分析相结合的漏洞挖掘模式，减少一定量的重复人工审计。</a></p>
+<p>静态分析工具都有其自身的缺陷，分析的结果很难做到尽善尽美。因此站在一位漏洞挖掘工程师的角度，我设置本题的目标是探索如何合理的使用静态分析工具，并最大程度的利用这种自动化的方式帮助我们减少人工分析的工作。</p>
+<p>二</p>
+<p>根据参数特征查询</p>
+<p>根据参数特征查询适用于过滤一些常见的危险函数的危险操作。</p>
+<p>01</p>
+<p>针对strcat函数</p>
+<p>例如如果strcat的二个参数是一个常量字符串的话是很难有溢出的，即使有溢出也难以造成很大的危害。故此这种情况我们一般不需重点关注。</p>
+<p>在本次datacon赛题二中，我们对strcat进行查询并设置其第二个参数是一个变量的情况。这里我们的查询规则如下，查找类型为变量(identifier)，callee的筛选是为了筛选出调用这个变量的函数要是strcat函数，最后index指定了这个变量是strcat的第二个参数（下标从0开始)，as taintPropagationPath RETURN taintPropagationPath 是为了前端将结果显示的更好看一些。</p>
+<p>match (n:<br>identifier) where n.callee&#x3D;”strcat” and n.index&#x3D;1 with [n] as taintPropagationPath RETURN taintPropagationPath</p>
+<p>查询结果如下，可以看到符合的结果只有两条。因为查询到的结果并不多，所以可以进行一下人工验证。验证后发现恰好是我们题目设置的答案odhcpd:<br>0x000036A9 odhcpd:<br>0x000035F9</p>
+<p>依据这种思路我们可以查询到 【漏洞3】和【漏洞4】。</p>
+<p>总 结</p>
+<p>与之类似的情况还有strcpy函数，我们依然可以依照上面的原则进行编写规则进行查询。</p>
+<p>在现实情况中，如果我们上传了整个固件可以如此查询一下他system和popen的调用情况，那么如果他执行的是一个常量字符串那么肯定不可能是一个命令注入漏洞。因此我们可以同样对他system和popen的第一个参数类型进行限制，帮助我们初步筛选一下目标，减轻人工逆向的工作量。</p>
+<p>02</p>
+<p>针对memmove函数</p>
+<p>首先我们来看下memmove函数的函数定义，第一个参数是dst，第二个参数是src，第三个参数是len。</p>
+<p>void * memmove(void *dst, const void *src, size_t len);</p>
+<p>通常memmove安全的使用方法有以下两种：</p>
+<p>  1. 调用memmove函数的时候第三个参数是一个固定的值</p>
+<p>memmove(dest, src, sizeof(dest));</p>
+<ol start="2">
+<li>memmove的dest大小是根据第三个参数的大小申请出来的</li>
+</ol>
+<p>dest &#x3D; malloc(size);memmove(dst, src, size);</p>
+<p>我们针对这两种情况进行排除，编写查询命令。其中not (m)-[:<br>dfg]-(n)即是现在第一个参数跟第三个参数之间不存在直接的数据流关系。</p>
+<p>match (n:<br>identifier{callee:”memmove”,index:0}), (m:<br>identifier{callee:”memmove”,index:2})where n.function&#x3D;m.function and m.line&#x3D;n.line and not (m)-[:<br>dfg]-(n) WITH [m] AS taintPropagationPath RETURN taintPropagationPath</p>
+<p>依据此思路我们在全部的二进制中进行搜索到接近20处疑似位置。得益于破壳平台可返回的疑似点的反编译代码我们可以人工快速判断一下，如果仍有比较多的不确定选项我们可以考虑针对这些特定的memmove使用污点查询来进行二次筛选。</p>
+<p>最终我们可以查询到【漏洞5】【漏洞6】【漏洞7】【漏洞9】【漏洞10】【漏洞11】。</p>
+<p>总 结</p>
+<p>其实如签到题的格式化字符串，其他危险函数如snprintf等都可以用这种方法查询，且也都有不错的过滤效果</p>
+<p>但在更多的二进制一起查的时候这种查询方法还是略显粗糙，如果出现的结果仍然很多，我们可以结合污点查询或是我们人工分析出的再编写规则进行过滤。</p>
+<p>三</p>
+<p>使用污点追踪</p>
+<p>污点追踪可以让我们聚焦数据流传播到的危险函数。</p>
+<p>签到题，题目一，题目二所包含的漏洞类型其实都可以使用污点查询的方式来进行查询与之前提到的查询方法进行交叉验证。</p>
+<p>01</p>
+<p>使用默认source和sink</p>
+<p>针对ustpd这个目标，我们使用下面默认的source到sink的污点查询进行查找，也就是平台定义的is_source和is_sink。</p>
+<p>match (n:<br>identifier) where n.is_source&#x3D;1 with collect(id(n)) as sourceSet match (m:<br>identifier{index:0}) where m.is_sink&#x3D;1 with sourceSet,collect(id(m)) as sinkSet CALL VQL.taintPropagation(sourceSet, sinkSet,1) YIELD taintPropagationPath RETURN taintPropagationPath ORDER BY size(taintPropagationPath)</p>
+<p>如下，我们成功查询到了签到题的格式化字符串漏洞ustpd:<br>0x0804F571，其数据流调用也很清晰。</p>
+<p>在赛题中其实使用标准库函数作为source点的程序比较少，因此基本没有什么误报。依据此思路我们可以查询到 【漏洞1】【漏洞2】</p>
+<p>不过显然，这比我们预期当中要查找到的漏洞点要少，我们还需要进一步对每个程序可能的source点进行分析，再对其进行自定义source点的污点追踪。有一些程序自定义的函数可能反编译工具无法准确识别他们的参数，我们也可以通过在ghidra中进行重定义后导出gzf文件，再上传到破壳平台上进行分析。</p>
+<p>总 结</p>
+<p>对于一些source和sink非常明确的程序，使用这种查询方法能帮助我们快速锁定一些值得审视的攻击面且能帮助我们排除调大量无威胁的危险函数调用。</p>
+<p>02</p>
+<p>使用自定义的source，sink点</p>
+<p>对于整数溢出漏洞，我们可以采用上面的根据参数特征来排除，或者匹配一些模式。这里笔者选择采用source点到malloc的方式来进行污点查询。因为发生整数溢出的前提也是malloc的size字段是我们可控的。</p>
+<p>下面我们针对bfdd进行一个污点查询，其中source就设置为默认的is_source，sink设置为malloc函数。可以查询到这个漏洞即是我们设置的漏洞点bfdd:<br>0x0805AD02</p>
+<p>当然很多情况下，程序由于间接的函数调用，或是程序存在身自定义的数据读取函数。这时使用默认的source点可能就会没有结果。这时我们需要对程序简单的进行分析，例如uhtppd其实是使用ustream_get_read_buf这个函数返回一个包含着网络通信数据的buffer地址。我们就可以将ustream_get_read_buf这个函数的返回值作为一个source点。</p>
+<p>在题目中存在少量查到数据流但是并非是漏洞点的情况，但是数量不多且破壳平台返回了详细的污点追踪路径情况，因此很容易排除掉。最后依据此思路可以查询【漏洞8】【漏洞12】【漏洞13】【漏洞14】。</p>
+<p>在实际情况中如果我们遇到了某个数据流中有明显的check点导致后续的危险函数调用是安全的，我也可以通过写对应的规则去排除这种情况。</p>
+<p>总 结</p>
+<p>适用于对程序进行了一定分析后，自动化寻找一些自己感兴趣的数据流。基于这些数据流进行分析，即使在没有符号执行的条件下也是可以大大减轻我们分析的工作量的。</p>
+<p>四</p>
+<p>使用污点追踪</p>
+<p>01</p>
+<p>根据函数名判断函数功能</p>
+<p>而对于类似于第三题这种实现为循环拷贝的转码函数，一种思路是我们可以从函数名的角度入手，利用下面的正则匹配匹配出具有类似编码功能的函数。</p>
+<p>MATCH (n:<br>function)WHERE n.name &#x3D;~ “.<em>decode.</em>|.<em>hex.</em>“RETURN n.nameLIMIT 1000</p>
+<p>02</p>
+<p>根据函数结构判断函数功能</p>
+<p>寻找到一个成环的cfg（control flow graph)，这部分成环的cfg一般都是一个循环操作。然后我们再观察该循环操作所对应的code_line(对应的反编译代码）中是否有我们关心的操作。如对于该函数传入的参数param_2的赋值操作。这个语句也可以考虑写的更精确一些，比如成环中间经过的所有basic_block都可以判断下其所属的code_line中有无我们关心的操作。</p>
+<p>match (m:<br>code_line)&lt;-[:<br>own]-(n:<br>basic_block)-[:<br>cfg*1..3]-&gt;(n) where m.name contains “*param_2” return DISTINCT n.function limit 1000</p>
+<p>依据此思路可以查询到 【漏洞20】，但我们可以看到上面的查询方法查找到符合这种定义的函数有48个。这时候依据题目给出的提示寻找解码类型的函数。这里查询到的很多函数明显从名称上来看就可以判断不是我们需要关注的。故此我们可以通过再编写规则这些函数所在的文件，这个函数的名称，调用这个函数处的参数类型进行筛选。</p>
+<p>总 结</p>
+<p>利用破壳平台还可以根据程序的一些basic_block的结构信息，ast的相关信息等进行查询。有一些通过参数类型，数据流不好识别的漏洞模式特征通过基本块或者语法树的特征可能更容易识别到。</p>
+<p>五</p>
+<p>写在最后</p>
+<p>破壳平台在设计之初就一直在思考怎么让漏洞挖掘工程师和静态分析工具进行更高效的人机结合，我们考虑到常用的漏洞扫描工具很难将使用者对特定目标的经验加入进去，所以使用了查询交互式漏洞挖掘的思路，用户可以不断的编程来搜索漏洞、逼近漏洞，沉淀出针对某些漏洞的“专属”规则，甚至实现批量扫描；同时我们在日常工作中还深刻认识到漏洞挖掘有时候以团队的形式开展可以更高效，所以我们依托查询交互式漏洞挖掘这种模式，让用户和小伙伴们可以“开黑”挖洞。</p>
+<p>当然，破壳平台目前还有很多不足，例如漏洞查询语言当前门槛和学习成本较高、UI还不够美观、平台容易崩等情况，在接收到反馈后我们也制定了开发计划，将一步步的完善；我们也计划放出更多的案例文档来帮助大家学习，向大家展示平台更多的用法，希望大家可以和破壳平台一起成长。</p>
+<p>六</p>
+<p>题目答案</p>
+<p>01</p>
+<p>漏洞1</p>
+<p>从recvfrom函数接收到的数据直接作为printf函数的格式化字符串参数使用。</p>
+<p>cc &#x3D; recvfrom(ufd.fd, &amp;buf, sizeof(buf), 0, (struct sockaddr *)&amp;sl, &amp;salen); if (cc &lt; 0) { switch (errno)   {   case EINTR:   continue; case EAGAIN:   return; default: cc &#x3D; 0; } } snprintf(log_buf, sizeof(log_buf), “recvfrom recved : %s”, buf); printf(log_buf);</p>
+<p>简单送分格式化字符串，可以根据题目提示设置source点与sink点进行污点查询。</p>
+<p>MATCH (n:<br>identifier) WHERE n.callee &#x3D; “recvfrom” AND n.index&#x3D;1 WITH collect(id(n)) as sourceSetMATCH (n:<br>identifier) WHERE n.callee &#x3D; “printf” AND n.index&#x3D;0 WITH sourceSet,collect(id(n)) as sinkSet call VQL.taintPropagation(sourceSet,sinkSet,3)YIELD taintPropagationPath RETURN taintPropagationPath</p>
+<p>ustpd:<br>0x0804F571</p>
+<p>02</p>
+<p>漏洞2</p>
+<p>漏洞附件为ustp</p>
+<p>在ustp附件中的bridge_bpdu_rcv函数中，会调用如下代码，其中snprintf的第二个参数是可控的，这样把h拷贝到paket上时会造成缓冲区溢出。</p>
+<p>char packet[1300]; snprintf(packet, l, “LLC header and the data %s”, h); LOG(“header len %d, data %s”, l, packet);</p>
+<p>使用recvfrom函数的buffer参数作为source点，snprintf的size参数作为sink点进行污点传播。</p>
+<p>MATCH (n:<br>identifier) WHERE n.callee &#x3D; “recvfrom” AND n.index&#x3D;1 WITH collect(id(n)) as sourceSet MATCH (n:<br>identifier) WHERE n.callee &#x3D; “snprintf” AND n.index&#x3D;1 WITH sourceSet,collect(id(n)) as sinkSet call VQL.taintPropagation(sourceSet,sinkSet,3)YIELD taintPropagationPath RETURN taintPropagationPath</p>
+<p>ustpd:<br>0x0804F79B</p>
+<p>03</p>
+<p>漏洞3</p>
+<p>漏洞附件为odhcpd</p>
+<p>odhcpd_receive_packets在解包过程中存在缓冲区溢出漏洞。由strcat造成。</p>
+<p>char buf[32];snprintf(buf, 0x20u, “Received %zd Bytes from “, len);strcat(buf, ipbuf);syslog(7, “%s”, buf);</p>
+<p>这个和下面的漏洞3可以是同一思路，因为这几个二进制中使用strcat函数的地方一共也没有几处，因此直接对危险函数strcat查询即可。</p>
+<p>match (n:<br>identifier) where n.callee&#x3D;”strcat” and n.index&#x3D;1 return n</p>
+<p>odhcpd:<br>0x000035F9</p>
+<p>04</p>
+<p>漏洞4</p>
+<p>附件odhcpd</p>
+<p>同样是strcat造成的漏洞。</p>
+<p>if ( destiface ) { for ( i &#x3D; interfaces.list_head.next; i-&gt;prev !&#x3D; interfaces.list_head.prev; i &#x3D; i-&gt;next )   { if ( i[4].next &#x3D;&#x3D; (list_head *)destiface ) { snprintf(buf, 0x20u, “Received %zd Bytes from “, len); strcat(buf, ipbuf); syslog(7, “%s”);((void (__cdecl *)(odhcpd_receive_packets::$54E5DB5725EA5BD631F9B1F8B1B758E1 *, uint8_t *, int, list_head *, void *))u[1].cb)( &amp;addr, data_buf, len, i,dest); } }}</p>
+<p>查找危险函数就可以筛选出。</p>
+<p>match (n:<br>identifier) where n.callee&#x3D;”strcat” and n.index&#x3D;1 return</p>
+<p>odhcpd:<br>0x000036A9</p>
+<p>05</p>
+<p>漏洞5</p>
+<p>附件为bgpd</p>
+<p>在bgp_flowspec_ip_address函数中psize是用户可控的，这个值没有检查就被传入给了memcpy的第三个参数造成了缓冲区溢出。</p>
+<p>prefix_local.prefixlen &#x3D; nlri_ptr[offset];psize &#x3D; PSIZE(prefix_local.prefixlen);offset++;prefix_local.family &#x3D; afi2family(afi);if (prefix_local.family &#x3D;&#x3D; AF_INET6) {prefix_offset &#x3D; nlri_ptr[offset];if (ipv6_offset)*ipv6_offset &#x3D; prefix_offset;offset++;}<br>memmove(&amp;prefix_local.u.prefix, &amp;nlri_ptr[offset], psize);</p>
+<p>寻找第一个参数和第三个参数之间没有dfg(data flow graph)数据流关系的memmove函数调用。这种查询思路一个是排除了第三个参数为常数的情况，一个是排除了下面这种情况：</p>
+<p>buf &#x3D; malloc(n+1);memmove(buf, data, n);</p>
+<p>以下是查询语句</p>
+<p>match (n:<br>identifier{callee:”memmove”,index:0}), (m:<br>identifier{callee:”memmove”,index:2})where n.function&#x3D;m.function and m.line&#x3D;n.line and not (m)-[:<br>dfg]-(n) return m.function,m.file</p>
+<p>bgpd:<br>0x8146C95</p>
+<p>06</p>
+<p>漏洞6</p>
+<p>附件为bgpd</p>
+<p>在bgp_capability_parse中memmove的第三个参数来自于用户可控的数据，但是并没有对其大小做限制。</p>
+<p>switch (caphdr.code) {case CAPABILITY_CODE_MP: {*mp_capability &#x3D; 1;</p>
+<p>&#x2F;* Ignore capability when override-capability is set. <em>&#x2F;if (!CHECK_FLAG(peer-&gt;flags,PEER_FLAG_OVERRIDE_CAPABILITY)) {&#x2F;</em> Set negotiated value. *&#x2F;ret &#x3D; bgp_capability_mp(peer, &amp;caphdr);</p>
+<p>&#x2F;* Unsupported Capability. <em>&#x2F;if (ret &lt; 0) {&#x2F;</em> Store return data. *&#x2F;char tmp_buf[0x30];memmove(tmp_buf, sp, caphdr.length + 2);strcpy(*error, tmp_buf);<em>error +&#x3D; caphdr.length + 2;}ret &#x3D; 0; &#x2F;</em> Don’t return error for this *&#x2F;} } break;</p>
+<p>寻找第一个参数和第三个参数之间没有数据流关系的memmove函数调用。</p>
+<p>match (n:<br>identifier{callee:”memmove”,index:0}), (m:<br>identifier{callee:”memmove”,index:2})where n.function&#x3D;m.function and m.line&#x3D;n.line and not (m)-[:<br>dfg]-(n) return m.function,m.file</p>
+<p>bgpd:<br>0x08149FE1</p>
+<p>07</p>
+<p>漏洞7</p>
+<p>附件为bgp</p>
+<p>在bgp_route_refresh_receive函数中，pize来自于用户数据后续没有进行范围检测即传入了memmove第三个参数中。</p>
+<p>if ((ok &#x3D; (p_pnt &lt; p_end)))orfp.p.prefixlen &#x3D; *p_pnt++;&#x2F;* afi checked already *&#x2F;orfp.p.family &#x3D; afi2family(afi);&#x2F;* 0 if not ok *&#x2F;psize &#x3D; PSIZE(orfp.p.prefixlen);<br>if (psize &gt; 0)memmove(&amp;orfp.p.u.prefix, p_pnt, psize);</p>
+<p>寻找第一个参数和第三个参数之间没有数据流关系的memmove函数调用。</p>
+<p>match (n:<br>identifier{callee:”memmove”,index:0}), (m:<br>identifier{callee:”memmove”,index:2})where n.function&#x3D;m.function and m.line&#x3D;n.line and not (m)-[:<br>dfg]-(n) return m.function,m.file</p>
+<p>bgpd:<br>0x08144EE0</p>
+<p>08</p>
+<p>漏洞8</p>
+<p>在relay_process_headers中snprintf的第二个参数可控，也就是size字段可控，可以造成溢出。</p>
+<p>newline &#x3D; strchr(buf, ‘n’);if (!newline)break;<br>line_len &#x3D; newline + 1 - buf;snprintf(log_buf, line_len, “%s”, newline); printf(“%s”, log_buf);</p>
+<p>这里使用通常的污点追踪即可查询，我们可以通过一些自动化手段或人工判断出uhttpd文件中常用的source包含了ustream_get_read_buf等函数。</p>
+<p>因此我们可以设置ustream_get_read_buf的返回值为source点，snprintf的第二个参数进行污点查询。</p>
+<p>MATCH (n:<br>identifier) WHERE n.callee &#x3D; “ustream_get_read_buf” AND n.index&#x3D;-1 WITH collect(id(n)) as sourceSet MATCH (n:<br>identifier) WHERE n.callee &#x3D; “snprintf” AND n.index&#x3D;1 WITH sourceSet,collect(id(n)) as sinkSet CALL VQL.taintPropagation(sourceSet,sinkSet,3)YIELD taintPropagationPath RETURN taintPropagationPath</p>
+<p>uhttpd:<br>0x0805108A</p>
+<p>09</p>
+<p>漏洞9</p>
+<p>附件为ldpd</p>
+<p>在session_get_pdu中dlen是可控的，dlen的长度会超过avf的长度造成memmove越界。</p>
+<p>static ssize_t session_get_pdu(struct ibuf_read *r, char **b){struct ldp_hdr l;size_t av, dlen, left;<br>av &#x3D; r-&gt;wpos;if (av &lt; sizeof(l))return (0);<br>memcpy(&amp;l, r-&gt;buf, sizeof(l));dlen &#x3D; ntohs(l.length) + LDP_HDR_DEAD_LEN;<br>if ((*b &#x3D; malloc(dlen)) &#x3D;&#x3D; NULL)return (-1);<br>memcpy(*b, r-&gt;buf, dlen);<br>left &#x3D; av - dlen;memmove(r-&gt;buf, r-&gt;buf + dlen, left);r-&gt;wpos &#x3D; left;<br>return (dlen);}</p>
+<p>寻找第一个参数和第三个参数之间没有数据流关系的memmove函数调用。</p>
+<p>match (n:<br>identifier{callee:”memmove”,index:0}), (m:<br>identifier{callee:”memmove”,index:2})where n.function&#x3D;m.function and m.line&#x3D;n.line and not (m)-[:<br>dfg]-(n) return m.function,m.file</p>
+<p>ldpd:<br>0x080671A8</p>
+<p>10</p>
+<p>漏洞10</p>
+<p>附件lldpd</p>
+<p>在函数lldp_decode中，没有检测tlv_size是不是为0，后续在PEEK_BYTES造成缓冲区溢出。</p>
+<p>{ log_warn(“lldp”, “unable to allocate memory for id tlv “ “received on %s”, hardware-&gt;h_ifname); goto malformed; } memmove(b, pos, tlv_size - 1);</p>
+<p>match (n:<br>identifier{callee:”memmove”,index:0}), (m:<br>identifier{callee:”memmove”,index:2})where n.function&#x3D;m.function and m.line&#x3D;n.line and not (m)-[:<br>dfg]-(n) return m.function,m.file</p>
+<p>lldpd:<br>0x0804F6EC</p>
+<p>11</p>
+<p>漏洞11</p>
+<p>附件lldpd </p>
+<p>同样是在函数lldp_decode中，不过是另一个case，没有检测tlv_size是不是为0，后续在PEEK_BYTES造成缓冲区溢出。</p>
+<p>{ log_warn(“lldp”, “unable to allocate memory for string tlv “ “received on %s”, hardware-&gt;h_ifname); goto malformed; } memmove(b, pos, tlv_size - 1);</p>
+<p>寻找第一个参数和第三个参数之间没有数据流关系的memmove函数调用。</p>
+<p>match (n:<br>identifier{callee:”memmove”,index:0}), (m:<br>identifier{callee:”memmove”,index:2})where n.function&#x3D;m.function and m.line&#x3D;n.line and not (m)-[:<br>dfg]-(n) return m.function,m.file</p>
+<p>lldpd:<br>0x0804F848</p>
+<p>12</p>
+<p>漏洞12</p>
+<p>附件bgpd </p>
+<p>在函数bgp_notify_receive中，tmp_size是16位的数据，进行左移会造成整数溢出。后续malloc的大小会远小于memcpy的数据，最终溢出。</p>
+<p>tmp_size &#x3D; outer.length &lt;&lt; 3;if (inner.length) { peer-&gt;notify.length &#x3D; inner.length; peer-&gt;notify.data &#x3D; malloc(tmp_size); memcpy(peer-&gt;notify.data, inner.raw_data, inner.length); }</p>
+<p>在bgpd中，通过人工或AI方法可以分析得知stream_getw，stream_getc等函数均可以作为source点。此时我们可以使用stream_getw函数为的返回值为source点，malloc函数的第一个参数为sink点进行污点查询。</p>
+<p>MATCH (n:<br>identifier) WHERE n.callee &#x3D; “stream_getw” AND n.index&#x3D;-1 WITH collect(id(n)) as sourceSet MATCH (n:<br>identifier) WHERE n.callee &#x3D; “malloc” AND n.index&#x3D;0 WITH sourceSet,collect(id(n)) as sinkSet call VQL.taintPropagation(sourceSet,sinkSet,2)YIELD taintPropagationPath RETURN taintPropagationPath</p>
+<p>bgpd:<br>0x081443F6</p>
+<p>13</p>
+<p>漏洞13</p>
+<p>附件bgpd </p>
+<p>同上，在函数bgp_notify_receive中，tmp_size是16位的数据，进行右移会造成整数溢出。后续malloc的大小会远小于memcpy的数据，最终溢出。</p>
+<p>&#x2F;* For further diagnostic record returned Data. *&#x2F; if (inner.length) { peer-&gt;notify.length &#x3D; inner.length; peer-&gt;notify.data &#x3D; malloc(tmp_size); memcpy(peer-&gt;notify.data, inner.raw_data, inner.length); }</p>
+<p>查询思路同【漏洞1】</p>
+<p>bgpd:<br>0x081444E5</p>
+<p>14</p>
+<p>漏洞14</p>
+<p>同上，在函数bgp_notify_receive中，tmp_size是16位的数据，进行右移会造成整数溢出。后续malloc的大小会远小于memcpy的数据，最终溢出。</p>
+<p>&#x2F;* For debug *&#x2F;{int i;<br>int first &#x3D; 0;<br>char c[4];</p>
+<p>if (inner.length) {inner.data &#x3D; malloc(tmp_size);for (i &#x3D; 0; i &lt; inner.length; i++)if (first) {snprintf(c, sizeof(c), “ %02x”, stream_getc(peer-&gt;curr));</p>
+<p>查询思路同【漏洞1】</p>
+<p>bgpd:<br>0x08144535</p>
+<p>15</p>
+<p>漏洞15</p>
+<p>在control_read函数中bcb_left来自于用户可控的数据，读取了四个字节，但是并没有限制其大小。后续malloc的时候会造成整数溢出。</p>
+<p>&#x2F;* Validate header fields. *&#x2F; plen &#x3D; ntohl(bcm.bcm_length); bcb-&gt;bcb_buf &#x3D; malloc(sizeof(bcm) + bcb-&gt;bcb_left + 1); if (bcb-&gt;bcb_buf &#x3D;&#x3D; NULL) { zlog_warn(“%s: not enough memory for message size: %zu”, <strong>func</strong>, bcb-&gt;bcb_left); control_free(bcs); return; }</p>
+<p>这个二进制程序中用read做source点即可</p>
+<p>call VQL.getArgument(“malloc”,0) yield node with collect(id(node)) as sinksetcall VQL.getArgument(“read”,1) yield node with collect(id(node)) as sourceset,sinksetcall VQL.taintPropagation(sourceset,sinkset,3) yield taintPropagationPath return taintPropagationPath</p>
+<p>bfdd:<br>0x0805AD02</p>
+<p>16</p>
+<p>漏洞16</p>
+<p>附件:<br>uhttpd</p>
+<p>漏洞1存在于uh_b64decode，其中tmp_buf长度是有限的，但是auth的长度可能会大于tmp_buf的空间。</p>
+<p>char tmp_buf[0x80];if (auth &amp;&amp; !strncasecmp(auth, “Basic “, 6)){auth +&#x3D; 6;</p>
+<p>uh_b64decode(tmp_buf, auth, strlen(auth));pass &#x3D; strchr(tmp_buf, ‘:’);if (pass){user &#x3D; tmp_buf;*pass++ &#x3D; 0;} }</p>
+<p>对函数名中包含decode和hex的进行查询。这里使用了正则匹配的方法。当然IDA和python脚本也可以实现类似的功能，不过在多文件等情况中使用这种图数据库查询语句是一种更为简单的平替。</p>
+<p>MATCH (n:<br>function)WHERE n.name &#x3D;~ “.<em>decode.</em>|.<em>hex.</em>“RETURN n.nameLIMIT 1000</p>
+<p>uhttpd:<br>0x08050812</p>
+<p>17</p>
+<p>漏洞17</p>
+<p>附件：uhttpd</p>
+<p>漏洞存在于uh_path_lookup中，其在调用uh_urldecode函数时会溢出uh_buff。</p>
+<p>&#x2F;* no query string, decode all of url *&#x2F; else if (uh_urldecode(&amp;uh_buff[docroot_len], url, strlen(url)) &lt; 0) return NULL;</p>
+<p>与【漏洞1】相同</p>
+<p>uhttpd:<br>0x0804E4F3</p>
+<p>18</p>
+<p>漏洞18</p>
+<p>附件：uhttpd</p>
+<p>漏洞存在于uh_path_lookup中，其在调用uh_urldecode函数时会溢出uh_buff。</p>
+<p>&#x2F;* urldecode component w&#x2F;o query *&#x2F; if (pathptr &gt; url) { if (uh_urldecode(&amp;uh_buff[docroot_len], url, pathptr - url) &lt; 0) return NULL; }</p>
+<p>同上</p>
+<p>uhttpd:<br>0x0804E52D</p>
+<p>19</p>
+<p>漏洞19</p>
+<p>附件：odchpd-ipv6</p>
+<p>该漏洞存在于附件odhcp-v6中，在dhcpv6_ia_handle_IAs中调用odhcpd_hexlify，其中olen没有长度限制会造成缓冲区溢出。</p>
+<p>dhcpv6_for_each_option(start, end, otype, olen, odata){if (otype &#x3D;&#x3D; DHCPV6_OPT_CLIENTID){clid_data &#x3D; odata;clid_len &#x3D; olen;<br>if (olen &#x3D;&#x3D; 14 &amp;&amp; odata[0] &#x3D;&#x3D; 0 &amp;&amp; odata[1] &#x3D;&#x3D; 1)memcpy(mac, &amp;odata[8], sizeof(mac));else if (olen &#x3D;&#x3D; 10 &amp;&amp; odata[0] &#x3D;&#x3D; 0 &amp;&amp; odata[1] &#x3D;&#x3D; 3)memcpy(mac, &amp;odata[4], sizeof(mac));<br>odhcpd_hexlify(duidbuf, odata, olen); }</p>
+<p>同上</p>
+<p>odchpd-ipv6:<br>0x0000D361</p>
+<p>20</p>
+<p>漏洞20</p>
+<p>附件：sshd</p>
+<p>在sshd附件中setproctitle函数中会调用strnvis函数，该函数实际是从v8到v9进行了拷贝，但是v8的大小是小于v9的。这个函数功能是转化不可见字符。</p>
+<p>char v8[512]; &#x2F;&#x2F; [esp+1Ch] [ebp-61Ch] BYREFchar v9[1024]; &#x2F;strvis(v8, v9, 27);</p>
+<p>match (m:<br>code_line)&lt;-[:<br>own]-(n:<br>basic_block)-[:<br>cfg*1..3]-&gt;(n) where m.name contains “*param_2” return DISTINCT n.function</p>
+<p>sshd:<br>0x0008C045</p>
+<p>点击下方的卡片关注我们吧！</p>
+<p>点击阅读原文进入破壳平台</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line">match (n:</span><br><span class="line">identifier) where n.callee=&quot;strcat&quot; and n.index=1 with [n] as taintPropagationPath RETURN taintPropagationPath</span><br><span class="line">void * memmove(void *dst, const void *src, size_t len);</span><br><span class="line">memmove(dest, src, sizeof(dest));</span><br><span class="line">dest = malloc(size);memmove(dst, src, size);</span><br><span class="line">match (n:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:0&#125;), (m:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:2&#125;)where n.function=m.function and m.line=n.line and not (m)-[:</span><br><span class="line">dfg]-(n) WITH [m] AS taintPropagationPath RETURN taintPropagationPath</span><br><span class="line">match (n:</span><br><span class="line">identifier) where n.is_source=1 with collect(id(n)) as sourceSet match (m:</span><br><span class="line">identifier&#123;index:0&#125;) where m.is_sink=1 with sourceSet,collect(id(m)) as sinkSet CALL VQL.taintPropagation(sourceSet, sinkSet,1) YIELD taintPropagationPath RETURN taintPropagationPath ORDER BY size(taintPropagationPath)</span><br><span class="line">MATCH (n:</span><br><span class="line">function)WHERE n.name =~ &quot;.*decode.*|.*hex.*&quot;RETURN n.nameLIMIT 1000</span><br><span class="line">match (m:</span><br><span class="line">code_line)&lt;-[:</span><br><span class="line">own]-(n:</span><br><span class="line">basic_block)-[:</span><br><span class="line">cfg*1..3]-&gt;(n) where m.name contains &quot;*param_2&quot; return DISTINCT n.function limit 1000</span><br><span class="line">cc = recvfrom(ufd.fd, &amp;buf, sizeof(buf), 0, (struct sockaddr *)&amp;sl, &amp;salen); if (cc &lt; 0) &#123; switch (errno)   &#123;   case EINTR:   continue; case EAGAIN:   return; default: cc = 0; &#125; &#125; snprintf(log_buf, sizeof(log_buf), &quot;recvfrom recved : %s&quot;, buf); printf(log_buf);</span><br><span class="line">MATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;recvfrom&quot; AND n.index=1 WITH collect(id(n)) as sourceSetMATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;printf&quot; AND n.index=0 WITH sourceSet,collect(id(n)) as sinkSet call VQL.taintPropagation(sourceSet,sinkSet,3)YIELD taintPropagationPath RETURN taintPropagationPath</span><br><span class="line">char packet[1300]; snprintf(packet, l, &quot;LLC header and the data %s&quot;, h); LOG(&quot;header len %d, data %s&quot;, l, packet);</span><br><span class="line">MATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;recvfrom&quot; AND n.index=1 WITH collect(id(n)) as sourceSet MATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;snprintf&quot; AND n.index=1 WITH sourceSet,collect(id(n)) as sinkSet call VQL.taintPropagation(sourceSet,sinkSet,3)YIELD taintPropagationPath RETURN taintPropagationPath</span><br><span class="line">char buf[32];snprintf(buf, 0x20u, &quot;Received %zd Bytes from &quot;, len);strcat(buf, ipbuf);syslog(7, &quot;%s&quot;, buf);</span><br><span class="line">match (n:</span><br><span class="line">identifier) where n.callee=&quot;strcat&quot; and n.index=1 return n</span><br><span class="line">if ( destiface ) &#123; for ( i = interfaces.list_head.next; i-&gt;prev != interfaces.list_head.prev; i = i-&gt;next )   &#123; if ( i[4].next == (list_head *)destiface ) &#123; snprintf(buf, 0x20u, &quot;Received %zd Bytes from &quot;, len); strcat(buf, ipbuf); syslog(7, &quot;%s&quot;);((void (__cdecl *)(odhcpd_receive_packets::$54E5DB5725EA5BD631F9B1F8B1B758E1 *, uint8_t *, int, list_head *, void *))u[1].cb)( &amp;addr, data_buf, len, i,dest); &#125; &#125;&#125;</span><br><span class="line">match (n:</span><br><span class="line">identifier) where n.callee=&quot;strcat&quot; and n.index=1 return</span><br><span class="line">prefix_local.prefixlen = nlri_ptr[offset];psize = PSIZE(prefix_local.prefixlen);offset++;prefix_local.family = afi2family(afi);if (prefix_local.family == AF_INET6) &#123;prefix_offset = nlri_ptr[offset];if (ipv6_offset)*ipv6_offset = prefix_offset;offset++;&#125;</span><br><span class="line">memmove(&amp;prefix_local.u.prefix, &amp;nlri_ptr[offset], psize);</span><br><span class="line">buf = malloc(n+1);memmove(buf, data, n);</span><br><span class="line">match (n:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:0&#125;), (m:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:2&#125;)where n.function=m.function and m.line=n.line and not (m)-[:</span><br><span class="line">dfg]-(n) return m.function,m.file</span><br><span class="line">switch (caphdr.code) &#123;case CAPABILITY_CODE_MP: &#123;*mp_capability = 1;</span><br><span class="line"></span><br><span class="line">/* Ignore capability when override-capability is set. */if (!CHECK_FLAG(peer-&gt;flags,PEER_FLAG_OVERRIDE_CAPABILITY)) &#123;/* Set negotiated value. */ret = bgp_capability_mp(peer, &amp;caphdr);</span><br><span class="line"></span><br><span class="line">/* Unsupported Capability. */if (ret &lt; 0) &#123;/* Store return data. */char tmp_buf[0x30];memmove(tmp_buf, sp, caphdr.length + 2);strcpy(*error, tmp_buf);*error += caphdr.length + 2;&#125;ret = 0; /* Don&#x27;t return error for this */&#125; &#125; break;</span><br><span class="line">match (n:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:0&#125;), (m:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:2&#125;)where n.function=m.function and m.line=n.line and not (m)-[:</span><br><span class="line">dfg]-(n) return m.function,m.file</span><br><span class="line">if ((ok = (p_pnt &lt; p_end)))orfp.p.prefixlen = *p_pnt++;/* afi checked already */orfp.p.family = afi2family(afi);/* 0 if not ok */psize = PSIZE(orfp.p.prefixlen);</span><br><span class="line">if (psize &gt; 0)memmove(&amp;orfp.p.u.prefix, p_pnt, psize);</span><br><span class="line">match (n:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:0&#125;), (m:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:2&#125;)where n.function=m.function and m.line=n.line and not (m)-[:</span><br><span class="line">dfg]-(n) return m.function,m.file</span><br><span class="line">newline = strchr(buf, &#x27;n&#x27;);if (!newline)break;</span><br><span class="line">line_len = newline + 1 - buf;snprintf(log_buf, line_len, &quot;%s&quot;, newline); printf(&quot;%s&quot;, log_buf);</span><br><span class="line">MATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;ustream_get_read_buf&quot; AND n.index=-1 WITH collect(id(n)) as sourceSet MATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;snprintf&quot; AND n.index=1 WITH sourceSet,collect(id(n)) as sinkSet CALL VQL.taintPropagation(sourceSet,sinkSet,3)YIELD taintPropagationPath RETURN taintPropagationPath</span><br><span class="line">static ssize_t session_get_pdu(struct ibuf_read *r, char **b)&#123;struct ldp_hdr l;size_t av, dlen, left;</span><br><span class="line">av = r-&gt;wpos;if (av &lt; sizeof(l))return (0);</span><br><span class="line">memcpy(&amp;l, r-&gt;buf, sizeof(l));dlen = ntohs(l.length) + LDP_HDR_DEAD_LEN;</span><br><span class="line">if ((*b = malloc(dlen)) == NULL)return (-1);</span><br><span class="line">memcpy(*b, r-&gt;buf, dlen);</span><br><span class="line">left = av - dlen;memmove(r-&gt;buf, r-&gt;buf + dlen, left);r-&gt;wpos = left;</span><br><span class="line">return (dlen);&#125;</span><br><span class="line">match (n:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:0&#125;), (m:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:2&#125;)where n.function=m.function and m.line=n.line and not (m)-[:</span><br><span class="line">dfg]-(n) return m.function,m.file</span><br><span class="line">&#123; log_warn(&quot;lldp&quot;, &quot;unable to allocate memory for id tlv &quot; &quot;received on %s&quot;, hardware-&gt;h_ifname); goto malformed; &#125; memmove(b, pos, tlv_size - 1);</span><br><span class="line">match (n:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:0&#125;), (m:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:2&#125;)where n.function=m.function and m.line=n.line and not (m)-[:</span><br><span class="line">dfg]-(n) return m.function,m.file</span><br><span class="line">&#123; log_warn(&quot;lldp&quot;, &quot;unable to allocate memory for string tlv &quot; &quot;received on %s&quot;, hardware-&gt;h_ifname); goto malformed; &#125; memmove(b, pos, tlv_size - 1);</span><br><span class="line">match (n:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:0&#125;), (m:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:2&#125;)where n.function=m.function and m.line=n.line and not (m)-[:</span><br><span class="line">dfg]-(n) return m.function,m.file</span><br><span class="line">tmp_size = outer.length &lt;&lt; 3;if (inner.length) &#123; peer-&gt;notify.length = inner.length; peer-&gt;notify.data = malloc(tmp_size); memcpy(peer-&gt;notify.data, inner.raw_data, inner.length); &#125;</span><br><span class="line">MATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;stream_getw&quot; AND n.index=-1 WITH collect(id(n)) as sourceSet MATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;malloc&quot; AND n.index=0 WITH sourceSet,collect(id(n)) as sinkSet call VQL.taintPropagation(sourceSet,sinkSet,2)YIELD taintPropagationPath RETURN taintPropagationPath</span><br><span class="line">/* For further diagnostic record returned Data. */ if (inner.length) &#123; peer-&gt;notify.length = inner.length; peer-&gt;notify.data = malloc(tmp_size); memcpy(peer-&gt;notify.data, inner.raw_data, inner.length); &#125;</span><br><span class="line">/* For debug */&#123;int i;</span><br><span class="line">int first = 0;</span><br><span class="line">char c[4];</span><br><span class="line"></span><br><span class="line">if (inner.length) &#123;inner.data = malloc(tmp_size);for (i = 0; i &lt; inner.length; i++)if (first) &#123;snprintf(c, sizeof(c), &quot; %02x&quot;, stream_getc(peer-&gt;curr));</span><br><span class="line">/* Validate header fields. */ plen = ntohl(bcm.bcm_length); bcb-&gt;bcb_buf = malloc(sizeof(bcm) + bcb-&gt;bcb_left + 1); if (bcb-&gt;bcb_buf == NULL) &#123; zlog_warn(&quot;%s: not enough memory for message size: %zu&quot;, __func__, bcb-&gt;bcb_left); control_free(bcs); return; &#125;</span><br><span class="line">call VQL.getArgument(&quot;malloc&quot;,0) yield node with collect(id(node)) as sinksetcall VQL.getArgument(&quot;read&quot;,1) yield node with collect(id(node)) as sourceset,sinksetcall VQL.taintPropagation(sourceset,sinkset,3) yield taintPropagationPath return taintPropagationPath</span><br><span class="line">char tmp_buf[0x80];if (auth &amp;&amp; !strncasecmp(auth, &quot;Basic &quot;, 6))&#123;auth += 6;</span><br><span class="line"></span><br><span class="line">uh_b64decode(tmp_buf, auth, strlen(auth));pass = strchr(tmp_buf, &#x27;:&#x27;);if (pass)&#123;user = tmp_buf;*pass++ = 0;&#125; &#125;</span><br><span class="line">MATCH (n:</span><br><span class="line">function)WHERE n.name =~ &quot;.*decode.*|.*hex.*&quot;RETURN n.nameLIMIT 1000</span><br><span class="line">/* no query string, decode all of url */ else if (uh_urldecode(&amp;uh_buff[docroot_len], url, strlen(url)) &lt; 0) return NULL;</span><br><span class="line">/* urldecode component w/o query */ if (pathptr &gt; url) &#123; if (uh_urldecode(&amp;uh_buff[docroot_len], url, pathptr - url) &lt; 0) return NULL; &#125;</span><br><span class="line">dhcpv6_for_each_option(start, end, otype, olen, odata)&#123;if (otype == DHCPV6_OPT_CLIENTID)&#123;clid_data = odata;clid_len = olen;</span><br><span class="line">if (olen == 14 &amp;&amp; odata[0] == 0 &amp;&amp; odata[1] == 1)memcpy(mac, &amp;odata[8], sizeof(mac));else if (olen == 10 &amp;&amp; odata[0] == 0 &amp;&amp; odata[1] == 3)memcpy(mac, &amp;odata[4], sizeof(mac));</span><br><span class="line">odhcpd_hexlify(duidbuf, odata, olen); &#125;</span><br><span class="line">char v8[512]; // [esp+1Ch] [ebp-61Ch] BYREFchar v9[1024]; /strvis(v8, v9, 27);</span><br><span class="line">match (m:</span><br><span class="line">code_line)&lt;-[:</span><br><span class="line">own]-(n:</span><br><span class="line">basic_block)-[:</span><br><span class="line">cfg*1..3]-&gt;(n) where m.name contains &quot;*param_2&quot; return DISTINCT n.function</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/148134.html">https://www.ctfiot.com/148134.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/DataCon_2023%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E8%B5%9B%E9%A2%98%E4%BA%8C%E5%AE%98%E6%96%B9%E9%A2%98%E8%A7%A3.full.md">CTF大赛WP集合&#x2F;articles&#x2F;DataCon_2023漏洞分析赛题二官方题解.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/openwrt/">openwrt</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Misc/DataCon2023%E8%BD%AF%E4%BB%B6%E5%AE%89%E5%85%A8%E8%B5%9B%E9%81%93-%E5%86%A0%E5%86%9B%E6%88%98%E9%98%9FWP%E5%88%86%E4%BA%AB/" title="DataCon2023软件安全赛道，冠军战队WP分享"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">DataCon2023软件安全赛道，冠军战队WP分享</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Misc/Google_CTF_2023_Writeup_by_Venom/" title="Google CTF 2023 Writeup by Venom"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Google CTF 2023 Writeup by Venom</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

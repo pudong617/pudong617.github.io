@@ -1,0 +1,258 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2024 KCTF 大赛 - 第五题《废弃星球》设计思路及解析 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="BF-IBE + HMAC 密钥等价伪碰撞 + BLS12-381 光滑子群攻击 + LSB 多次 reset 拼方程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 KCTF 大赛 - 第五题《废弃星球》设计思路及解析">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Crypto/2024_KCTF_%E5%A4%A7%E8%B5%9B_-_%E7%AC%AC%E4%BA%94%E9%A2%98-%E5%BA%9F%E5%BC%83%E6%98%9F%E7%90%83-%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="BF-IBE + HMAC 密钥等价伪碰撞 + BLS12-381 光滑子群攻击 + LSB 多次 reset 拼方程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="BF-IBE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Crypto/2024_KCTF_%E5%A4%A7%E8%B5%9B_-_%E7%AC%AC%E4%BA%94%E9%A2%98-%E5%BA%9F%E5%BC%83%E6%98%9F%E7%90%83-%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2024 KCTF 大赛 - 第五题《废弃星球》设计思路及解析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2024 KCTF 大赛 - 第五题《废弃星球》设计思路及解析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2024 KCTF 大赛 - 第五题《废弃星球》设计思路及解析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/201347.html">https://www.ctfiot.com/201347.html</a><br>ID: 201347</p>
+</blockquote>
+<p>2024 KCTF 大赛于8月15日正式开赛！比赛设置了多维度的评分体系，包括难度值、火力值和精致度积分，旨在引导竞赛的难度和趣味度，使其更具挑战性和吸引力。同时，也为参赛选手提供了更加公平、有趣的竞赛平台。</p>
+<p>今天中午12点，第五题《废弃星球》已截止答题，无战队成功提交flag。据参赛选手反馈，本题确实有一定的难度，一起来看看设计思路和题解吧。</p>
+<p>*注意：签到题《逐光启航》持续开放，整个比赛期间均可提交答案获得积分</p>
+<p>出题战队：98k</p>
+<p>战队成员ID：GreatIchild（队长）、c10v3r、tl2cents</p>
+<p>设计思路</p>
+<p>参赛题目类别：Crypto + Reverse</p>
+<p>题目类型：远程环境（docker） + 附件</p>
+<p>题目相关主题：IBE，PKC，Pairing，Rust。相关描述如：convenient public key service。</p>
+<p>出题人：tl2cents</p>
+<p>1、题目设计思路&#x2F;背景</p>
+<p>新兴的公钥加密体制，赛题实现了基于身份的加密（Identity-Based Encryption abbr. IBE）体制，传统的公钥加密需要的公钥文件和用户真实身份往往没有直接的关联，并且公钥为二进制文件，用户难以记住，只能用其他方式保存和发送，比如 PGP 邮件加密服务，需要先获知对方的公钥，才能进行加密传输，实际使用复杂。</p>
+<p><strong>公钥即身份，是 IBE 的核心理念。</strong>例如在 PGP 服务中，任意用户的公钥就是其邮箱地址例如 <a href="mailto:&#97;&#x6c;&#105;&#99;&#101;&#x40;&#101;&#x78;&#97;&#x6d;&#x70;&#108;&#x65;&#x2e;&#x63;&#x6f;&#x6d;">&#97;&#x6c;&#105;&#99;&#101;&#x40;&#101;&#x78;&#97;&#x6d;&#x70;&#108;&#x65;&#x2e;&#x63;&#x6f;&#x6d;</a>，同一公钥基础设施下的用户将可以直接发送加密邮件。这将大大简便公钥加密使用的便捷性。</p>
+<p>2、赛题实现和漏洞</p>
+<p>赛题实现了一个简单的 IBE 公钥系统，提供邮件注册、登录、恢复等功能，IBE 加密基于安全的 BLS12-381 曲线，使用 rust 实现。</p>
+<p>主要漏洞在于密码学误用：</p>
+<p>赛题提供的完整的交互信息提示，其外在逻辑是非常简单的，发现漏洞点需要先逆向定位到关键逻辑，再结合密码分析找到漏洞。</p>
+<p>详细利用见赛题 EXP。</p>
+<p>3、exp 运行截图</p>
+<p>rust 环境下，在 exp 目录执行：</p>
+<p>cargo run –release</p>
+<p>赛题解析</p>
+<p>由于本题无战队提交flag，以下解析由出题者【tl2cents】给出思路。</p>
+<p>考虑 rust 逆向难度较高，加上交互的逻辑不太简单，为了减小逆向工作量，将 server 的源码给出，于是逆向核心工作量在于 IBE 密码算法实现，即下述函数：</p>
+<p>保留符号的 Rust 逆上述实现，能对应上 pairing-ce 库的 api ，核心加密算法的逻辑就相对简单了。本题给出了提示 Identity Based Encryption，加上 pairing-ce 库函数，去 Google 一下现有的 IBE 体制，就能找到最著名的一篇实现 Identity-Based Encryption from the Weil Pairing(<a target="_blank" rel="noopener" href="https://crypto.stanford.edu/~dabo/papers/bfibe.pdf)%EF%BC%8C%E6%9C%AC%E9%A2%98%E5%8D%B3%E5%AE%9E%E7%8E%B0%E4%BA%86">https://crypto.stanford.edu/~dabo/papers/bfibe.pdf)，本题即实现了</a> BF-IBE 密码算法。</p>
+<p>完整源码见附件 chlallenge-src.zip，感兴趣的密码师傅可以直接当成 crypto 题目来做，看雪往年貌似都没有纯 crypto 赛道的题，所以这题最终还是加了逆向的东西在里面，至于题目分类到 pwn 方向，是因为题目部署时用的 pwn 题目框架，自动归类到 pwn。</p>
+<p>1、Writeup</p>
+<p>基于身份的加密（Identity-Based Encryption abbr. IBE），传统的公钥加密需要的公钥文件和用户真实身份往往没有直接的关联，并且公钥为二进制文件，用户难以记住，只能用其他方式保存和发送，比如 PGP 邮件加密服务，需要先获知对方的公钥，才能进行加密传输，实际使用复杂。</p>
+<p>公钥即身份是 IBE 的核心理念例如在 PGP 服务中，任意用户的公钥就是其邮箱地址例如 <a href="mailto:&#97;&#108;&#x69;&#99;&#101;&#x40;&#101;&#120;&#97;&#109;&#x70;&#x6c;&#101;&#x2e;&#99;&#x6f;&#109;">&#97;&#108;&#x69;&#99;&#101;&#x40;&#101;&#120;&#97;&#109;&#x70;&#x6c;&#101;&#x2e;&#99;&#x6f;&#109;</a>，同一公钥基础设施下的用户将可以直接发送加密邮件。这将大大简便公钥加密使用的便捷性。赛题实现了一个简单的 IBE 公钥系统，提供邮件注册、登录、恢复等功能，IBE 加密基于安全的 BLS12-381 曲线，使用 rust 实现。</p>
+<p>完整漏洞利用过程：</p>
+<p>2、Identity Based Encrytion</p>
+<p>基于身份的加密（identity based encryption）是一类绑定加密者身份的加密。Boneh 和 Franklin 在 2001 年第一次提出了用双线性映射构造 IBE 密码体制。IBE 的特点是公钥可以是任意字符串，例如电子邮件地址、电话号码等，这消除了传统公钥基础设施（PKI）中证书管理的需要。但是同时引入了一个中心的信任方，称之为 PKG ，他负责所有密钥的产生和分发。本题基于 BLS12-381 曲线实现了一个标准的 BF-IBE 加密。</p>
+<p>该加密体制流程如下：</p>
+<p>解密验证如下：</p>
+<p>对于双线性映射感兴趣的读者可以参考我的另一篇博客 Intro to bilinear map（<a target="_blank" rel="noopener" href="https://blog.tanglee.top/2024/08/24/Intro-to-Bilinear-Map.html%EF%BC%89%E3%80%82%E6%9C%AC%E9%A2%98%E7%9A%84%E5%AF%86%E7%A0%81%E7%AE%97%E6%B3%95%E4%B8%BB%E4%BD%93%E5%AE%9E%E7%8E%B0%E5%9F%BA%E6%9C%AC%E4%B8%8E%E6%A0%87%E5%87%86%E7%9A%84">https://blog.tanglee.top/2024/08/24/Intro-to-Bilinear-Map.html）。本题的密码算法主体实现基本与标准的</a> BF-IBE 算法一致，区别在于：</p>
+<p>上述两个函数是本题逆向的两个关键函数。</p>
+<p>3、HMAC 伪碰撞</p>
+<p>hmac 的函数如下：</p>
+<p>pub fn hmac2g1<T>(msg: &amp;str, pk: &amp;T) -&gt; G1Affinewhere T: Hashable,{ let data &#x3D; pk.hash(); let mut keyed_hmac &#x3D; <HmacFunc as Mac>::<br>new_from_slice(msg.as_bytes()).unwrap(); keyed_hmac.update(&amp;data); let result &#x3D; keyed_hmac.finalize().into_bytes(); let result &#x3D; result.as_slice(); let x &#x3D; BigUint::<br>from_bytes_be(result); let xr &#x3D; Fr::<br>from_str(&amp;x.to_string()).unwrap(); G1::<br>one().into_affine().mul(xr).into_affine()}</p>
+<p>首先比较明显的误用在于 hmac2g1(uname, pkg.gs) ，根据注册函数给出的逻辑，这个 uname 是用户可控的任意字符串（邮箱），但是不能多次注册同一个 uname，以及禁掉了 <a href="mailto:&#x61;&#x64;&#109;&#105;&#x6e;&#64;&#x70;&#x75;&#x62;&#107;&#x65;&#121;&#x2e;&#99;&#x6f;&#x6d;">&#x61;&#x64;&#109;&#105;&#x6e;&#64;&#x70;&#x75;&#x62;&#107;&#x65;&#121;&#x2e;&#99;&#x6f;&#x6d;</a> 的注册。用户想要获取 admin 的权限，必须拿到 admin 的私钥。那么是否能够找到两个字符串 a 和 b 使得上述 hmac2g1(a, pk) 与 hmac2g1(b, pk) 得到相同的值，从而生成一样的私钥？</p>
+<p>注意到使用 uname 作为 hmac 函数的密钥输入，是不安全的。根据 hmac 的一般框架</p>
+<p>其中 K’ 是从秘密密钥 K 推导出的分组长度（blocksize）的密钥（本题 sha256 的 blocksize 是 64 字节），</p>
+<p>因此，容易知道下述情况会生成伪 hmac 碰撞，这种碰撞不是 hash 函数本身的问题，而在于密钥的等价性：</p>
+<p>回到本题， <a href="mailto:&#x61;&#x64;&#109;&#105;&#x6e;&#x40;&#112;&#117;&#98;&#x6b;&#x65;&#121;&#46;&#x63;&#111;&#x6d;">&#x61;&#x64;&#109;&#105;&#x6e;&#x40;&#112;&#117;&#98;&#x6b;&#x65;&#121;&#46;&#x63;&#111;&#x6d;</a> 与 <a href="mailto:&#97;&#100;&#109;&#105;&#x6e;&#x40;&#x70;&#x75;&#x62;&#x6b;&#x65;&#121;&#46;&#99;&#111;&#109;&#x78;&#48;&#48;">&#97;&#100;&#109;&#105;&#x6e;&#x40;&#x70;&#x75;&#x62;&#x6b;&#x65;&#121;&#46;&#99;&#111;&#109;&#x78;&#48;&#48;</a> 会生成相同的私钥，因此只需要注册一个 <a href="mailto:&#x61;&#100;&#x6d;&#x69;&#x6e;&#x40;&#112;&#x75;&#98;&#107;&#x65;&#121;&#x2e;&#99;&#x6f;&#109;&#120;&#x30;&#x30;">&#x61;&#100;&#x6d;&#x69;&#x6e;&#x40;&#112;&#x75;&#98;&#107;&#x65;&#121;&#x2e;&#99;&#x6f;&#109;&#120;&#x30;&#x30;</a> 字符串的账号，就能拿到 <a href="mailto:&#x61;&#100;&#x6d;&#105;&#x6e;&#x40;&#x70;&#x75;&#x62;&#x6b;&#101;&#x79;&#46;&#x63;&#x6f;&#109;">&#x61;&#100;&#x6d;&#105;&#x6e;&#x40;&#x70;&#x75;&#x62;&#x6b;&#101;&#x79;&#46;&#x63;&#x6f;&#109;</a> 的私钥以及 credential （私钥的哈希），从而认证后获得 admin 权限。</p>
+<p>4、BLS12-381 曲线子群攻击</p>
+<p>BLS12-381 曲线是标准的安全曲线，常用于 pairing-based cryptography 和零知识证明协议。BLS12-381 曲线存在 256 比特的一个素数阶子群，具有 128 比特的安全性，且支持高效配对（pairing）。在 pairing-ce 库中，本身实现是没有任何问题的， 所有运算都是基于这个 256 比特的素数阶子群来操作的。但是，一旦我们在这个库上使用用户自定义的点，就可能导致恶意的子群攻击（Subgroup Attack）。关于 BLS12-381 曲线的更多信息，请参考 BLS12-381 For The Rest Of Us。（<a target="_blank" rel="noopener" href="https://hackmd.io/@benjaminion/bls12-381%EF%BC%89">https://hackmd.io/@benjaminion/bls12-381）</a></p>
+<p>首先在 sagemath 上简单测试 BLS12-381 曲线的阶：</p>
+<p>p &#x3D; 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaabK &#x3D; GF(p)a &#x3D; K(0x00)b &#x3D; K(0x04)E &#x3D; EllipticCurve(K, (a, b))G &#x3D; E(0x17F1D3A73197D7942695638C4FA9AC0FC3688C4F9774B905A14E3A3F171BAC586C55E83FF97A1AEFFB3AF00ADB22C6BB, 0x08B3F481E3AAA0F1A09E30ED741D8AE4FCF5E095D5D00AF600DB18CB2C04B3EDD03CC744A2888AE40CAA232946C5E7E1)</p>
+<h1 id="E-set-order-0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001-0x396C8C005555E1568C00AAAB0000AAAB-full-order-E-order-print-factor-full-order"><a href="#E-set-order-0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001-0x396C8C005555E1568C00AAAB0000AAAB-full-order-E-order-print-factor-full-order" class="headerlink" title="E.set_order(0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001 * 0x396C8C005555E1568C00AAAB0000AAAB)full_order &#x3D; E.order()print(factor(full_order))"></a>E.set_order(0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001 * 0x396C8C005555E1568C00AAAB0000AAAB)full_order &#x3D; E.order()print(factor(full_order))</h1><p>可以得到：</p>
+<p>3 * 11^2 * 10177^2 * 859267^2 * 52437899^2 * 52435875175126190479447740508185965837690552500527637822603658699938581184513</p>
+<p>BLS12-381 曲线上的确存在光滑子群，其阶大概 126 比特。但是其群结构不是循环群，即必须有两个生成元才能生成整个群。因此我们能够找到的最大阶光滑子群的最大阶是：</p>
+<p>只有 64 比特。那么我们能否将题目中 IBE 的交互迁移到光滑子群呢？注意到 make_key_blind 的相关逻辑：</p>
+<p>pub fn make_key_blind(&amp;self, x: Fq) -&gt; Option { if let Some(g) &#x3D; get_point_from_x(x, false) { Some(PrivateKey::<br>new(self.pk, g.mul(self.x).into_affine())) } else { None } }<br>fn blind_recovery(&amp;self, x: Fq) -&gt; Option<Hash> { &#x2F;&#x2F; only server_admin can do this if let Some(sk) &#x3D; self.pkg.make_key_blind(x) { Some(sk.gx.hash()) } else { None } }</p>
+<p>在 blind_recovery 函数中，admin 控制输入参数 xx 作为 BLS12-381 曲线上的点的 x-坐标。Server 虽然会检查曲线上是否存在该点，但并不会检查该点是否仍然落在 256 比特的素数阶群内，最终会输出点的哈希，其中 d 是 PKG 的私钥。</p>
+<p>因为返回值只有哈希，不能使用 Pohlig-Hellman 算法求解离散对数，但是子群足够光滑，分为三次，进行简单的爆破也能恢复出 d 的 64 比特信息，发送下述三个子群的生成元：</p>
+<p>5、LSB Leak Oracle</p>
+<p>交互中可以重置整个 system 的 PKG，即：</p>
+<p>fn reset_system(&amp;mut self, mul: &amp;Fr) -&gt; Option { &#x2F;&#x2F; not 1 or 0 if mul &#x3D;&#x3D; &amp;Fr::<br>from_str(“1”).unwrap() || mul &#x3D;&#x3D; &amp;Fr::<br>from_str(“0”).unwrap() { return Some(false); } let mut super_x &#x3D; self.pkg.x.clone(); super_x.mul_assign(mul); let pkg &#x3D; PKG::<br>new(super_x); let admin_sk &#x3D; pkg.make_key(&amp;self.admin); let user_store: UserStore &#x3D; Mutex::<br>new(HashMap::<br>new()); { let mut muser_store &#x3D; user_store.lock().unwrap(); muser_store.insert(self.admin.clone(), admin_sk.gx.hash()); } self.pkg &#x3D; pkg; self.user_store &#x3D; user_store; Some(true) }</p>
+<p>记 256 比特的素数阶为：</p>
+<p>乍一看这似乎是一个 Hidden Number Problem，但是基于 Lattice 求解 HNP 在这里行不通，因为我们最多只能重置两次系统，从而最多只能得到三个 等式，不能完全恢复 d。</p>
+<p>与 HNP 问题不同的是，在这里 m 是可控的，可以转换成类似 RSA-LSB-Leak 的场景。将私钥 d 进行 p 进制展开：</p>
+<p>在这题中，我们最多恢复出：</p>
+<p>进而：</p>
+<p>注记</p>
+<p>今日中午12点，第六题 异星文明</p>
+<p>正式开赛</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<p>点击阅读原文查看更多</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">cargo run --release</span><br><span class="line">pub fn hmac2g1&lt;T&gt;(msg: &amp;str, pk: &amp;T) -&gt; G1Affinewhere T: Hashable,&#123; let data = pk.hash(); let mut keyed_hmac = &lt;HmacFunc as Mac&gt;::</span><br><span class="line">new_from_slice(msg.as_bytes()).unwrap(); keyed_hmac.update(&amp;data); let result = keyed_hmac.finalize().into_bytes(); let result = result.as_slice(); let x = BigUint::</span><br><span class="line">from_bytes_be(result); let xr = Fr::</span><br><span class="line">from_str(&amp;x.to_string()).unwrap(); G1::</span><br><span class="line">one().into_affine().mul(xr).into_affine()&#125;</span><br><span class="line">p = 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaabK = GF(p)a = K(0x00)b = K(0x04)E = EllipticCurve(K, (a, b))G = E(0x17F1D3A73197D7942695638C4FA9AC0FC3688C4F9774B905A14E3A3F171BAC586C55E83FF97A1AEFFB3AF00ADB22C6BB, 0x08B3F481E3AAA0F1A09E30ED741D8AE4FCF5E095D5D00AF600DB18CB2C04B3EDD03CC744A2888AE40CAA232946C5E7E1)</span><br><span class="line"># E.set_order(0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001 * 0x396C8C005555E1568C00AAAB0000AAAB)full_order = E.order()print(factor(full_order))</span><br><span class="line">3 * 11^2 * 10177^2 * 859267^2 * 52437899^2 * 52435875175126190479447740508185965837690552500527637822603658699938581184513</span><br><span class="line">pub fn make_key_blind(&amp;self, x: Fq) -&gt; Option &#123; if let Some(g) = get_point_from_x(x, false) &#123; Some(PrivateKey::</span><br><span class="line">new(self.pk, g.mul(self.x).into_affine())) &#125; else &#123; None &#125; &#125;</span><br><span class="line">fn blind_recovery(&amp;self, x: Fq) -&gt; Option&lt;Hash&gt; &#123; // only server_admin can do this if let Some(sk) = self.pkg.make_key_blind(x) &#123; Some(sk.gx.hash()) &#125; else &#123; None &#125; &#125;</span><br><span class="line">fn reset_system(&amp;mut self, mul: &amp;Fr) -&gt; Option &#123; // not 1 or 0 if mul == &amp;Fr::</span><br><span class="line">from_str(&quot;1&quot;).unwrap() || mul == &amp;Fr::</span><br><span class="line">from_str(&quot;0&quot;).unwrap() &#123; return Some(false); &#125; let mut super_x = self.pkg.x.clone(); super_x.mul_assign(mul); let pkg = PKG::</span><br><span class="line">new(super_x); let admin_sk = pkg.make_key(&amp;self.admin); let user_store: UserStore = Mutex::</span><br><span class="line">new(HashMap::</span><br><span class="line">new()); &#123; let mut muser_store = user_store.lock().unwrap(); muser_store.insert(self.admin.clone(), admin_sk.gx.hash()); &#125; self.pkg = pkg; self.user_store = user_store; Some(true) &#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/201347.html">https://www.ctfiot.com/201347.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2024_KCTF_%E5%A4%A7%E8%B5%9B_-_%E7%AC%AC%E4%BA%94%E9%A2%98%E3%80%8A%E5%BA%9F%E5%BC%83%E6%98%9F%E7%90%83%E3%80%8B%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2024_KCTF_大赛_-_第五题《废弃星球》设计思路及解析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/BF-IBE/">BF-IBE</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Crypto/2024CTF%E9%95%BF%E5%9F%8E%E6%9D%AFmisc%E9%A2%98-%E5%8E%8B%E4%B8%80%E5%8E%8B-%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" title="2024 CTF 长城杯 misc 题 &quot;压一压&quot; 解题思路"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2024 CTF 长城杯 misc 题 &quot;压一压&quot; 解题思路</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Crypto/2024-%E9%A2%86%E8%88%AA%E6%9D%AF-%E5%88%9D%E8%B5%9BWP-%E4%BA%8C/" title="2024&quot;领航杯&quot;-初赛WP（二）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2024&quot;领航杯&quot;-初赛WP（二）</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#E-set-order-0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001-0x396C8C005555E1568C00AAAB0000AAAB-full-order-E-order-print-factor-full-order"><span class="toc-number">1.</span> <span class="toc-text">E.set_order(0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF00000001 * 0x396C8C005555E1568C00AAAB0000AAAB)full_order &#x3D; E.order()print(factor(full_order))</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

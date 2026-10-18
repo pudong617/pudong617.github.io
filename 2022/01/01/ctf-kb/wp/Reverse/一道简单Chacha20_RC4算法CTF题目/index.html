@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>一道简单 Chacha20 + RC4 算法 CTF 题目 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="Reverse 32 位题：花指令 0x40146A 跳 0x40146F + Chacha20 + RC4 + srand(time^pid) 爆破。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一道简单 Chacha20 + RC4 算法 CTF 题目">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Reverse/%E4%B8%80%E9%81%93%E7%AE%80%E5%8D%95Chacha20_RC4%E7%AE%97%E6%B3%95CTF%E9%A2%98%E7%9B%AE/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="Reverse 32 位题：花指令 0x40146A 跳 0x40146F + Chacha20 + RC4 + srand(time^pid) 爆破。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Chacha20">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Reverse/%E4%B8%80%E9%81%93%E7%AE%80%E5%8D%95Chacha20_RC4%E7%AE%97%E6%B3%95CTF%E9%A2%98%E7%9B%AE/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '一道简单 Chacha20 + RC4 算法 CTF 题目',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">一道简单 Chacha20 + RC4 算法 CTF 题目</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="一道简单 Chacha20 + RC4 算法 CTF 题目"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/89178.html">https://www.ctfiot.com/89178.html</a><br>ID: 89178</p>
+</blockquote>
+<p>本道逆向题涉及的知识点如下：</p>
+<p>反调试</p>
+<p>花指令</p>
+<p>chacha20加密</p>
+<p>rc4加密</p>
+<p>这是今年12月份帮一朋友做的一道CTF题，看题目描述是某春秋平台的，做这道题也花了2小时，因为以前没遇到过chacha20加密，做题的时在论坛也没有搜到chacha20算法，故而写一篇文章记录一下，供大家参考。</p>
+<p>首先我们观察下这道题目，解压后如下，看样子加密后的flag就在flag.enc中：</p>
+<p>按照做题惯例，先查个壳，发现就是普通的32位程序，使用VC++编译器编译，没壳：</p>
+<p>我们直接拖到IDA中进行静态分析。</p>
+<p>进去之后，没什么好说的，直接找main函数按F5开始分析整个程序逻辑；我们先大略的分析一下，见下图注释，函数名都还没有修改，都是IDA自动生成的。</p>
+<p>如上注释，通过初步的分析，我们大致了解到，整个程序就是将flag读入，然后经过中间一系列未识别到的函数，最后把文件改名为flag.enc并将加密后的内容覆盖输出到flag.enc。要注意在上图的第23行有一个全局变量的字节序列，这个序列是在函数sub_401610生成的，这里的内容我们最后再分析，接下来先分析最主要的中间那三个函数。</p>
+<p>我们看到在22行，有一个名为loc_401450的函数，我们点进去看看为什么该函数没有被IDA正确识别，如下图：</p>
+<p>点进去之后，发现左边的地址部分一片红，有经验的逆向人员一看0x401468~0x40146C这部分，就是明显的花指令特征，在地址0x40146A处的跳转无论如何都会跳转到0x40146F处，使得IDA未能识别这种跳转破坏了函数的栈帧，因此IDA没有将该部分正确识别为函数。</p>
+<p>看过我另一篇文章的大家应该清楚花指令的还原，也可以用脚本，但是这里的花指令不多，故而我们直接手动来快速还原。将光标定位在地址0x40146E，然后直接按键盘上的D，即可将该部分转换为数据。</p>
+<p>弹出如下框，这是在IDA在质问我们人类智慧的一个警告，直接Yes就可以。</p>
+<p>然后在正确的代码地址0x40146F处按C键，使得该处的数据转变为正确的代码。</p>
+<p>此外，由于0x40146A~0x40146E都是人工添加的无用代码，我们可以直接将该部分数据全部转为空指令nop，即0x90，如下图：</p>
+<p>将这5个无用的字节替换为0x90，然后点OK。</p>
+<p>至此，上述去花操作完成。</p>
+<p>然后，我们选中整个函数的部分0x401450~0x401566，然后按快捷键P，让整个函数能被IDA正确识别。此时我们再次回到main函数的伪代码窗口，看到该部分函数已经被正确识别了，如下图：</p>
+<p>剩下的loc_401940和loc_401AA0处的函数还原，和上述处理方法相同，需要注意的是函数的结尾一般是以retn结束。</p>
+<p>接下来我们双击点进去sub_401450，开始分析该函数的算法，进去之后也是一脸茫然，看不明白；</p>
+<p>继续点进去sub_401380函数看看，我们发现其中有这样一个字符串expand 32-byte k，如下图：</p>
+<p>经过一番搜索，才知道这个加密函数是chacha20加密，找到了这个算法的C代码实现，<a target="_blank" rel="noopener" href="https://github.com/shiffthq/chacha20%EF%BC%8C%E7%AE%97%E6%B3%95%E5%A4%A7%E8%87%B4%E5%85%88%E8%BF%9B%E8%A1%8C%E5%88%9D%E5%A7%8B%E5%8C%96%EF%BC%8C%E7%9F%A9%E9%98%B5%E7%BD%AE%E6%8D%A2%EF%BC%8C%E7%84%B6%E5%90%8E%E5%86%8D%E6%98%AF%E8%BD%AE%E5%87%BD%E6%95%B0%EF%BC%8C%E6%9C%80%E5%90%8E%E7%94%9F%E6%88%90%E4%BA%86%E5%AF%86%E9%92%A5%E6%B5%81%EF%BC%8C%E4%BB%A5%E4%B8%8B%E6%98%AF%E8%A2%AB%E8%B0%83%E7%94%A8%E5%8A%A0/%E8%A7%A3%E5%AF%86%E5%87%BD%E6%95%B0%E6%8E%A5%E5%8F%A3%EF%BC%9A">https://github.com/shiffthq/chacha20，算法大致先进行初始化，矩阵置换，然后再是轮函数，最后生成了密钥流，以下是被调用加/解密函数接口：</a></p>
+<p>void ChaCha20XOR(uint8_t key[32], uint32_t counter, uint8_t nonce[12], uint8_t *in, uint8_t *out, int inlen) { int i, j; uint32_t s[16]; uint8_t block[64]; &#x2F;&#x2F;static void chacha20_init_state(uint32_t s[16], uint8_t key[32], uint32_t counter, uint8_t nonce[12]) chacha20_init_state(s, key, counter, nonce); for (i &#x3D; 0; i &lt; inlen; i +&#x3D; 64) { &#x2F;&#x2F;static void chacha20_block(uint32_t in[16], uint8_t out[64], int num_rounds) chacha20_block(s, block, 20); s[12]++; for (j &#x3D; i; j &lt; i + 64; j++) { if (j &gt;&#x3D; inlen) { break; } out[j] &#x3D; in[j] ^ block[j - i]; } }}</p>
+<p>经过对比，我们发现这个函数就是chacha20的加解密算法，对比我们找到的源码，把这个算法拿过来稍微改改，只要把原来函数的in[j]参数直接换作是out[j]即可和题目一样，该参数既当作输入又当作输出。</p>
+<p>注：我们使用的话，将github源码下载下来，把cpp和h文件导入即可；ChaCha20是一种流密码，可以将其理解为对称加密算法。</p>
+<p>然后剩下的两个函数，如果有一定逆向题目积累的话，就不难猜测出这是RC4流密码。该算法先是对S盒的一个初始化，然后进行加解密操作，对该密码算法的详情可参考文末附带的链接。</p>
+<p>加解密算法分析完了，接下来我们呼应一下本题的题目名称Random，看看前边遗留的sub_401610()函数，该函数生成了一个加密密钥，如下图：</p>
+<p>我们发现这是一个伪随机生成的，关键是要知道其伪随机生成的种子Seed，v0是根据当前时间的时间戳生成的，所以本题的一个坑点应该是在这里，当前的进程ID我可以猜测他的区间为1~9000。</p>
+<p>做题的时候，刚开始我以为时间戳就是flag.enc文件的时间戳，后来发现怎么都出不来，于是从题目的出题时间开始算起（也就是‎ 2022‎年‎9‎月‎11‎日，‏‎23:22:02），写了一个爆破，由于流密码的速度非常快，所以我很快就爆破出来了。</p>
+<p>根据以上分析，我们写出其主要的wp代码，完整wp代码我放在了文末的附件，大家打开就能运行。</p>
+<p>void get_flag(unsigned char* mykey, int v0, int pid){ unsigned char s[256] &#x3D; { 0 }; unsigned char key[12] &#x3D; “Encrypted!!”; char hexData[48] &#x3D; { 0xFC, 0xD4, 0x19, 0x74, 0x51, 0x67, 0xED, 0x4B, 0x9C, 0x48, 0xC6, 0x5F, 0x9B, 0x5D, 0xB4, 0xF0, 0x44, 0x02, 0xAF, 0xAC, 0x66, 0x01, 0x06, 0xA5, 0xBE, 0xBC, 0xD0, 0x77, 0x29, 0x64, 0x8D, 0x5E, 0x41, 0xD4, 0x77, 0x31, 0x40, 0xB4, 0x92, 0x22, 0xF9, 0x9F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; &#x2F;&#x2F;flag.enc字节序列 int enc_len &#x3D; strlen(hexData); rc4_init(s, key, strlen((const char *)key)); rc4_crypt(s, (uint8_t *)hexData, enc_len); ChaCha20XOR((uint8_t *)mykey, 1, key, (uint8_t *)hexData, strlen(hexData)); if (hexData[0] &#x3D;&#x3D; ‘f’ &amp;&amp; hexData[1] &#x3D;&#x3D; ‘l’ &amp;&amp; hexData[2] &#x3D;&#x3D; ‘a’) { &#x2F;&#x2F;判定前三个字母是fla输出即可 printf(“timestamp:%d,pid:%d “, v0, pid); for (int i &#x3D; 0; i &lt; 48; i++){ printf(“%c”, hexData[i]); } printf(“n”); exit(0); }} int main() { unsigned char mykey[32]; int timestamp; DWORD Seed; timestamp &#x3D; 1662973302; &#x2F;&#x2F; time(0); 2022-09-12 17:01:42 for (int pid &#x3D; 1; pid &lt; 9000; pid++){ for (timestamp &#x3D; 1662909722; timestamp &lt;&#x3D; 1662973302; timestamp++) { &#x2F;&#x2F;最坑的点在这里，时间戳要从出题时间点开始算起 Seed &#x3D; timestamp ^ pid; srand(Seed); for (int i &#x3D; 0; i &lt; 32; ++i) mykey[i] &#x3D; (unsigned __int16)rand() &gt;&gt; 8; get_flag(mykey, timestamp, pid); &#x2F;&#x2F;传入timestamp和pid纯属好奇 } } printf(“endn”); return 0;}</p>
+<p>解得flag</p>
+<p>为了防止该题目再次出现，flag我就不以文本形式展现了。</p>
+<p>另外本文中对另外一个反调试的函数没有进行过多分析，这类文章很多，大家搜一下就知道了，绕过方式也很简单。因为本题目的难度还没有用到动态分析。此外，虽是一道CTF题目，但是其中包含的反调试、ChaCha20、RC4流密码、花指令以及函数的识别，也值得我们多多去学习。</p>
+<p>看雪ID：newu</p>
+<p><a target="_blank" rel="noopener" href="https://bbs.pediy.com/user-home-592531.htm">https://bbs.pediy.com/user-home-592531.htm</a></p>
+<p>*本文由看雪论坛 newu 原创，转载请注明来自看雪社区</p>
+<h1 id="往期推荐"><a href="#往期推荐" class="headerlink" title="往期推荐"></a>往期推荐</h1><p>1.CVE-2022-21882提权漏洞学习笔记</p>
+<p>2.wibu证书 – 初探</p>
+<p>3.win10 1909逆向之APIC中断和实验</p>
+<p>4.EMET下EAF机制分析以及模拟实现</p>
+<p>5.sql注入学习分享</p>
+<p>6.V8 Array.prototype.concat函数出现过的issues和他们的POC们</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<p>点击“阅读原文”，了解更多！</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">void ChaCha20XOR(uint8_t key[32], uint32_t counter, uint8_t nonce[12], uint8_t *in, uint8_t *out, int inlen) &#123; int i, j; uint32_t s[16]; uint8_t block[64]; //static void chacha20_init_state(uint32_t s[16], uint8_t key[32], uint32_t counter, uint8_t nonce[12]) chacha20_init_state(s, key, counter, nonce); for (i = 0; i &lt; inlen; i += 64) &#123; //static void chacha20_block(uint32_t in[16], uint8_t out[64], int num_rounds) chacha20_block(s, block, 20); s[12]++; for (j = i; j &lt; i + 64; j++) &#123; if (j &gt;= inlen) &#123; break; &#125; out[j] = in[j] ^ block[j - i]; &#125; &#125;&#125;</span><br><span class="line">void get_flag(unsigned char* mykey, int v0, int pid)&#123; unsigned char s[256] = &#123; 0 &#125;; unsigned char key[12] = &quot;Encrypted!!&quot;; char hexData[48] = &#123; 0xFC, 0xD4, 0x19, 0x74, 0x51, 0x67, 0xED, 0x4B, 0x9C, 0x48, 0xC6, 0x5F, 0x9B, 0x5D, 0xB4, 0xF0, 0x44, 0x02, 0xAF, 0xAC, 0x66, 0x01, 0x06, 0xA5, 0xBE, 0xBC, 0xD0, 0x77, 0x29, 0x64, 0x8D, 0x5E, 0x41, 0xD4, 0x77, 0x31, 0x40, 0xB4, 0x92, 0x22, 0xF9, 0x9F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 &#125;; //flag.enc字节序列 int enc_len = strlen(hexData); rc4_init(s, key, strlen((const char *)key)); rc4_crypt(s, (uint8_t *)hexData, enc_len); ChaCha20XOR((uint8_t *)mykey, 1, key, (uint8_t *)hexData, strlen(hexData)); if (hexData[0] == &#x27;f&#x27; &amp;&amp; hexData[1] == &#x27;l&#x27; &amp;&amp; hexData[2] == &#x27;a&#x27;) &#123; //判定前三个字母是fla输出即可 printf(&quot;timestamp:%d,pid:%d &quot;, v0, pid); for (int i = 0; i &lt; 48; i++)&#123; printf(&quot;%c&quot;, hexData[i]); &#125; printf(&quot;n&quot;); exit(0); &#125;&#125; int main() &#123; unsigned char mykey[32]; int timestamp; DWORD Seed; timestamp = 1662973302; // time(0); 2022-09-12 17:01:42 for (int pid = 1; pid &lt; 9000; pid++)&#123; for (timestamp = 1662909722; timestamp &lt;= 1662973302; timestamp++) &#123; //最坑的点在这里，时间戳要从出题时间点开始算起 Seed = timestamp ^ pid; srand(Seed); for (int i = 0; i &lt; 32; ++i) mykey[i] = (unsigned __int16)rand() &gt;&gt; 8; get_flag(mykey, timestamp, pid); //传入timestamp和pid纯属好奇 &#125; &#125; printf(&quot;endn&quot;); return 0;&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/89178.html">https://www.ctfiot.com/89178.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E4%B8%80%E9%81%93%E7%AE%80%E5%8D%95Chacha20_RC4%E7%AE%97%E6%B3%95CTF%E9%A2%98%E7%9B%AE.full.md">CTF大赛WP集合&#x2F;articles&#x2F;一道简单Chacha20_RC4算法CTF题目.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Chacha20/">Chacha20</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Reverse/WP-2022%E5%B9%B4%E6%98%A5%E7%A7%8B%E6%9D%AF%E6%98%A5%E5%AD%A3%E8%B5%9BReverse-Pwn%E7%B1%BB%E9%A2%98%E7%9B%AE%E8%A7%A3%E6%9E%90/" title="【WP】2022年春秋杯春季赛 Reverse、Pwn 类题目解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【WP】2022年春秋杯春季赛 Reverse、Pwn 类题目解析</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Reverse/%E4%B8%80%E6%AC%A1%E6%9C%89%E6%84%8F%E6%80%9D%E7%9A%84CTF%E9%A2%98%E7%9B%AEbabyre%E7%9A%84%E9%80%86%E5%90%91%E8%BF%87%E7%A8%8B/" title="一次有意思的CTF题目 babyre 的逆向过程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">一次有意思的CTF题目 babyre 的逆向过程</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%80%E6%9C%9F%E6%8E%A8%E8%8D%90"><span class="toc-number">1.</span> <span class="toc-text">往期推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

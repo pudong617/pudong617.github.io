@@ -1,0 +1,620 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2023 强网杯初赛 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="强网杯初赛 6+ 题：sage gamma 阶乘+bsgs+RSA_p^5+共享比特+复数RSA+ISIS。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023 强网杯初赛">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/2023_%E5%BC%BA%E7%BD%91%E6%9D%AF_%E5%88%9D%E8%B5%9B/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="强网杯初赛 6+ 题：sage gamma 阶乘+bsgs+RSA_p^5+共享比特+复数RSA+ISIS。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="sagemath_gamma">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/2023_%E5%BC%BA%E7%BD%91%E6%9D%AF_%E5%88%9D%E8%B5%9B/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2023 强网杯初赛',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2023 强网杯初赛</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2023 强网杯初赛"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/152614.html">https://www.ctfiot.com/152614.html</a><br>ID: 152614</p>
+</blockquote>
+<p>周末打了强网杯，“坐大牢”。这里放一哈比赛中我搞出来的几道题目（都是一些没什么技术含量的题，还是太菜了。）</p>
+<p>强网先锋</p>
+<p>speed up</p>
+<p>题目需要计算2^27的阶乘结果的各个位数之和</p>
+<p>直接运行 factorial</p>
+<p>sagemath 也还有一个 gamma 函数，</p>
+<p><a target="_blank" rel="noopener" href="https://oeis.org/search?q=1,+2,+6,+9,+63&go=Search">https://oeis.org/search?q=1%2C+2%2C+6%2C+9%2C+63&amp;go=Search</a>)</p>
+<p>题目的 f(x) 函数就是个个位数相加，直接跑这个循环要跑麻，这里选择转 str 再求和</p>
+<p>aaa &#x3D; gamma(2^27+1)<br>bbb &#x3D; str(aaa)<br>from tqdm import tqdm</p>
+<p>res &#x3D; 0</p>
+<p>for each in tqdm(bbb):</p>
+<p>res +&#x3D; int(each)</p>
+<p>print(res)</p>
+<p>或者计算一下 直接去查序列也能查到</p>
+<p>1, 2, 6, 9, 63 – OEIS (<a target="_blank" rel="noopener" href="https://oeis.org/search?q=1,+2,+6,+9,+63&go=Search">https://oeis.org/search?q=1%2C+2%2C+6%2C+9%2C+63&amp;go=Search</a>)</p>
+<p>石头剪刀布</p>
+<p>根据代码，代码前五次出拳是随便出的，然后会“训练”。测试的时候发现，刚开始我出5个石头，然后第六七次代码都出布，如果我第八九次都出剪刀，代码第十次会出石头。所以其实代码出法是固定的，主要应该是根据我前面的出法。因此其实就相当于摸黑走迷宫。每次试错，然后根据代码的出法选择能赢的出法就可以了。</p>
+<p>from pwn import *<br>context.log_level &#x3D; ‘debug’</p>
+<p>flag&#x3D;“00000112201202021021100111222001200221101201010212202100221101012020210210011122101220120”</p>
+<p>while True:</p>
+<p>print(flag)</p>
+<p>sh &#x3D; remote(“8.147.131.244”，14183)</p>
+<p>index&#x3D;0</p>
+<p>for i in range(5):</p>
+<p>sh.recvuntil(“）：”)</p>
+<p>sh.sendline(flag[index])</p>
+<p>index+&#x3D;1</p>
+<p>res &#x3D; sh.recvuntil(“———————————–“)</p>
+<p>#print(res.decode())</p>
+<p>while True:</p>
+<p>sh.recvuntil(“）：”)</p>
+<p>if index&lt;len(flag):</p>
+<p>sh.sendline(flag[index])</p>
+<p>index+&#x3D;1</p>
+<p>else:</p>
+<p>sh.sendline(flag[index-1])</p>
+<p>res &#x3D; sh.recvuntil(“———————————–“)</p>
+<p>print(res.decode())</p>
+<p>if “Me10n出拳：剪刀” in res.decode():</p>
+<p>flag+&#x3D;“0”;break</p>
+<p>elif “Me10n出拳：石头” in res.decode():</p>
+<p>flag+&#x3D;“2”;break</p>
+<p>elif “Me10n出拳：布” in res.decode():</p>
+<p>flag+&#x3D;“1”;break</p>
+<p>crypto</p>
+<p>discrete_log</p>
+<p>朴素dlp，只不过 flag 被填充了，填充已知，直接对c处理去填充，已知的“flag{}”，也可以去掉，多的偏移，就开根开掉，就能得到“裸”的 ，然后开始猜，45-6，flag最长是39个字节，这不可能解的出来，在 p-1&#x3D;2q 的情况下。</p>
+<p>猜长度不长，题目里有一个flag，里面有14 个字节.但是2^56，也是一个不切实际的数字。</p>
+<p>猜字符不全，只有十六进制字符，结合bsgs算法，复杂度是16^7， 两个亿，可以接受，但是太慢，</p>
+<p>后面试试 12 个字节， 一趟只有一千多万，运气不错，一发入魂（代码有点粗鄙，比赛的时候忘记 product 这个函数了哈哈哈哈哈，勿喷）</p>
+<p>p &#x3D; 173383907346370188246634353442514171630882212643019826706575120637048836061602034776136960080336351252616860522273644431927909101923807914940397420063587913080793842100264484222211278105783220210128152062330954876427406484701993115395306434064667136148361558851998019806319799444970703714594938822660931343299<br>g &#x3D; 5<br>c &#x3D; 105956730578629949992232286714779776923846577007389446302378719229216496867835280661431342821159505656015790792811649783966417989318584221840008436316642333656736724414761508478750342102083967959048112859470526771487533503436337125728018422740023680376681927932966058904269005466550073181194896860353202252854</p>
+<p>from Crypto.Util.number import *</p>
+<p>from tqdm import *</p>
+<p>table &#x3D; “0123456789abcdef”</p>
+<p>ii&#x3D;12</p>
+<p>lengthpad &#x3D; 128-ii-6</p>
+<p>padding &#x3D; bytes_to_long(b”flag{“+b’x00′*ii+b”}”+(chr(lengthpad)*lengthpad).encode())</p>
+<p>#pad_inv &#x3D; inverse(padding，p-1)</p>
+<p>ctmp &#x3D; c * (pow(g，-padding，p))%p</p>
+<p>for _ in range(lengthpad*8+8):</p>
+<p>ctmp &#x3D; pow(ctmp，(p+3)&#x2F;&#x2F;4，p)</p>
+<p>mh&#x3D;{}</p>
+<p>for i in tqdm(table):</p>
+<p>for j in table:</p>
+<p>for k in table:</p>
+<p>for l in table:</p>
+<p>for m in table:</p>
+<p>for n in table:</p>
+<p>mm &#x3D; i+j+k+l+m+n</p>
+<p>mm &#x3D; mm.encode()</p>
+<p>mm &#x3D; bytes_to_long(mm)*1&lt;&lt;((ii&#x2F;&#x2F;2)*8)</p>
+<p>mh[pow(g，mm，p)] &#x3D; mm</p>
+<p>print(“[+]”)</p>
+<p>ml&#x3D;{}</p>
+<p>for i in tqdm(table):</p>
+<p>for j in table:</p>
+<p>for k in table:</p>
+<p>for l in table:</p>
+<p>for m in table:</p>
+<p>for n in table:</p>
+<p>mm &#x3D; i+j+k+l+m+n</p>
+<p>mm &#x3D; mm.encode()</p>
+<p>mm &#x3D; bytes_to_long(mm)</p>
+<p>if ctmp*pow(g，-mm，p) in mh:</p>
+<p>print(mh[ctmp*pow(g，-mm，p)])</p>
+<p>print(mm)</p>
+<p>44%|████▍     | 7&#x2F;16 [04:01&lt;05:10， 34.51s&#x2F;it]16771905891018463815302905856</p>
+<p>60904317531494</p>
+<p>56%|█████▋    | 9&#x2F;16 [05:33&lt;04:19， 37.05s&#x2F;it]</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p> from Crypto.Util.number import *</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<p> long_to_bytes(16771905891018463815302905856)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>’61e800x00x00x00x00x00x00′</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p> long_to_bytes(60904317531494)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>‘7dd65f’</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p> 61e8007dd65f</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p> </p>
+<p>not only rsa</p>
+<p>题目的n是一个p^5，不过m填充了，所以不能偷鸡。另外 e 是p-1的因子。得先开根，再 lift一下。不过忘记lift怎么搞了。但是sagemath说它会，直接 nth_root 就可以了。他自己会 lift</p>
+<p>from Crypto.Util.number import *<br>n &#x3D; 6249734963373034215610144758924910630356277447014258270888329547267471837899275103421406467763122499270790512099702898939814547982931674247240623063334781529511973585977522269522704997379194673181703247780179146749499072297334876619475914747479522310651303344623434565831770309615574478274456549054332451773452773119453059618433160299319070430295124113199473337940505806777950838270849<br>e &#x3D; 641747<br>c &#x3D; 730024611795626517480532940587152891926416120514706825368440230330259913837764632826884065065554839415540061752397144140563698277864414584568812699048873820551131185796851863064509294123861487954267708318027370912496252338232193619491860340395824180108335802813022066531232025997349683725357024257420090981323217296019482516072036780365510855555146547481407283231721904830868033930943<br>c &#x3D; Mod(c，n)<br>tmp &#x3D; c.nth_root(e，all&#x3D;True)<br>for t in tmp:<br> if b”flag{“ in long_to_bytes(t):<br>  print(long_to_bytes(t))</p>
+<p>guess game</p>
+<p>这题是分组相关的，估计是分组分析（赛后从 nepnep 师傅那里了解到好像是积分分析），但是不太会，但是看着解那么多，也许非预期了。看了一下要求，要求知道key的70%比特。key是随机生成的。那么期望我们是知道50%的。只要运气好那么亿点点就行了。好在交互也没有pow，放后台爆破就可以看下一题了。</p>
+<p>from pwn import *<br>context.log_level &#x3D; 40</p>
+<p>for i in range(99999)</p>
+<p>sh &#x3D; remote(‘47.97.69.130’，22333)</p>
+<p>sh.recvuntil(‘team token:’)</p>
+<p>sh.sendline(‘icq1f53668cd7a8a6cd934da51b6ac0f’)</p>
+<p>sh.recvuntil(‘&gt;’)</p>
+<p>sh.sendline(‘2’)</p>
+<p>for _ in range(80):</p>
+<p>sh.recvuntil(‘ &gt; ‘)</p>
+<p>sh.sendline(‘1’)</p>
+<p>fff &#x3D; sh.recv()</p>
+<p>if b”flag” in fff:</p>
+<p>print(“[+]”，fff)</p>
+<p>break</p>
+<p>sh.close()</p>
+<p>babyrsa</p>
+<p>论问题，一开始以为是用的虎符这篇：《Cryptanalysis of RSA Variants with Primes Sharing Most Signi cant Bits》</p>
+<p>调了半天发现界不满足</p>
+<p>后来找到这一篇:《A new attack on some RSA variants》</p>
+<p>不过用的格子还是和虎符这篇一样，只是改了一下式子，</p>
+<p>论文还贴心的给出了样例，和题目的参数几乎一致，用了一下虎符的板子  ，把样例跑通了，然后直接拿题目数据，梭了就好了。</p>
+<h1 id="https-github-com-1umi3re-my-ctf-challenge-blob-main-hfctf-2022-RRSSAA-exp-py"><a href="#https-github-com-1umi3re-my-ctf-challenge-blob-main-hfctf-2022-RRSSAA-exp-py" class="headerlink" title="https://github.com/1umi3re/my_ctf_challenge/blob/main/hfctf_2022/RRSSAA/exp.py"></a><a target="_blank" rel="noopener" href="https://github.com/1umi3re/my_ctf_challenge/blob/main/hfctf_2022/RRSSAA/exp.py">https://github.com/1umi3re/my_ctf_challenge/blob/main/hfctf_2022/RRSSAA/exp.py</a></h1><p>from gmpy2 import next_prime， iroot<br>from Crypto.Util.number import getPrime， inverse， GCD， bytes_to_long， long_to_bytes<br>from sage.all import *</p>
+<p>def attack2(N， e， m， t， X， Y):</p>
+<p>PR &#x3D; PolynomialRing(QQ， ‘x，y’， 2， order&#x3D;‘lex’)</p>
+<p>x， y &#x3D; PR.gens()</p>
+<p>v0 &#x3D; int(851033777767430284858630579937210957794466604656176459982282)</p>
+<p>a1 &#x3D; int(v0<em>pow(2，1-2</em>r，e) % e)</p>
+<p>a2 &#x3D; int(-((N+1)^2-v0^2)<em>pow(2，-4</em>r，e) % e)</p>
+<p>a3 &#x3D; int(-pow(2，-4*r，e) % e)</p>
+<p>F &#x3D; x<em>y^2+a1</em>x<em>y+a2</em>x+a3</p>
+<p>G_polys &#x3D; []</p>
+<h1 id="G-k，i-1，i-2-x，y-x-i-1-k-y-i-2-2k-f-x，y-k-e-m-k"><a href="#G-k，i-1，i-2-x，y-x-i-1-k-y-i-2-2k-f-x，y-k-e-m-k" class="headerlink" title="G_{k，i_1，i_2}(x，y) &#x3D; x^{i_1-k}y_{i_2-2k}f(x，y)^{k}e^{m-k}"></a>G_{k，i_1，i_2}(x，y) &#x3D; x^{i_1-k}y_{i_2-2k}f(x，y)^{k}e^{m-k}</h1><p>for k in range(m + 1):</p>
+<p>for i_1 in range(k， m+1):</p>
+<p>for i_2 in [2<em>k， 2</em>k + 1]:</p>
+<p>G_polys.append(x**(i_1-k) * y**(i_2-2<em>k) * F*<em>k * e</em></em>(m-k))</p>
+<p>H_polys &#x3D; []</p>
+<h1 id="y-shift-H-k，i-1，i-2-x，y-y-i-2-2k-f-x，y-k-e-m-k"><a href="#y-shift-H-k，i-1，i-2-x，y-y-i-2-2k-f-x，y-k-e-m-k" class="headerlink" title="y_shift H_{k，i_1，i_2}(x，y) &#x3D; y^{i_2-2k} f(x，y)^k e^{m-k}"></a>y_shift H_{k，i_1，i_2}(x，y) &#x3D; y^{i_2-2k} f(x，y)^k e^{m-k}</h1><p>for k in range(m + 1):</p>
+<p>for i_2 in range(2<em>k+2， 2</em>k+t+1):</p>
+<p>H_polys.append(y**(i_2-2<em>k) * F*<em>k * e</em></em>(m-k))</p>
+<p>polys &#x3D; G_polys + H_polys</p>
+<p>monomials &#x3D; []</p>
+<p>for poly in polys:</p>
+<p>monomials.append(poly.lm())</p>
+<p>dims1 &#x3D; len(polys)</p>
+<p>dims2 &#x3D; len(monomials)</p>
+<p>MM &#x3D; matrix(QQ， dims1， dims2)</p>
+<p>for idx， poly in enumerate(polys):</p>
+<p>for idx_， monomial in enumerate(monomials):</p>
+<p>if monomial in poly.monomials():</p>
+<p>MM[idx， idx_] &#x3D; poly.monomial_coefficient(monomial) * monomial(X， Y)</p>
+<p>B &#x3D; MM.LLL()</p>
+<p>found_polynomials &#x3D; False</p>
+<p>for pol1_idx in range(B.nrows()):</p>
+<p>for pol2_idx in range(pol1_idx + 1， B.nrows()):</p>
+<p>P &#x3D; PolynomialRing(QQ， ‘a，b’， 2)</p>
+<p>a， b &#x3D; P.gens()</p>
+<p>pol1 &#x3D; pol2 &#x3D; 0</p>
+<p>for idx_， monomial in enumerate(monomials):</p>
+<p>pol1 +&#x3D; monomial(a，b) * B[pol1_idx， idx_] &#x2F; monomial(X， Y)</p>
+<p>pol2 +&#x3D; monomial(a，b) * B[pol2_idx， idx_] &#x2F; monomial(X， Y)</p>
+<h1 id="resultant"><a href="#resultant" class="headerlink" title="resultant"></a>resultant</h1><p>rr &#x3D; pol1.resultant(pol2)</p>
+<h1 id="are-these-good-polynomials"><a href="#are-these-good-polynomials" class="headerlink" title="are these good polynomials?"></a>are these good polynomials?</h1><p>if rr.is_zero() or rr.monomials() &#x3D;&#x3D; [1]:</p>
+<p>continue</p>
+<p>else:</p>
+<p>print(f”found them， using vectors {pol1_idx}， {pol2_idx}“)</p>
+<p>found_polynomials &#x3D; True</p>
+<p>break</p>
+<p>if found_polynomials:</p>
+<p>break</p>
+<p>if not found_polynomials:</p>
+<p>print(“no independant vectors could be found. This should very rarely happen…”)</p>
+<p>PRq &#x3D; PolynomialRing(QQ， ‘z’)</p>
+<p>z &#x3D; PRq.gen()</p>
+<p>rr &#x3D; rr(z， z)</p>
+<p>soly &#x3D; rr.roots()[0][0]</p>
+<p>ppol &#x3D; pol1(z， soly)</p>
+<p>solx &#x3D; ppol.roots()[0][0]</p>
+<p>return solx， soly</p>
+<p>n&#x3D;55278236879146294459287519313515015685380083756155249084273897269903897152<br>7583700286165151070122839392475703529145787767511154040420301213537883448775<br>3490236754111855821567310395547714573242118176027909363197756783356599319622<br>032729503900145504768199117956830109488213721179197298976559379295734300889</p>
+<p>e&#x3D;16021660724557845861903926629189678508104614030647584377887691761323265228<br>7299785779127187720183513050607559971811655488962872622371180677470958951356<br>8954231551854272228221374950755254517488059881672395429081401188537939199041<br>4696263834518312117922281210824958741501122210535644121406075221738197619232<br>4626000787621569081638679868015716657107623944592368869664509905357045639631<br>8030591266831924613300474358714621854701733494674381260966300537890565644498<br>4371409043041484148339572240945472316645060906808117473860228212000852669342<br>881620738498172046794549032176677232076775574888980921634064269760730733</p>
+<p>#c &#x3D; Complex(re&#x3D;2012948531808535658618135982376157338497630873224229514232396588630318374103303632458672435554153057032250931230752901501660055660862099702318326352000431226866382254438987809465982480745411398406968025077723685872358629823751506867202963276004837767911659230345188497115504371022168504350112757911970， im&#x3D;381189254885346479441224149330737027827963006108977158894650476797604540263935003393925783161307886586032523860105464648325293157866129992025717767014563299764845263099980532235028862005360622884509996726485571556604386339566439967304706464942491349381908685406278617323955301845117990230102559034276)</p>
+<p>a&#x3D;1.997</p>
+<p>d&#x3D;0.7</p>
+<p>b&#x3D;0.1</p>
+<p>X &#x3D; int(2*n^(a+d-2))</p>
+<p>Y &#x3D; int(3<em>n^(1&#x2F;2-2</em>b))</p>
+<p>v &#x3D; attack2(n， e， 4， 4， X， Y)[1]</p>
+<p>v &#x3D; int(v)</p>
+<p>r &#x3D; 100</p>
+<p>nn &#x3D; Mod(n，2^r)</p>
+<p>u0 &#x3D; nn.nth_root(2，all&#x3D;True)[0]</p>
+<p>u0 &#x3D; int(u0)</p>
+<p>v0 &#x3D; 2*u0+(n-u0^2)*inverse(u0，4^r) % 4^r</p>
+<p>pq &#x3D; int(2^(2*r)*v+v0)</p>
+<p>ppq &#x3D; isqrt(pq^2-4*n)</p>
+<p>p &#x3D; (pq+ppq)&#x2F;&#x2F;2</p>
+<p>q &#x3D; n&#x2F;&#x2F;p</p>
+<p>p &#x3D; 1900012498118758080386063557941332201661823681127196909513390375685272680057296393801682140714541517469250351359374711900794251164879414119839995155173</p>
+<p>q &#x3D; 2909361750718925654806263886008919952754040081505772293312305999147201945140177280651101936712818375809233132556289477012051690455667963261726156542693</p>
+<p>from Crypto.Util.number import isPrime， inverse， bytes_to_long</p>
+<p>from random import getrandbits， randrange</p>
+<p>from collections import namedtuple</p>
+<p>Complex &#x3D; namedtuple(“Complex”， [“re”， “im”])</p>
+<p>def complex_mult(c1， c2， modulus):</p>
+<p>return Complex(</p>
+<p>(c1.re * c2.re – c1.im * c2.im) % modulus，</p>
+<p>(c1.re * c2.im + c1.im * c2.re) % modulus，</p>
+<p>)</p>
+<p>def complex_pow(c， exp， modulus):</p>
+<p>result &#x3D; Complex(1， 0)</p>
+<p>while exp &gt; 0:</p>
+<p>if exp &amp; 1:</p>
+<p>result &#x3D; complex_mult(result， c， modulus)</p>
+<p>c &#x3D; complex_mult(c， c， modulus)</p>
+<p>exp &gt;&gt;&#x3D; 1</p>
+<p>return result</p>
+<p>def rand_prime(nbits， kbits， share):</p>
+<p>while True:</p>
+<p>p &#x3D; (getrandbits(nbits) &lt;&lt; kbits) + share</p>
+<p>if p % 4 &#x3D;&#x3D; 3 and isPrime(p):</p>
+<p>return p</p>
+<p>def gen():</p>
+<p>while True:</p>
+<p>k &#x3D; getrandbits(100)</p>
+<p>pp &#x3D; getrandbits(400) &lt;&lt; 100</p>
+<p>qq &#x3D; getrandbits(400) &lt;&lt; 100</p>
+<p>p &#x3D; pp + k</p>
+<p>q &#x3D; qq + k</p>
+<p>if isPrime(p) and isPrime(q):</p>
+<p>break</p>
+<p>if q &gt; p:</p>
+<p>p， q &#x3D; q， p</p>
+<p>n &#x3D; p * q</p>
+<p>lb &#x3D; int(n ** 0.675)</p>
+<p>ub &#x3D; int(n ** 0.70)</p>
+<p>d &#x3D; randrange(lb， ub)</p>
+<p>e &#x3D; inverse(d， (p * p – 1) * (q * q – 1))</p>
+<p>sk &#x3D; (p， q， d)</p>
+<p>pk &#x3D; (n， e)</p>
+<p>return pk， sk</p>
+<p>from Crypto.Util.number import *</p>
+<p>n&#x3D;55278236879146294459287519313515015685380083756155249084273897269903897152<br>7583700286165151070122839392475703529145787767511154040420301213537883448775<br>3490236754111855821567310395547714573242118176027909363197756783356599319622<br>032729503900145504768199117956830109488213721179197298976559379295734300889</p>
+<p>e&#x3D;16021660724557845861903926629189678508104614030647584377887691761323265228<br>7299785779127187720183513050607559971811655488962872622371180677470958951356<br>8954231551854272228221374950755254517488059881672395429081401188537939199041<br>4696263834518312117922281210824958741501122210535644121406075221738197619232<br>4626000787621569081638679868015716657107623944592368869664509905357045639631<br>8030591266831924613300474358714621854701733494674381260966300537890565644498<br>4371409043041484148339572240945472316645060906808117473860228212000852669342<br>881620738498172046794549032176677232076775574888980921634064269760730733</p>
+<p>c &#x3D; Complex(re&#x3D;2012948531808535658618135982376157338497630873224229514232396588630318374103303632458672435554153057032250931230752901501660055660862099702318326352000431226866382254438987809465982480745411398406968025077723685872358629823751506867202963276004837767911659230345188497115504371022168504350112757911970， im&#x3D;381189254885346479441224149330737027827963006108977158894650476797604540263935003393925783161307886586032523860105464648325293157866129992025717767014563299764845263099980532235028862005360622884509996726485571556604386339566439967304706464942491349381908685406278617323955301845117990230102559034276)</p>
+<p>p &#x3D; 1900012498118758080386063557941332201661823681127196909513390375685272680057296393801682140714541517469250351359374711900794251164879414119839995155173</p>
+<p>q &#x3D; 2909361750718925654806263886008919952754040081505772293312305999147201945140177280651101936712818375809233132556289477012051690455667963261726156542693</p>
+<p>d &#x3D; inverse(e， (p * p – 1) * (q * q – 1))</p>
+<p>m &#x3D; complex_pow(c， d， n)</p>
+<p>print(m)</p>
+<p>print(long_to_bytes(2284117282070580319467503526716887419216540004))</p>
+<p>print(long_to_bytes(1119861848972936994707380976950224397710735485))</p>
+<p>Complex(re&#x3D;2284117282070580319467503526716887419216540004， im&#x3D;1119861848972936994707380976950224397710735485)</p>
+<p>b’flag{62b1a28d70e11d’</p>
+<p>b’27b1cb1e2102b7e858}’</p>
+<p>1515</p>
+<p>论文题，2023 美密 《Finding short integer solutions when the modulus is small》</p>
+<p>这回论文更加贴心的给了攻击实现:  <a target="_blank" rel="noopener" href="https://github.com/verdiverdiverdi/ISIS-small-q">https://github.com/verdiverdiverdi/ISIS-small-q</a></p>
+<p>改一下 q， 开盖即食（因为 q 变大了，得调一下参，把beta_BKZ 和 beta_sieve 调大，随便乱调的，越大，越好，但是越慢，嗯，应该是这样，我也不懂）</p>
+<p>另外，题目没有给出的 m，n，q，v 都是可以测出的 m，n 看给出的矩阵维度就好，q 的话，多连接几次，发现出现的最大的数是 276，那 q 八九不离十就是 277了，刚好也是个素数。v 的话直接解线性方程组，前面加256个0，传过去，就会失败，但是能够知道 v 是1510</p>
+<p>from fpylll import BKZ， GSO， IntegerMatrix， LLL<br>from fpylll.algorithms.bkz2 import BKZReduction as BKZ2</p>
+<p>from sage.all import IntegerModRing， ZZ， matrix， identity_matrix，</p>
+<p>random_matrix， random_vector， vector</p>
+<p>from g6k import Siever</p>
+<p>from numpy import array， zeros</p>
+<p>from numpy.linalg import norm</p>
+<p>import sys</p>
+<h1 id="mitaka-n512q257"><a href="#mitaka-n512q257" class="headerlink" title="mitaka n512q257"></a>mitaka n512q257</h1><p>n &#x3D; 512</p>
+<p>m_ &#x3D; 1024</p>
+<p>m &#x3D; m_ + 1</p>
+<p>q &#x3D; 277</p>
+<p>nu &#x3D; 1510</p>
+<p>Zq &#x3D; IntegerModRing(q)</p>
+<h1 id="get-data"><a href="#get-data" class="headerlink" title="get data"></a>get data</h1><p>from hashlib import sha256</p>
+<p>from pwn import *</p>
+<h1 id="context-log-level-‘debug’"><a href="#context-log-level-‘debug’" class="headerlink" title="context.log_level &#x3D; ‘debug’"></a>context.log_level &#x3D; ‘debug’</h1><p>sh &#x3D; remote(“47.104.147.171”，“1515”)</p>
+<p>r1 &#x3D; int(sh.recvuntil(” “)[:-1])</p>
+<p>hash &#x3D; (sh.recvuntil(“n”)[:-1])</p>
+<p>for i in range(2**22):</p>
+<p>if sha256(str(i*r1).encode()).hexdigest().encode() &#x3D;&#x3D; hash:</p>
+<p>sh.sendline(str(i))</p>
+<p>break</p>
+<p>data &#x3D; sh.recvuntil(“ers: “).split(b”n”)[:-1]</p>
+<p>u &#x3D; eval(data[-1])</p>
+<p>import re</p>
+<p>A0 &#x3D; []</p>
+<p>for each in data[-513:-1]:</p>
+<p>new &#x3D; []</p>
+<p>each &#x3D; data[-513]</p>
+<p>each &#x3D; each.decode()</p>
+<p>each &#x3D; each.replace(“Give me r0: “，“”).replace(“]”，“”).replace(“[“，“”)</p>
+<p>each &#x3D; each.split(” “)</p>
+<p>for _ in each:</p>
+<p>if _ !&#x3D; “”:</p>
+<p>new.append(int(_))</p>
+<p>A0.append(new)</p>
+<p>A0 &#x3D; matrix(Zq，A0)</p>
+<h1 id="ISIS-matrix"><a href="#ISIS-matrix" class="headerlink" title="ISIS matrix"></a>ISIS matrix</h1><p>Id &#x3D; identity_matrix</p>
+<h1 id="keeping-the-“raw“-ISIS-matrix-to-check-everything-at-the-end"><a href="#keeping-the-“raw“-ISIS-matrix-to-check-everything-at-the-end" class="headerlink" title="keeping the “raw“ ISIS matrix to check everything at the end"></a>keeping the “raw“ ISIS matrix to check everything at the end</h1><p>AISIS &#x3D; matrix.block(Zq， [[identity_matrix(ZZ， n)]， [A0]])  # % q</p>
+<h1 id="uniform-ISIS-target"><a href="#uniform-ISIS-target" class="headerlink" title="uniform ISIS target"></a>uniform ISIS target</h1><p>u &#x3D; matrix(Zq，u)</p>
+<h1 id="SIS-matrix"><a href="#SIS-matrix" class="headerlink" title="SIS* matrix"></a>SIS* matrix</h1><p>Au0 &#x3D; matrix.block(Zq， [[matrix(u)]， [A0]])  # % q</p>
+<p>Afull &#x3D; matrix.block(Zq， [[identity_matrix(ZZ， n)]， [Au0]])  # % q</p>
+<h1 id="keeping-a-numpy-version-of-Afull-makes-life-easier-later"><a href="#keeping-a-numpy-version-of-Afull-makes-life-easier-later" class="headerlink" title="keeping a numpy version of Afull makes life easier later"></a>keeping a numpy version of Afull makes life easier later</h1><p>A_np &#x3D; array(Afull.lift())</p>
+<p>print(“SIS* instance built”)</p>
+<h1 id="basis-of-the-SIS-kernel-lattice"><a href="#basis-of-the-SIS-kernel-lattice" class="headerlink" title="basis of the SIS* kernel lattice"></a>basis of the SIS* kernel lattice</h1><p>B &#x3D; matrix.block(ZZ， [[q*Id(n)， 0]， [-Au0， Id(m-n)]])</p>
+<p>print(“Full basis built”)</p>
+<p>“””</p>
+<p>The basis B that has been built is the kernel for the SIS* matrix (columns)</p>
+<p>A’ &#x3D; (Id || u ||  A0) in ZZ_q^(n x (n + 1 + n))</p>
+<p>&#x3D; (Id || Au0)</p>
+<p>where u is the uniform ISIS target vector and A0 is uniform in ZZ_q^(n x n).</p>
+<p>We rewrite this as</p>
+<p>A’ &#x3D; (A_1′ A_2′) &#x3D; (Id || Au0)</p>
+<p>The basis， in <del>row</del> notation， is</p>
+<p>[q I_n     0   ]</p>
+<p>[  U   I_(n+1) ]</p>
+<p>where U &#x3D; – (A_1′)^-1 A_2′ &#x3D; -Au0</p>
+<p>“””</p>
+<h1 id="take-a-2z-dimensional-block，-with-volume-q-z"><a href="#take-a-2z-dimensional-block，-with-volume-q-z" class="headerlink" title="take a 2z dimensional block， with volume q^z"></a>take a 2z dimensional block， with volume q^z</h1><h1 id="i-e-symmetric-around-the-centre-of-the-basis"><a href="#i-e-symmetric-around-the-centre-of-the-basis" class="headerlink" title="i.e. symmetric around the centre of the basis"></a>i.e. symmetric around the centre of the basis</h1><p>z1 &#x3D; 80</p>
+<p>z2 &#x3D; 80</p>
+<p>d &#x3D; z1+z2</p>
+<p>“””</p>
+<p>Note that because of the form of the basis， the basis of the</p>
+<p>projected sublattice we are concerned with can be directly</p>
+<p>taken from the full basis as below.</p>
+<p>First we project against some number k of q vectors to take</p>
+<p>[q I_n     0   ]</p>
+<p>[  U   I_(n+1) ]</p>
+<p>to</p>
+<p>[0        0         0   ]</p>
+<p>[0  q I_(n – k)     0   ]</p>
+<p>[0    U[k:n]    I_(n+1) ]</p>
+<p>where U[k:n] is the kth to the (n-1)th columns of U.</p>
+<p>Then we simply do not include the final k row vectors.</p>
+<p>“””</p>
+<p>B_ &#x3D; matrix(B)[n-z1:n+z2， n-z1:n+z2]</p>
+<p>beta_BKZ &#x3D; 32</p>
+<p>beta_sieve &#x3D; 77</p>
+<p>def complete_solution(v):</p>
+<h1 id="this-lifts-and-reduces-a-vector-from-the-projected-sublattice-sieve"><a href="#this-lifts-and-reduces-a-vector-from-the-projected-sublattice-sieve" class="headerlink" title="this lifts and reduces a vector from the projected sublattice sieve"></a>this lifts and reduces a vector from the projected sublattice sieve</h1><p>x &#x3D; zeros(m， dtype&#x3D;“int32”)</p>
+<p>x[n-z1:n+z2] &#x3D; v</p>
+<p>y &#x3D; (x.dot(A_np))[:n-z1] % q</p>
+<p>y -&#x3D; q * (y &gt; q&#x2F;2)</p>
+<p>x[:n-z1] &#x3D; -y</p>
+<p>return x</p>
+<p>print(“Partial basis built”)</p>
+<p>C &#x3D; B_.LLL()</p>
+<p>print(“Partial Basis LLL reduced”)</p>
+<p>X &#x3D; IntegerMatrix.from_matrix(C)</p>
+<p>M &#x3D; GSO.Mat(X， float_type&#x3D;“ld”， U&#x3D;IntegerMatrix.identity(d)，</p>
+<p>UinvT&#x3D;IntegerMatrix.identity(d))</p>
+<p>lll &#x3D; LLL.Reduction(M)</p>
+<p>bkz &#x3D; BKZ2(lll)</p>
+<p>g6k &#x3D; Siever(M)</p>
+<p>for bs in range(5， beta_BKZ+1):</p>
+<p>param &#x3D; BKZ.Param(block_size&#x3D;bs， max_loops&#x3D;1， auto_abort&#x3D;True)</p>
+<p>print(“rBKZ-%d &#x2F; %d … “ % (bs， beta_BKZ)， end&#x3D;“”)</p>
+<p>bkz(param)</p>
+<p>bkz.lll_obj()</p>
+<p>sys.stdout.flush()</p>
+<p>print(“BKZ profile :”)</p>
+<p>for x in bkz.M.r():</p>
+<p>print(“%.3f” % (x**.5)， end&#x3D;” “)</p>
+<p>print</p>
+<p>g6k.initialize_local(0， beta_sieve-20， beta_sieve)</p>
+<p>g6k(alg&#x3D;“gauss”)</p>
+<p>while g6k.l &gt; 0:</p>
+<p>g6k.extend_left()</p>
+<p>g6k(alg&#x3D;“gauss” if g6k.n &lt; 50 else “hk3”)</p>
+<p>print(“r Sieve-%d &#x2F; %d … “ % (g6k.n， beta_sieve)， end&#x3D;“”)</p>
+<p>sys.stdout.flush()</p>
+<p>with g6k.temp_params(saturation_ratio&#x3D;.9):</p>
+<p>g6k(alg&#x3D;“gauss” if g6k.n &lt; 50 else “hk3”)</p>
+<p>print(“n Sieving Done”)</p>
+<p>norms &#x3D; []</p>
+<p>X_ &#x3D; array(matrix(X))[:<br>beta_sieve]</p>
+<p>print(X_.shape)</p>
+<p>trials &#x3D; 0</p>
+<p>FailZ， FailC， FailN &#x3D; 0， 0， 0</p>
+<p>for vec in g6k.itervalues():</p>
+<p>trials +&#x3D; 1</p>
+<p>v &#x3D; array(vec)</p>
+<p>x &#x3D; v.dot(X_)</p>
+<p>if (x % q &#x3D;&#x3D; 0).all():</p>
+<h1 id="trivial-vector-all-mod-q"><a href="#trivial-vector-all-mod-q" class="headerlink" title="trivial vector: all mod q"></a>trivial vector: all mod q</h1><p>FailZ +&#x3D; 1</p>
+<p>continue</p>
+<p>if abs(x[z1]) !&#x3D; 1:</p>
+<h1 id="we-do-not-recieve-1-in-the-first-position，-we-we-cannot"><a href="#we-do-not-recieve-1-in-the-first-position，-we-we-cannot" class="headerlink" title="we do not recieve +&#x2F;-1 in the first position， we we cannot"></a>we do not recieve +&#x2F;-1 in the first position， we we cannot</h1><h1 id="solve-ISIS-for-u"><a href="#solve-ISIS-for-u" class="headerlink" title="solve ISIS for u"></a>solve ISIS for u</h1><p>FailC +&#x3D; 1</p>
+<p>continue</p>
+<p>lx &#x3D; norm(array(x))</p>
+<p>y &#x3D; complete_solution(x)</p>
+<p>ly &#x3D; norm(y)</p>
+<p>if ly &lt; nu:</p>
+<p>break</p>
+<h1 id="the-norm-of-the-solution-is-too-long"><a href="#the-norm-of-the-solution-is-too-long" class="headerlink" title="the norm of the solution is too long"></a>the norm of the solution is too long</h1><p>FailN +&#x3D; 1</p>
+<p>print(“Failures: nt %d lifts were 0 mod q，nt %d lifts didn’t had the coeff +&#x2F;- 1，nt %d lifts were too long” % (FailZ， FailC， FailN)) # noqa</p>
+<p>if trials &#x3D;&#x3D; g6k.db_size():</p>
+<p>print(“FAILED: All candidates lifted. No solution found”)</p>
+<p>exit()</p>
+<h1 id="Reconstructing-ISIS-solution-from-SIS-solution"><a href="#Reconstructing-ISIS-solution-from-SIS-solution" class="headerlink" title="Reconstructing ISIS solution from SIS* solution"></a>Reconstructing ISIS solution from SIS* solution</h1><p>f &#x3D; – y[n]</p>
+<p>x &#x3D; vector(ZZ， list(f * y[:n])+list(f * y[n+1:]))</p>
+<h1 id="Checking-it-all"><a href="#Checking-it-all" class="headerlink" title="Checking it all"></a>Checking it all</h1><p>assert (x * AISIS &#x3D;&#x3D; u)</p>
+<p>assert (x.norm().n() &lt; nu)</p>
+<h1 id="Claiming-victory"><a href="#Claiming-victory" class="headerlink" title="Claiming victory"></a>Claiming victory</h1><p>print(“SUCCESS: ISIS solved after %d lifts， out of %d candidates !” % (trials， g6k.db_size())) # noqa</p>
+<p>print(“Solution Norm:”， x.norm().n()， ” &lt; “， nu)</p>
+<p>print(“solution :”， x)</p>
+<p>sh.sendline(str(list(x)))</p>
+<p>print(sh.recv())</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">aaa = gamma(2^27+1)</span><br><span class="line">bbb = str(aaa)</span><br><span class="line">from tqdm import tqdm</span><br><span class="line">from pwn import *</span><br><span class="line">context.log_level = &#x27;debug&#x27;</span><br><span class="line">p = 173383907346370188246634353442514171630882212643019826706575120637048836061602034776136960080336351252616860522273644431927909101923807914940397420063587913080793842100264484222211278105783220210128152062330954876427406484701993115395306434064667136148361558851998019806319799444970703714594938822660931343299</span><br><span class="line">g = 5</span><br><span class="line">c = 105956730578629949992232286714779776923846577007389446302378719229216496867835280661431342821159505656015790792811649783966417989318584221840008436316642333656736724414761508478750342102083967959048112859470526771487533503436337125728018422740023680376681927932966058904269005466550073181194896860353202252854</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">n = 6249734963373034215610144758924910630356277447014258270888329547267471837899275103421406467763122499270790512099702898939814547982931674247240623063334781529511973585977522269522704997379194673181703247780179146749499072297334876619475914747479522310651303344623434565831770309615574478274456549054332451773452773119453059618433160299319070430295124113199473337940505806777950838270849</span><br><span class="line">e = 641747</span><br><span class="line">c = 730024611795626517480532940587152891926416120514706825368440230330259913837764632826884065065554839415540061752397144140563698277864414584568812699048873820551131185796851863064509294123861487954267708318027370912496252338232193619491860340395824180108335802813022066531232025997349683725357024257420090981323217296019482516072036780365510855555146547481407283231721904830868033930943</span><br><span class="line">c = Mod(c，n)</span><br><span class="line">tmp = c.nth_root(e，all=True)</span><br><span class="line">for t in tmp:</span><br><span class="line"> if b&quot;flag&#123;&quot; in long_to_bytes(t):</span><br><span class="line">  print(long_to_bytes(t))</span><br><span class="line">from pwn import *</span><br><span class="line">context.log_level = 40</span><br><span class="line"># https://github.com/1umi3re/my_ctf_challenge/blob/main/hfctf_2022/RRSSAA/exp.py</span><br><span class="line">from gmpy2 import next_prime， iroot</span><br><span class="line">from Crypto.Util.number import getPrime， inverse， GCD， bytes_to_long， long_to_bytes</span><br><span class="line">from sage.all import *</span><br><span class="line">from fpylll import BKZ， GSO， IntegerMatrix， LLL</span><br><span class="line">from fpylll.algorithms.bkz2 import BKZReduction as BKZ2</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/152614.html">https://www.ctfiot.com/152614.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2023_%E5%BC%BA%E7%BD%91%E6%9D%AF_%E5%88%9D%E8%B5%9B.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2023_强网杯_初赛.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/sagemath-gamma/">sagemath_gamma</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Misc/2023_%E5%BC%BA%E7%BD%91%E6%9D%AF_writeup_by_Arr3stY0u/" title="2023 强网杯 WriteUp by Arr3stY0u"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2023 强网杯 WriteUp by Arr3stY0u</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Misc/AntCTF_x_D-CTF_2023_d3op%E5%A4%8D%E7%9B%98%E7%AC%94%E8%AE%B0/" title="AntCTF x D³CTF 2023 d3op 复盘笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">AntCTF x D³CTF 2023 d3op 复盘笔记</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#https-github-com-1umi3re-my-ctf-challenge-blob-main-hfctf-2022-RRSSAA-exp-py"><span class="toc-number">1.</span> <span class="toc-text">https:&#x2F;&#x2F;github.com&#x2F;1umi3re&#x2F;my_ctf_challenge&#x2F;blob&#x2F;main&#x2F;hfctf_2022&#x2F;RRSSAA&#x2F;exp.py</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#G-k%EF%BC%8Ci-1%EF%BC%8Ci-2-x%EF%BC%8Cy-x-i-1-k-y-i-2-2k-f-x%EF%BC%8Cy-k-e-m-k"><span class="toc-number">2.</span> <span class="toc-text">G_{k，i_1，i_2}(x，y) &#x3D; x^{i_1-k}y_{i_2-2k}f(x，y)^{k}e^{m-k}</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#y-shift-H-k%EF%BC%8Ci-1%EF%BC%8Ci-2-x%EF%BC%8Cy-y-i-2-2k-f-x%EF%BC%8Cy-k-e-m-k"><span class="toc-number">3.</span> <span class="toc-text">y_shift H_{k，i_1，i_2}(x，y) &#x3D; y^{i_2-2k} f(x，y)^k e^{m-k}</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#resultant"><span class="toc-number">4.</span> <span class="toc-text">resultant</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#are-these-good-polynomials"><span class="toc-number">5.</span> <span class="toc-text">are these good polynomials?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#mitaka-n512q257"><span class="toc-number">6.</span> <span class="toc-text">mitaka n512q257</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#get-data"><span class="toc-number">7.</span> <span class="toc-text">get data</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#context-log-level-%E2%80%98debug%E2%80%99"><span class="toc-number">8.</span> <span class="toc-text">context.log_level &#x3D; ‘debug’</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ISIS-matrix"><span class="toc-number">9.</span> <span class="toc-text">ISIS matrix</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#keeping-the-%E2%80%9Craw%E2%80%9C-ISIS-matrix-to-check-everything-at-the-end"><span class="toc-number">10.</span> <span class="toc-text">keeping the “raw“ ISIS matrix to check everything at the end</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#uniform-ISIS-target"><span class="toc-number">11.</span> <span class="toc-text">uniform ISIS target</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SIS-matrix"><span class="toc-number">12.</span> <span class="toc-text">SIS* matrix</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#keeping-a-numpy-version-of-Afull-makes-life-easier-later"><span class="toc-number">13.</span> <span class="toc-text">keeping a numpy version of Afull makes life easier later</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#basis-of-the-SIS-kernel-lattice"><span class="toc-number">14.</span> <span class="toc-text">basis of the SIS* kernel lattice</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#take-a-2z-dimensional-block%EF%BC%8C-with-volume-q-z"><span class="toc-number">15.</span> <span class="toc-text">take a 2z dimensional block， with volume q^z</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#i-e-symmetric-around-the-centre-of-the-basis"><span class="toc-number">16.</span> <span class="toc-text">i.e. symmetric around the centre of the basis</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#this-lifts-and-reduces-a-vector-from-the-projected-sublattice-sieve"><span class="toc-number">17.</span> <span class="toc-text">this lifts and reduces a vector from the projected sublattice sieve</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#trivial-vector-all-mod-q"><span class="toc-number">18.</span> <span class="toc-text">trivial vector: all mod q</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#we-do-not-recieve-1-in-the-first-position%EF%BC%8C-we-we-cannot"><span class="toc-number">19.</span> <span class="toc-text">we do not recieve +&#x2F;-1 in the first position， we we cannot</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#solve-ISIS-for-u"><span class="toc-number">20.</span> <span class="toc-text">solve ISIS for u</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#the-norm-of-the-solution-is-too-long"><span class="toc-number">21.</span> <span class="toc-text">the norm of the solution is too long</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Reconstructing-ISIS-solution-from-SIS-solution"><span class="toc-number">22.</span> <span class="toc-text">Reconstructing ISIS solution from SIS* solution</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Checking-it-all"><span class="toc-number">23.</span> <span class="toc-text">Checking it all</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Claiming-victory"><span class="toc-number">24.</span> <span class="toc-text">Claiming victory</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">24.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

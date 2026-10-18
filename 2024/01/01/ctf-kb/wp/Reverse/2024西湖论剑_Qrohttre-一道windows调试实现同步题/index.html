@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2024 西湖论剑 Qrohttre（Windows 调试器实现父子进程同步 + SMC） | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="Qrohttre 主进程用 Win32 DEBUG_PROCESS 调试子进程，TF 单步 + 双段 SMC 自解密 + 0xCC 断点同步用户输入；patch WriteProcessMemory + CE dump + 父子进程双 IDA patch 是分析套路。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 西湖论剑 Qrohttre（Windows 调试器实现父子进程同步 + SMC）">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/2024%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91_Qrohttre-%E4%B8%80%E9%81%93windows%E8%B0%83%E8%AF%95%E5%AE%9E%E7%8E%B0%E5%90%8C%E6%AD%A5%E9%A2%98/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="Qrohttre 主进程用 Win32 DEBUG_PROCESS 调试子进程，TF 单步 + 双段 SMC 自解密 + 0xCC 断点同步用户输入；patch WriteProcessMemory + CE dump + 父子进程双 IDA patch 是分析套路。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Qrohttre 父子进程同步调试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/2024%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91_Qrohttre-%E4%B8%80%E9%81%93windows%E8%B0%83%E8%AF%95%E5%AE%9E%E7%8E%B0%E5%90%8C%E6%AD%A5%E9%A2%98/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2024 西湖论剑 Qrohttre（Windows 调试器实现父子进程同步 + SMC）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2024 西湖论剑 Qrohttre（Windows 调试器实现父子进程同步 + SMC）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2024 西湖论剑 Qrohttre（Windows 调试器实现父子进程同步 + SMC）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/172527.html">https://www.ctfiot.com/172527.html</a><br>ID: 172527</p>
+</blockquote>
+<p>一</p>
+<p>第一段smc</p>
+<p>字符串搜输出内容，有个假的校验，下断点断不下来。断scanf跟踪，返回到40DFDE，动态静态代码不一致，smc。</p>
+<p>解密代码：</p>
+<p>加密段是0x40DE77~0x40e2bb。</p>
+<p>二</p>
+<p>利用调试技术实现进程同步通信</p>
+<p>主进程以调试模式创建子进程，子进程执行相同的程序：</p>
+<p>GetModuleFileNameA(0, Filename, 0x104u);GetStartupInfoA(&amp;StartupInfo);v9 &#x3D; CreateProcessA(Filename, 0, 0, 0, 1, DEBUG_PROCESS, 0, 0, &amp;StartupInfo, &amp;ProcessInformation);</p>
+<p>主进程等待调试事件。</p>
+<p>子进程创建，发生调试事件控制权回到主进程，主进程 在子进程入口点设置0xCC断点。</p>
+<p>主进程获取用户输入。主进程恢复子进程运行，继续等待调试事件。</p>
+<p>子进程运行至入口点，0xCC断点控制权回到主进程。</p>
+<p>f_OnException_406FA0 函数负责分发异常调试事件（处理了断点、单步、访问越权三种不同的异常调试事件）。</p>
+<p>0xCC触发的断点异常，分发给f_OnBreakPoint_4070A0函数处理。该函数将用户输入数据同步到子进程，并设置TF位触发单步异常。</p>
+<p>主进程 恢复子进程运行，继续等待调试事件。</p>
+<p>子进程执行代码，由于TF位被设置，触发单步异常控制权回到主进程，分发给f_OnSingleStep_407530函数处理。</p>
+<p>该函数会一直设置TF位，故相当于主进程以单步的方式调试子进程。</p>
+<p>该函数中还包括一个反调试，导致主进程无法被继续调试。</p>
+<p>#define ThreadHideFromDebugger 0x11ZwSetInformationThread(GetCurrentThread(), ThreadHideFromDebugger, 0, 0);</p>
+<p>f_OnSingleStep_407530是主进程步进调试子进程的代码。当检测到子进程运行到第二段SMC时，解码起始16字节的代码。</p>
+<p>完成起始16字节代码解密后，子进程每执行一条指令之前，主进程就解密一次后续代码，并往子进程上一条指令填充垃圾数据。</p>
+<p>按图片所示，patch掉第二个写回垃圾指令的WriteProcessMemory，然后在图中位置设置断点。执行到断点时（把下面那条Write也执行了）用ark找到子进程pid，用CE dump子进程40B991-40DDB4的解密后的代码。（此处解密不完全，5.1有补充）</p>
+<p>加密段是40B991-40DDB4，复制一份程序改名为QrohttreSub.exe，方便分析子进程，ida里把CE dump出来的解密后代码patch到QrohttreSub.exe中。</p>
+<p>patch完后，ida识别出QrohttreSub.exe的main函数位于0040B8F0。</p>
+<p>通过单步陷阱处理函数（f_OnSingleStep_407530）解密的代码，从40B991开始的指令，操作数是不正确的，还未完全解密。</p>
+<p>子进程执行错误操作数的读写指令，触发访问权限异常，控制权再次回到主进程，分发给f_OnAccessViolation_406710。</p>
+<p>该函数会读取指令读写的地址（该函数默认指令第2~5字节为读写的地址）。</p>
+<p>根据读写地址不同进行处理（详见5.2）。</p>
+<p>完整解密过程是：先单步异常，解密指令；再触发内存访问越权，解密操作数</p>
+<p>因此4.3图中的断点位置，是解密最后一条指令，恰好最后几条指令是jmp和nop，不会触发内存访问越权，估得到的是正确的解密指令和操作数的代码</p>
+<p>经过调试验证，只有读内存的地址是不正确会触发访问越权，然后被修正。</p>
+<p>读内存A04DDB2C的指令会被改成读414008。</p>
+<p>其余读其他地址指令由sub_4072E0处理，读的地址改为41400C，且父子进程41400C处的数据会被同步修改。</p>
+<p>三</p>
+<p>读写数据的完整过程</p>
+<p>现在可以得出子进程40B991处代码的实际执行过程。这是子进程40B991处完整解密后的部分代码（操作数也解密了）。</p>
+<p>表面完全解密后的代码是：（注意v414008[0]相当于是*(v414008+4<em>0)，而不是</em>(414008+4*0)）</p>
+<p>&#x2F;&#x2F; 子进程数据int* v414008; &#x2F;&#x2F; &amp;v414008 &#x3D; 414008int* v41400C; &#x2F;&#x2F; &amp;v41400C &#x3D; 41400C*v41400C &#x3D; func(v414008[0], v414008[5], v414008[3], …);</p>
+<p>解密操作数前的代码，其中key和A04DDB2C的位置都位于非法地址：</p>
+<p>int* vA04DDB2C; &#x2F;&#x2F; &amp;vA04DDB2C &#x3D; A04DDB2Cint* key; &#x2F;&#x2F; &amp;key &#x3D; valid addressint temp &#x3D; func(A04DDB2C[0], A04DDB2C[5], A04DDB2C[3], …);*key &#x3D; temp;</p>
+<p>第一次解密操作数，将A04DDB2C替换成414008：</p>
+<p>int* v414008; &#x2F;&#x2F; &amp;v414008 &#x3D; 414008int* key; &#x2F;&#x2F; &amp;key &#x3D; valid addressint temp &#x3D; func(v414008[0], v414008[5], v414008[3], …);*key &#x3D; temp;</p>
+<p>第二次解密操作数，将key替换成41400C，且修改了子进程内存数据：</p>
+<p>int* v414008; &#x2F;&#x2F; &amp;v414008 &#x3D; 414008int* v41400C; &#x2F;&#x2F; &amp;v41400C &#x3D; 41400Cint temp &#x3D; func(v414008[0], v414008[5], v414008[3], …);v41400C &#x3D; 0x414490 + 4<em>map[key]; &#x2F;&#x2F; 主进程sub_4072E0修改了子进程41400C处的数据</em>v41400C &#x3D; temp;</p>
+<p>至此才是正确的执行内容。</p>
+<p>四</p>
+<p>还原与解密</p>
+<p>一共有48段上面这样这样的代码，func很好处理，直接复制然后z3就行。</p>
+<p>根据key的不同修改v41400C的值的映射有点麻烦，因为解密指令后得到的错误地址就是key，第二次解密操作数后key就被修改成41400C了。</p>
+<p>这里不去获取映射了，直接获取映射后的结果，映射后v41400C的值会被设为4 * idx + 0x414490，代码是按顺序执行的，ida或者x32dbg主进程在40730B处下个断点即可，直接读eax，获取其相对414490的偏移。</p>
+<p>读出idx：</p>
+<p>idx &#x3D; [5, 7, 3, 6, 1, 0, 9, 4, 2, 8, 14, 17, 13, 19, 12, 16, 11, 18, 10, 15, 23, 29, 20, 27, 22, 26, 21, 25, 28, 24, 33, 38, 31, 32, 39, 37, 30, 36, 34, 35, 47, 45, 40, 46, 42, 44, 43, 41]</p>
+<p>用v414490[idx[i]]依次替换掉sub_40B991中的*v41400C。</p>
+<p>回到主进程的f_main_40DE18，最后有一个比较：</p>
+<p>ReadProcessMemory(hProcess, &amp;dword_414490, &amp;dword_414490, 0xC0u, 0);<br>if ( !memcmp(&amp;dword_414490, arr414010, 0xC0u) )<br>    f_print(“Right, the flag is DASCTF{%48s}n”, (char)&amp;d_input);<br>  else<br>    f_print(“Wrong flagn”, v3);</p>
+<p>读出414010处的48*4字节内容，令其一一等于v414490数组，用z3解出v414008。</p>
+<p>from z3 import *</p>
+<p>arr414010 &#x3D; [10055, 1165166, 4294965955, 28964355, 2005, 11801, 4294956681, 5157, 6788, 4294954770, 5381, 6008, 4294962473, 4294962309, 12710, 4294960983, 4294960907, 4294958038, 381186, 4294248290, 7421, 106, 5891, 3564, 338599, 11442, 4294960088, 4941, 1000466, 4294958069, 7857, 557652, 4294953719, 4294957570, 633437, 1639, 4294953318, 4294967085, 4294469914, 4294966863, 11488, 9153, 4294959608, 7942, 5848, 6812, 6688, 4294504346]</p>
+<p>v414008 &#x3D; [BitVec(‘v414008_{}’.format(i), 32) for i in range(48)]<br>v414490 &#x3D; [0 for i in range(48)]</p>
+<p>def sub_40B991():<br>    v414490[5] &#x3D; (v414008[0] + v414008[5] + v414008[3] - v414008[7]) ^ (v414008[2] * v414008[4] + v414008[6] + v414008[1])<br>    v414490[7] &#x3D; (v414008[7] * v414008[0]) ^ (v414008[4] + v414008[5] + v414008[2] - v414008[1]) ^ v414008[6] ^ v414008[3]<br>    pass # 省略后续部分<br>    <br>sub_40B991()</p>
+<p>s &#x3D; Solver()<br>for i in range(48):<br>    s.add(v414008[i] &gt;&#x3D; 30)<br>    s.add(v414008[i] &lt;&#x3D; 127)<br>for i in range(48):<br>    s.add(v414490[i] &#x3D;&#x3D; arr414010[i])</p>
+<p>if s.check() &#x3D;&#x3D; sat:<br>    m &#x3D; s.model()<br>    flag &#x3D; ‘’<br>    for i in range(48):<br>        flag +&#x3D; chr(m[v414008[i]].as_long())<br>    print(‘DASCTF{{{}}}’.format(flag))<br>else:<br>    print(‘unsat’)<br># DASCTF{cTkBnLT6gA8H_sX7Q2VMBMAtl9PZvojBPnSTH7J7aNHeStxN}</p>
+<p>看雪ID：wx_御史神风</p>
+<p><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/user-home-907036.htm">https://bbs.kanxue.com/user-home-907036.htm</a></p>
+<p>*本文为看雪论坛优秀文章，由 wx_御史神风 原创，转载请注明来自看雪社区</p>
+<h1 id="往期推荐"><a href="#往期推荐" class="headerlink" title="往期推荐"></a>往期推荐</h1><p>1、一次.net cpu爆高分析-windbg sos基本命令使用及分析思路</p>
+<p>2、虚假交友APP(信息窃取)逆向分析</p>
+<p>3、常见的固件加解密方式与D-Link固件解密实战分析</p>
+<p>4、.NET 恶意软件 101：分析 .NET 可执行文件结构</p>
+<p>5、CVE-2024-0015复现 (DubheCTF DayDream)</p>
+<p>6、Unity的et热更新分析和补丁</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<p>点击阅读原文查看更多</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">一</span><br><span class="line">第一段smc</span><br><span class="line">二</span><br><span class="line">利用调试技术实现进程同步通信</span><br><span class="line">GetModuleFileNameA(0, Filename, 0x104u);GetStartupInfoA(&amp;StartupInfo);v9 = CreateProcessA(Filename, 0, 0, 0, 1, DEBUG_PROCESS, 0, 0, &amp;StartupInfo, &amp;ProcessInformation);</span><br><span class="line">    #define ThreadHideFromDebugger 0x11ZwSetInformationThread(GetCurrentThread(), ThreadHideFromDebugger, 0, 0);</span><br><span class="line">三</span><br><span class="line">读写数据的完整过程</span><br><span class="line">// 子进程数据int* v414008; // &amp;v414008 = 414008int* v41400C; // &amp;v41400C = 41400C*v41400C = func(v414008[0], v414008[5], v414008[3], ...);</span><br><span class="line">int* vA04DDB2C; // &amp;vA04DDB2C = A04DDB2Cint* key; // &amp;key = valid addressint temp = func(A04DDB2C[0], A04DDB2C[5], A04DDB2C[3], ...);*key = temp;</span><br><span class="line">int* v414008; // &amp;v414008 = 414008int* key; // &amp;key = valid addressint temp = func(v414008[0], v414008[5], v414008[3], ...);*key = temp;</span><br><span class="line">int* v414008; // &amp;v414008 = 414008int* v41400C; // &amp;v41400C = 41400Cint temp = func(v414008[0], v414008[5], v414008[3], ...);v41400C = 0x414490 + 4*map[key]; // 主进程sub_4072E0修改了子进程41400C处的数据*v41400C = temp;</span><br><span class="line">四</span><br><span class="line">还原与解密</span><br><span class="line">idx = [5, 7, 3, 6, 1, 0, 9, 4, 2, 8, 14, 17, 13, 19, 12, 16, 11, 18, 10, 15, 23, 29, 20, 27, 22, 26, 21, 25, 28, 24, 33, 38, 31, 32, 39, 37, 30, 36, 34, 35, 47, 45, 40, 46, 42, 44, 43, 41]</span><br><span class="line">ReadProcessMemory(hProcess, &amp;dword_414490, &amp;dword_414490, 0xC0u, 0);</span><br><span class="line">if ( !memcmp(&amp;dword_414490, arr414010, 0xC0u) )</span><br><span class="line">    f_print(&quot;Right, the flag is DASCTF&#123;%48s&#125;n&quot;, (char)&amp;d_input);</span><br><span class="line">  else</span><br><span class="line">    f_print(&quot;Wrong flagn&quot;, v3);</span><br><span class="line">from z3 import *</span><br><span class="line"></span><br><span class="line">arr414010 = [10055, 1165166, 4294965955, 28964355, 2005, 11801, 4294956681, 5157, 6788, 4294954770, 5381, 6008, 4294962473, 4294962309, 12710, 4294960983, 4294960907, 4294958038, 381186, 4294248290, 7421, 106, 5891, 3564, 338599, 11442, 4294960088, 4941, 1000466, 4294958069, 7857, 557652, 4294953719, 4294957570, 633437, 1639, 4294953318, 4294967085, 4294469914, 4294966863, 11488, 9153, 4294959608, 7942, 5848, 6812, 6688, 4294504346]</span><br><span class="line"></span><br><span class="line">v414008 = [BitVec(&#x27;v414008_&#123;&#125;&#x27;.format(i), 32) for i in range(48)]</span><br><span class="line">v414490 = [0 for i in range(48)]</span><br><span class="line"></span><br><span class="line">def sub_40B991():</span><br><span class="line">    v414490[5] = (v414008[0] + v414008[5] + v414008[3] - v414008[7]) ^ (v414008[2] * v414008[4] + v414008[6] + v414008[1])</span><br><span class="line">    v414490[7] = (v414008[7] * v414008[0]) ^ (v414008[4] + v414008[5] + v414008[2] - v414008[1]) ^ v414008[6] ^ v414008[3]</span><br><span class="line">    pass # 省略后续部分</span><br><span class="line">    </span><br><span class="line">sub_40B991()</span><br><span class="line"></span><br><span class="line">s = Solver()</span><br><span class="line">for i in range(48):</span><br><span class="line">    s.add(v414008[i] &gt;= 30)</span><br><span class="line">    s.add(v414008[i] &lt;= 127)</span><br><span class="line">for i in range(48):</span><br><span class="line">    s.add(v414490[i] == arr414010[i])</span><br><span class="line"></span><br><span class="line">if s.check() == sat:</span><br><span class="line">    m = s.model()</span><br><span class="line">    flag = &#x27;&#x27;</span><br><span class="line">    for i in range(48):</span><br><span class="line">        flag += chr(m[v414008[i]].as_long())</span><br><span class="line">    print(&#x27;DASCTF&#123;&#123;&#123;&#125;&#125;&#125;&#x27;.format(flag))</span><br><span class="line">else:</span><br><span class="line">    print(&#x27;unsat&#x27;)</span><br><span class="line"># DASCTF&#123;cTkBnLT6gA8H_sX7Q2VMBMAtl9PZvojBPnSTH7J7aNHeStxN&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/172527.html">https://www.ctfiot.com/172527.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2024%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91_Qrohttre%EF%BC%9A%E4%B8%80%E9%81%93windows%E8%B0%83%E8%AF%95%E5%AE%9E%E7%8E%B0%E5%90%8C%E6%AD%A5%E9%A2%98.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2024西湖论剑_Qrohttre：一道windows调试实现同步题.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Qrohttre-%E7%88%B6%E5%AD%90%E8%BF%9B%E7%A8%8B%E5%90%8C%E6%AD%A5%E8%B0%83%E8%AF%95/">Qrohttre 父子进程同步调试</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Reverse/2024%E5%B9%B4KCTF%E6%B0%B4%E6%B3%8A%E6%A2%81%E5%B1%B1-%E5%8F%8D%E6%B7%B7%E6%B7%86/" title="2024 年 KCTF 水泊梁山 - 反混淆"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2024 年 KCTF 水泊梁山 - 反混淆</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Reverse/2024%E5%B9%B4%E7%BE%8A%E5%9F%8E%E6%9D%AF%E7%B2%A4%E6%B8%AF%E6%BE%B3%E5%A4%A7%E6%B9%BE%E5%8C%BA%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9BWP-Reverse%E7%AF%87/" title="羊城杯 2024/chal (Reverse)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">羊城杯 2024/chal (Reverse)</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%80%E6%9C%9F%E6%8E%A8%E8%8D%90"><span class="toc-number">1.</span> <span class="toc-text">往期推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

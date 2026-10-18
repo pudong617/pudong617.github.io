@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>DataCon2023漏洞分析赛道，冠军战队WP分享 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="DataCon2023漏洞分析：CodeQL&#x2F;Joern+污点传播Cypher查询">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DataCon2023漏洞分析赛道，冠军战队WP分享">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/DataCon2023%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E8%B5%9B%E9%81%93-%E5%86%A0%E5%86%9B%E6%88%98%E9%98%9FWP%E5%88%86%E4%BA%AB/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="DataCon2023漏洞分析：CodeQL&#x2F;Joern+污点传播Cypher查询">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="vuln-audit">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/DataCon2023%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E8%B5%9B%E9%81%93-%E5%86%A0%E5%86%9B%E6%88%98%E9%98%9FWP%E5%88%86%E4%BA%AB/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'DataCon2023漏洞分析赛道，冠军战队WP分享',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">DataCon2023漏洞分析赛道，冠军战队WP分享</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="DataCon2023漏洞分析赛道，冠军战队WP分享"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/151336.html">https://www.ctfiot.com/151336.html</a><br>ID: 151336</p>
+</blockquote>
+<p>由中国通信学会数据安全委员会指导，奇安信集团、清华大学网络研究院、北京市大数据中心、蚂蚁集团、腾讯安全大数据实验室、Coremail广东盈世、赛尔网络主办的DataCon大数据安全分析竞赛最终排名已揭晓。</p>
+<p>清华大学TrickorTech战队、武汉大学N0nE429战队、中国科学院信息工程研究所404NOTFOUND战队、中国科学院信息工程研究所Hematopoiesisbshjdkvhbj战队、社会联合跃哥我真不会啊战队分别获得AI安全赛道、软件安全赛道、邮件安全赛道、互联网威胁溯源赛道、漏洞分析赛道冠军。本期跃哥我真不会啊为大家分享漏洞分析赛道解题思路。</p>
+<p>题目一：漏洞模式理解与审计</p>
+<p>buffer &#x3D; (char *) pcalloc(r-&gt;pool, vlen+1);memcpy(buffer, crlf + 4, vlen);</p>
+<p>nv::<br>base64Decode((nv *)(s1a + 4), (const char *)v23, (unsigned int)v16, (unsigned __int8 *)v15, v19)</p>
+<p>sprintf(v6, “%s&#x2F;%s”, byte_43E290, (const char *)dword_43F6D0);</p>
+<p>hsize &#x3D; ntohl(nsize);str &#x3D; (char *) calloc(sizeof(char), hsize+1);</p>
+<p>pool_ptr &#x3D; DCAlloc((unsigned __int16)(6 * size));</p>
+<p>my $content &#x3D; qx{$tarexec -O -xf $tempdir&#x2F;parts&#x2F;$part ‘$f’};</p>
+<p>assert(strlen(header) + strlen(content) &lt; sizeof(http_page)); tmp &#x3D; http_page;  tmp +&#x3D; sprintf(tmp, header, strlen(content));  tmp +&#x3D; sprintf(tmp, “%s” content);</p>
+<p>var inputData &#x3D; Serialize.Deserialize&lt;object[]&gt;(Request.QueryString[“inputData”]);</p>
+<p>chartBase.DataBind(chartInfo.LoadData());</p>
+<p>strcpy(acStack_545 + 1,local_2c);</p>
+<p>v42 &#x3D; strstr(*(const char **)(v41 + 56), “&#x2F;doc&#x2F;xml”); if ( v42 ) { v43 &#x3D; v42 + 8; if ( strlen(v42 + 8) &gt; 0x1F || (sscanf(v43, “&#x2F;%[^&#x2F;]”, haystack), haystack[0]) &amp;&amp; !strstr(haystack, “xml”) &amp;&amp; sub_F0CF0(haystack) ) sub_F0CF0-&gt; … snprintf(s, 0x1Fu, “&#x2F;dav&#x2F;%s.tar.gz”, a1); memset(v4, 0, sizeof(v4)); snprintf(v4, 0xFFu, “tar zxf %s -C &#x2F;home&#x2F;webLib&#x2F;doc&#x2F;xml”, s); if ( system(v4) &lt; 0 )<br> v12 &#x3D; 0; if ( a1 ) { snprintf(s, 31u, “&#x2F;home&#x2F;webLib&#x2F;doc&#x2F;xml&#x2F;%s”, a1);&#x2F;&#x2F; &#x2F;&#x2F;&#x2F;&#x2F;&#x2F;&#x2F;&#x2F;&#x2F;&#x2F;&#x2F;&#x2F;&#x2F;xx;aaaa; aaa为执行的命令。xx为对应的语言包 if ( !sub_294474(s) ) { dev_debug_v1(5, 38, “hardwareif&#x2F;e1&#x2F;unihardwareif.c”, 493, “hwif_language_load”, “%s exist!n”, s); return 0;    }需要做一定的绕过</p>
+<p><code>c435 main (int argc, char *argv[]) 436 { ... 534 for (n = 1; n &lt; (guint) argc; n++) 535 { ... 568 } ... 610 path = g_strdup (argv[n]); // 获取执行命令具体字符串 ... 629 if (path[0] != &#39;/&#39;) 630 { ... // 该函数会根据PATH环境变量寻找要执行命令的绝对地址 632 s = g_find_program_in_path (path); ... 639 argv[n] = path = s; // 把获取到的绝对地址修改回命令行参数 640 }php if (function_exists(&#39;proc_open&#39;)) { $cactiphp = proc_open(read_config_option(&#39;path_php_binary&#39;) . &#39; -q &#39; . $config[&#39;base_path&#39;] . &#39;/script_server.php realtime &#39; . $poller_id, $cactides, $pipes); // line 385 $output = fgets($pipes[1], 1024); $using_proc_function = true; } else { $using_proc_function = false; }</code></p>
+<p>cdata &#x3D; apr_palloc(pool, len + 1);if (strip_white){&#x2F;* trim leading whitespace *&#x2F;while (apr_isspace(<em>cdata)) &#x2F;</em> assume: return false for ‘ ’ <em>&#x2F;++cdata;&#x2F;</em> trim trailing whitespace *&#x2F;while (len– &gt; 0 &amp;&amp; apr_isspace(cdata[len]))continue;cdata[len + 1] &#x3D; ‘ ’;}</p>
+<p>题目二：二进制漏洞模式归纳与自动化挖掘</p>
+<p>MATCH (n:<br>identifier) WHERE n.callee &#x3D; “ustream_get_read_buf” AND n.index&#x3D;-1 WITH collect(id(n)) as sourceSetMATCH (n:<br>identifier) WHERE n.callee &#x3D; “snprintf” AND (n.index&#x3D;1) WITH sourceSet,collect(id(n)) as sinkSetcall VQL.taintPropagation(sourceSet,sinkSet) YIELD taintPropagationPath RETURN taintPropagationPath</p>
+<p>match (n:<br>identifier{callee:”memmove”,index:0}), (m:<br>identifier{callee:”memmove”,index:2})where n.function&#x3D;m.function and m.line&#x3D;n.line and not (m)-[:<br>dfg]-(n) return m.function limit 1000</p>
+<p>– 推荐阅读 –</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">buffer = (char *) pcalloc(r-&gt;pool, vlen+1);memcpy(buffer, crlf + 4, vlen);</span><br><span class="line">nv::</span><br><span class="line">base64Decode((nv *)(s1a + 4), (const char *)v23, (unsigned int)v16, (unsigned __int8 *)v15, v19)</span><br><span class="line">sprintf(v6, &quot;%s/%s&quot;, byte_43E290, (const char *)dword_43F6D0);</span><br><span class="line">hsize = ntohl(nsize);str = (char *) calloc(sizeof(char), hsize+1);</span><br><span class="line">pool_ptr = DCAlloc((unsigned __int16)(6 * size));</span><br><span class="line">my $content = qx&#123;$tarexec -O -xf $tempdir/parts/$part &#x27;$f&#x27;&#125;;</span><br><span class="line">assert(strlen(header) + strlen(content) &lt; sizeof(http_page)); tmp = http_page;  tmp += sprintf(tmp, header, strlen(content));  tmp += sprintf(tmp, &quot;%s&quot; content);</span><br><span class="line">var inputData = Serialize.Deserialize&lt;object[]&gt;(Request.QueryString[&quot;inputData&quot;]);</span><br><span class="line">chartBase.DataBind(chartInfo.LoadData());</span><br><span class="line">strcpy(acStack_545 + 1,local_2c);</span><br><span class="line">v42 = strstr(*(const char **)(v41 + 56), &quot;/doc/xml&quot;); if ( v42 ) &#123; v43 = v42 + 8; if ( strlen(v42 + 8) &gt; 0x1F || (sscanf(v43, &quot;/%[^/]&quot;, haystack), haystack[0]) &amp;&amp; !strstr(haystack, &quot;xml&quot;) &amp;&amp; sub_F0CF0(haystack) ) sub_F0CF0-&gt; ... snprintf(s, 0x1Fu, &quot;/dav/%s.tar.gz&quot;, a1); memset(v4, 0, sizeof(v4)); snprintf(v4, 0xFFu, &quot;tar zxf %s -C /home/webLib/doc/xml&quot;, s); if ( system(v4) &lt; 0 )</span><br><span class="line"> v12 = 0; if ( a1 ) &#123; snprintf(s, 31u, &quot;/home/webLib/doc/xml/%s&quot;, a1);// ////////////xx;aaaa; aaa为执行的命令。xx为对应的语言包 if ( !sub_294474(s) ) &#123; dev_debug_v1(5, 38, &quot;hardwareif/e1/unihardwareif.c&quot;, 493, &quot;hwif_language_load&quot;, &quot;%s exist!n&quot;, s); return 0;    &#125;需要做一定的绕过</span><br><span class="line">```c435 main (int argc, char *argv[]) 436 &#123; ... 534 for (n = 1; n &lt; (guint) argc; n++) 535 &#123; ... 568 &#125; ... 610 path = g_strdup (argv[n]); // 获取执行命令具体字符串 ... 629 if (path[0] != &#x27;/&#x27;) 630 &#123; ... // 该函数会根据PATH环境变量寻找要执行命令的绝对地址 632 s = g_find_program_in_path (path); ... 639 argv[n] = path = s; // 把获取到的绝对地址修改回命令行参数 640 &#125;```</span><br><span class="line">```php if (function_exists(&#x27;proc_open&#x27;)) &#123; $cactiphp = proc_open(read_config_option(&#x27;path_php_binary&#x27;) . &#x27; -q &#x27; . $config[&#x27;base_path&#x27;] . &#x27;/script_server.php realtime &#x27; . $poller_id, $cactides, $pipes); // line 385 $output = fgets($pipes[1], 1024); $using_proc_function = true; &#125; else &#123; $using_proc_function = false; &#125;```</span><br><span class="line">cdata = apr_palloc(pool, len + 1);if (strip_white)&#123;/* trim leading whitespace */while (apr_isspace(*cdata)) /* assume: return false for &#x27; &#x27; */++cdata;/* trim trailing whitespace */while (len-- &gt; 0 &amp;&amp; apr_isspace(cdata[len]))continue;cdata[len + 1] = &#x27; &#x27;;&#125;</span><br><span class="line">MATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;ustream_get_read_buf&quot; AND n.index=-1 WITH collect(id(n)) as sourceSetMATCH (n:</span><br><span class="line">identifier) WHERE n.callee = &quot;snprintf&quot; AND (n.index=1) WITH sourceSet,collect(id(n)) as sinkSetcall VQL.taintPropagation(sourceSet,sinkSet) YIELD taintPropagationPath RETURN taintPropagationPath</span><br><span class="line">match (n:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:0&#125;), (m:</span><br><span class="line">identifier&#123;callee:&quot;memmove&quot;,index:2&#125;)where n.function=m.function and m.line=n.line and not (m)-[:</span><br><span class="line">dfg]-(n) return m.function limit 1000</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/151336.html">https://www.ctfiot.com/151336.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/DataCon2023%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%E8%B5%9B%E9%81%93%EF%BC%8C%E5%86%A0%E5%86%9B%E6%88%98%E9%98%9FWP%E5%88%86%E4%BA%AB.full.md">CTF大赛WP集合&#x2F;articles&#x2F;DataCon2023漏洞分析赛道，冠军战队WP分享.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/vuln-audit/">vuln-audit</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Misc/DataCon2023%E4%BA%92%E8%81%94%E7%BD%91%E5%A8%81%E8%83%81%E6%BA%AF%E6%BA%90%E8%B5%9B%E9%81%93-%E5%86%A0%E5%86%9B%E6%88%98%E9%98%9FWP%E5%88%86%E4%BA%AB/" title="DataCon2023互联网威胁溯源赛道，冠军战队WP分享"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">DataCon2023互联网威胁溯源赛道，冠军战队WP分享</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Misc/DataCon2023%E9%82%AE%E4%BB%B6%E5%AE%89%E5%85%A8%E8%B5%9B%E9%81%93-%E5%86%A0%E5%86%9B%E6%88%98%E9%98%9FWP%E5%88%86%E4%BA%AB/" title="DataCon2023邮件安全赛道，冠军战队WP分享"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">DataCon2023邮件安全赛道，冠军战队WP分享</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

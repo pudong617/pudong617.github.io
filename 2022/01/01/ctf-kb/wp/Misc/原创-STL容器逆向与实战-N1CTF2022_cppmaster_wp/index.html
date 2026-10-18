@@ -1,0 +1,926 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>[原创] STL 容器逆向与实战 (N1CTF 2022 cppmaster wp) | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="N1CTF 2022 cppmaster 逆向：LLVM Pass dump class 结构，deque 三层嵌套 STL 容器 + 动调 input_check 函数确认嵌套顺序 + 还原数据。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[原创] STL 容器逆向与实战 (N1CTF 2022 cppmaster wp)">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/%E5%8E%9F%E5%88%9B-STL%E5%AE%B9%E5%99%A8%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%9E%E6%88%98-N1CTF2022_cppmaster_wp/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="N1CTF 2022 cppmaster 逆向：LLVM Pass dump class 结构，deque 三层嵌套 STL 容器 + 动调 input_check 函数确认嵌套顺序 + 还原数据。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="stl_reversing">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/%E5%8E%9F%E5%88%9B-STL%E5%AE%B9%E5%99%A8%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%9E%E6%88%98-N1CTF2022_cppmaster_wp/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '[原创] STL 容器逆向与实战 (N1CTF 2022 cppmaster wp)',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">[原创] STL 容器逆向与实战 (N1CTF 2022 cppmaster wp)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="[原创] STL 容器逆向与实战 (N1CTF 2022 cppmaster wp)"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/76880.html">https://www.ctfiot.com/76880.html</a><br>ID: 76880</p>
+</blockquote>
+<p>0x1 序言</p>
+<p>在之前的CTF中常常出现了对STL容器的逆向，而在网上的资料中并没有搜到详细的STL容器逆向的经验和文章，这里配合编译器一起来看看常见的STL容器的内存模型，最后根据最近N1CTF比赛中cppmaster来进行实战。</p>
+<p>STL存在非常多种类的容器，但是多个容器之间的底层实现其实是类似的，例如set和map都采用的是rb_tree这个结构，因此我们从这种底层实现的数据结构来对STL容器分类，这里将要分析的容器分为分析四类：rb_tree,deque,hashtable,vector，顺带分析一下string的结构。</p>
+<p>当然可能还存在许许多多的STL容器，但是大体的分析思路是类似的。这里采用LLVM辅助我们分析容器的内存结构。</p>
+<p>0x2 Dump</p>
+<p>对于一个Class而言，在LLVM IR种对应的为StructType，可以使用API访问其下的子Type，因此可以随便简单写个pass来dump出ir种的类的内存模型，从而辅助我们逆向分析各个容器的内存表示和实现。具体代码如下。</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>23</p>
+<p>24</p>
+<p>25</p>
+<p>26</p>
+<p>27</p>
+<p>28</p>
+<p>29</p>
+<p>30</p>
+<p>31</p>
+<p>32</p>
+<p>33</p>
+<p>34</p>
+<p>35</p>
+<p>36</p>
+<p>37</p>
+<p>38</p>
+<p>39</p>
+<p>40</p>
+<p>41</p>
+<p>42</p>
+<p>43</p>
+<p>44</p>
+<p>45</p>
+<p>46</p>
+<p>47</p>
+<p>48</p>
+<p>49</p>
+<p>50</p>
+<p>51</p>
+<p>52</p>
+<p>53</p>
+<p>54</p>
+<p>55</p>
+<p>56</p>
+<p>57</p>
+<p>58</p>
+<p>59</p>
+<p>60</p>
+<p>61</p>
+<p>62</p>
+<p>63</p>
+<p>64</p>
+<p>65</p>
+<p>66</p>
+<p>67</p>
+<p>68</p>
+<p>69</p>
+<p>70</p>
+<p>71</p>
+<p>72</p>
+<p>73</p>
+<p>74</p>
+<p>75</p>
+<p>76</p>
+<p>77</p>
+<p>78</p>
+<p>79</p>
+<p>80</p>
+<p>81</p>
+<p>82</p>
+<p>83</p>
+<p>84</p>
+<p>85</p>
+<p>86</p>
+<p>87</p>
+<p>88</p>
+<p>89</p>
+<p>90</p>
+<p>91</p>
+<p>92</p>
+<p>93</p>
+<p>94</p>
+<p>95</p>
+<p>96</p>
+<p>97</p>
+<p>98</p>
+<p>99</p>
+<p>100</p>
+<p>101</p>
+<p>102</p>
+<p>103</p>
+<p>104</p>
+<p>105</p>
+<p>106</p>
+<p>107</p>
+<p>108</p>
+<p>109</p>
+<p>110</p>
+<p>111</p>
+<p>112</p>
+<p>113</p>
+<p>114</p>
+<p>115</p>
+<p>116</p>
+<p>117</p>
+<p>118</p>
+<p>119</p>
+<p>120</p>
+<p>121</p>
+<p>122</p>
+<p>#include “llvm&#x2F;Pass.h”</p>
+<p>#include “llvm&#x2F;IR&#x2F;Function.h”</p>
+<p>#include “llvm&#x2F;IR&#x2F;CFG.h”</p>
+<p>#include “llvm&#x2F;IR&#x2F;Type.h”</p>
+<p>#include “llvm&#x2F;ADT&#x2F;SmallSet.h”</p>
+<p>#include “llvm&#x2F;ADT&#x2F;SmallVector.h”</p>
+<p>#include “llvm&#x2F;IR&#x2F;BasicBlock.h”</p>
+<p>#include “llvm&#x2F;Support&#x2F;raw_ostream.h”</p>
+<p>#include “llvm&#x2F;IR&#x2F;LegacyPassManager.h”</p>
+<p>#include “llvm&#x2F;Transforms&#x2F;Utils&#x2F;Cloning.h”</p>
+<p>#include “llvm&#x2F;Transforms&#x2F;IPO&#x2F;PassManagerBuilder.h”</p>
+<p>#include<algorithm></p>
+<p>#include<string></p>
+<p>using namespace llvm;</p>
+<p>namespace</p>
+<p>{</p>
+<p>struct DumpClass : public FunctionPass</p>
+<p>{</p>
+<p>static char ID;</p>
+<p>DumpClass() : FunctionPass(ID) {}</p>
+<p>std::<br>string getTypeName(Type *type, DataLayout *data);</p>
+<p>void dumpType(int depth, Type *type, int index, DataLayout *data);</p>
+<p>bool runOnFunction(Function &amp;F) override</p>
+<p>{</p>
+<p>if(F.getName().compare(“main”))</p>
+<p>return false;</p>
+<p>std::<br>set&lt;StructType*&gt; types;</p>
+<p>const DataLayout *data &#x3D; &amp;F.getParent()-&gt;getDataLayout();</p>
+<p>for(Function::<br>iterator B &#x3D; F.begin(); B !&#x3D; F.end(); B++)</p>
+<p>{</p>
+<p>for(BasicBlock::<br>iterator I &#x3D; B-&gt;getFirstInsertionPt(); I !&#x3D; B-&gt;end(); I++)</p>
+<p>{</p>
+<p>Instruction *instr &#x3D; &amp;*I;</p>
+<p>if(isa<AllocaInst>(*instr))</p>
+<p>{</p>
+<p>AllocaInst <em>a &#x3D; (AllocaInst</em>)instr;</p>
+<p>Type *type &#x3D; a-&gt;getAllocatedType();</p>
+<p>if(type-&gt;isStructTy())</p>
+<p>{</p>
+<p>StructType <em>s &#x3D; (StructType</em>)type;</p>
+<p>if(s-&gt;isOpaque())</p>
+<p>continue;</p>
+<p>types.insert(s);</p>
+<p>}</p>
+<p>}</p>
+<p>}</p>
+<p>}</p>
+<p>for(StructType *type:<br>types)</p>
+<p>{</p>
+<p>errs()&lt;&lt;”\n\nstart dumping type: “ + type-&gt;getStructName() + “\n”;</p>
+<p>dumpType(0, type, 0, (DataLayout*)data);</p>
+<p>}</p>
+<p>return false;</p>
+<p>}</p>
+<p>};</p>
+<p>}</p>
+<p>std::<br>string DumpClass::<br>getTypeName(Type *type, DataLayout *data)</p>
+<p>{</p>
+<p>if(type-&gt;isIntegerTy())</p>
+<p>{</p>
+<p>IntegerType <em>i &#x3D; (IntegerType</em>)type;</p>
+<p>return “uint” + std::<br>to_string(i-&gt;getBitWidth()) + “_t”;</p>
+<p>}</p>
+<p>else if(type-&gt;isPointerTy())</p>
+<p>{</p>
+<p>PointerType <em>ptrType &#x3D; (PointerType</em>)type;</p>
+<p>return getTypeName(ptrType-&gt;getPointerElementType(), data) + “*”;</p>
+<p>}</p>
+<p>else if(type-&gt;isArrayTy())</p>
+<p>{</p>
+<p>ArrayType <em>arrType &#x3D; (ArrayType</em>)type;</p>
+<p>return getTypeName(arrType-&gt;getArrayElementType(), data) + “[“ +std::<br>to_string(arrType-&gt;getArrayNumElements()) + “]”;</p>
+<p>}</p>
+<p>else if(type-&gt;isFloatTy())</p>
+<p>{</p>
+<p>return “float”;</p>
+<p>}</p>
+<p>else if(type-&gt;isStructTy())</p>
+<p>{</p>
+<p>StructType <em>s &#x3D; (StructType</em>) type;</p>
+<p>return s-&gt;getStructName();</p>
+<p>}</p>
+<p>else</p>
+<p>{</p>
+<p>return “unknown_” + std::<br>to_string(data-&gt;getTypeAllocSizeInBits(type));</p>
+<p>}</p>
+<p>}</p>
+<p>void DumpClass::<br>dumpType(int depth, Type *type, int index, DataLayout *data)</p>
+<p>{</p>
+<p>std::<br>string blank &#x3D; “”;</p>
+<p>for(int i &#x3D; 0; i &lt; depth; i++)</p>
+<p>blank +&#x3D; “\t”;</p>
+<p>if(type-&gt;isStructTy())</p>
+<p>{</p>
+<p>StructType <em>s &#x3D; (StructType</em>)type;</p>
+<p>errs() &lt;&lt; blank + s-&gt;getStructName() + “ {\n”;</p>
+<p>for(int i &#x3D; 0; i &lt; s-&gt;getStructNumElements(); i++)</p>
+<p>{</p>
+<p>Type *subType &#x3D; s-&gt;getStructElementType(i);</p>
+<p>dumpType(depth + 1, subType, i, data);</p>
+<p>}</p>
+<p>&#x2F;&#x2F;</p>
+<p>errs() &lt;&lt; blank + “} field_” + std::<br>to_string(index) + “;\n”;</p>
+<p>}</p>
+<p>else</p>
+<p>{</p>
+<p>errs() &lt;&lt; blank + getTypeName(type, data) + “ field_” + std::<br>to_string(index) +”;\n”;</p>
+<p>}</p>
+<p>}</p>
+<p>char DumpClass::ID&#x3D;0;</p>
+<p>static RegisterPass<DumpClass> X(“dump”, “DumpClass”);</p>
+<p>&#x2F;&#x2F; Register for clang</p>
+<p>static RegisterStandardPasses Y(PassManagerBuilder::<br>EP_EarlyAsPossible,</p>
+<p>[](const PassManagerBuilder &amp;Builder, legacy::<br>PassManagerBase &amp;PM) {</p>
+<p>PM.add(new DumpClass());</p>
+<p>});</p>
+<p>0x3 deque</p>
+<p>deque是queue，stack，deque等线性容器的底层实现，通过dump工具可以dump出具体的内存结构如下。不难发现在deque中，主要分为三个部分，第一个用于描述map的，其中包含map大小和map的指针，第二个则是指向deque中起始元素的Deque_iterator，第三个则是指向了deque中结束元素的Deque_iterator。</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>class.std::<br>deque<string> {</p>
+<p>class.std::<br>_Deque_base {</p>
+<p>struct.std::<br>_Deque_base&lt;std::<br>__cxx11::<br>basic_string<char>, std::<br>allocator&lt;std::<br>__cxx11::<br>basic_string<char> &gt; &gt;::<br>_Deque_impl {</p>
+<p>struct.std::<br>_Deque_base&lt;std::<br>__cxx11::<br>basic_string<char>, std::<br>allocator&lt;std::<br>__cxx11::<br>basic_string<char> &gt; &gt;::<br>_Deque_impl_data {</p>
+<p>class.std::<br>__cxx11::<br>basic_string** map;</p>
+<p>uint64_t map_size;</p>
+<p>struct.std::<br>_Deque_iterator {</p>
+<p>class.std::<br>__cxx11::<br>basic_string* cur;</p>
+<p>class.std::<br>__cxx11::<br>basic_string* first;</p>
+<p>class.std::<br>__cxx11::<br>basic_string* last;</p>
+<p>class.std::<br>__cxx11::<br>basic_string** map;</p>
+<p>} start;</p>
+<p>struct.std::<br>_Deque_iterator {</p>
+<p>class.std::<br>__cxx11::<br>basic_string* cur;</p>
+<p>class.std::<br>__cxx11::<br>basic_string* first;</p>
+<p>class.std::<br>__cxx11::<br>basic_string* last;</p>
+<p>class.std::<br>__cxx11::<br>basic_string** map;</p>
+<p>} finish;</p>
+<p>} field_0;</p>
+<p>} field_0;</p>
+<p>} field_0;</p>
+<p>} field_0;</p>
+<p>这里需要注意的是：deque对元素的保存采取了分块保存的机制。deque采用一块连续的内存保存了一系列的指针。其中map即指向这一块连续的内存，换句话说map是一个指针，指向一个指针数组。而这个指针数组中的指针指向的则是一篇连续的，用于实际保存数据的内存区域，我们称为data array(每个元素的大小取决于deque中的模板类型)，具体的内存示意图可以如下图所示。</p>
+<p>而iterator的结构需要关注的是cur，他将直接指向数据数组中具体的元素，还有就是iterator下的map指针，这个元素则代表当前iterator指向的元素所在区块对应map中地址，last和first则指向data array的起始和结束。因此可以得知start和finish的map并不一定是相同的(即start迭代器指向元素不一定和finish迭代器指向元素处在同一个data array中)，所以iterator在进行迭代的时候是需要根据map跳跃到不同的data array中。</p>
+<p>0x4 vector</p>
+<p>vector作为常见又方便的stl容器，其实现并不复杂，比上述的deque要简单得多。vector仅仅由三个指针构成：start,finish,end_of_storage。start用于指向数组的第一个元素，而finish指向结束的位置，即最后一个元素后面。而end_of_storage指向当前为vector分配的堆空间的结束地址。</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>class.std::<br>vector<string> {</p>
+<p>struct.std::<br>_Vector_base {</p>
+<p>struct.std::<br>_Vector_base&lt;std::<br>__cxx11::<br>basic_string<char>, std::<br>allocator&lt;std::<br>__cxx11::<br>basic_string<char> &gt; &gt;::<br>_Vector_impl {</p>
+<p>struct.std::<br>_Vector_base&lt;std::<br>__cxx11::<br>basic_string<char>, std::<br>allocator&lt;std::<br>__cxx11::<br>basic_string<char> &gt; &gt;::<br>_Vector_impl_data {</p>
+<p>class.std::<br>__cxx11::<br>basic_string* start;</p>
+<p>class.std::<br>__cxx11::<br>basic_string* finish;</p>
+<p>class.std::<br>__cxx11::<br>basic_string* end_of_storage;</p>
+<p>} field_0;</p>
+<p>} field_0;</p>
+<p>} field_0;</p>
+<p>} field_0;</p>
+<p>为什么需要有一个end_of_storage呢，vector是一个动态的容器，他会根据元素数目分配固定内存，但是当有新的元素加入时，如果分配的固定内存不足以存放新的元素的话，则会进行扩容。因此，这个指针则用于对vector需要扩容时使用(需要注意的是元素的大小取决于模板类型type的大小，因此存在(finish-start)%sizeof(type)&#x3D;&#x3D;0)。具体的内存示意图可以如下图所示。</p>
+<p>0x5 rb_tree</p>
+<p>rb_tree即红黑树，具体的定义可以去网上翻阅资料，这里并不讨论其具体的实现和算法，仅仅讨论其数据结构在内存中的表示。rb_tree分为两个部分，一个适用于比较的key_compare，另一个则是header。重点分析header，header中存在一个node，和node_count。node即这个红黑树的起始节点，而node_count则代表这颗红黑树拥有多少的节点。node中描述了当前节点的颜色，父亲节点，左儿子和右儿子节点。</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>class.std::<br>map&lt;string,string&gt; {</p>
+<p>class.std::<br>_Rb_tree.6 {</p>
+<p>struct.std::<br>_Rb_tree&lt;std::<br>__cxx11::<br>basic_string<char>, std::<br>pair&lt;const std::<br>__cxx11::<br>basic_string<char>, std::<br>__cxx11::<br>basic_string<char> &gt;, std::<br>_Select1st&lt;std::<br>pair&lt;const std::<br>__cxx11::<br>basic_string<char>, std::<br>__cxx11::<br>basic_string<char> &gt; &gt;, std::<br>less&lt;std::<br>__cxx11::<br>basic_string<char> &gt;, std::<br>allocator&lt;std::<br>pair&lt;const std::<br>__cxx11::<br>basic_string<char>, std::<br>__cxx11::<br>basic_string<char> &gt; &gt; &gt;::<br>_Rb_tree_impl {</p>
+<p>struct.std::<br>_Rb_tree_key_compare {</p>
+<p>struct.std::<br>less {</p>
+<p>uint8_t value;</p>
+<p>} key_compare;</p>
+<p>} compare;</p>
+<p>struct.std::<br>_Rb_tree_header {</p>
+<p>struct.std::<br>_Rb_tree_node_base {</p>
+<p>uint32_t color;</p>
+<p>struct.std::<br>_Rb_tree_node_base* parent;</p>
+<p>struct.std::<br>_Rb_tree_node_base* left;</p>
+<p>struct.std::<br>_Rb_tree_node_base* right;</p>
+<p>} node;</p>
+<p>uint64_t node_count;</p>
+<p>} field_1;</p>
+<p>} field_0;</p>
+<p>} field_0;</p>
+<p>} field_0;</p>
+<p>这里需要注意的是，当红黑树中不存在节点时，header中node的parent是0，而left和right则指向node自身。当插入了结点之后，这个parent则会指向树的根节点，而left和right则指向红黑树的最左边的节点和最右边的节点。</p>
+<p>同时需要分清楚rb_tree变量本身和树本身。rb_tree变量中的node是不携带具体数据元素的，而树本身的节点在其node_base结构体结束后的内存区域则是数据元素。具体的内存示意图如下图所示。</p>
+<p>map和set的实现皆是基于rb_tree，而唯一不同之处在于set直接在node中存储数据，而map在node中存储的是键值对，是一个pair，而pair&lt;a,b&gt;在内存中的表示则是直接a后存放b。</p>
+<p>0x6 hashtable</p>
+<p>unordered_map和unordered_set的底层是由hashtable实现的。Prime_rehash_policy结构体适用于hashtable的rehash操作的不做分析，这里我们主要需要关注的是buckets，这个指针指向了一个_Hash_node_base*数组，如果指针为null则无效，这些指针数组中的指针指向的是一个链表，可以通过不断的访问next遍历链表中的所有node。bucket_count则表示buckets的大小，而element_count指的当前hashtable中所有的节点数目。默认的hashtable采用取模的方式找到对应的bucket，bucket_count一般为13。</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>class.std::<br>unordered_map {</p>
+<p>class.std::<br>_Hashtable {</p>
+<p>struct.std::<br>__detail::<br>_Hash_node_base** buckets;</p>
+<p>uint64_t bucket_count;</p>
+<p>struct.std::<br>__detail::<br>_Hash_node_base {</p>
+<p>struct.std::<br>__detail::<br>_Hash_node_base* next;</p>
+<p>} field_2;</p>
+<p>uint64_t element_count;</p>
+<p>struct.std::<br>__detail::<br>_Prime_rehash_policy {</p>
+<p>float max_load_factor;</p>
+<p>uint64_t next_resize;</p>
+<p>} field_4;</p>
+<p>struct.std::<br>__detail::<br>_Hash_node_base* field_5;</p>
+<p>} field_0;</p>
+<p>} field_0;</p>
+<p>因此需要遍历一个hashtable只需要遍历其bucket找到有效的list，并遍历各个list就能找到所有的数据了，类似rb_tree，元素的数据存储与链表结构_Hash_node_base的后面。具体的内存模型如下图所示。</p>
+<p>0x7 string</p>
+<p>string的结构比较简单。主要由一个指针ptr和字符串长度string_length构成。除此之外还会存在一个联合体，当字符串的长度小于8时会直接存储与这个缓冲区中，此时ptr指针将指向这个local_buf，大于这个local_buf将会在堆上另外分配内存，此时这个union转而用于存储分配堆的大小。</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>class.std::<br>__cxx11::<br>basic_string {</p>
+<p>struct.std::<br>__cxx11::<br>basic_string&lt;char, std::<br>char_traits<char>, std::<br>allocator<char> &gt;::<br>_Alloc_hider {</p>
+<p>uint8_t* ptr;</p>
+<p>} dataplus;</p>
+<p>uint64_t string_length;</p>
+<p>union.anon {</p>
+<p>uint64_t allocated_capacity;</p>
+<p>uint8_t local_buf[8];</p>
+<p>};</p>
+<p>} field_0;</p>
+<p>这样设计的目的是方便字符串大小变化的适应，便于实现字符串拼接等工作，且小字符串不用在堆上分配，对速度有少量提升。具体的内存示意图如下图所示，左边的是长度小于8的string。</p>
+<p>0x8 N1CTF2022 cppmaster</p>
+<p>该题给与了一个ELF文件，并给出了hint.txt:<br>Recursive stl containers ( &gt; 3 ), Identify and traverse these containers</p>
+<p>不难知道这个题目与STL容器密切相关，配合traverse不难猜测肯定是使用stl容器套容器的操作，先打开ida看看实现，找到main函数。</p>
+<p>经过动调，可以定位到代码输入函数所在位置，在main中给他命名为input_check。而他上面的函数明显初始化了一个deque的数据结构，第一行对应map，第二行对应map_size，接下来是两个iterator，四个qword一组。</p>
+<p>点开每个iterator的cur，也就是cur，可以看到其中存储了两个元素。</p>
+<p>如果理解了上述的数据结构内存模型，很容易看出来其实是rb_tree，第一个qword是compare_key，第二个qword是color，第三个qword代表parent，第四个和第五个是left和right，第六个qword则代表node_count，因此其实就是deque&lt;rb_tree&lt;&gt;&gt;这种嵌套方式。</p>
+<p>随意点开rb_tree中的一个node，分析一下rb_tree对应的模板类型，可以看到他存储的其实是std::<br>pair，所以其实是deque<map>&gt;，为什么我会知道是int呢，因为后文分析输入流时输入的都是数字，并通过数字从容器中访问内部数据。</p>
+<p>继续查看一下hash_table的buckets。</p>
+<p>随意点开一个bucket，里面存储的是个链表，链表节点数据中存储的也是一个std::<br>pair，因此这其实是一个unordered_map</p>
+<p>到这里我们对该变量有了大体的认识，大概率是不断地stl容器嵌套，接下来继续去分析输入和这些容器之间的关系。input_check函数通过input_num输入一个数字，并且返回该容器对应元素。这个明显是deque的取元素操作。</p>
+<p>然后通过step1跳转到下一层，下一层和input_check逻辑其实是差不多的，也是输入一个数字，然后获取map中对应的元素。</p>
+<p>然后通过step2跳转到下一层，持续同样的操作，只不过这一层是unordered_map罢了。</p>
+<p>这样的顺序刚好和我们之前分析的数据类型嵌套的顺序相符，所以我们需要根据这些函数来反推出这些数据结构的嵌套顺序。不难发现unordered_map的代码明显存在一个取mod的操作，而map存在std::<br>rebalanced的操作。因此可以写出如下脚本来分析出容器的嵌套类型。、</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>23</p>
+<p>24</p>
+<p>25</p>
+<p>26</p>
+<p>27</p>
+<p>import ida_bytes</p>
+<p>import ida_funcs</p>
+<p>import ida_xref</p>
+<p>import idaapi</p>
+<p>step_funcs &#x3D; {}</p>
+<p>funclist &#x3D; Functions()</p>
+<p>rebalance_func &#x3D; None</p>
+<p>for f in funclist:</p>
+<p>name &#x3D; ida_funcs.get_func_name(f)</p>
+<p>if ‘step’ in name:</p>
+<p>step_funcs[name] &#x3D; f</p>
+<p>elif ‘rebalance’ in name:</p>
+<p>rebalance_func &#x3D; f</p>
+<p>assert rebalance_func !&#x3D; None</p>
+<p>step_type &#x3D; {}</p>
+<p>for name, addr in step_funcs.items():</p>
+<p>code &#x3D; str(idaapi.decompile(addr))</p>
+<p>if ‘rebalance’ in code:</p>
+<p>step_type[name] &#x3D; ‘map’</p>
+<p>elif ‘%’ in code:</p>
+<p>step_type[name] &#x3D; ‘hash_map’</p>
+<p>else:</p>
+<p>step_type[name] &#x3D; ‘deque’</p>
+<p>for i in range(28):</p>
+<p>print(‘&#39;‘ + step_type[‘step’ + str(i + 1)] + ‘&#39;‘ + ‘, ‘, end &#x3D; ‘’)</p>
+<p>然后根据上述的出的容器嵌套顺序和对应容器的内存模型dump出对应的数据结构。</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>18</p>
+<p>19</p>
+<p>20</p>
+<p>21</p>
+<p>22</p>
+<p>23</p>
+<p>24</p>
+<p>25</p>
+<p>26</p>
+<p>27</p>
+<p>28</p>
+<p>29</p>
+<p>30</p>
+<p>31</p>
+<p>32</p>
+<p>33</p>
+<p>34</p>
+<p>35</p>
+<p>36</p>
+<p>37</p>
+<p>38</p>
+<p>39</p>
+<p>40</p>
+<p>41</p>
+<p>42</p>
+<p>43</p>
+<p>44</p>
+<p>45</p>
+<p>46</p>
+<p>47</p>
+<p>48</p>
+<p>49</p>
+<p>50</p>
+<p>51</p>
+<p>52</p>
+<p>53</p>
+<p>54</p>
+<p>55</p>
+<p>56</p>
+<p>57</p>
+<p>58</p>
+<p>59</p>
+<p>60</p>
+<p>61</p>
+<p>62</p>
+<p>63</p>
+<p>64</p>
+<p>65</p>
+<p>66</p>
+<p>67</p>
+<p>68</p>
+<p>69</p>
+<p>70</p>
+<p>71</p>
+<p>72</p>
+<p>73</p>
+<p>74</p>
+<p>75</p>
+<p>76</p>
+<p>77</p>
+<p>78</p>
+<p>79</p>
+<p>80</p>
+<p>81</p>
+<p>82</p>
+<p>83</p>
+<p>84</p>
+<p>85</p>
+<p>86</p>
+<p>87</p>
+<p>88</p>
+<p>89</p>
+<p>90</p>
+<p>91</p>
+<p>92</p>
+<p>93</p>
+<p>94</p>
+<p>95</p>
+<p>96</p>
+<p>97</p>
+<p>98</p>
+<p>99</p>
+<p>100</p>
+<p>101</p>
+<p>102</p>
+<p>103</p>
+<p>104</p>
+<p>105</p>
+<p>106</p>
+<p>107</p>
+<p>108</p>
+<p>109</p>
+<p>110</p>
+<p>111</p>
+<p>112</p>
+<p>113</p>
+<p>114</p>
+<p>115</p>
+<p>import ida_bytes</p>
+<p>import idaapi</p>
+<p>size_table &#x3D; {</p>
+<p>‘map’ : 48,</p>
+<p>‘deque’ : 80,</p>
+<p>‘string’ : 32,</p>
+<p>‘hash_map’ : 16,</p>
+<p>}</p>
+<p>def dump_rbtree_node(addr):</p>
+<p>return {</p>
+<p>‘color’ : ida_bytes.get_qword(addr),</p>
+<p>‘parent’ : ida_bytes.get_qword(addr + 8),</p>
+<p>‘left’ : ida_bytes.get_qword(addr + 16),</p>
+<p>‘right’ : ida_bytes.get_qword(addr + 24),</p>
+<p>}</p>
+<p>def dump_rbtree_map(addr):</p>
+<p>key &#x3D; ida_bytes.get_qword(addr)</p>
+<p>node_addr &#x3D; addr + 8</p>
+<p>node_num &#x3D; ida_bytes.get_qword(addr + 40)</p>
+<p>result &#x3D; {}</p>
+<p>def visit(node):</p>
+<p>if node &#x3D;&#x3D; idaapi.BADADDR:</p>
+<p>return</p>
+<p>info &#x3D; dump_rbtree_node(node)</p>
+<p>assert info[‘color’] &#x3D;&#x3D; 1 or info[‘color’] &#x3D;&#x3D; 0</p>
+<p>value_key &#x3D; ida_bytes.get_qword(node + 32)</p>
+<p>data_addr &#x3D; node + 40</p>
+<p>result[value_key] &#x3D; data_addr</p>
+<p>if info[‘left’] !&#x3D; 0:</p>
+<p>visit(info[‘left’])</p>
+<p>if info[‘right’] !&#x3D; 0:</p>
+<p>visit(info[‘right’])</p>
+<p>d &#x3D; dump_rbtree_node(node_addr)</p>
+<p>visit(d[‘parent’])</p>
+<p>assert len(result.keys()) &#x3D;&#x3D; node_num</p>
+<p>return result</p>
+<p>def dump_deque_iterator(addr):</p>
+<p>return {</p>
+<p>‘cur’ : ida_bytes.get_qword(addr),</p>
+<p>‘first’ : ida_bytes.get_qword(addr + 8),</p>
+<p>‘last’ : ida_bytes.get_qword(addr + 16),</p>
+<p>‘map’ : ida_bytes.get_qword(addr + 24),</p>
+<p>}</p>
+<p>def dump_deque(addr, delta):</p>
+<p>deque_map &#x3D; ida_bytes.get_qword(addr)</p>
+<p>map_size &#x3D; ida_bytes.get_qword(addr + 8)</p>
+<p>assert map_size &#x3D;&#x3D; 8</p>
+<p>start &#x3D; dump_deque_iterator(addr + 16)</p>
+<p>finish &#x3D; dump_deque_iterator(addr + 16 + 32)</p>
+<p>assert start[‘last’] &#x3D;&#x3D; finish[‘last’] and start[‘first’] &#x3D;&#x3D; finish[‘first’] andstart[‘map’] &#x3D;&#x3D; finish[‘map’]</p>
+<p>assert (finish[‘cur’] - start[‘cur’]) % delta &#x3D;&#x3D; 0</p>
+<p>ptr &#x3D; start[‘cur’]</p>
+<p>index &#x3D; 0</p>
+<p>result &#x3D; {}</p>
+<p>while ptr !&#x3D; finish[‘cur’]:</p>
+<p>result[index] &#x3D; ptr</p>
+<p>index +&#x3D; 1</p>
+<p>ptr +&#x3D; delta</p>
+<p>return result</p>
+<p>def dump_string(addr):</p>
+<p>data &#x3D; ida_bytes.get_qword(addr)</p>
+<p>length &#x3D; ida_bytes.get_qword(addr + 8)</p>
+<p>return ida_bytes.get_bytes(data, length).decode()</p>
+<p>def dump_hashtable_map(addr):</p>
+<p>addrs &#x3D; set()</p>
+<p>hash_table &#x3D; ida_bytes.get_qword(addr)</p>
+<p>table_num &#x3D; ida_bytes.get_qword(addr + 8)</p>
+<p>for i in range(table_num):</p>
+<p>link_list &#x3D; ida_bytes.get_qword(hash_table + 8 * i)</p>
+<p>if link_list &#x3D;&#x3D; 0:</p>
+<p>continue</p>
+<p>ptr &#x3D; ida_bytes.get_qword(link_list)</p>
+<p>while ptr !&#x3D; 0:</p>
+<p>assert ptr !&#x3D; idaapi.BADADDR</p>
+<p>addrs.add(ptr)</p>
+<p>ptr &#x3D; ida_bytes.get_qword(ptr)</p>
+<p>result &#x3D; {}</p>
+<p>for a in addrs:</p>
+<p>result[ida_bytes.get_qword(a + 8)] &#x3D; a + 16</p>
+<p>return result</p>
+<p>type_list &#x3D; [‘deque’, ‘map’, ‘hash_map’, ‘deque’, ‘map’, ‘map’, ‘hash_map’, ‘hash_map’, ‘map’, ‘map’, ‘hash_map’, ‘map’, ‘map’, ‘deque’, ‘deque’, ‘map’, ‘map’, ‘map’, ‘map’, ‘map’, ‘map’, ‘map’, ‘map’, ‘map’, ‘map’, ‘map’, ‘deque’, ‘deque’, ‘string’]</p>
+<p>def dump_dfs(depth, addr):</p>
+<p>stl_type &#x3D; type_list[depth]</p>
+<p>tmp &#x3D; {}</p>
+<p>if stl_type &#x3D;&#x3D; ‘map’:</p>
+<p>tmp &#x3D; dump_rbtree_map(addr)</p>
+<p>elif stl_type &#x3D;&#x3D; ‘hash_map’:</p>
+<p>tmp &#x3D; dump_hashtable_map(addr)</p>
+<p>elif stl_type &#x3D;&#x3D; ‘deque’:</p>
+<p>next_type &#x3D; type_list[depth + 1]</p>
+<p>tmp &#x3D; dump_deque(addr, size_table[next_type])</p>
+<p>elif stl_type &#x3D;&#x3D; ‘string’:</p>
+<p>return dump_string(addr)</p>
+<p>else:</p>
+<p>assert False</p>
+<p>node &#x3D; {}</p>
+<p>for k, v in tmp.items():</p>
+<p>node[k] &#x3D; dump_dfs(depth + 1, v)</p>
+<p>return node</p>
+<p>result &#x3D; dump_dfs(0, 0x7FFEA5D3A460)</p>
+<p>import json</p>
+<p>with open(‘json_data.txt’,’w+’) as f:</p>
+<p>json.dump(result, f)</p>
+<p>#dump_rbtree_map(0x55F47B277658)</p>
+<p>最后得到如下数据文件，是一个dict的嵌套，最后保存的是字符串。</p>
+<p>最后main函数通过对比字符串，来判断我们输入的一系列数字是否能够访问到对应的字符串，从而判断数字是否正确。</p>
+<p>最后根据dump出的dict从而写出dfs查找出对应的数字序列，从而获得flag。</p>
+<p>1</p>
+<p>2</p>
+<p>3</p>
+<p>4</p>
+<p>5</p>
+<p>6</p>
+<p>7</p>
+<p>8</p>
+<p>9</p>
+<p>10</p>
+<p>11</p>
+<p>12</p>
+<p>13</p>
+<p>14</p>
+<p>15</p>
+<p>16</p>
+<p>17</p>
+<p>target &#x3D; ‘8850a16d-e427-446e-b4df-5f45376e20e4’</p>
+<p>path &#x3D; []</p>
+<p>def dfs(depth, node):</p>
+<p>global path</p>
+<p>if type(node) &#x3D;&#x3D; dict:</p>
+<p>for k, v in node.items():</p>
+<p>path.append(k)</p>
+<p>dfs(depth + 1, v)</p>
+<p>path.pop()</p>
+<p>else:</p>
+<p>if node &#x3D;&#x3D; target:</p>
+<p>print(path)</p>
+<p>import json</p>
+<p>f &#x3D; open(‘json_data.txt’,’r’)</p>
+<p>data &#x3D; json.load(f)</p>
+<p>f.close()</p>
+<p>dfs(0, data)</p>
+<p>原文始发于看雪社区（R1mao）： [原创]STL容器逆向与实战(N1CTF2022 cppmaster wp)</p>
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/76880.html">https://www.ctfiot.com/76880.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%5B%E5%8E%9F%E5%88%9B%5DSTL%E5%AE%B9%E5%99%A8%E9%80%86%E5%90%91%E4%B8%8E%E5%AE%9E%E6%88%98%28N1CTF2022_cppmaster_wp%29.full.md">CTF大赛WP集合&#x2F;articles&#x2F;[原创]STL容器逆向与实战(N1CTF2022_cppmaster_wp).full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/stl-reversing/">stl_reversing</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Misc/%E5%8E%9F%E5%88%9B-%E4%BB%8ENCTF_2022_ezshellcode%E5%85%A5%E9%97%A8CTF_PWN%E4%B8%AD%E7%9A%84ptrace%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/" title="[原创] 从 NCTF 2022 ezshellcode 入门 CTF PWN 中的 ptrace 代码注入"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">[原创] 从 NCTF 2022 ezshellcode 入门 CTF PWN 中的 ptrace 代码注入</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Misc/%E5%90%84%E7%B1%BB%E5%B8%B8%E8%A7%81%E5%8E%8B%E7%BC%A9%E5%8C%85%E7%B1%BB%E5%9E%8B%E9%9A%90%E5%86%99%E6%9C%AF%E6%80%BB%E7%BB%93/" title="各类常见压缩包类型隐写术总结"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">各类常见压缩包类型隐写术总结</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

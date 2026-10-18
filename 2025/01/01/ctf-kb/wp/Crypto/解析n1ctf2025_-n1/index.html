@@ -1,0 +1,273 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>n1ctf 2025 Crypto (n1)³ 张量分解攻击 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="n1ctf 2025 Crypto 高难度：把 35 维立方加密视为对称张量 f(x) &#x3D; Σ w_k (v_k^T x)³，用 Jennrich 算法做 CP 分解恢复明文。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="n1ctf 2025 Crypto (n1)³ 张量分解攻击">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%90n1ctf2025_-n1/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="n1ctf 2025 Crypto 高难度：把 35 维立方加密视为对称张量 f(x) &#x3D; Σ w_k (v_k^T x)³，用 Jennrich 算法做 CP 分解恢复明文。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="tensor-decomposition">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%90n1ctf2025_-n1/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'n1ctf 2025 Crypto (n1)³ 张量分解攻击',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">n1ctf 2025 Crypto (n1)³ 张量分解攻击</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="n1ctf 2025 Crypto (n1)³ 张量分解攻击"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/278359.html">https://www.ctfiot.com/278359.html</a><br>ID: 278359</p>
+</blockquote>
+<p>n1ctf 2025 – Crypto – (n1)³ 完整技术解析</p>
+<p>题目信息</p>
+<p>考点: 张量分解、Jennrich算法、有限域、三次多项式</p>
+<p>task.sage– 加密脚本</p>
+<p>output.txt– 加密输出</p>
+<p>FLAG处理：</p>
+<p>将FLAG从字节转换为整数</p>
+<p>使用.digits(257)将整数转换为257进制表示</p>
+<p>这意味着FLAG被编码为35个0-256之间的数字</p>
+<p>有限域设置：</p>
+<p>工作在有限域GF(257)上（257是一个质数）</p>
+<p>n &#x3D; 35，即明文长度为35</p>
+<p>随机矩阵生成：</p>
+<p>U, T是35×35的随机可逆矩阵</p>
+<p>这些矩阵作为密钥使用</p>
+<p>加密函数：</p>
+<p>enc(x) &#x3D; (x * U).apply_map(lambda c: c^3) * T</p>
+<p>x是输入向量（35维）</p>
+<p>首先线性变换：x * U</p>
+<p>然后逐元素求三次方：apply_map(c^3)</p>
+<p>最后线性变换：* T</p>
+<p>第一行：35个三次多项式，构成多项式系统</p>
+<p>第二行：FLAG加密后的结果向量</p>
+<p>x是输入向量（35维）</p>
+<p>U, T是35×35可逆矩阵</p>
+<p>^{[3]}表示逐元素求三次方</p>
+<p>若三索引全不同：共有 3! &#x3D; 6 个排列，张量中放入 c&#x2F;6；</p>
+<p>若两相同一不同（如 xᵢ²xⱼ）：共有 3 个排列，放入 c&#x2F;3；</p>
+<p>若三相同（xᵢ³）：只有 1 个排列，放入 c。</p>
+<p>构造 A,B：按 S^(c) 的每个条目 (i,j,k) 同时计入其 3! 个排列到 A[p,q],B[p,q] 中，并分别乘以 aᵣ,bᵣ。</p>
+<p>求特征结构（有限域）：在 GF(257) 里我们通过扫描 t∈{0..256} 检测 det(X-tI)&#x3D;0 来收集特征值，并以空域（nullspace）求对应特征向量；向量按首个非零分量归一化为 1。</p>
+<p>解 W：用 A_rows 表示对所有单位向量 eⱼ 逐个评估 f(eⱼ) 的结果，其与 V^∘³ 满足：</p>
+<p>A_rows &#x3D; V^∘³ W</p>
+<p>因此 W &#x3D; (V^∘³)^(-1) A_rows。其中 A_rows 的构造很简单：只有常数项与”所有索引都等于 j”的 xⱼ³ 会在 eⱼ 处存活，其余项全为 0。</p>
+<p>三阶对称张量可以进行CP分解：S &#x3D; Σ(k&#x3D;1 to n) vₖ ⊗ vₖ ⊗ vₖ</p>
+<p>Jennrich算法利用随机收缩构造对称矩阵</p>
+<p>对称矩阵的特征分解给出原始向量</p>
+<p>时间复杂度：O(n³)</p>
+<p>确定性算法（在适当条件下）</p>
+<p>不需要初始猜测</p>
+<p>257是质数，所以GF(257)是域</p>
+<p>每个非零元素都有乘法逆元</p>
+<p>特征为257，意味着257 &#x3D; 0</p>
+<p>张量密码学：使用高阶张量构造密码系统</p>
+<p>有限域密码学：在有限域上设计密码算法</p>
+<p>代数攻击：通过代数方法分析密码系统</p>
+<p>张量分解：CP分解、Jennrich算法</p>
+<p>有限域线性代数：矩阵运算、特征值问题</p>
+<p>代数几何：多项式系统求解</p>
+<p>Python数值计算：精确的有限域运算</p>
+<p>算法实现：从数学理论到代码实现</p>
+<p>调试技巧：验证和测试的重要性</p>
+<p>解析输出文件：</p>
+<p>将output.txt的35个多项式分别保存为一段，用空行+—分隔</p>
+<p>将加密结果向量保存为逗号分隔的一行</p>
+<p>文件结构：</p>
+<p>parsed_components.txt # 35个三次多项式y_list.txt # 35个整数(0-256)</p>
+<p>多项式解析→张量构造→Jennrich分解→明文恢复</p>
+<p>每一步都需要在GF(257)上进行精确的有限域运算</p>
+<p>验证是确保分解正确性的关键步骤</p>
+<p>张量分解将三次多项式系统转化为线性结构</p>
+<p>Jennrich算法利用随机收缩暴露隐藏的投影方向</p>
+<p>有限域特性保证了三次方根的唯一性</p>
+<p>括号匹配正确分割复杂的多项式字符串</p>
+<p>对称化处理将多项式系数转换为张量元素</p>
+<p>多次尝试处理随机算法的不确定性</p>
+<p>parse_monos：把如51<em>x4</em>x5^2这类项解析为(系数, 有序索引元组)</p>
+<p>处理正负号、系数、变量索引和指数</p>
+<p>S_list：对每个输出分量m，把所有三次项规约到排序后的索引并做重数归一</p>
+<p>按3!排列数除以重复阶乘进行归一化</p>
+<p>build_contract_matrices_from_Sc：给定收缩张量S_c与随机a,b，构造A,B</p>
+<p>考虑所有排列并乘以相应的收缩向量元素</p>
+<p>X &#x3D; A * B^(-1)，扫t∈[0,256]找det(X-tI)&#x3D;0</p>
+<p>取零空间做特征向量，归一化使首个非零元素为1</p>
+<p>V^∘³可逆后，解W &#x3D; (V^∘³)^(-1)A_rows</p>
+<p>随机点验证一致性：f(x) ≟ W * (V^T x)^∘³ (mod 257)</p>
+<p>解u³ &#x3D; (W^T)^(-1)y</p>
+<p>u &#x3D; (u³)^(1&#x2F;3)（pow(val, inv3, 257)）</p>
+<p>解V^T x &#x3D; u，组装字节</p>
+<p>所有运算都要模257</p>
+<p>负数要转换为正数表示：-1 → 256</p>
+<p>使用pow(a, -1, 257)求乘法逆元</p>
+<p>设置种子确保可重现性</p>
+<p>多次尝试处理不可逆情况</p>
+<p>验证每一步的正确性</p>
+<p>稀疏张量存储节省内存</p>
+<p>早期终止避免无效计算</p>
+<p>缓存中间结果供调试使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">FLAG = ZZ.from_bytes(os.getenvb(b&quot;FLAG&quot;,b&quot;n1ctf&#123;.*&#125;&quot;)[6:-1]).digits(257)F, n = GF(257), len(FLAG)U, T = [random_matrix(F, n)for_in&#x27;:)&#x27;]enc =lambdax: (x * U).apply_map(lambdac: c^3) * Tprint(enc(vector(F[&quot;,&quot;.join(f&quot;x&#123;i&#125;&quot;foriinrange(n))].gens())))print(enc(vector(F, FLAG)))</span><br><span class="line">enc(x) = (x * U).apply_map(lambda c: c^3) * T</span><br><span class="line">f(x) = ((xU)^&#123;[3]&#125;)T</span><br><span class="line">f(x) = Σ(k=1 to 35) wₖ ⋅ (vₖᵀx)³</span><br><span class="line">S[i,j,k] = Σ(m=1 to 35) wₘ[i] ⋅ vₘ[j] ⋅ vₘ[k] ⋅ vₘ[l]</span><br><span class="line">f(x) = Σ(k=1 to 35) wₖ ⋅ (vₖᵀx)³</span><br><span class="line">A = S^(c) ×₃ a, B = S^(c) ×₃ b</span><br><span class="line">X = A B^(-1)</span><br><span class="line">defparse_polynomials(poly_line): poly_system = poly_line[1:-1] # 去掉外层括号 polynomials = [] current_poly =&quot;&quot; paren_count =0 forcharinpoly_system: current_poly += char ifchar ==&#x27;(&#x27;: paren_count +=1 elifchar ==&#x27;)&#x27;: paren_count -=1 elifchar ==&#x27;,&#x27;andparen_count ==0: # 找到多项式分隔符 polynomials.append(current_poly[:-1].strip()) current_poly =&quot;&quot;</span><br><span class="line">fᵢ(x) = Σ(j,k,l) S[i,j,k,l] ⋅ xⱼ ⋅ xₖ ⋅ xₗ</span><br><span class="line">defmultiplicity_of_tuple(tup): cnt = Counter(tup) mult = math.factorial(3) forvincnt.values(): mult //= math.factorial(v) returnmult</span><br><span class="line"># 对称化sorted_idxs = tuple(sorted(idxs))mult = multiplicity_of_tuple(sorted_idxs)inv_mult = pow(mult,-1, MOD)S_list[m][sorted_idxs] = (S_list[m].get(sorted_idxs,0) + coeff * inv_mult) % MOD</span><br><span class="line">defmat_inv(M): N = len(M) # 构造增广矩阵 [M|I] mat = [row + [1ifi==jelse0forjinrange(N)]fori,rowinenumerate(M)] # 高斯消元 forcolinrange(N): # 选择主元 pivot_row =None forrinrange(col, N): ifmat[r][col] % MOD !=0: pivot_row = r break ifpivot_rowisNone: returnNone</span><br><span class="line"># 矩阵奇异 # 交换行 ifpivot_row != col: mat[col], mat[pivot_row] = mat[pivot_row], mat[col] # 归一化主元 inv_pivot = pow(mat[col][col],-1, MOD) mat[col] = [(val * inv_pivot) % MODforvalinmat[col]] # 消元 forrinrange(N): ifr != col: factor = mat[r][col] iffactor !=0: mat[r] = [(mat[r][c] - factor * mat[col][c]) % MODforcinrange(2*N)] # 提取逆矩阵 return[row[N:]forrowinmat]</span><br><span class="line">defdet_mod(M): N = len(M) mat = [row[:]forrowinM] det =1 foriinrange(N): # 寻找主元 pivot =None forrinrange(i, N): ifmat[r][i] % MOD !=0: pivot = r break ifpivotisNone: return0 ifpivot != i: mat[i], mat[pivot] = mat[pivot], mat[i] det = (-det) % MOD det = (det * mat[i][i]) % MOD inv_pivot = pow(mat[i][i],-1, MOD) # 消元 forrinrange(i+1, N): ifmat[r][i] !=0: factor = (mat[r][i] * inv_pivot) % MOD forcinrange(i, N): mat[r][c] = (mat[r][c] - factor * mat[i][c]) % MOD returndet % MOD</span><br><span class="line">defbuild_Sc(c): &quot;&quot;&quot;用随机向量c对张量进行线性收缩&quot;&quot;&quot; Sc = &#123;&#125; form_val, Sminenumerate(S_list): cm = c[m_val] % MOD ifcm ==0: continue foridxs, valinSm.items(): Sc[idxs] = (Sc.get(idxs,0) + cm * val) % MOD returnScdefbuild_contract_matrices_from_Sc(Sc, a, b): &quot;&quot;&quot;构造收缩矩阵A和B&quot;&quot;&quot; A = [[0]*nfor_inrange(n)] B = [[0]*nfor_inrange(n)] for(i,j,k), valinSc.items(): # 考虑所有排列 perms = set(itertools.permutations((i,j,k))) for(p,q,r)inperms: A[p][q] = (A[p][q] + val * a[r]) % MOD B[p][q] = (B[p][q] + val * b[r]) % MOD returnA, B</span><br><span class="line"># 计算X = A * B^(-1)Binv = mat_inv(B)ifBinvisNone: continue</span><br><span class="line"># B不可逆，跳过X = mat_mul(A, Binv)</span><br><span class="line"># 寻找特征值eigenvals = []fortinrange(MOD): M = [[(X[i][j] - (tifi==jelse0)) % MODforjinrange(n)]foriinrange(n)] ifdet_mod(M) ==0: eigenvals.append(t)</span><br><span class="line"># 计算特征向量eigvecs = []forlamineigenvals: M = [[(X[i][j] - (lamifi==jelse0)) % MODforjinrange(n)]foriinrange(n)] basis = nullspace_mod(M) forvinbasis: # 归一化 foridx, valinenumerate(v): ifval !=0: inv = pow(val,-1, MOD) v = [(x * inv) % MODforxinv] break eigvecs.append(v)</span><br><span class="line"># 构造V矩阵V = [[eigvecs[col][row]forcolinrange(n)]forrowinrange(n)]# V的三次方V_cubed = [[pow(V[j][k],3, MOD)forkinrange(n)]forjinrange(n)]# 求解WVc_inv = mat_inv(V_cubed)W = mat_mul(Vc_inv, A_rows)</span><br><span class="line">defeval_poly(x): &quot;&quot;&quot;直接计算多项式值&quot;&quot;&quot; res = [0]*n form_idxinrange(n): s =0 forcoeff, idxsinmonos_all[m_idx]: iflen(idxs) ==0: s = (s + coeff) % MOD else: term = coeff foridxinidxs: term = (term * x[idx]) % MOD s = (s + term) % MOD res[m_idx] = s returnres</span><br><span class="line"># 验证分解是否正确for_inrange(3): x_test = [random.randrange(MOD)for_inrange(n)] u = [sum(V[row][k] * x_test[row]forrowinrange(n)) % MODforkinrange(n)] y_from = [sum(W[k][m] * pow(u[k],3, MOD)forkinrange(n)) % MODforminrange(n)] y_true = eval_poly(x_test) ify_from != y_true: ok =False break</span><br><span class="line">A_rows = V^∘³ W</span><br><span class="line">y = Σ(k) wₖ uₖ³, 其中 uₖ = (vₖᵀ x)</span><br><span class="line">y = Wᵀ u^∘³</span><br><span class="line">u^∘³ = (Wᵀ)^(-1) y</span><br><span class="line">u = (u^∘³)^(3^(-1) mod 256) （逐坐标幂）</span><br><span class="line">Vᵀ x = u</span><br><span class="line"># 1. 解u^3WT = [[found_W[i][j]foriinrange(n)]forjinrange(n)]WT_inv = mat_inv(WT)u3 = [sum(WT_inv[i][j] * y[j]forjinrange(n)) % MODforiinrange(n)]# 2. 计算三次方根（在GF(257)中唯一）inv3 = pow(3,-1, MOD-1) # 3在模256下的逆元u = [pow(val, inv3, MOD)forvalinu3]# 3. 解xVt = [[found_V[row][col]forrowinrange(n)]forcolinrange(n)]Vt_inv = mat_inv(Vt)x_sol = [sum(Vt_inv[i][j] * u[j]forjinrange(n)) % MODforiinrange(n)]</span><br><span class="line"># 重构整数（LSB在前）value =0fori, dinenumerate(x_sol): value += d * pow(257, i)</span><br><span class="line"># 转换为字节blen = (value.bit_length() +7) //8flag_bytes = value.to_bytes(blen,&#x27;big&#x27;)</span><br><span class="line"># 检查矩阵是否可逆ifmat_inv(B)isNone: continue</span><br><span class="line"># 跳过不可逆情况</span><br><span class="line"># 将特征向量归一化，使第一个非零元素为1foridx, valinenumerate(v): ifval !=0: inv = pow(val,-1, MOD) v = [(x * inv) % MODforxinv] break</span><br><span class="line">parsed_components.txt # 35个三次多项式y_list.txt # 35个整数(0-256)</span><br><span class="line">python3 solve.py</span><br><span class="line">Success at trial 8Recovered flag (utf-8): Pr0j3c7ion_4nd_M1nr4nk_4r3_p0w3rfulDone. Files written: recovered_digits.txt, recovered_flag_bytes.bin</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/278359.html">https://www.ctfiot.com/278359.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E8%A7%A3%E6%9E%90n1ctf2025_%28n1%29%C2%B3.full.md">CTF大赛WP集合&#x2F;articles&#x2F;解析n1ctf2025_(n1)³.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/tensor-decomposition/">tensor-decomposition</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%9D%AFezran/" title="2025 强网杯 ezran - MT19937 状态恢复攻击"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2025 强网杯 ezran - MT19937 状态恢复攻击</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%90%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81Unsafe_Parameters/" title="解析强网拟态 Unsafe Parameters - 共享私钥指数 RSA 攻击"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">解析强网拟态 Unsafe Parameters - 共享私钥指数 RSA 攻击</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

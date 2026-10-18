@@ -1,0 +1,279 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>DASCTF 2025 上半年赛 Writeup by Mini-Venom | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="DASCTF 2025 上半年赛 Mini-Venom 战队 WP，OBEX&#x2F;RSA 复私钥&#x2F;ECDSA 复用&#x2F;SM4 文件系统解密。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DASCTF 2025 上半年赛 Writeup by Mini-Venom">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/DASCTF_2025%E4%B8%8A%E5%8D%8A%E5%B9%B4%E8%B5%9B_Writeup_by_Mini-Venom/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="DASCTF 2025 上半年赛 Mini-Venom 战队 WP，OBEX&#x2F;RSA 复私钥&#x2F;ECDSA 复用&#x2F;SM4 文件系统解密。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="obex">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/DASCTF_2025%E4%B8%8A%E5%8D%8A%E5%B9%B4%E8%B5%9B_Writeup_by_Mini-Venom/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'DASCTF 2025 上半年赛 Writeup by Mini-Venom',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">DASCTF 2025 上半年赛 Writeup by Mini-Venom</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="DASCTF 2025 上半年赛 Writeup by Mini-Venom"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/258051.html">https://www.ctfiot.com/258051.html</a><br>ID: 258051</p>
+</blockquote>
+<p>招新小广告CTF组诚招re、crypto、pwn、misc、合约方向的师傅,长期招新IOT+Car+工控+样本分析多个组招人有意向的师傅请联系邮箱 <a href="mailto:&#x61;&#100;&#x6d;&#x69;&#110;&#64;&#x63;&#104;&#97;&#x6d;&#100;&#53;&#x2e;&#x6f;&#114;&#103;">&#x61;&#100;&#x6d;&#x69;&#110;&#64;&#x63;&#104;&#97;&#x6d;&#100;&#53;&#x2e;&#x6f;&#114;&#103;</a>(带上简历和想加入的小组)</p>
+<p>MISC</p>
+<p>BlueTrace</p>
+<p>题目说文件被传入PC中，去找找文件在哪，发现OBEX有图片行为</p>
+<p>tshark提取</p>
+<p>tshark -r BlueTrace.pcapng -Y obex.header.value.byte_sequence -T fields -e obex.header.value.byte_sequence &gt; 1.txt</p>
+<p>PC名称：INFERNITYのPC<br>fig:</p>
+<p>得到个照片<br>fig:</p>
+<p>分析颜色通道（RGB）值，发现都一样，那就提取，发现是隐藏了文本</p>
+<p>from PIL import Image  </p>
+<p>def check_rgb_uniformity(image_path):<br>img &#x3D; Image.open(image_path).convert(“RGB”)  <br>width, height &#x3D; img.size  <br>pixels &#x3D; img.load()  </p>
+<p>inconsistent_pixels &#x3D; []  <br>r_list &#x3D; []  <br>for y in range(height):  <br>for x in range(width):  <br>r, g, b &#x3D; pixels[x, y]  </p>
+<h1 id="print-f’-r-g-b-’"><a href="#print-f’-r-g-b-’" class="headerlink" title="print(f’{r}, {g}, {b}’)"></a>print(f’{r}, {g}, {b}’)</h1><h1 id="print-chr-r-end-’’"><a href="#print-chr-r-end-’’" class="headerlink" title="print(chr(r), end&#x3D;’’)"></a>print(chr(r), end&#x3D;’’)</h1><p>r_list.append(r)  </p>
+<h1 id="if-r-g-or-g-b"><a href="#if-r-g-or-g-b" class="headerlink" title="if r !&#x3D; g or g !&#x3D; b:"></a>if r !&#x3D; g or g !&#x3D; b:</h1><h1 id="inconsistent-pixels-append-x-y-r-g-b"><a href="#inconsistent-pixels-append-x-y-r-g-b" class="headerlink" title="inconsistent_pixels.append(((x, y), (r, g, b)))"></a>inconsistent_pixels.append(((x, y), (r, g, b)))</h1><p>ifnot inconsistent_pixels:  <br>print(‘’.join(hex(r)[2:] for r in r_list))  <br>else:  <br>print(f”❌ 有 {len(inconsistent_pixels)} 个像素通道不一致，示例：”)  </p>
+<p>check_rgb_uniformity(“flag.png”)</p>
+<p>fig:</p>
+<p>DASCTF{0ba687ee-60e0-4697-8f4c-42e9b81d2dc6}</p>
+<p>Webshell Plus</p>
+<p>是冰蝎的流量，但是用了openssl<br>fig:<br>fig:</p>
+<p>分析上面的马，我们需要去得到这当中的$p，才能得到后续交互的key<br>fig:</p>
+<p>目前有的条件是有public key，但是解密需要私钥，我们可以去解这个公钥</p>
+<p>提取n和e<br>fig:</p>
+<p>分解<br>fig:</p>
+<p>然后去构造private key</p>
+<p>from Crypto.Util.number import inverse  <br>from cryptography.hazmat.primitives.asymmetric import rsa  <br>from cryptography.hazmat.primitives import serialization  </p>
+<p>p &#x3D; 7867691643586180987785626545986251727789183377275546449400690071916592141728452581896381132002349573632855071606614201168751151435679435299890592299985167<br>q &#x3D; 7867691643586180987785626545986251727789183377275546449400690071916592141728452581896381132002349573632855071606614201168751151435679435299890592299985539<br>phi &#x3D; (p - 1) * (q - 1)  <br>n &#x3D; p * q  <br>e &#x3D; 65537<br>d &#x3D; inverse(e, phi)  <br>d_p &#x3D; d % (p - 1)  <br>d_q &#x3D; d % (q - 1)  <br>q_inv &#x3D; pow(q, -1, p)  </p>
+<p>private_key &#x3D; rsa.RSAPrivateNumbers(  <br>p&#x3D;p,  <br>q&#x3D;q,  <br>d&#x3D;d,  <br>dmp1&#x3D;d_p,  <br>dmq1&#x3D;d_q,  <br>iqmp&#x3D;q_inv,  <br>public_numbers&#x3D;rsa.RSAPublicNumbers(e, n)  <br>).private_key()  </p>
+<p>pem &#x3D; private_key.private_bytes(  <br>encoding&#x3D;serialization.Encoding.PEM,  <br>format&#x3D;serialization.PrivateFormat.PKCS8,  <br>encryption_algorithm&#x3D;serialization.NoEncryption()  <br>)  <br>print(pem.decode())</p>
+<p>然后后续解内容就行，发现其中TCP 32流中有&#x2F;etc&#x2F;shadow的结果，要的是root密码的md5，那就再去爆hashcat</p>
+<?php  
+$key = 'd14d8ce94563e71a';  
+$data = '  
+myzZoRJB9iFwgtIPC0fDUeFaS+fdv0LH3s0SKFXJkWe+V0zA2TRsTsfK65Dn7HMfUZaD+teWivQy
+Ajt320oY70by3v22VYG+fe9m+wVYkpscpuhYFu5u10Gk+/seD+6Swj65YvXjSJVI7fAC7wuUXCJE
+Io5CkJyC78gv7bCBn3Xd2TKaHp8grtoz+a9geiFFyhPYpjo1G8KFXE4zkzesi/vA5C9TF55yANHI
+LKvybGhwNnDqBA/EK1eB9oF99hwoH/JF0g/mXYCh+8pl6UtnXMWJibavqk+vW3daw2irj4BxUp5D
+hiBfialxH2TkYD+PWCawQRPyySSxY/5dsQplP0uuMDuijkM7A5VRK8tzs/XV14Norr1RWEshvfBu
+kQphvX1MZMXUTCf5Roqo9M6Sls2L5gK6z8rrnmSVNIOf8RzmAFnHOOtzbyO8wr/Fc5asNizVcPrC
+L9Ul3EUVy+h4p3ow2cQfaLHfs0RVs5KSJdVwHrJcgH8gdv6bUeOXkDkiboauyFdgQTbYQYCZ6pGl
+iiwbsgmU6M9QVGcXa27BxMPLZivnrIynGGVQT+b6HnOZT/jPgyz7TbzQDJH0YNynjdHFAgFkdngp
+h75uql2jlggVzr9/IKsAgCPZL1SK8ZdZfryMN89/mn1nq/0E1eWzKwZSym/qeCckqpFLcBUsDNpf
+bVkXdqyYZ5G1AYaAIp8OoUe+cEhoFnvay4/gVsn4Ol6qocOkwQ4pfv1dVWosaB2X8duzW7xTuZmU
+rfRLwW+ybsW3pvc/1TmlJYKLKTxWFUeiEKxrscnWz2fkIbNjRwD6rDHbQXPLk/cnB0gq7EE4JTxk
+ePqEJq+x5oR712jHqeMLeDtqtKiJX8NHZktaykEZlVTSu0ptknM1DDijOQtiQX5a6mpJgBSDIHxO
+kVsG/ghCZ2DnGYQd5YM4TkQOzzn2IRczBKxG+pj3H2/tqoL3Dpbjwjh8+KGbPBvtxYE4isC2rv+i
+J3OcfD/fA9u0QzZlVLAPot0HRkhQnjAprBSxC+nHMwv0oqX6/SsGoBsQjUeYQPsIbUEoXPQyfyiv
+8jny08uEBgfY8nMcxMrEcM54BVVFCwY4b7TfOM5dFd90bHNmStc051bJsXal/0q6Q7VI8vaUUvbn
+vZ+Z/2uOzHTa
+';  
+$json = openssl_decrypt($data, "AES128", $key);  
+print openssl_error_string();  
+$data = json_decode($json, true);  
+$status = base64_decode($data['status']);  
+$msg = base64_decode($data['msg']);  
+echo 'status:'.$status.'  
+msg:'.$msg;
+
+然后md5
+
+DASCTF{f3d279e1b58a1e25c092b018f035d406}
+
+CRYPTO
+
+Excessive Security
+
+有
+
+结束
+
+招新小广告
+
+ChaMd5 Venom 招收大佬入圈
+
+新成立组IOT+工控+样本分析 长期招新
+
+欢迎联系admin@chamd5.org
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br></pre></td><td class="code"><pre><span class="line">tshark -r BlueTrace.pcapng -Y obex.header.value.byte_sequence -T fields -e obex.header.value.byte_sequence &gt; 1.txt</span><br><span class="line">from PIL import Image  </span><br><span class="line"></span><br><span class="line">def check_rgb_uniformity(image_path):</span><br><span class="line">img = Image.open(image_path).convert(&quot;RGB&quot;)  </span><br><span class="line">width, height = img.size  </span><br><span class="line">pixels = img.load()  </span><br><span class="line"></span><br><span class="line">inconsistent_pixels = []  </span><br><span class="line">r_list = []  </span><br><span class="line">for y in range(height):  </span><br><span class="line">for x in range(width):  </span><br><span class="line">r, g, b = pixels[x, y]  </span><br><span class="line"># print(f&#x27;&#123;r&#125;, &#123;g&#125;, &#123;b&#125;&#x27;)  </span><br><span class="line"># print(chr(r), end=&#x27;&#x27;)  </span><br><span class="line">r_list.append(r)  </span><br><span class="line"># if r != g or g != b:  </span><br><span class="line"># inconsistent_pixels.append(((x, y), (r, g, b)))  </span><br><span class="line"></span><br><span class="line">ifnot inconsistent_pixels:  </span><br><span class="line">print(&#x27;&#x27;.join(hex(r)[2:] for r in r_list))  </span><br><span class="line">else:  </span><br><span class="line">print(f&quot;❌ 有 &#123;len(inconsistent_pixels)&#125; 个像素通道不一致，示例：&quot;)  </span><br><span class="line"></span><br><span class="line">check_rgb_uniformity(&quot;flag.png&quot;)</span><br><span class="line">from Crypto.Util.number import inverse  </span><br><span class="line">from cryptography.hazmat.primitives.asymmetric import rsa  </span><br><span class="line">from cryptography.hazmat.primitives import serialization  </span><br><span class="line"></span><br><span class="line">p = 7867691643586180987785626545986251727789183377275546449400690071916592141728452581896381132002349573632855071606614201168751151435679435299890592299985167</span><br><span class="line">q = 7867691643586180987785626545986251727789183377275546449400690071916592141728452581896381132002349573632855071606614201168751151435679435299890592299985539</span><br><span class="line">phi = (p - 1) * (q - 1)  </span><br><span class="line">n = p * q  </span><br><span class="line">e = 65537</span><br><span class="line">d = inverse(e, phi)  </span><br><span class="line">d_p = d % (p - 1)  </span><br><span class="line">d_q = d % (q - 1)  </span><br><span class="line">q_inv = pow(q, -1, p)  </span><br><span class="line"></span><br><span class="line">private_key = rsa.RSAPrivateNumbers(  </span><br><span class="line">p=p,  </span><br><span class="line">q=q,  </span><br><span class="line">d=d,  </span><br><span class="line">dmp1=d_p,  </span><br><span class="line">dmq1=d_q,  </span><br><span class="line">iqmp=q_inv,  </span><br><span class="line">public_numbers=rsa.RSAPublicNumbers(e, n)  </span><br><span class="line">).private_key()  </span><br><span class="line"></span><br><span class="line">pem = private_key.private_bytes(  </span><br><span class="line">encoding=serialization.Encoding.PEM,  </span><br><span class="line">format=serialization.PrivateFormat.PKCS8,  </span><br><span class="line">encryption_algorithm=serialization.NoEncryption()  </span><br><span class="line">)  </span><br><span class="line">print(pem.decode())</span><br><span class="line">&lt;?php  </span><br><span class="line">$key = &#x27;d14d8ce94563e71a&#x27;;  </span><br><span class="line">$data = &#x27;  </span><br><span class="line">myzZoRJB9iFwgtIPC0fDUeFaS+fdv0LH3s0SKFXJkWe+V0zA2TRsTsfK65Dn7HMfUZaD+teWivQy</span><br><span class="line">Ajt320oY70by3v22VYG+fe9m+wVYkpscpuhYFu5u10Gk+/seD+6Swj65YvXjSJVI7fAC7wuUXCJE</span><br><span class="line">Io5CkJyC78gv7bCBn3Xd2TKaHp8grtoz+a9geiFFyhPYpjo1G8KFXE4zkzesi/vA5C9TF55yANHI</span><br><span class="line">LKvybGhwNnDqBA/EK1eB9oF99hwoH/JF0g/mXYCh+8pl6UtnXMWJibavqk+vW3daw2irj4BxUp5D</span><br><span class="line">hiBfialxH2TkYD+PWCawQRPyySSxY/5dsQplP0uuMDuijkM7A5VRK8tzs/XV14Norr1RWEshvfBu</span><br><span class="line">kQphvX1MZMXUTCf5Roqo9M6Sls2L5gK6z8rrnmSVNIOf8RzmAFnHOOtzbyO8wr/Fc5asNizVcPrC</span><br><span class="line">L9Ul3EUVy+h4p3ow2cQfaLHfs0RVs5KSJdVwHrJcgH8gdv6bUeOXkDkiboauyFdgQTbYQYCZ6pGl</span><br><span class="line">iiwbsgmU6M9QVGcXa27BxMPLZivnrIynGGVQT+b6HnOZT/jPgyz7TbzQDJH0YNynjdHFAgFkdngp</span><br><span class="line">h75uql2jlggVzr9/IKsAgCPZL1SK8ZdZfryMN89/mn1nq/0E1eWzKwZSym/qeCckqpFLcBUsDNpf</span><br><span class="line">bVkXdqyYZ5G1AYaAIp8OoUe+cEhoFnvay4/gVsn4Ol6qocOkwQ4pfv1dVWosaB2X8duzW7xTuZmU</span><br><span class="line">rfRLwW+ybsW3pvc/1TmlJYKLKTxWFUeiEKxrscnWz2fkIbNjRwD6rDHbQXPLk/cnB0gq7EE4JTxk</span><br><span class="line">ePqEJq+x5oR712jHqeMLeDtqtKiJX8NHZktaykEZlVTSu0ptknM1DDijOQtiQX5a6mpJgBSDIHxO</span><br><span class="line">kVsG/ghCZ2DnGYQd5YM4TkQOzzn2IRczBKxG+pj3H2/tqoL3Dpbjwjh8+KGbPBvtxYE4isC2rv+i</span><br><span class="line">J3OcfD/fA9u0QzZlVLAPot0HRkhQnjAprBSxC+nHMwv0oqX6/SsGoBsQjUeYQPsIbUEoXPQyfyiv</span><br><span class="line">8jny08uEBgfY8nMcxMrEcM54BVVFCwY4b7TfOM5dFd90bHNmStc051bJsXal/0q6Q7VI8vaUUvbn</span><br><span class="line">vZ+Z/2uOzHTa</span><br><span class="line">&#x27;;  </span><br><span class="line">$json = openssl_decrypt($data, &quot;AES128&quot;, $key);  </span><br><span class="line">print openssl_error_string();  </span><br><span class="line">$data = json_decode($json, true);  </span><br><span class="line">$status = base64_decode($data[&#x27;status&#x27;]);  </span><br><span class="line">$msg = base64_decode($data[&#x27;msg&#x27;]);  </span><br><span class="line">echo &#x27;status:&#x27;.$status.&#x27;  </span><br><span class="line">msg:&#x27;.$msg;</span><br><span class="line">from hashlib import sha256  </span><br><span class="line">from random import randint  </span><br><span class="line">from Crypto.Util.number import inverse, bytes_to_long, getPrime,long_to_bytes  </span><br><span class="line">N = 98472559301398326519521704898800552100670435952553618641467704945731627783624140484670366845550939866842528582954361836035593755351584272693016822204234859506655433796327589389300744153263194916217158205372375670404000164793308078231134726345672236542974067442646354084915978240909130405000905936105602786257</span><br><span class="line">c1 = 40127670364311180283394426274113033719543797673129006844648567069726278369353910517424074073714346881895826377902772771837790964432434997986229629267700081564740160692151350365553131535789070670584548053624970689607275665921674708650254889369926426966093575171344082441699295255661725211366819524902641461331</span><br><span class="line">c2 = 4958767685161688254408001463637498631434015989118088175006720150146904021732816429444998309662995333252926794359370922113211567042198257249974382506057347524044728912256607992806670035884054654064021329936092742390064660715742236775795950389452053770118911570676738879382827738088237377423216124023239179385</span><br><span class="line">(h1, s1, r1) = (68926494835039378729440404424793589316085902585443402029912033361291851069895, 70264613994433317101824708333691569351293428290775945022557096997867421112623, 95467825458659408375936425122753380788640181504557006906236884175684680903422)  </span><br><span class="line">(h2, s2, r1) = (99816429822339421445908151468618514820067970997726274244928092260385418279182, 27386247988345867998752358066350183725137348277248603318763377237810993039608, 95467825458659408375936425122753380788640181504557006906236884175684680903422)  </span><br><span class="line">(h3, s3, r2) = (100471089356874379799029324099340355602511511524623953182021635156113287196537, 108271537842404710192407976239166854351892165018292127464175836717873395489565, 13940715298251935708383205669373172931583958487449924842542107474174521484127)  </span><br><span class="line">(h4, s4, r2) = (53552261622392134420510144174810499568173979993026285111445672642139328877380, 100312693542625967610858608130705401648902828203826044299984002070083890684220, 13940715298251935708383205669373172931583958487449924842542107474174521484127)  </span><br><span class="line">e = 65537</span><br><span class="line"></span><br><span class="line">n1 = 115792089237316195423570985008687907852837564279074904382605163141518161494337</span><br><span class="line"></span><br><span class="line">A1 = (r1 * s2) % n1  </span><br><span class="line">B1 = (-r1 * s1) % n1  </span><br><span class="line">C1 = (s1 * h2 - s2 * h1) % n1  </span><br><span class="line"></span><br><span class="line">A2 = (r2 * s4) % n1  </span><br><span class="line">B2 = (-r2 * s3) % n1  </span><br><span class="line">C2 = (s3 * h4 - s4 * h3) % n1  </span><br><span class="line"></span><br><span class="line">D1 = (A1 * B2 - A2 * B1) % n1  </span><br><span class="line">D1_inv = inverse_mod(D1, n1)  </span><br><span class="line"></span><br><span class="line">D2 = (A2 * B1 - A1 * B2) % n1  </span><br><span class="line">D2_inv = inverse_mod(D2, n1)  </span><br><span class="line"></span><br><span class="line">x1 = (C1 * B2 - C2 * B1) * D1_inv % n1  </span><br><span class="line">x2 = (A2 * C1 - A1 * C2) * D2_inv % n1  </span><br><span class="line"></span><br><span class="line">def attack(c1, c2, a, b, e, n):</span><br><span class="line">PR.&lt;x&gt;=PolynomialRing(Zmod(n))  </span><br><span class="line">g1 = x^e - c1  </span><br><span class="line">g2 = (a*x + b)^e - c2  </span><br><span class="line"></span><br><span class="line">def gcd(g1, g2):</span><br><span class="line">while g2:  </span><br><span class="line">g1, g2 = g2, g1 % g2  </span><br><span class="line">return g1.monic()  </span><br><span class="line">print(gcd(g1, g2))  </span><br><span class="line">return -gcd(g1, g2)[0]  </span><br><span class="line"></span><br><span class="line">m1 = attack(c1, c2, x1, x2, e, N)  </span><br><span class="line">flag = long_to_bytes(int(m1))  </span><br><span class="line">print(flag)  </span><br><span class="line"></span><br><span class="line">    #x + 98472559301398326519521704898800552100670435952553618641467704945731627783624140484670366845550939866842528582954361836035593755351584206749343906691680123993276208473999116876963410717148891366887303511134680635736354894959778972988838486751320350521474270271621998445045296093543008556372250828549972964948</span><br><span class="line">NAME  </span><br><span class="line">xianyu_decrypt  </span><br><span class="line"></span><br><span class="line">FUNCTIONS  </span><br><span class="line">decrypt_aes_ecb(enc_data: &#x27;bytes&#x27;, key: &#x27;bytes&#x27;) -&gt; &#x27;bytes&#x27;</span><br><span class="line">decrypt_aes_ecb(bytes enc_data: bytes, bytes key: bytes) -&gt; bytes  </span><br><span class="line"></span><br><span class="line">load_and_decrypt_xianyu(xianyu_path: &#x27;str&#x27;) -&gt; &#x27;dict&#x27;</span><br><span class="line">load_and_decrypt_xianyu(unicode xianyu_path: str) -&gt; dict  </span><br><span class="line"></span><br><span class="line">read_part1(data, offset)  </span><br><span class="line">read_part1(data, offset)  </span><br><span class="line"></span><br><span class="line">read_part2(data, offset)  </span><br><span class="line">read_part2(data, offset)  </span><br><span class="line"></span><br><span class="line">read_part3(data, offset)  </span><br><span class="line">read_part3(data, offset)  </span><br><span class="line"></span><br><span class="line">read_part4(data, offset, file_key, meta_length)  </span><br><span class="line">read_part4(data, offset, file_key, meta_length)  </span><br><span class="line"></span><br><span class="line">read_part5(data, offset, file_key)  </span><br><span class="line">read_part5(data, offset, file_key)  </span><br><span class="line"></span><br><span class="line">unpad(data: &#x27;bytes&#x27;) -&gt; &#x27;bytes&#x27;</span><br><span class="line">unpad(bytes data: bytes) -&gt; bytes  </span><br><span class="line"></span><br><span class="line">DATA  </span><br><span class="line">MASTER_KEY = b&#x27;XianYuAESKey0000&#x27;</span><br><span class="line">XIANYU_HEADER = b&#x27;XIANYUFS&#x27;</span><br><span class="line">__test__ = &#123;&#125;</span><br><span class="line">import os  </span><br><span class="line">import sys  </span><br><span class="line">import json  </span><br><span class="line">from xianyu_decrypt import (  </span><br><span class="line">load_and_decrypt_xianyu,  </span><br><span class="line">XIANYU_HEADER  </span><br><span class="line">)  </span><br><span class="line"></span><br><span class="line">def decrypt_auto(filepath, output_dir):</span><br><span class="line">os.makedirs(output_dir, exist_ok=True)  </span><br><span class="line">result = load_and_decrypt_xianyu(filepath)  </span><br><span class="line"></span><br><span class="line">if isinstance(result, dict):  </span><br><span class="line">for key, value in result.items():  </span><br><span class="line">output_path = os.path.join(output_dir, f&quot;&#123;key&#125;.bin&quot;if isinstance(value, bytes) elsef&quot;&#123;key&#125;.json&quot;)  </span><br><span class="line">with open(output_path, &#x27;wb&#x27;if isinstance(value, bytes) else&#x27;w&#x27;) as f:  </span><br><span class="line">f.write(value) if isinstance(value, bytes) else json.dump(value, f, indent=2)  </span><br><span class="line">else:  </span><br><span class="line">output_path = os.path.join(output_dir, &quot;decrypted.bin&quot;)  </span><br><span class="line">with open(output_path, &#x27;wb&#x27;) as f:  </span><br><span class="line">f.write(result)  </span><br><span class="line">return result  </span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:  </span><br><span class="line">input_file = sys.argv[1]  </span><br><span class="line">output_dir = sys.argv[2] if len(sys.argv) &gt; 2else os.path.splitext(input_file)[0] + &quot;_decrypted&quot;</span><br><span class="line">print(f&quot;Decrypting &#123;input_file&#125; to &#123;output_dir&#125;...&quot;)  </span><br><span class="line">decrypt_auto(input_file, output_dir)  </span><br><span class="line">print(&quot;Decryption completed&quot;)</span><br><span class="line">&#123;  </span><br><span class="line">&quot;name&quot;: &quot;u8004u800bAu68a6&quot;,  </span><br><span class="line">&quot;artist&quot;: &quot;u5706u5934ud83dudc31&quot;,  </span><br><span class="line">&quot;fl4g&quot;: &quot;(=u2180u03c9u2180=)u54c8~uff01uff01uff01u6211u542cu8bf4u5c31u5728u97f3u4e50u7684u201cu4fe1u606fu6587u4ef6u201du91ccuff01uff01&quot;,  </span><br><span class="line">&quot;flag&quot;: &quot;DASCTF&#123;fl5h_mus1c_miao_m1a0_mlaO&#125;&quot;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/258051.html](https://www.ctfiot.com/258051.html)
+> 仓库原文：[CTF大赛WP集合/articles/DASCTF_2025上半年赛_Writeup_by_Mini-Venom.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/DASCTF_2025%E4%B8%8A%E5%8D%8A%E5%B9%B4%E8%B5%9B_Writeup_by_Mini-Venom.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/obex/">obex</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Crypto/BabyStream_-_%E4%BB%8ELFSR%E5%88%B0LPN%E7%9A%84%E5%AE%8C%E6%95%B4%E6%94%BB%E5%87%BB%E5%A4%8D%E7%8E%B0/" title="BabyStream – 从 LFSR 到 LPN 的完整攻击复现"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">BabyStream – 从 LFSR 到 LPN 的完整攻击复现</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Crypto/DIVER_OSINT_CTF_2025_Writeup/" title="DIVER OSINT CTF 2025 Writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">DIVER OSINT CTF 2025 Writeup</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#print-f%E2%80%99-r-g-b-%E2%80%99"><span class="toc-number">1.</span> <span class="toc-text">print(f’{r}, {g}, {b}’)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#print-chr-r-end-%E2%80%99%E2%80%99"><span class="toc-number">2.</span> <span class="toc-text">print(chr(r), end&#x3D;’’)</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#if-r-g-or-g-b"><span class="toc-number">3.</span> <span class="toc-text">if r !&#x3D; g or g !&#x3D; b:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#inconsistent-pixels-append-x-y-r-g-b"><span class="toc-number">4.</span> <span class="toc-text">inconsistent_pixels.append(((x, y), (r, g, b)))</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

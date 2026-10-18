@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="200" viewBox="0 0 640 200" role="img" aria-label="Image unavailable">
+  <rect width="640" height="200" fill="#1f2933"/>
+  <rect x="1" y="1" width="638" height="198" fill="none" stroke="#3e4c59" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="320" y="94" text-anchor="middle" fill="#9aa5b1" font-family="Segoe UI, Arial, sans-serif" font-size="22" letter-spacing="1">IMAGE UNAVAILABLE</text>
+  <text x="320" y="126" text-anchor="middle" fill="#616e7c" font-family="Microsoft YaHei, Segoe UI, Arial, sans-serif" font-size="15">原图已失效或无法访问</text>
+</svg>

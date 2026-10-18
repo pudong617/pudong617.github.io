@@ -1,0 +1,380 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>解析2025强网拟态决赛easyre | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="强网拟态2025决赛easyre逆向,PE32+Windows+signal(SIGSEGV)+setjmp&#x2F;longjmp控制流混淆+异常处理触发跳转+TEA解密(delta补码0x61C88647+sum初值0xC6EF3720+32轮Feistel+32字符flag)。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解析2025强网拟态决赛easyre">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9Beasyre/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="强网拟态2025决赛easyre逆向,PE32+Windows+signal(SIGSEGV)+setjmp&#x2F;longjmp控制流混淆+异常处理触发跳转+TEA解密(delta补码0x61C88647+sum初值0xC6EF3720+32轮Feistel+32字符flag)。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="signal-handler">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9Beasyre/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '解析2025强网拟态决赛easyre',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">解析2025强网拟态决赛easyre</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="解析2025强网拟态决赛easyre"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/286199.html">https://www.ctfiot.com/286199.html</a><br>ID: 286199</p>
+</blockquote>
+<p>Signal异常处理与TEA加密算法的逆向分析实战</p>
+<p>前言</p>
+<p>本文将详细分析一道综合性逆向工程题目，该题目巧妙地将Signal异常处理机制与TEA加密算法结合，展现了现代恶意软件中常见的反分析技巧。通过本文的学习，读者将掌握如何识别和分析基于异常处理的控制流混淆，以及如何识别和破解TEA加密算法。</p>
+<p>题目初步分析</p>
+<p>文件基本信息</p>
+<p>首先对题目文件进行基本信息识别：</p>
+<p>file main.exe</p>
+<p>输出结果：</p>
+<p>main.exe: PE32+ executable (console) x86-64 (stripped to external PDB), for MS Windows, 10 sections</p>
+<p>这是一个64位Windows可执行文件，已剥离调试符号，增加了分析难度。</p>
+<p>字符串信息分析</p>
+<p>使用radare2提取程序中的字符串信息：</p>
+<p>r2 -q -c”aaa; iz”main.exe</p>
+<p>从输出中可以提取到以下关键字符串：</p>
+<p>“Input flag: ” – 程序会要求用户输入</p>
+<p>“Wrong flag! Try again.” – 输入错误的提示</p>
+<p>“Success! You got the flag.” – 输入正确的提示</p>
+<p>“Wrong length! Hint: 32 chars.” – 提示flag长度为32个字符</p>
+<p>SIGSEGV (信号值11) – 访问违例，通常由非法内存访问引起</p>
+<p>SIGILL – 非法指令</p>
+<p>SIGFPE – 浮点异常</p>
+<p>SIGINT – 中断信号（如Ctrl+C）</p>
+<p>注册异常处理函数：使用signal(SIGSEGV, handler)注册SIGSEGV信号的处理函数</p>
+<p>设置恢复点：调用setjmp保存当前的执行上下文</p>
+<p>触发异常：通过mov dword [0], eax向地址0写入，必然触发访问违例</p>
+<p>异常处理：操作系统捕获异常后，调用注册的处理函数</p>
+<p>恢复执行：处理函数通过longjmp跳转回setjmp保存的位置继续执行</p>
+<p>控制流混淆：正常的控制流被异常处理打断，静态分析工具难以跟踪执行路径</p>
+<p>代码隐藏：关键逻辑隐藏在异常处理函数中，而不在主执行流中</p>
+<p>反调试：未配置正确异常处理的调试器会认为程序崩溃，实际上程序正常运行</p>
+<p>动态行为：只有在运行时才能观察到完整的执行流程</p>
+<p>分组长度：64位（两个32位整数）</p>
+<p>密钥长度：128位（四个32位整数）</p>
+<p>轮数：32轮</p>
+<p>结构：Feistel网络</p>
+<p>代码量：极其简洁，适合嵌入式系统</p>
+<p>delta &#x3D; 0x9E3779B9（黄金分割比例 * 2^32）</p>
+<p>解密时使用delta的补码：0x61C88647</p>
+<p>sum初值 &#x3D; delta * 32 &#x3D; 0xC6EF3720</p>
+<p>特征常量0x61C88647：这是TEA的delta值的补码</p>
+<p>特征常量0xC6EF3720：delta * 32的值，用于32轮迭代</p>
+<p>位运算模式：典型的”左移4位”、”右移5位”、”异或”组合</p>
+<p>Feistel结构：两个32位变量交替运算</p>
+<p>位移运算（扩散）</p>
+<p>密钥混合（混淆）</p>
+<p>累加运算（非线性）</p>
+<p>XOR运算（可逆性）</p>
+<p>sum的初始值：解密时从delta * 32开始，而不是从0开始</p>
+<p>delta的选择：使用0x61C88647确保sum在32轮后正确递增回0</p>
+<p>运算顺序：先处理v1，再处理v0（与加密顺序相反）</p>
+<p>减法操作：使用减法代替加法（逆运算）</p>
+<p>sum的变化方向：每轮加delta（与加密时减delta相反）</p>
+<p>密钥：从异常处理函数中提取并计算</p>
+<p>密文：从程序数据段提取</p>
+<p>算法：标准TEA解密</p>
+<p>小端序（Little-Endian）：低位字节存储在低地址，x86&#x2F;x64架构使用</p>
+<p>大端序（Big-Endian）：高位字节存储在低地址，网络字节序</p>
+<p>‘f’ (ASCII 0x66) 在最低字节</p>
+<p>‘l’ (ASCII 0x6C) 在次低字节</p>
+<p>‘a’ (ASCII 0x61) 在次高字节</p>
+<p>‘g’ (ASCII 0x67) 在最高字节</p>
+<p>检查导入表，确认signal函数的导入</p>
+<p>定位signal函数的调用位置</p>
+<p>识别异常触发点（向地址0写入）</p>
+<p>找到异常处理函数的地址</p>
+<p>反汇编异常处理函数代码</p>
+<p>识别密钥读取位置</p>
+<p>理解密钥变换逻辑（XOR和SUB运算）</p>
+<p>提取原始密钥数据</p>
+<p>计算变换后的实际密钥</p>
+<p>分析校验函数调用的加密函数</p>
+<p>寻找特征常量（0x61C88647, 0xC6EF3720）</p>
+<p>识别位运算模式（左移4、右移5、异或）</p>
+<p>确认32轮迭代循环</p>
+<p>确定为TEA加密算法</p>
+<p>通过比较逻辑找到密文存储位置</p>
+<p>使用工具提取密文数据</p>
+<p>转换为适合编程语言处理的格式</p>
+<p>实现标准TEA解密算法</p>
+<p>注意sum和delta的初始值</p>
+<p>注意运算顺序和方向</p>
+<p>对8个32位整数（4组64位数据）进行解密</p>
+<p>理解x86&#x2F;x64的小端序存储方式</p>
+<p>将十六进制转换为ASCII字符</p>
+<p>对每4字节的字符串进行反转</p>
+<p>拼接得到完整flag</p>
+<p>0x9E3779B9– 原始delta值（加密时使用）</p>
+<p>0x61C88647– delta的补码（解密时使用）</p>
+<p>0xC6EF3720– delta * 32（解密时sum的初始值）</p>
+<p>一个左移4位（shl x, 4）</p>
+<p>一个右移5位（shr x, 5）</p>
+<p>多个add指令</p>
+<p>一个或多个xor指令</p>
+<p>循环计数器初始化为32</p>
+<p>或者sum从0累加到delta * 32</p>
+<p>从低地址开始存储低位字节（小端序）</p>
+<p>从低地址开始存储高位字节（大端序）</p>
+<p>‘f’ &#x3D; 0x66</p>
+<p>‘l’ &#x3D; 0x6C</p>
+<p>‘a’ &#x3D; 0x61</p>
+<p>‘g’ &#x3D; 0x67</p>
+<p>IDA Pro– 功能最强大，支持多种架构</p>
+<p>Ghidra– NSA开源，免费且功能强大</p>
+<p>radare2– 命令行工具，适合自动化分析</p>
+<p>Binary Ninja– 现代化UI，中间语言表示清晰</p>
+<p>x64dbg– Windows平台最佳选择</p>
+<p>GDB– Linux标准调试器</p>
+<p>WinDbg– Windows内核级调试</p>
+<p>LLDB– macOS和iOS调试</p>
+<p>010 Editor– 十六进制编辑器，支持模板</p>
+<p>CyberChef– 在线数据处理工具</p>
+<p>Python– 编写自动化脚本</p>
+<p>从main函数或入口点开始</p>
+<p>识别主要功能模块</p>
+<p>逐步深入细节</p>
+<p>绘制控制流图</p>
+<p>从字符串和导入函数入手</p>
+<p>找到关键功能点</p>
+<p>向上追踪调用链</p>
+<p>理解整体逻辑</p>
+<p>识别加密算法特征常量</p>
+<p>识别标准库函数模式</p>
+<p>识别反调试&#x2F;反分析技巧</p>
+<p>使用工具辅助识别</p>
+<p>S-box常量（固定的256字节表）</p>
+<p>10&#x2F;12&#x2F;14轮（取决于密钥长度）</p>
+<p>MixColumns和SubBytes操作</p>
+<p>Delta常量0x9E3779B9</p>
+<p>32或64轮</p>
+<p>简单的位运算组合</p>
+<p>256字节的S盒</p>
+<p>KSA（密钥调度算法）和PRGA（伪随机生成算法）</p>
+<p>两个索引变量i和j</p>
+<p>4个初始魔数：0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476</p>
+<p>64轮运算</p>
+<p>特定的位运算函数F, G, H, I</p>
+<p>5个初始常量</p>
+<p>80轮运算</p>
+<p>循环左移操作</p>
+<p>8个初始哈希值</p>
+<p>64轮运算</p>
+<p>特定的常量表（64个32位常量）</p>
+<p>Signal&#x2F;SEH异常处理</p>
+<p>VEH（Vectored Exception Handling）</p>
+<p>故意触发异常并利用处理流程</p>
+<p>GetTickCount() 检测运行时间</p>
+<p>rdtsc 指令检测CPU周期</p>
+<p>时间差异检测调试器存在</p>
+<p>IsDebuggerPresent() API</p>
+<p>PEB结构中的BeingDebugged标志</p>
+<p>检测调试器特征进程&#x2F;窗口</p>
+<p>CRC&#x2F;MD5校验自身代码</p>
+<p>检测断点（INT3指令，0xCC）</p>
+<p>检测代码段是否被修改</p>
+<p>参加在线CTF平台（CTFtime, pwnable.kr）</p>
+<p>练习各类reverse题目</p>
+<p>学习官方WriteUp</p>
+<p>与社区交流经验</p>
+<p>阅读开源软件源码</p>
+<p>对比源码和二进制</p>
+<p>理解编译器优化</p>
+<p>学习代码结构</p>
+<p>编写IDA&#x2F;Ghidra插件</p>
+<p>开发自动化分析脚本</p>
+<p>制作符号化工具</p>
+<p>构建分析框架</p>
+<p>关注安全研究博客</p>
+<p>阅读学术论文</p>
+<p>参与安全会议</p>
+<p>跟踪最新漏洞</p>
+<p>初步信息收集– 使用基本工具获取文件信息和字符串</p>
+<p>控制流分析– 识别异常处理机制和执行流程</p>
+<p>算法识别– 通过特征常量和代码模式识别TEA算法</p>
+<p>数据提取– 提取密钥和密文数据</p>
+<p>逆向实现– 编写解密程序</p>
+<p>数据处理– 正确处理字节序问题</p>
+<p>使用异常处理隐藏密钥变换逻辑，增加分析难度</p>
+<p>选择TEA这种轻量级算法，代码简洁但具有一定强度</p>
+<p>涉及字节序处理，考察对底层数据表示的理解</p>
+<p>Signal异常处理机制的原理和识别方法</p>
+<p>TEA加密算法的特征和解密实现</p>
+<p>字节序问题的本质和处理方法</p>
+<p>系统化的逆向分析思路</p>
+<p>Wheeler, D. J., &amp; Needham, R. M. (1994). TEA, a Tiny Encryption Algorithm</p>
+<p>TEA, XTEA, and XXTEA加密算法的改进历史</p>
+<p>Block Cipher Techniques（分组密码技术）</p>
+<p>Windows SEH (Structured Exception Handling) Documentation</p>
+<p>Signal Handling in POSIX Systems</p>
+<p>Exception Handling in x86&#x2F;x64 Architecture</p>
+<p>Practical Malware Analysis（恶意软件分析实战）</p>
+<p>Reversing: Secrets of Reverse Engineering（逆向工程权威指南）</p>
+<p>The IDA Pro Book（IDA Pro权威指南）</p>
+<p>CTFtime.org – CTF比赛信息和WriteUp</p>
+<p>GitHub – 各类逆向工程工具和脚本</p>
+<p>StackOverflow – 技术问题交流平台</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">file main.exe</span><br><span class="line">main.exe: PE32+ executable (console) x86-64 (stripped to external PDB), for MS Windows, 10 sections</span><br><span class="line">r2 -q -c&quot;aaa; iz&quot;main.exe</span><br><span class="line">r2 -q -c&quot;aaa; ii~signal&quot;main.exe</span><br><span class="line">32 0x140011390 NONE FUNC msvcrt.dll signal</span><br><span class="line">r2 -q -c&quot;aaa; axt 0x14000b082&quot;main.exe</span><br><span class="line">; 注册signal处理函数0x1400097be lea rdx, [0x140001720] ; 异常处理函数地址0x1400097c5 mov ecx, 0xb ; 信号值11 (SIGSEGV)0x1400097ca call signal ; 调用signal注册; 设置setjmp保存点0x1400097d2 lea rcx, [0x140010080]0x1400097d9 call _setjmp0x1400097de test eax, eax0x1400097e0 jne 0x1400097ed; 故意触发访问违例0x1400097e2 xor eax, eax0x1400097e4 mov dword [0], eax ; 向地址0写入，触发SIGSEGV0x1400097eb ud2 ; 未定义指令（备用触发方式）; 异常处理后返回点0x1400097ed lea rcx, [用户输入]0x1400097f1 call fcn.140001850 ; 调用校验函数</span><br><span class="line">r2 -q -c&quot;aaa; pd 100 @ 0x140001720&quot;main.exe</span><br><span class="line">; 从固定地址读取原始密钥0x140001724 mov eax, [0x14000a040] ; key[0] = 0x123456780x14000172a mov ecx, [0x14000a048] ; key[2] = 0xfedcba980x140001730 mov edx, [0x14000a04c] ; key[3] = 0x765432100x140001745 mov eax, [0x14000a044] ; key[1] = 0x9abcdef0; 对密钥进行变换0x140001736 xor eax, 0xdeadbeef ; key[0] ^= 0xdeadbeef0x14000173b sub ecx, 0x11223344 ; key[2] -= 0x112233440x14000174b xor edx, 0xccddeeff ; key[3] ^= 0xccddeeff0x140001765 sub eax, 0x789abcdf ; key[1] -= 0x789abcdf; 将变换后的密钥保存回内存0x14000177a movaps [0x14000a040], xmm0; 使用longjmp返回到setjmp位置0x140001781 call longjmp</span><br><span class="line">r2 -q -c&quot;aaa; pxw 16 @ 0x14000a040&quot;main.exe</span><br><span class="line">0x14000a040 0x12345678 0x9abcdef0 0xfedcba98 0x76543210</span><br><span class="line"># 原始密钥值key1 =0x12345678key2 =0x9abcdef0key3 =0xfedcba98key4 =0x76543210</span><br><span class="line"># 按照异常处理函数中的变换逻辑计算k0 = key1 ^0xdeadbeef # 0xCC99E897k1 = key2 -0x789abcdf # 0x22222211k2 = key3 -0x11223344 # 0xEDBA8754k3 = key4 ^0xccddeeff # 0xBA89DCEF</span><br><span class="line">k[0] = 0xCC99E897 (3432638615)k[1] = 0x22222211 (572662289)k[2] = 0xEDBA8754 (3988424532)k[3] = 0xBA89DCEF (3129597167)</span><br><span class="line">r2 -q -c&quot;aaa; pd 100 @ 0x140001790&quot;main.exe</span><br><span class="line">; TEA算法的delta常量（补码形式）0x1400017d5 sub r9d, 0x61c88647 ; delta = 0x61C886470x140001812 cmp r9d, 0xc6ef3720 ; sum = delta * 32; TEA核心运算逻辑0x1400017dc shl eax, 4 ; v &lt;&lt; 40x1400017df shr r12d, 5 ; v &gt;&gt; 50x1400017e3 add r12d, r8d ; 加上密钥0x1400017e6 add eax, ebx ; 累加0x1400017e8 xor eax, r12d ; 异或运算</span><br><span class="line">v0 += ((v1 &lt;&lt;4) + k[0]) ^ (v1 + sum) ^ ((v1 &gt;&gt;5) + k[1]);v1 += ((v0 &lt;&lt;4) + k[2]) ^ (v0 + sum) ^ ((v0 &gt;&gt;5) + k[3]);sum -= delta;</span><br><span class="line">voiddecrypt(uint32_t* v,uint32_t* k)&#123; uint32_tv0 = v[0], v1 = v[1]; uint32_tsum =0xC6EF3720; // delta * 32 uint32_tdelta =0x61C88647; for(inti =0; i &lt;32; i++) &#123; v1 -= ((v0 &lt;&lt;4) + k[2]) ^ (v0 + sum) ^ ((v0 &gt;&gt;5) + k[3]); v0 -= ((v1 &lt;&lt;4) + k[0]) ^ (v1 + sum) ^ ((v1 &gt;&gt;5) + k[1]); sum += delta; &#125; v[0] = v0; v[1] = v1;&#125;</span><br><span class="line">0x140001883 lea rdx, [0x14000a020] ; 密文数据地址0x1400018a2 cmp dword [rax], ebx ; 比较加密结果与密文</span><br><span class="line">r2 -q -c&quot;aaa; pxw 32 @ 0x14000a020&quot;main.exe</span><br><span class="line">0x14000a020 0xe1c22986 0xd39eddc5 0xdfa1484d 0x10d4e53c0x14000a030 0xc49a3be4 0x77dbf48a 0xe5ebae29 0xe99fec5c</span><br><span class="line">uint32_tciphertext[8] = &#123; 0xe1c22986,0xd39eddc5,0xdfa1484d,0x10d4e53c, 0xc49a3be4,0x77dbf48a,0xe5ebae29,0xe99fec5c&#125;;</span><br><span class="line">    #include&lt;stdint.h&gt;#include&lt;stdio.h&gt;voiddecrypt(uint32_t* v,uint32_t* k)&#123; uint32_tv0 = v[0], v1 = v[1]; uint32_tsum =0xC6EF3720; // delta * 32 uint32_tdelta =0x61C88647; for(inti =0; i &lt;32; i++) &#123; v1 -= ((v0 &lt;&lt;4) + k[2]) ^ (v0 + sum) ^ ((v0 &gt;&gt;5) + k[3]); v0 -= ((v1 &lt;&lt;4) + k[0]) ^ (v1 + sum) ^ ((v1 &gt;&gt;5) + k[1]); sum += delta; &#125; v[0] = v0; v[1] = v1; printf(&quot; %x %x&quot;, v0, v1);&#125;intmain()&#123; // 从程序中提取的密文 uint32_tv[8] = &#123; 0xe1c22986,0xd39eddc5,0xdfa1484d,0x10d4e53c, 0xc49a3be4,0x77dbf48a,0xe5ebae29,0xe99fec5c &#125;; // 计算得到的密钥 uint32_tk[4] = &#123;0xCC99E897,0x22222211,0xEDBA8754,0xBA89DCEF&#125;; printf(&quot;Decrypting TEA...n&quot;); // TEA每次处理64位（两个32位整数） for(inti =0; i &lt;8; i +=2) &#123; decrypt(&amp;v[i], k); &#125; printf(&quot;n&quot;); return0;&#125;</span><br><span class="line">gcc decrypt_tea.c -o decrypt_tea./decrypt_tea</span><br><span class="line">Decrypting TEA...67616c66 6731737b 5f6c346e 646e3468 5f72336c 745f7331 6b633172 7d212179</span><br><span class="line">32位整数：0x67616c66内存布局（小端序）： 地址增长方向 -&gt; [66] [6c] [61] [67] f l a g</span><br><span class="line">#!/usr/bin/env python3importbinascii</span><br><span class="line"># 从TEA解密得到的十六进制字符串hex_values =&quot;67616c66 6731737b 5f6c346e 646e3468 5f72336c 745f7331 6b633172 7d212179&quot;hex_list = hex_values.split(&quot; &quot;)print(&quot;Converting to ASCII with byte reversal:&quot;)flag =&quot;&quot;forhex_strinhex_list: # 将十六进制转为字节，解码为ASCII，然后反转字符串 decoded = binascii.a2b_hex(hex_str).decode() reversed_str = decoded[::-1] flag += reversed_str print(f&quot;&#123;hex_str&#125;-&gt;&#123;decoded&#125;-&gt;&#123;reversed_str&#125;&quot;)print(f&quot;nFinal flag:&#123;flag&#125;&quot;)</span><br><span class="line">python3 extract_flag.py</span><br><span class="line">Converting to ASCII with byte reversal:</span><br><span class="line">67616c66 -&gt; galf -&gt; flag6731737b -&gt; g1s&#123; -&gt; &#123;s1g5f6c346e -&gt; _l4n -&gt; n4l_646e3468 -&gt; dn4h -&gt; h4nd5f72336c -&gt; _r3l -&gt; l3r_745f7331 -&gt; t_s1 -&gt; 1s_t6b633172 -&gt; kc1r -&gt; r1ck7d212179 -&gt; &#125;!!y -&gt; y!!&#125;Final flag: flag&#123;s1gn4l_h4ndl3r_1s_tr1cky!!&#125;</span><br><span class="line">signal() - 注册信号处理函数_setjmp() - 保存执行上下文longjmp() - 恢复执行上下文</span><br><span class="line">mov dword [0], eax ; 向空指针写入mov dword [0xffffffff], eax ; 向非法地址写入div ecx ; 除零（当ecx为0时）ud2 ; 未定义指令</span><br><span class="line">setjmp -&gt; 触发异常 -&gt; 异常处理 -&gt; longjmp -&gt; 继续执行</span><br><span class="line">((v &lt;&lt;4) + k[i]) ^ (v + sum) ^ ((v &gt;&gt;5) + k[j])</span><br><span class="line">地址： 0x1000 0x1001 0x1002 0x1003数据： 78 56 34 12</span><br><span class="line">地址： 0x1000 0x1001 0x1002 0x1003数据： 12 34 56 78</span><br><span class="line"># 方法1：使用切片反转text =&quot;galf&quot;flag = text[::-1] # &quot;flag&quot;# 方法2：使用struct模块importstructnum =0x67616c66bytes_data = struct.pack(&#x27;&lt;I&#x27;, num) # 小端序打包text = bytes_data.decode()[::-1] # 解码并反转</span><br><span class="line"># 方法3：使用binascii模块importbinasciihex_str =&quot;67616c66&quot;decoded = binascii.a2b_hex(hex_str).decode() # &quot;galf&quot;flag = decoded[::-1] # &quot;flag&quot;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/286199.html">https://www.ctfiot.com/286199.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9Beasyre.full.md">CTF大赛WP集合&#x2F;articles&#x2F;解析2025强网拟态决赛easyre.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/signal-handler/">signal-handler</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81%E5%86%B3%E8%B5%9BWeakJump/" title="解析2025强网拟态决赛WeakJump"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">解析2025强网拟态决赛WeakJump</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%902025%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81Icall/" title="解析2025强网拟态Icall"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">解析2025强网拟态Icall</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

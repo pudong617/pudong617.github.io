@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第五届&quot;鹏城杯&quot;初赛 Reverse-MDriver-赛题解析 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="鹏城杯2025 WFP callout驱动逆向,ClassifyFn识别WFP过滤ICMP,MSR_LSTAR读KiSystemCall64前4字节作Key1,KUSER_SHARED_DATA.NtSystemRoot&#x3D;&quot;C:\WINDOWS&quot; UTF-16LE异或(~i)生成Key2,密文双key异或解flag,Python SOCK_RAW发ICMP包">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第五届&quot;鹏城杯&quot;初赛 Reverse-MDriver-赛题解析">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/%E7%AC%AC%E4%BA%94%E5%B1%8A-%E9%B9%8F%E5%9F%8E%E6%9D%AF-%E5%88%9D%E8%B5%9B_Reverse-MDriver-%E8%B5%9B%E9%A2%98%E8%A7%A3%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="鹏城杯2025 WFP callout驱动逆向,ClassifyFn识别WFP过滤ICMP,MSR_LSTAR读KiSystemCall64前4字节作Key1,KUSER_SHARED_DATA.NtSystemRoot&#x3D;&quot;C:\WINDOWS&quot; UTF-16LE异或(~i)生成Key2,密文双key异或解flag,Python SOCK_RAW发ICMP包">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Windows驱动">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Reverse/%E7%AC%AC%E4%BA%94%E5%B1%8A-%E9%B9%8F%E5%9F%8E%E6%9D%AF-%E5%88%9D%E8%B5%9B_Reverse-MDriver-%E8%B5%9B%E9%A2%98%E8%A7%A3%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第五届"鹏城杯"初赛 Reverse-MDriver-赛题解析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第五届&quot;鹏城杯&quot;初赛 Reverse-MDriver-赛题解析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第五届&quot;鹏城杯&quot;初赛 Reverse-MDriver-赛题解析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/291134.html">https://www.ctfiot.com/291134.html</a><br>ID: 291134</p>
+</blockquote>
+<p>驱动分析</p>
+<p>voidClassifyFn(constFWPS_INCOMING_VALUES0 <em>inFixedValues, &#x2F;&#x2F; a1constFWPS_INCOMING_METADATA_VALUES0 <em>inMetaValues,&#x2F;&#x2F; a2void</em>layerData, &#x2F;&#x2F; a3constvoid</em>classifyContext, &#x2F;&#x2F; a4constFWPS_FILTER1 <em>filter, &#x2F;&#x2F; a5 UINT64 flowContext, &#x2F;&#x2F; a6 (IDA识别为 _DWORD</em> 有误) FWPS_CLASSIFY_OUT0 *classifyOut &#x2F;&#x2F; a7);</p>
+<p>1: kd&gt; rdmsr C0000082msr[c0000082] &#x3D; fffff801<code>0c2119001: kd&gt; db fffff801</code>0c211900 l4fffff801&#96;0c211900 0f 01 f8 65（key1！！）</p>
+<p>defgenerate_v4_key():# 1. 准备种子字符串 “C:<br>WINDOWS” (宽字符, 大写)</p>
+<h1 id="来源于之前的分析：KUSER-SHARED-DATA-NtSystemRoot-seed-str-”C-WINDOWS”-seed-bytes-seed-str-encode-‘utf-16le’-seed-bytes-seed-bytes"><a href="#来源于之前的分析：KUSER-SHARED-DATA-NtSystemRoot-seed-str-”C-WINDOWS”-seed-bytes-seed-str-encode-‘utf-16le’-seed-bytes-seed-bytes" class="headerlink" title="来源于之前的分析：KUSER_SHARED_DATA.NtSystemRoot seed_str &#x3D;”C:\WINDOWS” seed_bytes &#x3D; seed_str.encode(‘utf-16le’) seed_bytes &#x3D; seed_bytes[:"></a>来源于之前的分析：KUSER_SHARED_DATA.NtSystemRoot seed_str &#x3D;”C:\WINDOWS” seed_bytes &#x3D; seed_str.encode(‘utf-16le’) seed_bytes &#x3D; seed_bytes[:</h1><p>0x14]print(f”[<em>] 种子数据 (Hex):{seed_bytes.hex().upper()}”) v4 &#x3D;bytearray(256)forkinrange(len(seed_bytes)): v4[k] &#x3D; seed_bytes[k]print(“[</em>] 开始计算密钥流 v4…”)foriinrange(256): not_i &#x3D; (~i) &amp;0xFF v4[i] ^&#x3D; not_i</p>
+<h1 id="5-输出结果print-“-“-30-print-f”-最终密钥-v4-256-bytes-生成完成。”-print-“-“-30-print-“前-40-字节预览-Hex-”-print-v4-40-hex-‘-‘-upper-print-“n-C-语言数组格式-”-c-array-’-‘-join-f’0x-b"><a href="#5-输出结果print-“-“-30-print-f”-最终密钥-v4-256-bytes-生成完成。”-print-“-“-30-print-“前-40-字节预览-Hex-”-print-v4-40-hex-‘-‘-upper-print-“n-C-语言数组格式-”-c-array-’-‘-join-f’0x-b" class="headerlink" title="5. 输出结果print(“-“*30)print(f”[+] 最终密钥 v4 (256 bytes) 生成完成。”)print(“-“*30)print(“前 40 字节预览 (Hex):”)print(v4[:40].hex(‘ ‘).upper())print(“n[C 语言数组格式]:”) c_array &#x3D;’, ‘.join([f’0x{b:"></a>5. 输出结果print(“-“*30)print(f”[+] 最终密钥 v4 (256 bytes) 生成完成。”)print(“-“*30)print(“前 40 字节预览 (Hex):”)print(v4[:40].hex(‘ ‘).upper())print(“n[C 语言数组格式]:”) c_array &#x3D;’, ‘.join([f’0x{b:</h1><p>02X}’forbinv4])print(f”unsigned char v4[256] &#x3D; {{{c_array}}};”)returnv4if__name__ &#x3D;&#x3D;”<strong>main</strong>“: key_stream &#x3D; generate_v4_key()</p>
+<p>反调试分析</p>
+<p>EXP</p>
+<p>defsolve_payload():# 1. 密文 (v41) - 20 字节 cipher &#x3D; [0xD4,0x90,0x60,0xED,0xC7,0xA4,0x30,0xF4,0xDF,0x93,0x1C,0xE5,0xD0,0x96,0x19,0xF3,0xDB,0x8E,0x21,0xA8 ]# 2. Key 1 (MSR Key) - 4 字节循环</p>
+<h1 id="来源于-KiSystemCall64-前4字节-key1-0x0F-0x01-0xF8-0x65-3-Key-2-Seed-Key-v4-取前-20-字节"><a href="#来源于-KiSystemCall64-前4字节-key1-0x0F-0x01-0xF8-0x65-3-Key-2-Seed-Key-v4-取前-20-字节" class="headerlink" title="来源于 KiSystemCall64 前4字节 key1 &#x3D; [0x0F,0x01,0xF8,0x65]# 3. Key 2 (Seed Key &#x2F; v4) - 取前 20 字节"></a>来源于 KiSystemCall64 前4字节 key1 &#x3D; [0x0F,0x01,0xF8,0x65]# 3. Key 2 (Seed Key &#x2F; v4) - 取前 20 字节</h1><h1 id="来源于-C"><a href="#来源于-C" class="headerlink" title="来源于 C:"></a>来源于 C:</h1><p>WINDOWS 异或处理 key2 &#x3D; [0xBC,0xFE,0xC7,0xFC,0xA7,0xFA,0xAE,0xF8,0xBE,0xF6,0xBB,0xF4,0xB7,0xF2,0xBE,0xF0,0xB8,0xEE,0xBE,0xEC ] payload &#x3D; []foriinrange(len(cipher)): c &#x3D; cipher[i] k2 &#x3D; key2[i] k1 &#x3D; key1[i %4] # 循环取 Key1 p &#x3D; c ^ k2 ^ k1 payload.append(p)print(“-“*60)</p>
+<h1 id="输出最终结果-payload-str-””-join-chr-x-forxinpayload-payload-hex-”-“-join-f”-x"><a href="#输出最终结果-payload-str-””-join-chr-x-forxinpayload-payload-hex-”-“-join-f”-x" class="headerlink" title="输出最终结果 payload_str &#x3D;””.join([chr(x)forxinpayload]) payload_hex &#x3D;” “.join([f”{x:"></a>输出最终结果 payload_str &#x3D;””.join([chr(x)forxinpayload]) payload_hex &#x3D;” “.join([f”{x:</h1><p>02X}”forxinpayload])print(f”[+] 最终 Key (Hex) :{payload_hex}”)print(f”[+] 最终 Key (String):{payload_str}”)if__name__ &#x3D;&#x3D;”<strong>main</strong>“: solve_payload()</p>
+<p>importsocketimportstructimporttimeimportosdefchecksum(data):<br>iflen(data) %2: data +&#x3D;b’x00’ res &#x3D;sum(struct.unpack(‘!%sH’% (len(data) &#x2F;&#x2F;2), data)) res &#x3D; (res &gt;&gt;16) + (res &amp;0xffff) res +&#x3D; res &gt;&gt;16return(~res) &amp;0xffffdefsend_final_exploit(): target_ip &#x3D;”127.0.0.1”print(f”[*] Target IP:{target_ip}”) key &#x3D;b’go_to_find_the_flag!’ icmp_type &#x3D;8 icmp_code &#x3D;0 icmp_id &#x3D; os.getpid() &amp;0xFFFF icmp_seq &#x3D;1 header_no_chk &#x3D; struct.pack(‘!BBHHH’, icmp_type, icmp_code,0, icmp_id, icmp_seq) chk &#x3D; checksum(header_no_chk + key)</p>
+<h1 id="填入校验和-header-struct-pack-‘-BBHHH’-icmp-type-icmp-code-chk-icmp-id-icmp-seq-packet-header-key"><a href="#填入校验和-header-struct-pack-‘-BBHHH’-icmp-type-icmp-code-chk-icmp-id-icmp-seq-packet-header-key" class="headerlink" title="填入校验和 header &#x3D; struct.pack(‘!BBHHH’, icmp_type, icmp_code, chk, icmp_id, icmp_seq) packet &#x3D; header + key"></a>填入校验和 header &#x3D; struct.pack(‘!BBHHH’, icmp_type, icmp_code, chk, icmp_id, icmp_seq) packet &#x3D; header + key</h1><p>try: s &#x3D; socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP) s.sendto(packet, (target_ip,0))print(f”[+] Packet Sent! Type&#x3D;{icmp_type}, Payload&#x3D;’{key.decode()}’”)print(“[*] 驱动触发”)exceptExceptionase:<br>print(f”[X] 发送失败:{e}”)if__name__ &#x3D;&#x3D;”<strong>main</strong>“: send_final_exploit()input(“n[!] 进程已暂停。n按回车键退出…”)</p>
+<p>flag{Y0r_Ar3_W1nKern3l_Mas7er!*}</p>
+<p>看雪ID：relost</p>
+<p><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/user-home-1006061.htm">https://bbs.kanxue.com/user-home-1006061.htm</a></p>
+<p>*本文为看雪论坛优秀文章，由relost原创，转载请注明来自看雪社区</p>
+<h1 id="往期推荐"><a href="#往期推荐" class="headerlink" title="往期推荐"></a>往期推荐</h1><p>逆向分析某手游基于异常的内存保护</p>
+<p>解决Il2cppapi混淆，通杀DumpUnityCs文件</p>
+<p>记录一次Unity加固的探索与实现</p>
+<p>DLINK路由器命令注入漏洞从1DAY到0DAY</p>
+<p>量子安全 quantum ctf Global Hyperlink Zone Hack the box</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<p>点击阅读原文查看更多</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">voidClassifyFn(constFWPS_INCOMING_VALUES0 *inFixedValues, // a1constFWPS_INCOMING_METADATA_VALUES0 *inMetaValues,// a2void*layerData, // a3constvoid*classifyContext, // a4constFWPS_FILTER1 *filter, // a5 UINT64 flowContext, // a6 (IDA识别为 _DWORD* 有误) FWPS_CLASSIFY_OUT0 *classifyOut // a7);</span><br><span class="line">1: kd&gt; rdmsr C0000082msr[c0000082] = fffff801`0c2119001: kd&gt; db fffff801`0c211900 l4fffff801`0c211900 0f 01 f8 65（key1！！）</span><br><span class="line">defgenerate_v4_key():# 1. 准备种子字符串 &quot;C:</span><br><span class="line">WINDOWS&quot; (宽字符, 大写)</span><br><span class="line"># 来源于之前的分析：KUSER_SHARED_DATA.NtSystemRoot seed_str =&quot;C:\WINDOWS&quot; seed_bytes = seed_str.encode(&#x27;utf-16le&#x27;) seed_bytes = seed_bytes[:</span><br><span class="line">0x14]print(f&quot;[*] 种子数据 (Hex):&#123;seed_bytes.hex().upper()&#125;&quot;) v4 =bytearray(256)forkinrange(len(seed_bytes)): v4[k] = seed_bytes[k]print(&quot;[*] 开始计算密钥流 v4...&quot;)foriinrange(256): not_i = (~i) &amp;0xFF v4[i] ^= not_i</span><br><span class="line"># 5. 输出结果print(&quot;-&quot;*30)print(f&quot;[+] 最终密钥 v4 (256 bytes) 生成完成。&quot;)print(&quot;-&quot;*30)print(&quot;前 40 字节预览 (Hex):&quot;)print(v4[:40].hex(&#x27; &#x27;).upper())print(&quot;n[C 语言数组格式]:&quot;) c_array =&#x27;, &#x27;.join([f&#x27;0x&#123;b:</span><br><span class="line">02X&#125;&#x27;forbinv4])print(f&quot;unsigned char v4[256] = &#123;&#123;&#123;c_array&#125;&#125;&#125;;&quot;)returnv4if__name__ ==&quot;__main__&quot;: key_stream = generate_v4_key()</span><br><span class="line">defsolve_payload():# 1. 密文 (v41) - 20 字节 cipher = [0xD4,0x90,0x60,0xED,0xC7,0xA4,0x30,0xF4,0xDF,0x93,0x1C,0xE5,0xD0,0x96,0x19,0xF3,0xDB,0x8E,0x21,0xA8 ]# 2. Key 1 (MSR Key) - 4 字节循环</span><br><span class="line"># 来源于 KiSystemCall64 前4字节 key1 = [0x0F,0x01,0xF8,0x65]# 3. Key 2 (Seed Key / v4) - 取前 20 字节</span><br><span class="line"># 来源于 C:</span><br><span class="line">WINDOWS 异或处理 key2 = [0xBC,0xFE,0xC7,0xFC,0xA7,0xFA,0xAE,0xF8,0xBE,0xF6,0xBB,0xF4,0xB7,0xF2,0xBE,0xF0,0xB8,0xEE,0xBE,0xEC ] payload = []foriinrange(len(cipher)): c = cipher[i] k2 = key2[i] k1 = key1[i %4] # 循环取 Key1 p = c ^ k2 ^ k1 payload.append(p)print(&quot;-&quot;*60)</span><br><span class="line"># 输出最终结果 payload_str =&quot;&quot;.join([chr(x)forxinpayload]) payload_hex =&quot; &quot;.join([f&quot;&#123;x:</span><br><span class="line">02X&#125;&quot;forxinpayload])print(f&quot;[+] 最终 Key (Hex) :&#123;payload_hex&#125;&quot;)print(f&quot;[+] 最终 Key (String):&#123;payload_str&#125;&quot;)if__name__ ==&quot;__main__&quot;: solve_payload()</span><br><span class="line">importsocketimportstructimporttimeimportosdefchecksum(data):</span><br><span class="line">iflen(data) %2: data +=b&#x27;x00&#x27; res =sum(struct.unpack(&#x27;!%sH&#x27;% (len(data) //2), data)) res = (res &gt;&gt;16) + (res &amp;0xffff) res += res &gt;&gt;16return(~res) &amp;0xffffdefsend_final_exploit(): target_ip =&quot;127.0.0.1&quot;print(f&quot;[*] Target IP:&#123;target_ip&#125;&quot;) key =b&#x27;go_to_find_the_flag!&#x27; icmp_type =8 icmp_code =0 icmp_id = os.getpid() &amp;0xFFFF icmp_seq =1 header_no_chk = struct.pack(&#x27;!BBHHH&#x27;, icmp_type, icmp_code,0, icmp_id, icmp_seq) chk = checksum(header_no_chk + key)</span><br><span class="line"># 填入校验和 header = struct.pack(&#x27;!BBHHH&#x27;, icmp_type, icmp_code, chk, icmp_id, icmp_seq) packet = header + key</span><br><span class="line">try: s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP) s.sendto(packet, (target_ip,0))print(f&quot;[+] Packet Sent! Type=&#123;icmp_type&#125;, Payload=&#x27;&#123;key.decode()&#125;&#x27;&quot;)print(&quot;[*] 驱动触发&quot;)exceptExceptionase:</span><br><span class="line">print(f&quot;[X] 发送失败:&#123;e&#125;&quot;)if__name__ ==&quot;__main__&quot;: send_final_exploit()input(&quot;n[!] 进程已暂停。n按回车键退出...&quot;)</span><br><span class="line">flag&#123;Y0r_Ar3_W1nKern3l_Mas7er!*&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/291134.html">https://www.ctfiot.com/291134.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E7%AC%AC%E4%BA%94%E5%B1%8A%E2%80%9C%E9%B9%8F%E5%9F%8E%E6%9D%AF%E2%80%9D%E5%88%9D%E8%B5%9B_Reverse-MDriver-%E8%B5%9B%E9%A2%98%E8%A7%A3%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;第五届“鹏城杯”初赛_Reverse-MDriver-赛题解析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Windows%E9%A9%B1%E5%8A%A8/">Windows驱动</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Reverse/%E5%BC%BA%E7%BD%91%E6%9D%AFS9%E5%88%9D%E8%B5%9B%E9%80%86%E5%90%91-%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" title="强网杯S9初赛逆向 tradere 解题思路 - ptrace父子VM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">强网杯S9初赛逆向 tradere 解题思路 - ptrace父子VM</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Reverse/%E7%AC%AC%E4%B8%89%E5%B1%8A%E5%8F%A4%E5%89%91%E5%B1%B1%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%8A%9F%E9%98%B2%E5%A4%A7%E8%B5%9B%E5%88%9D%E8%B5%9BReverse%E5%85%A8%E8%A7%A3wp/" title="第三届古剑山网络安全功防大赛初赛Reverse全解wp"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第三届古剑山网络安全功防大赛初赛Reverse全解wp</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9D%A5%E6%BA%90%E4%BA%8E%E4%B9%8B%E5%89%8D%E7%9A%84%E5%88%86%E6%9E%90%EF%BC%9AKUSER-SHARED-DATA-NtSystemRoot-seed-str-%E2%80%9DC-WINDOWS%E2%80%9D-seed-bytes-seed-str-encode-%E2%80%98utf-16le%E2%80%99-seed-bytes-seed-bytes"><span class="toc-number">1.</span> <span class="toc-text">来源于之前的分析：KUSER_SHARED_DATA.NtSystemRoot seed_str &#x3D;”C:\WINDOWS” seed_bytes &#x3D; seed_str.encode(‘utf-16le’) seed_bytes &#x3D; seed_bytes[:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E8%BE%93%E5%87%BA%E7%BB%93%E6%9E%9Cprint-%E2%80%9C-%E2%80%9C-30-print-f%E2%80%9D-%E6%9C%80%E7%BB%88%E5%AF%86%E9%92%A5-v4-256-bytes-%E7%94%9F%E6%88%90%E5%AE%8C%E6%88%90%E3%80%82%E2%80%9D-print-%E2%80%9C-%E2%80%9C-30-print-%E2%80%9C%E5%89%8D-40-%E5%AD%97%E8%8A%82%E9%A2%84%E8%A7%88-Hex-%E2%80%9D-print-v4-40-hex-%E2%80%98-%E2%80%98-upper-print-%E2%80%9Cn-C-%E8%AF%AD%E8%A8%80%E6%95%B0%E7%BB%84%E6%A0%BC%E5%BC%8F-%E2%80%9D-c-array-%E2%80%99-%E2%80%98-join-f%E2%80%990x-b"><span class="toc-number">2.</span> <span class="toc-text">5. 输出结果print(“-“*30)print(f”[+] 最终密钥 v4 (256 bytes) 生成完成。”)print(“-“*30)print(“前 40 字节预览 (Hex):”)print(v4[:40].hex(‘ ‘).upper())print(“n[C 语言数组格式]:”) c_array &#x3D;’, ‘.join([f’0x{b:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9D%A5%E6%BA%90%E4%BA%8E-KiSystemCall64-%E5%89%8D4%E5%AD%97%E8%8A%82-key1-0x0F-0x01-0xF8-0x65-3-Key-2-Seed-Key-v4-%E5%8F%96%E5%89%8D-20-%E5%AD%97%E8%8A%82"><span class="toc-number">3.</span> <span class="toc-text">来源于 KiSystemCall64 前4字节 key1 &#x3D; [0x0F,0x01,0xF8,0x65]# 3. Key 2 (Seed Key &#x2F; v4) - 取前 20 字节</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9D%A5%E6%BA%90%E4%BA%8E-C"><span class="toc-number">4.</span> <span class="toc-text">来源于 C:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E6%9C%80%E7%BB%88%E7%BB%93%E6%9E%9C-payload-str-%E2%80%9D%E2%80%9D-join-chr-x-forxinpayload-payload-hex-%E2%80%9D-%E2%80%9C-join-f%E2%80%9D-x"><span class="toc-number">5.</span> <span class="toc-text">输出最终结果 payload_str &#x3D;””.join([chr(x)forxinpayload]) payload_hex &#x3D;” “.join([f”{x:</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A1%AB%E5%85%A5%E6%A0%A1%E9%AA%8C%E5%92%8C-header-struct-pack-%E2%80%98-BBHHH%E2%80%99-icmp-type-icmp-code-chk-icmp-id-icmp-seq-packet-header-key"><span class="toc-number">6.</span> <span class="toc-text">填入校验和 header &#x3D; struct.pack(‘!BBHHH’, icmp_type, icmp_code, chk, icmp_id, icmp_seq) packet &#x3D; header + key</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%80%E6%9C%9F%E6%8E%A8%E8%8D%90"><span class="toc-number">7.</span> <span class="toc-text">往期推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">7.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

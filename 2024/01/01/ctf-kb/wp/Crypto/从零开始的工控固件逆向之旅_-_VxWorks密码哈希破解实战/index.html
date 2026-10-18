@@ -1,0 +1,478 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>从零开始的工控固件逆向之旅 – VxWorks密码哈希破解实战 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="VxWorks loginDefaultEncrypt 加权求和+魔数+32 位掩码导致大量碰撞，FLAG+4 字符 0.07 秒爆破。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从零开始的工控固件逆向之旅 – VxWorks密码哈希破解实战">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Crypto/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84%E5%B7%A5%E6%8E%A7%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91%E4%B9%8B%E6%97%85_-_VxWorks%E5%AF%86%E7%A0%81%E5%93%88%E5%B8%8C%E7%A0%B4%E8%A7%A3%E5%AE%9E%E6%88%98/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="VxWorks loginDefaultEncrypt 加权求和+魔数+32 位掩码导致大量碰撞，FLAG+4 字符 0.07 秒爆破。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="VxWorks">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Crypto/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84%E5%B7%A5%E6%8E%A7%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91%E4%B9%8B%E6%97%85_-_VxWorks%E5%AF%86%E7%A0%81%E5%93%88%E5%B8%8C%E7%A0%B4%E8%A7%A3%E5%AE%9E%E6%88%98/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '从零开始的工控固件逆向之旅 – VxWorks密码哈希破解实战',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">从零开始的工控固件逆向之旅 – VxWorks密码哈希破解实战</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="从零开始的工控固件逆向之旅 – VxWorks密码哈希破解实战"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/283309.html">https://www.ctfiot.com/283309.html</a><br>ID: 283309</p>
+</blockquote>
+<p>从零开始的工控固件逆向之旅 – VxWorks密码哈希破解实战</p>
+<p>引言：一次真实的工控安全挑战</p>
+<p>你是否想过,控制着工厂生产线、电力系统、甚至火星探测器的嵌入式设备,它们的密码是如何保护的?本文将带你深入一次真实的CTF逆向挑战,通过分析VxWorks实时操作系统的固件,理解工控系统的密码机制,并发现其中隐藏的安全漏洞。</p>
+<p>题目背景:</p>
+<p>给定文件:<br>key.bin(973KB固件文件) +_key.bin.extracted&#x2F;385(4.6MB提取文件)</p>
+<p>任务目标: 找到能生成哈希值cQwwddSRxS的密码</p>
+<p>技术栈: VxWorks RTOS + PowerPC架构 + 密码学</p>
+<p>掌握固件文件的分析方法和工具使用</p>
+<p>理解实时操作系统(RTOS)的密码机制</p>
+<p>学会设计有效的密码破解策略</p>
+<p>认识工控系统安全的重要性</p>
+<p>这是什么类型的文件?</p>
+<p>它来自哪个系统平台?</p>
+<p>文件中隐藏着什么信息?</p>
+<p>偏移0x20:<br>140-NOE-771-01– 设备型号</p>
+<p>偏移0x30:<br>Nov 21 14 12:03– 编译时间戳</p>
+<p>偏移0x40:<br>Quantum Ethernet Executive firmware Ver. 6.40– 固件描述</p>
+<p>火星探测器”好奇号”</p>
+<p>波音787梦幻客机</p>
+<p>全球数百万台工业控制设备</p>
+<p>使用IDA Pro打开固件</p>
+<p>定位loginDefaultEncrypt函数</p>
+<p>分析PowerPC汇编代码</p>
+<p>还原C算法</p>
+<p>搜索VxWorks文档</p>
+<p>查找安全公告和漏洞数据库</p>
+<p>寻找开源实现</p>
+<p>位置(i)</p>
+<p>字符</p>
+<p>ASCII</p>
+<p>权重(i+2)</p>
+<p>XOR值(i+1)</p>
+<p>计算过程</p>
+<p>结果</p>
+<p>0</p>
+<p>F</p>
+<p>70</p>
+<p>2</p>
+<p>1</p>
+<p>70×2⊕1 &#x3D; 140⊕1</p>
+<p>141</p>
+<p>1</p>
+<p>L</p>
+<p>76</p>
+<p>3</p>
+<p>2</p>
+<p>76×3⊕2 &#x3D; 228⊕2</p>
+<p>230</p>
+<p>2</p>
+<p>A</p>
+<p>65</p>
+<p>4</p>
+<p>3</p>
+<p>65×4⊕3 &#x3D; 260⊕3</p>
+<p>263</p>
+<p>3</p>
+<p>G</p>
+<p>71</p>
+<p>5</p>
+<p>4</p>
+<p>71×5⊕4 &#x3D; 355⊕4</p>
+<p>359</p>
+<p>4</p>
+<p>K</p>
+<p>75</p>
+<p>6</p>
+<p>5</p>
+<p>75×6⊕5 &#x3D; 450⊕5</p>
+<p>455</p>
+<p>5</p>
+<p>N</p>
+<p>78</p>
+<p>7</p>
+<p>6</p>
+<p>78×7⊕6 &#x3D; 546⊕6</p>
+<p>548</p>
+<p>6</p>
+<p>X</p>
+<p>88</p>
+<p>8</p>
+<p>7</p>
+<p>88×8⊕7 &#x3D; 704⊕7</p>
+<p>711</p>
+<p>7</p>
+<p>Y</p>
+<p>89</p>
+<p>9</p>
+<p>8</p>
+<p>89×9⊕8 &#x3D; 801⊕8</p>
+<p>809</p>
+<p>将加权和乘以魔数31695317(十六进制0x1E3A1D5)</p>
+<p>转换为无符号长整型字符串</p>
+<p>输入</p>
+<p>第1步(&lt;‘3’)</p>
+<p>第2步(&lt;‘7’)</p>
+<p>第3步(&lt;‘9’)</p>
+<p>最终输出</p>
+<p>说明</p>
+<p>‘0’</p>
+<p>+33→’Q’</p>
+<p>‘Q’&lt;‘7’→跳过</p>
+<p>‘Q’&lt;‘9’→跳过</p>
+<p>规则1</p>
+<p>‘1’</p>
+<p>+33→’R’</p>
+<p>‘R’&lt;‘7’→跳过</p>
+<p>‘R’&lt;‘9’→跳过</p>
+<p>规则1</p>
+<p>‘2’</p>
+<p>+33→’S’</p>
+<p>‘S’&lt;‘7’→跳过</p>
+<p>‘S’&lt;‘9’→跳过</p>
+<p>规则1</p>
+<p>‘3’</p>
+<p>不变</p>
+<p>+47→’b’</p>
+<p>‘b’&lt;‘9’→跳过</p>
+<p>规则2</p>
+<p>‘4’</p>
+<p>不变</p>
+<p>+47→’c’</p>
+<p>‘c’&lt;‘9’→跳过</p>
+<p>规则2</p>
+<p>‘5’</p>
+<p>不变</p>
+<p>+47→’d’</p>
+<p>‘d’&lt;‘9’→跳过</p>
+<p>规则2</p>
+<p>‘6’</p>
+<p>不变</p>
+<p>不变</p>
+<p>+65→’w’</p>
+<p>规则3</p>
+<p>‘7’</p>
+<p>不变</p>
+<p>不变</p>
+<p>+65→’x’</p>
+<p>规则3</p>
+<p>‘8’</p>
+<p>不变</p>
+<p>不变</p>
+<p>+65→’y’</p>
+<p>规则3</p>
+<p>‘9’</p>
+<p>不变</p>
+<p>不变</p>
+<p>不变</p>
+<p>保持</p>
+<p>位置</p>
+<p>输入</p>
+<p>输出</p>
+<p>0</p>
+<p>4</p>
+<p>c</p>
+<p>1</p>
+<p>0</p>
+<p>Q</p>
+<p>2</p>
+<p>6</p>
+<p>w</p>
+<p>3</p>
+<p>6</p>
+<p>w</p>
+<p>4</p>
+<p>5</p>
+<p>d</p>
+<p>5</p>
+<p>5</p>
+<p>d</p>
+<p>6</p>
+<p>2</p>
+<p>S</p>
+<p>7</p>
+<p>1</p>
+<p>R</p>
+<p>8</p>
+<p>7</p>
+<p>x</p>
+<p>9</p>
+<p>2</p>
+<p>S</p>
+<p>有限字符集: 哈希只包含10个字符{Q, R, S, b, c, d, w, x, y, 9}</p>
+<p>确定性: 相同密码总产生相同哈希(无盐值)</p>
+<p>简单运算: 仅用加法、乘法、异或,无复杂变换</p>
+<p>短哈希: 最多10位长度</p>
+<p>ord(字符): 获取字符的ASCII值</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>ord(‘F’)70</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>chr(数值): 将ASCII值转换为字符</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>chr(70)’F’</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>&amp; 0xffffffff: 32位掩码,相当于模2^32</p>
+<p>目标哈希:<br>cQwwddSRxS</p>
+<p>哈希算法:<br>vx_hash()函数</p>
+<p>密码长度: 8-40字符</p>
+<p>密码内容: ?</p>
+<p>这是CTF比赛题目</p>
+<p>CTF密码通常以FLAG开头</p>
+<p>文件名是key.bin,暗示密钥&#x2F;密码主题</p>
+<p>仅测试了约3万次(总空间的1.75%)就找到答案</p>
+<p>Python纯计算速度达到40万次&#x2F;秒</p>
+<p>无需C&#x2F;C++优化或GPU加速</p>
+<p>FLAGAWYZ: W(87)×8⊕7 + Y(89)×9⊕8 + Z(90)×10⊕9</p>
+<p>FLAGAZWY: Z(90)×8⊕7 + W(87)×9⊕8 + Y(89)×10⊕9</p>
+<p>管理员设置密码为FLAGKNXY</p>
+<p>哈希存储为cQwwddSRxS</p>
+<p>攻击者用FLAGAWYZ,FLAGAZWY等434个密码中任何一个都能登录!</p>
+<p>真实密码可能是40字符的强密码</p>
+<p>但攻击者只需找到任意8字符的碰撞即可登录</p>
+<p>防御措施</p>
+<p>VxWorks算法</p>
+<p>现代算法(bcrypt)</p>
+<p>无</p>
+<p>有(随机,每个密码不同)</p>
+<p>1次</p>
+<p>可配置(2^n次,如2^12&#x3D;4096次)</p>
+<p>10^10</p>
+<p>2^184</p>
+<p>弱</p>
+<p>强</p>
+<p>弱</p>
+<p>强(有盐值)</p>
+<p>0.0025ms</p>
+<p>可调(如100ms)</p>
+<p>使用file、hexdump、strings等基础工具</p>
+<p>从文件头部提取设备型号、编译时间等元数据</p>
+<p>通过字符串定位关键函数</p>
+<p>识别VxWorks、PowerPC等嵌入式技术</p>
+<p>利用公开资料(CVE、GitHub、文档)研究算法</p>
+<p>理解加权求和、魔数乘法、字符变换等技术</p>
+<p>将C算法翻译为Python实现</p>
+<p>使用已知测试用例验证算法正确性</p>
+<p>字典攻击 – 利用人性弱点,测试常见密码</p>
+<p>智能暴力破解 – 根据题目特征缩小搜索空间</p>
+<p>性能优化 – Python实现达到40万次&#x2F;秒</p>
+<p>碰撞分析 – 发现算法的深层安全弱点</p>
+<p>识别哈希碰撞漏洞</p>
+<p>量化安全影响(434个碰撞)</p>
+<p>对比现代密码学最佳实践</p>
+<p>提出安全加固建议</p>
+<p>可逆性:A ⊕ B ⊕ B &#x3D; A</p>
+<p>均匀性: 输出0和1的概率各50%</p>
+<p>敏感性: 输入1位变化,输出1位变化</p>
+<p>Cython: Python代码编译为C</p>
+<p>Numba: JIT编译加速</p>
+<p>C&#x2F;C++重写核心循环</p>
+<p>GPU加速(CUDA)</p>
+<p>使用bcrypt、scrypt或Argon2</p>
+<p>添加随机盐值(每个密码不同)</p>
+<p>多次迭代(增加计算成本,如10,000次)</p>
+<p>实施密码策略(强制复杂密码)</p>
+<p>启用多因素认证(2FA)</p>
+<p>仅单次迭代,仍不够安全</p>
+<p>大量老设备仍使用旧算法</p>
+<p>升级固件成本高,很多设备未更新</p>
+<p>目标哈希:<br>cQwwddSRxS</p>
+<p>破解密码:<br>FLAGAWYZ</p>
+<p>破解速度: 403,259 次&#x2F;秒</p>
+<p>破解时间: 0.07秒</p>
+<p>发现碰撞: 434个(仅FLAG****模式)</p>
+<p>碰撞原因: 加权和相同(3516)</p>
+<p>全球数百万台VxWorks设备在使用</p>
+<p>电力系统、水处理厂、化工厂等关键基础设施</p>
+<p>弱密码算法可能被攻击者利用</p>
+<p>很多老设备因成本问题未更新固件</p>
+<p>负责任地披露漏洞</p>
+<p>推动使用现代安全算法</p>
+<p>提高工控系统的安全意识</p>
+<p>守护关键基础设施的安全</p>
+<p>CTF平台: CTFtime.org、pwnable.kr</p>
+<p>学习网站: CryptoHack、OverTheWire</p>
+<p>会议: DEF CON、Black Hat、S4x</p>
+<p>论坛: r&#x2F;ReverseEngineering、看雪论坛</p>
+<p>Wind River VxWorks Documentation</p>
+<p>VxWorks Programmer’s Guide – loginLib</p>
+<p>CVE-2010-2965: VxWorks weak password hashing</p>
+<p>CERT VU#840249: Wind River Systems vulnerability</p>
+<p>CISA ICS-ALERT-10-214-01</p>
+<p>GitHub: dchest&#x2F;historic-password-hashes</p>
+<p>GitHub: Fluepke&#x2F;VX-Works-Password-Hash-Cracker</p>
+<p>CTF-Wiki: 固件分析入门</p>
+<p>看雪论坛: 嵌入式安全板块</p>
+<p>Industrial Cyber: 工控安全新闻</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"># 查看文件类型$ file key.binkey.bin: data</span><br><span class="line"># 查看文件大小$ ls -lh key.bin-rwxrwxrwx 1 root root 973K 8月 27 2018 key.bin</span><br><span class="line">$ hexdump -C key.bin | head -2000000000 13 00 03 03 40 06 40 06 84 03cd03 46 77 0d 29 |....@.@.....Fw.)|00000010 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |................|00000020 31 34 30 2d 4e 4f 45 2d 37 37 31 2d 30 31 00 00 |140-NOE-771-01..|00000030 4e 6f 76 20 32 31 20 31 34 20 31 32 3a 30 33 00 |Nov 21 14 12:03.|00000040 51 75 61 6e 74 75 6d 20 45 74 68 65 72 6e 65 74 |Quantum Ethernet|00000050 20 45 78 65 63 75 74 69 76 65 20 66 69 72 6d 77 | Executive firmw|00000060 61 72 65 20 56 65 72 2e 20 36 2e 34 30 00 00 00 |are Ver. 6.40...|</span><br><span class="line">00000000 13 00 03 03 40 06 40 06 84 03 cd 03 46 77 0d 29 |....@.@.....Fw.)|^ ^ ^| | |偏移地址 十六进制数据(每两位是一个字节) ASCII显示</span><br><span class="line"># 在extracted文件中搜索VxWorks相关字符串$ strings _key.bin.extracted/385 | grep -i&quot;vxworks&quot;| head -5UNIX Type: L8 Version: VxWorksfec(0,0) labcomm1:</span><br><span class="line">smooney_100MBTornado_NAtargetconfigbsp_noevxWorks.stP:/Eth_NOE/vxWorks_gen/../utils/setfstime.cppP:/Eth_NOE/vxWorks_gen/../bp_drv/bp_isr.cpp</span><br><span class="line"># 搜索login和encrypt相关的字符串$ strings _key.bin.extracted/385 | grep -i&quot;login&quot;Guest login ok, upload directory is %s.Login failed.loginUserAddloginUserVerifyloginDefaultEncrypt # ← 找到了!loginInit&lt;VxWorks login:</span><br><span class="line"># 使用grep的-b选项显示字节偏移$ grep -obUaP&quot;loginDefaultEncrypt&quot;_key.bin.extracted/3852289956:</span><br><span class="line">loginDefaultEncrypt</span><br><span class="line"># 转换为十六进制地址$ python3 -c&quot;print(f&#x27;0x&#123;2289956:X&#125;&#x27;)&quot;0x22F124</span><br><span class="line">文件类型: 施耐德Quantum PLC固件操作系统: VxWorks RTOS目标函数: loginDefaultEncrypt @ 0x22F124下一步: 研究这个函数的算法</span><br><span class="line">/** VxWorks 6.9 loginDefaultEncrypt* 来源: VxWorks官方文档*/STATUSloginDefaultEncrypt(char*in,char*out)&#123; intix; unsignedlongmagic =31695317; // 魔数常量 unsignedlongpasswdInt =0; // 密码长度限制: 8-40字符 if(strlen(in) &lt;8||strlen(in) &gt;40) &#123; errnoSet(S_loginLib_INVALID_PASSWORD); return(ERROR); &#125; // 步骤1: 计算加权字符和 for(ix =0; ix &lt;strlen(in); ix++) passwdInt += (in[ix]) * (ix +2) ^ (ix +1); // 步骤2: 乘以魔数并转为字符串 sprintf(out,&quot;%u&quot;, (long)(passwdInt * magic)); // 步骤3: 字符变换 for(ix =0; ix &lt;strlen(out); ix++) &#123; if(out[ix] &lt;&#x27;3&#x27;) out[ix] = out[ix] +&#x27;!&#x27;; // ASCII +33 if(out[ix] &lt;&#x27;7&#x27;) out[ix] = out[ix] +&#x27;/&#x27;; // ASCII +47 if(out[ix] &lt;&#x27;9&#x27;) out[ix] = out[ix] +&#x27;B&#x27;; // ASCII +65 (实际是&#x27;A&#x27;) &#125; return(OK);&#125;</span><br><span class="line">加权和 = Σ [ASCII(字符[i]) × (i+2) ⊕ (i+1)] i=0 到 密码长度-1</span><br><span class="line">位置 i = 0字符 = &#x27;F&#x27;ASCII值 = 70计算: 权重乘法: 70 × (0+2) = 70 × 2 = 140 异或操作: 140 ⊕ (0+1) = 140 ⊕ 1 = 141</span><br><span class="line">140的二进制: 10001100⊕ 1的二进制: 00000001 ------------- 结果: 10001101 = 141(十进制)</span><br><span class="line">&gt;&gt;&gt;140^1141</span><br><span class="line">sprintf(out,&quot;%u&quot;, (long)(passwdInt * magic));</span><br><span class="line">3516 × 31695317 = 111,440,734,572</span><br><span class="line">111,440,734,572的二进制(37位): 110011111001001100010101010010110110032位掩码 (&amp; 0xFFFFFFFF)后: 只保留低32位: 11110010011000101010100101101100 十进制: 4,066,552,172</span><br><span class="line">&gt;&gt;&gt;(3516*31695317) &amp;0xFFFFFFFF4066552172</span><br><span class="line">if(out[ix] &lt;&#x27;3&#x27;) out[ix] = out[ix] +&#x27;!&#x27;; // ASCII +33if(out[ix] &lt;&#x27;7&#x27;) out[ix] = out[ix] +&#x27;/&#x27;; // ASCII +47if(out[ix] &lt;&#x27;9&#x27;) out[ix] = out[ix] +&#x27;B&#x27;; // ASCII +65 (实际是&#x27;A&#x27;)</span><br><span class="line">初始: &#x27;4&#x27; (ASCII 52)第1次判断: &#x27;4&#x27; &lt; &#x27;3&#x27; ? 否,不变第2次判断: &#x27;4&#x27; &lt; &#x27;7&#x27; ? 是! → ASCII 52 + 47 = 99 → &#x27;c&#x27;第3次判断: &#x27;c&#x27; &lt; &#x27;9&#x27; ? 否,不变最终: &#x27;c&#x27;</span><br><span class="line">defvx_hash(password): &quot;&quot;&quot; VxWorks loginDefaultEncrypt 算法的Python实现 Args: password: 密码字符串 (必须8-40字符) Returns: 哈希字符串,如果密码长度无效则返回None &quot;&quot;&quot; # 参数验证 iflen(password) &lt;8orlen(password) &gt;40: returnNone magic =0x1E3A1D5</span><br><span class="line"># 31695317 password_int =0 # 步骤1: 计算加权字符和 foriinrange(len(password)): password_int += int(ord(password[i]) * (i +2) ^ (i +1)) # 步骤2: 乘以魔数并掩码到32位 temp = str((int(password_int * magic) &amp;0xffffffff)) # 步骤3: 字符变换 output =&#x27;&#x27; forcintemp: ifc &lt;&#x27;3&#x27;: output += chr(ord(c) + ord(&#x27;!&#x27;)) # +33 elifc &lt;&#x27;6&#x27;: output += chr(ord(c) + ord(&#x27;/&#x27;)) # +47 elifc &lt;&#x27;9&#x27;: output += chr(ord(c) + ord(&#x27;A&#x27;)) # +65 else: output += c # &#x27;9&#x27;保持不变 returnoutput</span><br><span class="line">&gt;&gt;&gt;ord(&#x27;F&#x27;)70</span><br><span class="line">&gt;&gt;&gt;chr(70)&#x27;F&#x27;</span><br><span class="line"># 测试脚本test_cases = [ (&quot;fdrusers&quot;,&quot;ycwxQxSS9&quot;), # VxWorks默认用户 (&quot;targettarget&quot;,&quot;Sxddcd9cSQ&quot;), # 常见测试密码 (&quot;FLAGKNXY&quot;,&quot;cQwwddSRxS&quot;), # 题目目标(稍后解释如何知道)]print(&quot;VxWorks Hash 算法验证:&quot;)print(&quot;=&quot;*70)print(f&quot;&#123;&#x27;密码&#x27;:&lt;20&#125;&#123;&#x27;预期哈希&#x27;:&lt;15&#125;&#123;&#x27;计算结果&#x27;:&lt;15&#125;&#123;&#x27;状态&#x27;:&lt;5&#125;&quot;)print(&quot;-&quot;*70)forpwd, expectedintest_cases: result = vx_hash(pwd) status =&quot;✓&quot;ifresult == expectedelse&quot;✗&quot; print(f&quot;&#123;pwd:&lt;20&#125;&#123;expected:&lt;15&#125;&#123;result:&lt;15&#125;&#123;status:&lt;5&#125;&quot;)</span><br><span class="line">VxWorks Hash 算法验证:======================================================================密码 预期哈希 计算结果 状态----------------------------------------------------------------------fdrusers ycwxQxSS9 ycwxQxSS9 ✓targettarget Sxddcd9cSQ Sxddcd9cSQ ✓FLAGKNXY cQwwddSRxS cQwwddSRxS ✓</span><br><span class="line">策略1: 字典攻击 (最快) ↓ 失败策略2: 智能暴力破解 (针对性) ↓ 失败策略3: 全量暴力破解 (保底)</span><br><span class="line">wordlist = [ # VxWorks常见默认密码 &quot;password&quot;,&quot;vxworks&quot;,&quot;targetvx&quot;,&quot;windrive&quot;, &quot;admin123&quot;,&quot;12345678&quot;,&quot;adminadmin&quot;, # 工控系统常见密码 &quot;scadadmin&quot;,&quot;sysadmin&quot;,&quot;rootroot&quot;, &quot;targettarget&quot;,&quot;operator&quot;,&quot;engineer&quot;, # CTF常见密码模式 &quot;ctfctfctf&quot;,&quot;flagflag&quot;,&quot;testtest&quot;,&quot;hackhack&quot;, &quot;password123&quot;,&quot;qwertyui&quot;,&quot;asdfghjk&quot;,]</span><br><span class="line">target_hash =&quot;cQwwddSRxS&quot;print(&quot;策略1: 字典攻击&quot;)print(&quot;-&quot;*70)print(f&quot;目标哈希:&#123;target_hash&#125;&quot;)print(f&quot;字典大小:&#123;len(wordlist)&#125;个密码n&quot;)found =Falseforidx, pwdinenumerate(wordlist,1): # 跳过太短的密码 iflen(pwd) &lt;8: continue result = vx_hash(pwd) # 检查是否匹配 ifresult == target_hash: print(f&quot;n 字典攻击成功!&quot;) print(f&quot; 密码:&#123;pwd&#125;&quot;) found =True break else: # 显示部分尝试过程 print(f&quot; [&#123;idx:2d&#125;]&#123;pwd:&lt;20&#125;→&#123;result&#125;&quot;)ifnotfound: print(f&quot;n 字典攻击失败 - 密码不在字典中&quot;)</span><br><span class="line">策略1: 字典攻击----------------------------------------------------------------------目标哈希: cQwwddSRxS字典大小: 21 个密码 [ 1] password → cSdcSQdwc9 [ 3] targetvx → RyS9SwSQdw [ 4] windrive → bSb9ywbcR [ 5] admin123 → RyQQdyyyc9 [10] rootroot → bx9cbxRxRQ [15] ctfctfctf → RSyy9bQwRS [21] asdfghjk → RxycdS9ycy字典攻击失败 - 密码不在字典中</span><br><span class="line">字符集: A-Z大写字母 + 0-9数字 = 36个字符组合数: 36^4 = 1,679,616 种预估时间: 1,679,616 / 400,000(次/秒) ≈ 4秒</span><br><span class="line">importitertoolsimportstringimporttimeprint(&quot;n策略2: 智能暴力破解&quot;)print(&quot;-&quot;*70)print(&quot;假设: 密码格式为 FLAG + 4个字符&quot;)print(&quot;字符集: A-Z + 0-9&quot;)charset = string.ascii_uppercase + string.digits # ABCD...Z0123...9total = len(charset) **4print(f&quot;搜索空间:&#123;total:,&#125;种组合&quot;)print(f&quot;开始时间:&#123;time.strftime(&#x27;%H:%M:%S&#x27;)&#125;n&quot;)start_time = time.time()tested =0forcomboinitertools.product(charset, repeat=4): pwd =&quot;FLAG&quot;+&#x27;&#x27;.join(combo) result = vx_hash(pwd) tested +=1 # 进度显示(每5万次) iftested %50000==0: elapsed = time.time() - start_time speed = tested / elapsedifelapsed &gt;0else0 eta = (total - tested) / speedifspeed &gt;0else0 print(f&quot; 进度:&#123;tested:&gt;8,&#125;/&#123;total:,&#125;(&#123;tested/total*100:5.2f&#125;%) &quot; f&quot;速度:&#123;speed:&gt;8,.0f&#125;/s 预计:&#123;eta:&gt;5.1f&#125;s&quot;, end=&#x27;r&#x27;) # 检查是否匹配 ifresult == target_hash: elapsed = time.time() - start_time print(f&quot;nn 密码破解成功!&quot;) print(f&quot; 密码:&#123;pwd&#125;&quot;) print(f&quot; 哈希:&#123;result&#125;&quot;) print(f&quot; 尝试次数:&#123;tested:,&#125;&quot;) print(f&quot; 耗时:&#123;elapsed:.2f&#125;秒&quot;) print(f&quot; 平均速度:&#123;tested/elapsed:,.0f&#125;次/秒&quot;) found =True break</span><br><span class="line">策略2: 智能暴力破解----------------------------------------------------------------------假设: 密码格式为 FLAG + 4个字符字符集: A-Z + 0-9搜索空间: 1,679,616 种组合开始时间: 20:15:</span><br><span class="line">38密码破解成功! 密码: FLAGAWYZ 哈希: cQwwddSRxS 尝试次数: 29,402 耗时: 0.07秒 平均速度: 403,259 次/秒</span><br><span class="line">password =&quot;FLAGAWYZ&quot;result = vx_hash(password)print(&quot;n&quot;+&quot;=&quot;*70)print(&quot;破解结果验证&quot;)print(&quot;=&quot;*70)print(f&quot;密码:&#123;password&#125;&quot;)print(f&quot;哈希:&#123;result&#125;&quot;)print(f&quot;目标: cQwwddSRxS&quot;)print(f&quot;匹配:&#123;&#x27;✓ 完全匹配!&#x27;ifresult == target_hashelse&#x27;✗ 不匹配&#x27;&#125;&quot;)</span><br><span class="line">======================================================================破解结果验证======================================================================密码: FLAGAWYZ哈希: cQwwddSRxS目标: cQwwddSRxS匹配: ✓ 完全匹配!</span><br><span class="line">位置 字符 ASCII 权重 XOR值 计算公式 乘法结果 异或结果---- ---- ----- ----- ------ ------------------- --------- --------0 F 70 2 1 70 × 2 ⊕ 1 140 1411 L 76 3 2 76 × 3 ⊕ 2 228 2302 A 65 4 3 65 × 4 ⊕ 3 260 2633 G 71 5 4 71 × 5 ⊕ 4 355 3594 K 75 6 5 75 × 6 ⊕ 5 450 4555 N 78 7 6 78 × 7 ⊕ 6 546 5486 X 88 8 7 88 × 8 ⊕ 7 704 7117 Y 89 9 8 89 × 9 ⊕ 8 801 809 总和: 3516</span><br><span class="line">140的二进制表示: 128 64 32 16 8 4 2 1 1 0 0 0 1 1 0 0 = 1401的二进制表示: 128 64 32 16 8 4 2 1 0 0 0 0 0 0 0 1 = 1异或运算(相同为0,不同为1): 128 64 32 16 8 4 2 1 1 0 0 0 1 1 0 1 = 141</span><br><span class="line">加权和 × 魔数: 3516 × 31695317 = 111,440,734,572</span><br><span class="line">十进制: 111,440,734,572二进制: 0b1100111110010011000101010100101101100 (37位)十六进制: 0x19F2618AAC</span><br><span class="line">111,440,734,572 &amp; 0xFFFFFFFF二进制: 原始(37位): 1 1001 1111 0010 0110 0001 1000 1010 1010 1100 掩码(32位): 1111 1111 1111 1111 1111 1111 1111 1111 结果(32位): 1111 0010 0110 0001 1000 1010 1010 1100十进制: 4,066,552,172十六进制: 0xF2618AAC</span><br><span class="line">位置 输入 判断1(&lt;&#x27;3&#x27;) 判断2(&lt;&#x27;7&#x27;) 判断3(&lt;&#x27;9&#x27;) 输出---- ---- ----------- ----------- ----------- ----0 4 否(不变) 是(+47=99) 否(跳过) c1 0 是(+33=81) 否(跳过) 否(跳过) Q2 6 否(不变) 否(不变) 是(+65=119) w3 6 否(不变) 否(不变) 是(+65=119) w4 5 否(不变) 是(+47=100) 否(跳过) d5 5 否(不变) 是(+47=100) 否(跳过) d6 2 是(+33=83) 否(跳过) 否(跳过) S7 1 是(+33=82) 否(跳过) 否(跳过) R8 7 否(不变) 否(不变) 是(+65=120) x9 2 是(+33=83) 否(跳过) 否(跳过) S</span><br><span class="line"># 搜索所有产生相同哈希的FLAG****密码importitertoolsimportstringtarget_hash =&quot;cQwwddSRxS&quot;charset = string.ascii_uppercase # 仅大写字母collisions = []print(&quot;搜索所有FLAG****碰撞密码...&quot;)forcomboinitertools.product(charset, repeat=4): pwd =&quot;FLAG&quot;+&#x27;&#x27;.join(combo) ifvx_hash(pwd) == target_hash: collisions.append(pwd)print(f&quot;n发现&#123;len(collisions)&#125;个碰撞密码!&quot;)</span><br><span class="line">搜索所有FLAG****碰撞密码...发现 434 个碰撞密码!</span><br><span class="line">print(&quot;n前20个碰撞密码:&quot;)print(&quot;-&quot;*70)foridx, pwdinenumerate(collisions[:20],1): print(f&quot; &#123;idx:3d&#125;.&#123;pwd&#125;&quot;)</span><br><span class="line">前20个碰撞密码:---------------------------------------------------------------------- 1. FLAGAWYZ 2. FLAGAZWY 3. FLAGBYXZ 4. FLAGCVWY 5. FLAGCWYV 6. FLAGCXYW 7. FLAGDUXZ 8. FLAGDWXX 9. FLAGDXTY 10. FLAGDYXV 11. FLAGDZXW 12. FLAGEWVZ 13. FLAGEYXX 14. FLAGEZTY 15. FLAGFTXY 16. FLAGFUZV 17. FLAGFVZW 18. FLAGFWZT 19. FLAGFXZU 20. FLAGFYUZ ... 55. FLAGKNXY ← 这也是一个有效答案! ...434. FLAGZZTK</span><br><span class="line">print(&quot;n碰撞密码的加权和分析:&quot;)print(&quot;-&quot;*80)print(f&quot;&#123;&#x27;密码&#x27;:&lt;15&#125;&#123;&#x27;加权和&#x27;:&lt;10&#125;&#123;&#x27;魔数乘积&#x27;:&lt;20&#125;&#123;&#x27;32位掩码&#x27;:&lt;15&#125;&quot;)print(&quot;-&quot;*80)forpwdincollisions[:10]: # 计算加权和 password_int =0 foriinrange(len(pwd)): password_int += int(ord(pwd[i]) * (i +2) ^ (i +1)) product = password_int *0x1E3A1D5 masked = product &amp;0xFFFFFFFF print(f&quot;&#123;pwd:&lt;15&#125;&#123;password_int:&lt;10&#125;&#123;product:&lt;20&#125;&#123;masked:&lt;15&#125;&quot;)</span><br><span class="line">碰撞密码的加权和分析:--------------------------------------------------------------------------------密码 加权和 魔数乘积 32位掩码--------------------------------------------------------------------------------FLAGAWYZ 3516 111440734572 4066552172FLAGAZWY 3516 111440734572 4066552172FLAGBYXZ 3516 111440734572 4066552172FLAGCVWY 3516 111440734572 4066552172FLAGCWYV 3516 111440734572 4066552172FLAGCXYW 3516 111440734572 4066552172FLAGDUXZ 3516 111440734572 4066552172FLAGDWXX 3516 111440734572 4066552172FLAGDXTY 3516 111440734572 4066552172FLAGDYXV 3516 111440734572 4066552172</span><br><span class="line">原始乘积: 111,440,734,572 (37位)32位掩码: 只保留低32位丢失的信息: 高5位 (11001)</span><br><span class="line">&quot;4066552172&quot; → &quot;cQwwddSRxS&quot;</span><br><span class="line">密码哈希数据库: password → cSdcSQdwc9 admin123 → RyQQdyyyc9 ... FLAGAWYZ → cQwwddSRxS FLAGAZWY → cQwwddSRxS ...</span><br><span class="line">file # 文件类型识别hexdump # 十六进制查看strings # 字符串提取grep # 文本搜索和模式匹配</span><br><span class="line">binwalk # 固件自动分析和提取IDA Pro # 专业反汇编工具(支持PowerPC)Ghidra # NSA开源逆向工程平台radare2 # 开源逆向框架</span><br><span class="line">Python3 - itertools # 组合生成 - string # 字符集定义 - time # 性能测试 - struct # 二进制数据处理</span><br><span class="line">固件文件 (key.bin) ↓字符串分析 → 发现loginDefaultEncrypt ↓公开资料 → CVE-2010-2965漏洞 ↓算法实现 → Python vx_hash() ↓智能破解 → FLAGAWYZ (0.07秒) ↓深度分析 → 434个碰撞密码 ↓安全评估 → 算法存在严重弱点</span><br><span class="line">#!/usr/bin/env python3&quot;&quot;&quot;VxWorks loginDefaultEncrypt 算法实现&quot;&quot;&quot;defvx_hash(password): &quot;&quot;&quot; VxWorks loginDefaultEncrypt 哈希函数 参数: password: 密码字符串(8-40字符) 返回: 哈希字符串,如果密码长度无效则返回None &quot;&quot;&quot; iflen(password) &lt;8orlen(password) &gt;40: returnNone magic =0x1E3A1D5</span><br><span class="line"># 31695317 password_int =0 # 步骤1: 加权和 foriinrange(len(password)): password_int += int(ord(password[i]) * (i +2) ^ (i +1)) # 步骤2: 魔数乘法与掩码 temp = str((int(password_int * magic) &amp;0xffffffff)) # 步骤3: 字符变换 output =&#x27;&#x27; forcintemp: ifc &lt;&#x27;3&#x27;: output += chr(ord(c) + ord(&#x27;!&#x27;)) elifc &lt;&#x27;6&#x27;: output += chr(ord(c) + ord(&#x27;/&#x27;)) elifc &lt;&#x27;9&#x27;: output += chr(ord(c) + ord(&#x27;A&#x27;)) else: output += c returnoutputif__name__ ==&quot;__main__&quot;: # 验证 assertvx_hash(&quot;FLAGAWYZ&quot;) ==&quot;cQwwddSRxS&quot; print(&quot;✓ 算法验证通过&quot;)</span><br><span class="line">#!/usr/bin/env python3&quot;&quot;&quot;智能密码破解&quot;&quot;&quot;importitertoolsimportstringfromvx_hashimportvx_hashtarget =&quot;cQwwddSRxS&quot;charset = string.ascii_uppercase + string.digitsprint(f&quot;目标哈希:&#123;target&#125;&quot;)print(&quot;搜索FLAG****模式...&quot;)forcomboinitertools.product(charset, repeat=4): pwd =&quot;FLAG&quot;+&#x27;&#x27;.join(combo) ifvx_hash(pwd) == target: print(f&quot;✓ 找到密码:&#123;pwd&#125;&quot;) break</span><br><span class="line">1. FLAGAWYZ2. FLAGAZWY3. FLAGBYXZ4. FLAGCVWY5. FLAGCWYV6. FLAGCXYW7. FLAGDUXZ8. FLAGDWXX9. FLAGDXTY10. FLAGDYXV...55. FLAGKNXY...434. FLAGZZTK</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/283309.html">https://www.ctfiot.com/283309.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84%E5%B7%A5%E6%8E%A7%E5%9B%BA%E4%BB%B6%E9%80%86%E5%90%91%E4%B9%8B%E6%97%85_%E2%80%93_VxWorks%E5%AF%86%E7%A0%81%E5%93%88%E5%B8%8C%E7%A0%B4%E8%A7%A3%E5%AE%9E%E6%88%98.full.md">CTF大赛WP集合&#x2F;articles&#x2F;从零开始的工控固件逆向之旅_–_VxWorks密码哈希破解实战.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/VxWorks/">VxWorks</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Crypto/WP-2024%E5%B9%B4%E6%98%A5%E7%A7%8B%E6%9D%AF%E5%A4%8F%E5%AD%A3%E8%B5%9B%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%E8%AF%A6%E8%A7%A3%E5%90%88%E9%9B%86/" title="【WP】2024年春秋杯夏季赛解题思路详解合集"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">【WP】2024年春秋杯夏季赛解题思路详解合集</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Crypto/%E5%AE%98%E6%96%B9WP_-_%E4%BE%A7%E4%BF%A1%E9%81%93%E6%94%BB%E5%87%BB%E8%B5%9B%E9%A2%98Power_Trajectory_Diagram%E8%A7%A3%E6%9E%90/" title="侧信道攻击赛题Power Trajectory Diagram官方WP - 大鲲智联+信安国赛"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">侧信道攻击赛题Power Trajectory Diagram官方WP - 大鲲智联+信安国赛</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

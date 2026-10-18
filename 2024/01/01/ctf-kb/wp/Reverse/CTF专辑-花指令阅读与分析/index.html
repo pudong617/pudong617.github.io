@@ -1,0 +1,344 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>CTF 专辑 – 花指令阅读与分析 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="花指令阅读与分析 — JunkCode 算数拆分 + push&#x2F;pop&#x2F;retn 等价解释 + 抵消型 (add-sub&#x2F;xor-xor) + jmp db 型 (EB 03 跳 55 E8 AA) + 间接赋值 + IDA LinearSweep vs Recursive Traversal 反汇编算法差异。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CTF 专辑 – 花指令阅读与分析">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/CTF%E4%B8%93%E8%BE%91-%E8%8A%B1%E6%8C%87%E4%BB%A4%E9%98%85%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="花指令阅读与分析 — JunkCode 算数拆分 + push&#x2F;pop&#x2F;retn 等价解释 + 抵消型 (add-sub&#x2F;xor-xor) + jmp db 型 (EB 03 跳 55 E8 AA) + 间接赋值 + IDA LinearSweep vs Recursive Traversal 反汇编算法差异。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="花指令">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/CTF%E4%B8%93%E8%BE%91-%E8%8A%B1%E6%8C%87%E4%BB%A4%E9%98%85%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'CTF 专辑 – 花指令阅读与分析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">CTF 专辑 – 花指令阅读与分析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="CTF 专辑 – 花指令阅读与分析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/194547.html">https://www.ctfiot.com/194547.html</a><br>ID: 194547</p>
+</blockquote>
+<p>一、垃圾代码（JunkCode）</p>
+<p>对于垃圾代码和花指令的区分，我们一般将没有实际意义的代码称作垃圾代码（Junk Code&#x2F;Garbage code），而把干扰调试器分析的代码称作花指令。</p>
+<p>典型的JunkCode一般是一些操作指令具有相同的操作数，执行一些毫无作用的运算，比如：</p>
+<p>mov eax,eax;xchg esp,esp;jmp rva&#x3D;0;&#x2F;&#x2F;E9 00 00 00 00xor eax,0;    ；任何一个数异或0等于本身</p>
+<p>二、汇编指令的等价替换</p>
+<p>（1）算数拆分</p>
+<p>add eax,0x5;就可以拆分为add eax,0x2;add eax,0x1;inc eax;inc eax;再如：shl eax,5就可以拆分为：shl eax,3;shl eax,1;shl eax,1;当然，也可以综合其他寄存器进行值的传递，比如：add eax,4;可以改写成：xor ebx,ebx;add ebx,2;mul ebx,2;add eax,ebx;</p>
+<p>诸如此类的可以写很多种，不再阐述</p>
+<p>下面对几个指令的等价解释进行描述：</p>
+<p>（2）等价解释</p>
+<p>Ⅰ.push&#x2F;pop</p>
+<p>push 0x11111;在x86程序里就等价于sub esp,0x4;mov [esp],0x11111;</p>
+<p>pop eax;在x86程序里面就等价于mov eax,[esp];add esp,0x4;&#x2F;&#x2F;因此，当某个寄存器没有实际作用的时候，可以用多个Pop,来代替add esp;</p>
+<p>Ⅱ.jmp addr</p>
+<p>mov eip,addr;</p>
+<p>push addr;retn;</p>
+<p>push next opcodeAddr;jmp addr;</p>
+<p>Ⅳ.retn</p>
+<p>比如retn 0x5其等价于：mov eip,[esp];add esp,0x4+0x5;</p>
+<p>push ecx;mov ecx,[esp+4];add esp,8;jmp ecx;&#x2F;&#x2F;这种写法会破坏ecx的值，因此使用的前提是ecx没有正在被程序使用</p>
+<p>Ⅴ.enter&#x2F;leave</p>
+<p>ENTER numbytes, nestinglevel</p>
+<p>ENTER 有两个操作数：</p>
+<p>第一个是常数，定义为局部变量保存的堆栈空间字节数；</p>
+<p>第二个定义了过程的词法嵌套级。</p>
+<p>它为局部变量保留堆栈空间，把 EBP 入栈。具体来说，它执行三个操作：</p>
+<p>把 EBP 入栈 (push ebp)</p>
+<p>把 EBP 设置为堆栈帧的基址 (mov ebp, esp)</p>
+<p>为局部变量保留空间 (sub esp, numbytes)</p>
+<p>下面给出一个实例，ENTER 指令为局部变量保留了 8 个字节的堆栈空间：</p>
+<p>enter 8,0</p>
+<p>它与下列指令等效：</p>
+<p>push ebp;mov ebp,esp;sub esp,8;</p>
+<p>而一般情况下，只是简单的enter 后面不接参数，那就没有sub esp的说法了</p>
+<p>而leave指令则跟enter相反，一般出现在retn之前:</p>
+<p>它等价于：</p>
+<p>mov esp, ebp;pop ebp;</p>
+<p>等价于 mov A,0;因为异或同一个值的结果必定是0；</p>
+<p>Ⅶ.add&#x2F;sub A,1</p>
+<p>等价于inc A;&#x2F;&#x2F;A+&#x3D;1dec A;&#x2F;&#x2F;A-&#x3D;1</p>
+<p>Ⅷ.push&#x2F;popad</p>
+<p>Ⅸ.and</p>
+<p>and esp,0xfffffff0</p>
+<p>16进制为：E8 00 00 00 00</p>
+<p>这种指令常用来获取下一行代码的地址，也可用于获取eip的值。</p>
+<p>004710D5 &gt;    E8 00000000   call 11111.004710DA004710DA  |.  68 10B14900   push 11111.0049B110这里执行call后，eip的值为004710DAh，而此时[esp]的值，就是0x4710DAh，因此获取call时的eip就是[esp]-0x5;</p>
+<p>mov op1,op2     —-&gt;    push op2 &#x2F; pop op1</p>
+<p>xor A,B&#x3D;&#x3D;(<del>A&amp;B)|(A&amp;</del>B)</p>
+<p>（3）间接赋值</p>
+<p>我们知道，数学上常有 b&#x3D;a,c&#x3D;b就是c&#x3D;a</p>
+<p>那么同样的，在构建花指令的时候也可以这么做。</p>
+<p>三、抵消型花指令</p>
+<p>抵消型花指令主要的注意点有两个方面，一个是运算的抵消，即逆运算；</p>
+<p>另外一个就是栈平衡类型，栈平衡也是考虑堆栈抵消型花指令的注意点。</p>
+<p>抵消型花指令一般不会干扰分析引擎分析，但可能会影响栈平衡</p>
+<p>（1）运算抵消</p>
+<p>常见的运算抵消有这样几种</p>
+<p>push-pop（压栈-出栈）</p>
+<p>add-sub adc-sbb （加法-减法 进位加法-借位减法）mul-div imul-idiv   （乘法-除法 整数乘法-整数除法）inc-dec （加1-减1）</p>
+<p>shl-shr （左移-右移）</p>
+<p>xor-xor  (异或)</p>
+<p>not-not (取反)</p>
+<p>push eax;pop eax;add eax,2;mul eax,2;div eax,2;xor eax,2;xor eax,2;inc eax;dec eax;inc ebx;inc ebx;sub ebx,2;shl ebx,2;shr ebx,2;sub eax,2;</p>
+<p>（2）栈平衡实例</p>
+<p>Ⅰ.push&#x2F;pop类</p>
+<p>pushad;pushfd;push eax;push ecx;push ebx;push esi;pop esi;pop ebx;pop ecx;pop eax;popfd;popad;</p>
+<p>Ⅱ.动态使栈平衡</p>
+<p>动态使栈平衡的主要思路就是保存原来的栈指针,后面再恢复；下面给出一个实例：</p>
+<p>push ebp;mov ebp,esp;sub esp,1000h;push 0h;push esi;push eax;mov esp,ebp;pop ebp;</p>
+<p>四、jmp db型花指令</p>
+<p>这类花指令主要是干扰分析工具分析：</p>
+<p>其中IDA　使用的反汇编算法是Recursive Traversal</p>
+<p>Olldbg     使用的反汇编算法是LinearSweep&#x2F;Recursive Traversal(按ctrl+A组合键时)</p>
+<p>其中线性扫描（LinearSweep）算法的技术含量不高，反汇编工具将整个模块中的每一条指令都反汇编成汇编指令，将遇到的机器码都作为代码处理，没有对所反汇编的内容进行任何判断。因此，该种算法不能有效的将代码和数据区分开，从而导致反汇编出现错误。这种错误会影响对下一条指令的正确识别，会使整个反汇编都出现错误。</p>
+<p>而递归行进法（Recursive Traversal）按照代码可能执行的顺序来反汇编程序，对每条可能的路径进行扫描。当解码出分支指令后，反汇编工具就将这个地址记录下来，并分别反汇编各个分支中的指令，因此该算法灵活度高。</p>
+<p>（1）无条件跳转的jmp db型</p>
+<p>最基本的Jmp db型就是跳转接上了一个干扰的db opcode：</p>
+<p>例如</p>
+<p>004710D5 &gt; $ &#x2F;EB 03         jmp short 11111.004710DA004710D7     |55            db 55                                    ;  CHAR ‘U’004710D8     |E8            db E8                                    ;  注意这里004710D9   . |AA            db AA004710DA   &gt; 83C0 02       add eax,0x2</p>
+<p>004710D5 &gt; &#x2F;EB 03           jmp short 11111.004710DA004710D7   |55              push ebp                                 ; kernel32.768E00C9004710D8   |E8 AA83C002     call 03079487</p>
+<p>说明：Linear Sweep型反汇编引擎是逐行反汇编的，该花指令中的垃圾数据db EBh 干扰了其工作，因此错误地确定了指令的起始位置，导致反汇编的一些跳转指令的地址无效</p>
+<p>而OD使用递归引擎分析就会正常，变成：</p>
+<p>004710D5 &gt; $ &#x2F;EB 03         jmp short 11111.004710DA004710D7     |55            db 55                                    ;  CHAR ‘U’004710D8     |E8            db E8004710D9   . |AA            stos byte ptr es:[edi]004710DA   &gt; 83C0 02       add eax,0x2</p>
+<p>（2）条件跳转的jmp db型</p>
+<p>条件跳转跟无条件跳转其实差不多，主要的是用条件跳转代替了原来的jmp</p>
+<p>下面给出一个CTF中常出现的实例：</p>
+<p>start:  xor eax,eax;  test eax,eax;  jz label1;  jnz label1;  db E8h;label 1:  xor eax,3;  add eax,3;  ………..</p>
+<p>（3）jmp to db干扰分析型(jx+jnx)</p>
+<p>注：这里的jmp to db指的是一类，控制转移指令到的地址是无效的数据(db)的情况</p>
+<p>这里的jx,jnx一般指两个相对的条件跳转，上面常接</p>
+<p>来设置位，让条件跳转成立。</p>
+<p>在递归算法中一个十分重要的假设是：对任意一条控制转移指令（jmp&#x2F;retn&#x2F;call等）都能确定其后继（即转移）的目的地址，要想要迷惑这类反汇编工具，只要让其难以确定跳转的目的地址即可；</p>
+<p>一个实例如下：</p>
+<p>start:  xor eax,eax;  test eax,eax;  jz label0;  jnz label1;label 0:  db 0E8hlabel 1:  xor eax,3;  add eax,3;  ………..</p>
+<p>与上面的实例2作对比，可以看见是两个跳转实际上是跳到了不同的地方，一个是混淆的代码，一个是真正的控制流，而上面只是直接跳到了真正的控制流，只不过是控制流上面接了脏字节。</p>
+<p>OD中反编译的结果如下</p>
+<p>004710D5 &gt;  33C0            xor eax,eax004710D7    85C0            test eax,eax004710D9    74 03           je short 11111.004710DE004710DB    75 00           jnz short 11111.004710DD004710DD    E8 83F00383     call 834B0165004710E2    c003 90         rol byte ptr ds:[ebx],0x90</p>
+<p>这里具体解释下原因，首先是有两个跳转</p>
+<p> je跳转到的是xor eax,3而jnz是跳转到db E8，而E8是call的opcode 后面需要4个字节作为地址，所以这边就会将xor等的opcode 作为地址，从而导致识别错误。</p>
+<p>因此这种写法，在CTF中非常常见，因为两种引擎都不能将他分析出来，需要手动去除。</p>
+<p>注：(这里的db，也可以换成一些干扰堆栈平衡的指令，不过一定不会被执行，比如add esp,0x1)</p>
+<p>五、call 0h型</p>
+<p>（1）call +db+平衡</p>
+<p>call loc+1;db C8;pop eax;&#x2F;&#x2F;add esp,0x4;</p>
+<p>（2）call + add [esp], n + retn</p>
+<p>004010BF   .  E8 00000000   call 1111.004010C4004010C4  &#x2F;$  830424 06     add dword ptr ss:[esp],0x6004010C8  .  C3            retn004010C9      B9            db B9</p>
+<p>可以看到这里的add，是将call 00h的返回的地址，也就是[esp]+0x6（add 的四个字节+C3 B9）</p>
+<p>来实现一个跳转，到004010CA，对于这种，只需要将下面的特征码patch掉就可以了：</p>
+<p>E80000000083042406C3??</p>
+<p>六、去除脚本</p>
+<p>import ida_bytesimport ida_ida<br>def patch(ea,num&#x3D;1):    for i in range(num):        ida_bytes.patch_byte(ea+i,0x90)    return<br>def f(begin_addr,end_addr,hexStr)  xx&#x3D;(len(hexStr)-1)&#x2F;&#x2F;2    bMask &#x3D; bytes.fromhex(hexStr.replace(‘00’, ‘01’).replace(‘??’, ‘00’))    bPattern &#x3D; bytes.fromhex(hexStr.replace(‘??’, ‘00’))    signs&#x3D;ida_bytes.BIN_SEARCH_FORWARD| ida_bytes.BIN_SEARCH_NOBREAK| ida_bytes.BIN_SEARCH_NOSHOW    while begin_addr&lt;end_addr:        ea&#x3D;ida_bytes.bin_search(begin_addr,end_addr,bPattern,bMask,1,signs)        if ea &#x3D;&#x3D; ida_idaapi.BADADDR:            break        else:            print(hex(ea))            patch(ea,xx)            begin_addr&#x3D;ea+xx f(0x0,0x1000,”?? ?? 00 00 00 ??”)</p>
+<p>在上述脚本中：</p>
+<p>定义了一个名为f的函数，用于执行二进制搜索并对匹配的位置进行nop。</p>
+<p>begin_addr是搜索开始的地址。</p>
+<p>end_addr是搜索结束的地址。</p>
+<p>hexStr是用于搜索的十六进制模式字符串（用空格分开，其中??表示通配符，注意不可以使用诸如2?这样的情况）</p>
+<p>接着，将hexStr转换为两个字节数组：bMask和bPattern。bMask是用于表示可变字节的，其中00表示需要匹配的字节，01表示不需要匹配的字节；bPattern则是用于搜索的固定字节序列。</p>
+<p>定义了一个signs变量，用于指定搜索的标志位，其中BIN_SEARCH_FORWARD表示向前搜索，BIN_SEARCH_NOBREAK表示不允许搜索中途中断，BIN_SEARCH_NOSHOW表示不显示搜索结果。</p>
+<p>接着使用ida_bytes.bin_search函数进行二进制搜索，从begin_addr到end_addr之间搜索bPattern，其中可变字节由bMask指定。搜索到匹配的位置后，将其打印出来，并调用patch函数对其进行补丁操作。</p>
+<p>最后更新begin_addr为下一个搜索的起始地址，通常为当前匹配位置加上一个偏移量。</p>
+<p>七、例题</p>
+<p>[GFCTF 2021]wordy</p>
+<p>花指令-jmp db型IDA脚本编写动态调试</p>
+<p>一、基本分析</p>
+<p>分析main()函数可以看到是杂乱的字节，观察0x1144可以发现，存在着jmp db1这种类型的花指令，因此可以写一个idapython脚本来解决</p>
+<p>代码如下：</p>
+<p>import ida_bytesimport ida_ida<br>def patch(ea,num&#x3D;1):  for i in range(num):    ida_bytes.patch_byte(ea+i,0x90)  returnprint(“—–”)hexStr&#x3D;”EB FF C0 BF ?? 00 00 00 E8”bMask &#x3D; bytes.fromhex(hexStr.replace(‘00’, ‘01’).replace(‘??’, ‘00’))bPattern &#x3D; bytes.fromhex(hexStr.replace(‘??’, ‘00’))signs&#x3D;ida_bytes.BIN_SEARCH_FORWARD| ida_bytes.BIN_SEARCH_NOBREAK| ida_bytes.BIN_SEARCH_NOSHOWprint(bMask,bPattern)begin_addr&#x3D;0x1135end_addr&#x3D;0x3100while begin_addr&lt;end_addr:  ea&#x3D;ida_bytes.bin_search(begin_addr,end_addr,bPattern,bMask,1,signs)  if ea &#x3D;&#x3D; ida_idaapi.BADADDR:    break  else:    print(hex(ea))    patch(ea,3)    begin_addr&#x3D;ea+8</p>
+<p>二、自动化逆向</p>
+<p>既然我们已经去除了花指令，且代码都是重复的，为什么我们不能直接获取putchar()的内容呢，为此，我们在上面代码的基础下，写下如下</p>
+<p>idapython代码:</p>
+<p>import idcimport ida_bytesimport ida_idaprint(“—–”)hexStr&#x3D;”EB FF C0 BF ?? 00 00 00 E8”bMask &#x3D; bytes.fromhex(hexStr.replace(‘00’, ‘01’).replace(‘??’, ‘00’))bPattern &#x3D; bytes.fromhex(hexStr.replace(‘??’, ‘00’))signs&#x3D;ida_bytes.BIN_SEARCH_FORWARD| ida_bytes.BIN_SEARCH_NOBREAK| ida_bytes.BIN_SEARCH_NOSHOWprint(bMask,bPattern)begin_addr&#x3D;0x1135end_addr&#x3D;0x3100s&#x3D;””while begin_addr&lt;end_addr:  ea&#x3D;ida_bytes.bin_search(begin_addr,end_addr,bPattern,bMask,1,signs)  if ea &#x3D;&#x3D; ida_idaapi.BADADDR:    break  else:    s+&#x3D;chr(idc.get_wide_byte(ea+4))    begin_addr&#x3D;ea+8 print(s)</p>
+<p>#GFCTF{u_are2wordy}</p>
+<p>[NCTF 2022]cccha</p>
+<p>花指令-call 0h型花指令-抵消式花指令-jmp db型IDA脚本编写chacha20</p>
+<p>一、去花</p>
+<p>分析main()函数，乱七八糟，看不了伪代码，观察汇编</p>
+<p>（1）花指令-jmp变型(call 0h型)</p>
+<p>这边的call 0h(E8 00 00 00 00)实际上目的是获取eip的地址，即call下面一行指令的地址，pop rbx的作用就是将取到的eip值放到rbx里面，然后给rbx加上一个值，赋值给call函数的返回地址，所以这段代码的本质实际上是实现了一个跳转的作用（jmp指令的变型），跳转的地址就是计算后的rbx.</p>
+<p>除了这一种jmp变型之外，还有一种类似的，不同的是add所占用的字节数不同，</p>
+<p>import ida_bytesimport ida_idaimport idcsigns&#x3D;ida_bytes.BIN_SEARCH_FORWARD| ida_bytes.BIN_SEARCH_NOBREAK| ida_bytes.BIN_SEARCH_NOSHOWbegin_addr&#x3D;0x1090end_addr&#x3D;0xa1e7lth&#x3D;lambda code:<br>int((len(code)+1)&#x2F;3)<br>def patch(ea,code):    cd&#x3D;list(code)    for i in range(len(cd)):        ida_bytes.patch_byte(ea+i,cd[i])    return<br>def patch_jmp_1(hexStr):    print(“——patch_jmp_1———–”)    bMask &#x3D; bytes.fromhex(hexStr.replace(‘00’, ‘01’).replace(‘??’, ‘00’))    bPattern &#x3D; bytes.fromhex(hexStr.replace(‘??’, ‘00’))    iaddr&#x3D;begin_addr    length&#x3D;lth(hexStr)    while iaddr&lt;end_addr:        ea&#x3D;ida_bytes.bin_search(iaddr,end_addr,bPattern,bMask,1,signs)        print(hex(ea))        if ea &#x3D;&#x3D; ida_idaapi.BADADDR:            break        else:            offset&#x3D;idc.get_wide_dword(ea+12)+3            code&#x3D;b’xe9’+offset.to_bytes(4, ‘little’)            patch(ea,b’x90’*length)            patch(ea,code)            iaddr&#x3D;ea+length    return<br>def patch_jmp_2(hexStr):    print(“———–patch_jmp_2———“)    bMask &#x3D; bytes.fromhex(hexStr.replace(‘00’, ‘01’).replace(‘??’, ‘00’))    bPattern &#x3D; bytes.fromhex(hexStr.replace(‘??’, ‘00’))    iaddr&#x3D;begin_addr    length&#x3D;lth(hexStr)    while iaddr&lt;end_addr:        ea&#x3D;ida_bytes.bin_search(iaddr,end_addr,bPattern,bMask,1,signs)        print(hex(ea))        if ea &#x3D;&#x3D; ida_idaapi.BADADDR:            break        else:            offset&#x3D;idc.get_wide_byte(ea+12)+6            code&#x3D;b’xeb’+offset.to_bytes(1, ‘little’)            patch(ea,b’x90’*length)            patch(ea,code)            iaddr&#x3D;ea+length    return<br>def patch_directly(code):    print(“——花指令:”,code,”—–”)    bMask &#x3D; bytes.fromhex(code.replace(‘00’, ‘01’).replace(‘??’, ‘00’))    bPattern &#x3D; bytes.fromhex(code.replace(‘??’, ‘00’))    iaddr&#x3D;begin_addr    length&#x3D;lth(code)    while iaddr&lt;end_addr:        ea&#x3D;ida_bytes.bin_search(iaddr,end_addr,bPattern,bMask,1,signs)        print(hex(ea))        if ea &#x3D;&#x3D; ida_idaapi.BADADDR:            break        else:            patch(ea,b’x90’*length)            iaddr&#x3D;ea+length-1    return<br>patch_jmp_1(“53 53 9C E8 00 00 00 00 5B 48 81 C3 ?? ?? ?? ?? 48 89 5C 24 10 9D 5B C3”)p&#x3D;[“50 53 52 5A 5B 58”, “52 50 58 5A”,”53 52 5A 5B”,”50 52 5A 58”,”50 53 5B 58”,”53 5B”,”50 58”,”52 5A”,”9C 50 48 3D 22 20 00 00 77 04 7E 02 E8 E8 58 9D”]#抵消式花指令 如push rbx&amp;pop rbx;  jmp db;<br>for i in p:    patch_directly(i)patch_jmp_2(“53 53 9C E8 00 00 00 00 5B 48 83 C3 ?? 48 89 5C 24 10 9D 5B C3”)<br>‘’’junk_jmp_change_1.text:<br>0000000000008838 53                            push    rbx.text:<br>0000000000008839 53                            push    rbx.text:<br>000000000000883A 9C                            pushfq.text:<br>000000000000883B E8 00 00 00 00                call    $+5.text:<br>0000000000008840 5B                            pop     rbx.text:<br>0000000000008841 48 81 C3 3F 00 00 00          add     rbx, (offset byte_887F - offset loc_8840).text:<br>0000000000008848 48 89 5C 24 10                mov     [rsp+18h+var_8], rbx.text:<br>000000000000884D 9D                            popfq.text:<br>000000000000884E 5B                            pop     rbx.text:<br>000000000000884F C3                            retn’’’’’’junk_jmp_change_2.text:<br>000000000000892C 53                            push    rbx.text:<br>000000000000892D 53                            push    rbx.text:<br>000000000000892E 9C                            pushfq.text:<br>000000000000892F E8 00 00 00 00                call    $+5.text:<br>0000000000008934 5B                            pop     rbx.text:<br>0000000000008935 48 83 C3 C4                   add     rbx, (offset qword_88F8 - offset loc_8934).text:<br>0000000000008939 48 89 5C 24 10                mov     [rsp+20h+var_10], rbx.text:<br>000000000000893E 9D                            popfq.text:<br>000000000000893F 5B                            pop     rbx.text:<br>0000000000008940 C3                            retn’’’<br>‘’’junk_jmp_db.text:<br>0000000000008883 9C                            pushfq.text:<br>0000000000008884 50                            push    rax.text:<br>0000000000008885 48 3D 22 20 00 00             cmp     rax, 2022h.text:<br>000000000000888B 77 04                         ja      short loc_8891.text:<br>000000000000888D 7E 02                         jle     short loc_8891.text:<br>000000000000888F E8                            db 0E8h.text:<br>0000000000008890 E8                            db 0E8h.text:<br>0000000000008891 58                            pop     rax.text:<br>0000000000008892 9D                            popfq’’’</p>
+<p>二、分析</p>
+<p>IDA状态栏右键，重新分析程序。</p>
+<p>重新分析，伪代码如下：</p>
+<p>可以分析出，这里是一个典型的chacha20的字符串，且这个函数是用来初始化状态的</p>
+<p>__int64 __fastcall sub_55FC9CAF9DED(){  __int64 v0; &#x2F;&#x2F; rbp  int i; &#x2F;&#x2F; [rsp-140h] [rbp-140h]  _DWORD v3[44]; &#x2F;&#x2F; [rsp-138h] [rbp-138h] BYREF  __int64 v4; &#x2F;&#x2F; [rsp-85h] [rbp-85h] BYREF  int v5; &#x2F;&#x2F; [rsp-7Dh] [rbp-7Dh]  char v6; &#x2F;&#x2F; [rsp-79h] [rbp-79h]  _QWORD v7[4]; &#x2F;&#x2F; [rsp-78h] [rbp-78h] BYREF  char v8; &#x2F;&#x2F; [rsp-58h] [rbp-58h]  _QWORD v9[5]; &#x2F;&#x2F; [rsp-48h] [rbp-48h] BYREF  __int16 v10; &#x2F;&#x2F; [rsp-20h] [rbp-20h]  unsigned __int64 v11; &#x2F;&#x2F; [rsp-10h] [rbp-10h]  __int64 v12; &#x2F;&#x2F; [rsp-8h] [rbp-8h]<br>  v12 &#x3D; v0;  v11 &#x3D; __readfsqword(0x28u);  v7[0] &#x3D; 7639691014887960151LL;  v7[1] &#x3D; 0x12CFEBEC73124005LL;  v7[2] &#x3D; 0xF060C3D29ED918C4LL;  v7[3] &#x3D; 0x45613036DB175B72LL;  v4 &#x3D; 0x143D83BD8A1337E6LL;  v5 &#x3D; -1868846699;  v9[0] &#x3D; 0x23CE4B73757CC05ELL;  v9[1] &#x3D; 0x708F01F3AC89BBA4LL;  v9[2] &#x3D; 0x62D45B4183317FC8LL;  v9[3] &#x3D; 0x4B50FC9DDC27A7A6LL;  v9[4] &#x3D; 0x385117386B2F9806LL;  v10 &#x3D; 0xEF2F;  v8 &#x3D; 0;  v6 &#x3D; 0;  puts(“input:”);  gets(s1);  if ( strlen(s1) !&#x3D; 42 )  {    printf(“Wrong!”);    exit(0);  }  expand_key(v3, v7, &amp;v4, -1640531527);  Gen_KeyStream(v3);  for ( i &#x3D; 0; i &lt;&#x3D; 41; ++i ){    s1[i] ^&#x3D; *(v3 + i);    s1[i] +&#x3D; i;  }  if ( !memcmp(s1, v9, 0x2AuLL) )    printf(“Right!”);  else    printf(“Wrong!”);  return 0LL;}</p>
+<p>v9_g&#x3D;[0x23CE4B73757CC05E,0x708F01F3AC89BBA4,0x62D45B4183317FC8,0x4B50FC9DDC27A7A6,0x385117386B2F9806,0xEF2F]s_g&#x3D;[0x24aa2514342efc10,0x57b9d9d0924bd6aa,0x668a271f44325f8f ,0x1900ecaca269bcb6,0x774ec7717c3840df,0xd878e3846e0ebb32]def f(x):    s&#x3D;[]    for i in x:        t&#x3D;hex(i)[2:]        for j in range(len(t),0, -2):            s.append(int(t[j-2:j],16))    return sv9&#x3D;f(v9_g)s&#x3D;f(s_g)flg&#x3D;””for i in range(42):    flg+&#x3D;chr(((v9[i]-i)^s[i]+256)%256)print(flg)</p>
+<p>NCTF{cb86d437-8671-42a4-82dc-3259754e5ef5}</p>
+<p>八、总结</p>
+<p>文末:</p>
+<p>欢迎师傅们加入我们:</p>
+<p>星盟安全团队纳新群1:<br>222328705</p>
+<p>星盟安全团队纳新群2:<br>346014666</p>
+<p>有兴趣的师傅欢迎一起来讨论!</p>
+<p>PS:<br>团队纳新简历投递邮箱：</p>
+<p><a href="mailto:&#120;&#109;&#x63;&#x76;&#x65;&#64;&#113;&#x71;&#x2e;&#99;&#111;&#x6d;">&#120;&#109;&#x63;&#x76;&#x65;&#64;&#113;&#x71;&#x2e;&#99;&#111;&#x6d;</a></p>
+<p>责任编辑：@LYK0r4师傅</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">mov eax,eax;xchg esp,esp;jmp rva=0;//E9 00 00 00 00xor eax,0;    ；任何一个数异或0等于本身</span><br><span class="line">add eax,0x5;就可以拆分为add eax,0x2;add eax,0x1;inc eax;inc eax;再如：shl eax,5就可以拆分为：shl eax,3;shl eax,1;shl eax,1;当然，也可以综合其他寄存器进行值的传递，比如：add eax,4;可以改写成：xor ebx,ebx;add ebx,2;mul ebx,2;add eax,ebx;</span><br><span class="line">push 0x11111;在x86程序里就等价于sub esp,0x4;mov [esp],0x11111;</span><br><span class="line">pop eax;在x86程序里面就等价于mov eax,[esp];add esp,0x4;//因此，当某个寄存器没有实际作用的时候，可以用多个Pop,来代替add esp;</span><br><span class="line">mov eip,addr;</span><br><span class="line">push addr;retn;</span><br><span class="line">push next opcodeAddr;jmp addr;</span><br><span class="line">比如retn 0x5其等价于：mov eip,[esp];add esp,0x4+0x5;</span><br><span class="line">push ecx;mov ecx,[esp+4];add esp,8;jmp ecx;//这种写法会破坏ecx的值，因此使用的前提是ecx没有正在被程序使用</span><br><span class="line">push ebp;mov ebp,esp;sub esp,8;</span><br><span class="line">mov esp, ebp;pop ebp;</span><br><span class="line">等价于 mov A,0;因为异或同一个值的结果必定是0；</span><br><span class="line">等价于inc A;//A+=1dec A;//A-=1</span><br><span class="line">and esp,0xfffffff0</span><br><span class="line">004710D5 &gt;    E8 00000000   call 11111.004710DA004710DA  |.  68 10B14900   push 11111.0049B110这里执行call后，eip的值为004710DAh，而此时[esp]的值，就是0x4710DAh，因此获取call时的eip就是[esp]-0x5;</span><br><span class="line">mov op1,op2     ----&gt;    push op2 / pop op1</span><br><span class="line">xor A,B==(~A&amp;B)|(A&amp;~B)</span><br><span class="line">push eax;pop eax;add eax,2;mul eax,2;div eax,2;xor eax,2;xor eax,2;inc eax;dec eax;inc ebx;inc ebx;sub ebx,2;shl ebx,2;shr ebx,2;sub eax,2;</span><br><span class="line">pushad;pushfd;push eax;push ecx;push ebx;push esi;pop esi;pop ebx;pop ecx;pop eax;popfd;popad;</span><br><span class="line">push ebp;mov ebp,esp;sub esp,1000h;push 0h;push esi;push eax;mov esp,ebp;pop ebp;</span><br><span class="line">004710D5 &gt; $ /EB 03         jmp short 11111.004710DA004710D7     |55            db 55                                    ;  CHAR &#x27;U&#x27;004710D8     |E8            db E8                                    ;  注意这里004710D9   . |AA            db AA004710DA   &gt; 83C0 02       add eax,0x2</span><br><span class="line">004710D5 &gt; /EB 03           jmp short 11111.004710DA004710D7   |55              push ebp                                 ; kernel32.768E00C9004710D8   |E8 AA83C002     call 03079487</span><br><span class="line">004710D5 &gt; $ /EB 03         jmp short 11111.004710DA004710D7     |55            db 55                                    ;  CHAR &#x27;U&#x27;004710D8     |E8            db E8004710D9   . |AA            stos byte ptr es:[edi]004710DA   &gt; 83C0 02       add eax,0x2</span><br><span class="line">start:  xor eax,eax;  test eax,eax;  jz label1;  jnz label1;  db E8h;label 1:  xor eax,3;  add eax,3;  ...........</span><br><span class="line">start:  xor eax,eax;  test eax,eax;  jz label0;  jnz label1;label 0:  db 0E8hlabel 1:  xor eax,3;  add eax,3;  ...........</span><br><span class="line">004710D5 &gt;  33C0            xor eax,eax004710D7    85C0            test eax,eax004710D9    74 03           je short 11111.004710DE004710DB    75 00           jnz short 11111.004710DD004710DD    E8 83F00383     call 834B0165004710E2    c003 90         rol byte ptr ds:[ebx],0x90</span><br><span class="line">call loc+1;db C8;pop eax;//add esp,0x4;</span><br><span class="line">004010BF   .  E8 00000000   call 1111.004010C4004010C4  /$  830424 06     add dword ptr ss:[esp],0x6004010C8  .  C3            retn004010C9      B9            db B9</span><br><span class="line">E80000000083042406C3??</span><br><span class="line">import ida_bytesimport ida_ida</span><br><span class="line">def patch(ea,num=1):    for i in range(num):        ida_bytes.patch_byte(ea+i,0x90)    return</span><br><span class="line">def f(begin_addr,end_addr,hexStr)  xx=(len(hexStr)-1)//2    bMask = bytes.fromhex(hexStr.replace(&#x27;00&#x27;, &#x27;01&#x27;).replace(&#x27;??&#x27;, &#x27;00&#x27;))    bPattern = bytes.fromhex(hexStr.replace(&#x27;??&#x27;, &#x27;00&#x27;))    signs=ida_bytes.BIN_SEARCH_FORWARD| ida_bytes.BIN_SEARCH_NOBREAK| ida_bytes.BIN_SEARCH_NOSHOW    while begin_addr&lt;end_addr:        ea=ida_bytes.bin_search(begin_addr,end_addr,bPattern,bMask,1,signs)        if ea == ida_idaapi.BADADDR:            break        else:            print(hex(ea))            patch(ea,xx)            begin_addr=ea+xx f(0x0,0x1000,&quot;?? ?? 00 00 00 ??&quot;)</span><br><span class="line">import ida_bytesimport ida_ida</span><br><span class="line">def patch(ea,num=1):  for i in range(num):    ida_bytes.patch_byte(ea+i,0x90)  returnprint(&quot;-----&quot;)hexStr=&quot;EB FF C0 BF ?? 00 00 00 E8&quot;bMask = bytes.fromhex(hexStr.replace(&#x27;00&#x27;, &#x27;01&#x27;).replace(&#x27;??&#x27;, &#x27;00&#x27;))bPattern = bytes.fromhex(hexStr.replace(&#x27;??&#x27;, &#x27;00&#x27;))signs=ida_bytes.BIN_SEARCH_FORWARD| ida_bytes.BIN_SEARCH_NOBREAK| ida_bytes.BIN_SEARCH_NOSHOWprint(bMask,bPattern)begin_addr=0x1135end_addr=0x3100while begin_addr&lt;end_addr:  ea=ida_bytes.bin_search(begin_addr,end_addr,bPattern,bMask,1,signs)  if ea == ida_idaapi.BADADDR:    break  else:    print(hex(ea))    patch(ea,3)    begin_addr=ea+8</span><br><span class="line">import idcimport ida_bytesimport ida_idaprint(&quot;-----&quot;)hexStr=&quot;EB FF C0 BF ?? 00 00 00 E8&quot;bMask = bytes.fromhex(hexStr.replace(&#x27;00&#x27;, &#x27;01&#x27;).replace(&#x27;??&#x27;, &#x27;00&#x27;))bPattern = bytes.fromhex(hexStr.replace(&#x27;??&#x27;, &#x27;00&#x27;))signs=ida_bytes.BIN_SEARCH_FORWARD| ida_bytes.BIN_SEARCH_NOBREAK| ida_bytes.BIN_SEARCH_NOSHOWprint(bMask,bPattern)begin_addr=0x1135end_addr=0x3100s=&quot;&quot;while begin_addr&lt;end_addr:  ea=ida_bytes.bin_search(begin_addr,end_addr,bPattern,bMask,1,signs)  if ea == ida_idaapi.BADADDR:    break  else:    s+=chr(idc.get_wide_byte(ea+4))    begin_addr=ea+8 print(s)</span><br><span class="line">#GFCTF&#123;u_are2wordy&#125;</span><br><span class="line">import ida_bytesimport ida_idaimport idcsigns=ida_bytes.BIN_SEARCH_FORWARD| ida_bytes.BIN_SEARCH_NOBREAK| ida_bytes.BIN_SEARCH_NOSHOWbegin_addr=0x1090end_addr=0xa1e7lth=lambda code:</span><br><span class="line">int((len(code)+1)/3)</span><br><span class="line">def patch(ea,code):    cd=list(code)    for i in range(len(cd)):        ida_bytes.patch_byte(ea+i,cd[i])    return</span><br><span class="line">def patch_jmp_1(hexStr):    print(&quot;------patch_jmp_1-----------&quot;)    bMask = bytes.fromhex(hexStr.replace(&#x27;00&#x27;, &#x27;01&#x27;).replace(&#x27;??&#x27;, &#x27;00&#x27;))    bPattern = bytes.fromhex(hexStr.replace(&#x27;??&#x27;, &#x27;00&#x27;))    iaddr=begin_addr    length=lth(hexStr)    while iaddr&lt;end_addr:        ea=ida_bytes.bin_search(iaddr,end_addr,bPattern,bMask,1,signs)        print(hex(ea))        if ea == ida_idaapi.BADADDR:            break        else:            offset=idc.get_wide_dword(ea+12)+3            code=b&#x27;xe9&#x27;+offset.to_bytes(4, &#x27;little&#x27;)            patch(ea,b&#x27;x90&#x27;*length)            patch(ea,code)            iaddr=ea+length    return</span><br><span class="line">def patch_jmp_2(hexStr):    print(&quot;-----------patch_jmp_2---------&quot;)    bMask = bytes.fromhex(hexStr.replace(&#x27;00&#x27;, &#x27;01&#x27;).replace(&#x27;??&#x27;, &#x27;00&#x27;))    bPattern = bytes.fromhex(hexStr.replace(&#x27;??&#x27;, &#x27;00&#x27;))    iaddr=begin_addr    length=lth(hexStr)    while iaddr&lt;end_addr:        ea=ida_bytes.bin_search(iaddr,end_addr,bPattern,bMask,1,signs)        print(hex(ea))        if ea == ida_idaapi.BADADDR:            break        else:            offset=idc.get_wide_byte(ea+12)+6            code=b&#x27;xeb&#x27;+offset.to_bytes(1, &#x27;little&#x27;)            patch(ea,b&#x27;x90&#x27;*length)            patch(ea,code)            iaddr=ea+length    return</span><br><span class="line">def patch_directly(code):    print(&quot;------花指令:&quot;,code,&quot;-----&quot;)    bMask = bytes.fromhex(code.replace(&#x27;00&#x27;, &#x27;01&#x27;).replace(&#x27;??&#x27;, &#x27;00&#x27;))    bPattern = bytes.fromhex(code.replace(&#x27;??&#x27;, &#x27;00&#x27;))    iaddr=begin_addr    length=lth(code)    while iaddr&lt;end_addr:        ea=ida_bytes.bin_search(iaddr,end_addr,bPattern,bMask,1,signs)        print(hex(ea))        if ea == ida_idaapi.BADADDR:            break        else:            patch(ea,b&#x27;x90&#x27;*length)            iaddr=ea+length-1    return</span><br><span class="line">patch_jmp_1(&quot;53 53 9C E8 00 00 00 00 5B 48 81 C3 ?? ?? ?? ?? 48 89 5C 24 10 9D 5B C3&quot;)p=[&quot;50 53 52 5A 5B 58&quot;, &quot;52 50 58 5A&quot;,&quot;53 52 5A 5B&quot;,&quot;50 52 5A 58&quot;,&quot;50 53 5B 58&quot;,&quot;53 5B&quot;,&quot;50 58&quot;,&quot;52 5A&quot;,&quot;9C 50 48 3D 22 20 00 00 77 04 7E 02 E8 E8 58 9D&quot;]#抵消式花指令 如push rbx&amp;pop rbx;  jmp db;</span><br><span class="line">for i in p:    patch_directly(i)patch_jmp_2(&quot;53 53 9C E8 00 00 00 00 5B 48 83 C3 ?? 48 89 5C 24 10 9D 5B C3&quot;)</span><br><span class="line">&#x27;&#x27;&#x27;junk_jmp_change_1.text:</span><br><span class="line">0000000000008838 53                            push    rbx.text:</span><br><span class="line">0000000000008839 53                            push    rbx.text:</span><br><span class="line">000000000000883A 9C                            pushfq.text:</span><br><span class="line">000000000000883B E8 00 00 00 00                call    $+5.text:</span><br><span class="line">0000000000008840 5B                            pop     rbx.text:</span><br><span class="line">0000000000008841 48 81 C3 3F 00 00 00          add     rbx, (offset byte_887F - offset loc_8840).text:</span><br><span class="line">0000000000008848 48 89 5C 24 10                mov     [rsp+18h+var_8], rbx.text:</span><br><span class="line">000000000000884D 9D                            popfq.text:</span><br><span class="line">000000000000884E 5B                            pop     rbx.text:</span><br><span class="line">000000000000884F C3                            retn&#x27;&#x27;&#x27;&#x27;&#x27;&#x27;junk_jmp_change_2.text:</span><br><span class="line">000000000000892C 53                            push    rbx.text:</span><br><span class="line">000000000000892D 53                            push    rbx.text:</span><br><span class="line">000000000000892E 9C                            pushfq.text:</span><br><span class="line">000000000000892F E8 00 00 00 00                call    $+5.text:</span><br><span class="line">0000000000008934 5B                            pop     rbx.text:</span><br><span class="line">0000000000008935 48 83 C3 C4                   add     rbx, (offset qword_88F8 - offset loc_8934).text:</span><br><span class="line">0000000000008939 48 89 5C 24 10                mov     [rsp+20h+var_10], rbx.text:</span><br><span class="line">000000000000893E 9D                            popfq.text:</span><br><span class="line">000000000000893F 5B                            pop     rbx.text:</span><br><span class="line">0000000000008940 C3                            retn&#x27;&#x27;&#x27;</span><br><span class="line">&#x27;&#x27;&#x27;junk_jmp_db.text:</span><br><span class="line">0000000000008883 9C                            pushfq.text:</span><br><span class="line">0000000000008884 50                            push    rax.text:</span><br><span class="line">0000000000008885 48 3D 22 20 00 00             cmp     rax, 2022h.text:</span><br><span class="line">000000000000888B 77 04                         ja      short loc_8891.text:</span><br><span class="line">000000000000888D 7E 02                         jle     short loc_8891.text:</span><br><span class="line">000000000000888F E8                            db 0E8h.text:</span><br><span class="line">0000000000008890 E8                            db 0E8h.text:</span><br><span class="line">0000000000008891 58                            pop     rax.text:</span><br><span class="line">0000000000008892 9D                            popfq&#x27;&#x27;&#x27;</span><br><span class="line">__int64 __fastcall sub_55FC9CAF9DED()&#123;  __int64 v0; // rbp  int i; // [rsp-140h] [rbp-140h]  _DWORD v3[44]; // [rsp-138h] [rbp-138h] BYREF  __int64 v4; // [rsp-85h] [rbp-85h] BYREF  int v5; // [rsp-7Dh] [rbp-7Dh]  char v6; // [rsp-79h] [rbp-79h]  _QWORD v7[4]; // [rsp-78h] [rbp-78h] BYREF  char v8; // [rsp-58h] [rbp-58h]  _QWORD v9[5]; // [rsp-48h] [rbp-48h] BYREF  __int16 v10; // [rsp-20h] [rbp-20h]  unsigned __int64 v11; // [rsp-10h] [rbp-10h]  __int64 v12; // [rsp-8h] [rbp-8h]</span><br><span class="line">  v12 = v0;  v11 = __readfsqword(0x28u);  v7[0] = 7639691014887960151LL;  v7[1] = 0x12CFEBEC73124005LL;  v7[2] = 0xF060C3D29ED918C4LL;  v7[3] = 0x45613036DB175B72LL;  v4 = 0x143D83BD8A1337E6LL;  v5 = -1868846699;  v9[0] = 0x23CE4B73757CC05ELL;  v9[1] = 0x708F01F3AC89BBA4LL;  v9[2] = 0x62D45B4183317FC8LL;  v9[3] = 0x4B50FC9DDC27A7A6LL;  v9[4] = 0x385117386B2F9806LL;  v10 = 0xEF2F;  v8 = 0;  v6 = 0;  puts(&quot;input:&quot;);  gets(s1);  if ( strlen(s1) != 42 )  &#123;    printf(&quot;Wrong!&quot;);    exit(0);  &#125;  expand_key(v3, v7, &amp;v4, -1640531527);  Gen_KeyStream(v3);  for ( i = 0; i &lt;= 41; ++i )&#123;    s1[i] ^= *(v3 + i);    s1[i] += i;  &#125;  if ( !memcmp(s1, v9, 0x2AuLL) )    printf(&quot;Right!&quot;);  else    printf(&quot;Wrong!&quot;);  return 0LL;&#125;</span><br><span class="line">v9_g=[0x23CE4B73757CC05E,0x708F01F3AC89BBA4,0x62D45B4183317FC8,0x4B50FC9DDC27A7A6,0x385117386B2F9806,0xEF2F]s_g=[0x24aa2514342efc10,0x57b9d9d0924bd6aa,0x668a271f44325f8f ,0x1900ecaca269bcb6,0x774ec7717c3840df,0xd878e3846e0ebb32]def f(x):    s=[]    for i in x:        t=hex(i)[2:]        for j in range(len(t),0, -2):            s.append(int(t[j-2:j],16))    return sv9=f(v9_g)s=f(s_g)flg=&quot;&quot;for i in range(42):    flg+=chr(((v9[i]-i)^s[i]+256)%256)print(flg)</span><br><span class="line">NCTF&#123;cb86d437-8671-42a4-82dc-3259754e5ef5&#125;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/194547.html">https://www.ctfiot.com/194547.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/CTF%E4%B8%93%E8%BE%91%E2%80%93%E8%8A%B1%E6%8C%87%E4%BB%A4%E9%98%85%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;CTF专辑–花指令阅读与分析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%8A%B1%E6%8C%87%E4%BB%A4/">花指令</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Reverse/CTF%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90-_engineTest_-_%E9%80%BB%E8%BE%91%E9%97%A8%E7%94%B5%E8%B7%AF%E5%BC%95%E6%93%8E%E7%9A%84%E5%AE%8C%E6%95%B4%E7%A0%B4%E8%A7%A3/" title="CTF逆向工程深度解析: engineTest – 逻辑门电路引擎的完整破解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">CTF逆向工程深度解析: engineTest – 逻辑门电路引擎的完整破解</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Reverse/CrackMe3_%E9%80%86%E5%90%91%E5%88%86%E6%9E%90%E5%AE%9E%E6%88%98_-_PowerPC%E6%9E%B6%E6%9E%84%E5%8F%8C%E9%87%8D%E5%8A%A0%E5%AF%86%E6%8C%91%E6%88%98%E5%AE%8C%E5%85%A8%E8%A7%A3%E6%9E%90/" title="CrackMe3 逆向分析实战 – PowerPC架构双重加密挑战完全解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">CrackMe3 逆向分析实战 – PowerPC架构双重加密挑战完全解析</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

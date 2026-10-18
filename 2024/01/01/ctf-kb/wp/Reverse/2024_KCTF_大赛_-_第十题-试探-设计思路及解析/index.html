@@ -1,0 +1,260 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2024 KCTF 大赛 - 第十题《试探》设计思路及解析 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="shellcode 拼图游戏 + 0 元素轨迹做注册码 + 6 字节花指令去混淆。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2024 KCTF 大赛 - 第十题《试探》设计思路及解析">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/2024_KCTF_%E5%A4%A7%E8%B5%9B_-_%E7%AC%AC%E5%8D%81%E9%A2%98-%E8%AF%95%E6%8E%A2-%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="shellcode 拼图游戏 + 0 元素轨迹做注册码 + 6 字节花指令去混淆。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="拼图游戏">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/2024_KCTF_%E5%A4%A7%E8%B5%9B_-_%E7%AC%AC%E5%8D%81%E9%A2%98-%E8%AF%95%E6%8E%A2-%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2024 KCTF 大赛 - 第十题《试探》设计思路及解析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2024 KCTF 大赛 - 第十题《试探》设计思路及解析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2024 KCTF 大赛 - 第十题《试探》设计思路及解析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/203613.html">https://www.ctfiot.com/203613.html</a><br>ID: 203613</p>
+</blockquote>
+<p>2024 KCTF 大赛于8月15日正式开赛！比赛设置了多维度的评分体系，包括难度值、火力值和精致度积分，旨在引导竞赛的难度和趣味度，使其更具挑战性和吸引力。同时，也为参赛选手提供了更加公平、有趣的竞赛平台。</p>
+<p>今天中午12点，第十题《试探》已截止答题，本题共有10支战队成功破解，【hzqmwne】战队用时1小时48分18秒抢先拿下此题，第二名来自【Nepnep】战队、第三名来自【COMPASS】战队。</p>
+<p>*注意：签到题《逐光启航》持续开放，整个比赛期间均可提交答案获得积分</p>
+<p>一起来看看本题设计思路和解析吧！</p>
+<p>出题战队：天外星系</p>
+<p>战队成员ID：geekfire</p>
+<p>设计思路</p>
+<p>题目名称:<br>hidesc<br>运行环境:<br>win10 win11<br>输出提示:<br>key正确则输出提示ok!</p>
+<p>题目设计思路：</p>
+<p>算法采用一个简单的拼图游戏</p>
+<p>初始状态为：</p>
+<p>{0, 1, 3},<br>{5, 2, 6},<br>{4, 7, 8}</p>
+<p>目标状态为：</p>
+<p>{1, 2, 3},<br>{4, 5, 6},<br>{7, 8, 0}</p>
+<p>通过移动元素0来到达目标状态。移动过程中0元素的坐标即为注册码。</p>
+<p>整个算法隐藏在一段shellcode中，并且shellcode加入了大量的花指令干扰分析。</p>
+<p>对shellcode的加载函进行了字符串隐藏 并通过系统调用隐藏API的方式干扰分析。</p>
+<p>最终注册码为：</p>
+<p>011110202122</p>
+<p>赛题解析</p>
+<p>以下解析由看雪专家【wx_孤城】给出，来自【中午吃什么】战队。</p>
+<p>丢进IDA查看main函数，有一些简单的字符串加密。</p>
+<p>逐步断点，调用了以下函数：<br>ntdll.dll<br>NtAddBootEntry<br>TpAllocWait<br>TpSetWait</p>
+<p>猜测为shellcode注入，简单分析下main函数逻辑。</p>
+<p>18DB处的逻辑，将kctf + input + 6050处的一块shellcode拷贝到75C0<br>之后创建2个线程，线程A执行shellcode， 线程B等待答案并输出结果ok!或no!</p>
+<p>下面重点分析这串shellcode。</p>
+<p>选中140006050，使用IDA–&gt;Edit–&gt;Code转换为代码。<br>这时候我们是不能F5的，因为作者做了混淆。</p>
+<p>混淆分为2部分</p>
+<p>经过分析发现无效指令特征码只有这三种：<br>?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? FD EB 1F 3E 1C EB EB<br>?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? FF EB 15 3E 1D EB FB<br>?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? FE EB 18 3E 1C EB EB</p>
+<p>直接丢给GPT写个去混淆的python脚本。</p>
+<p>1.py，将无关跳转和无效指令替换为nop。</p>
+<h1 id="coding-gbk"><a href="#coding-gbk" class="headerlink" title="-- coding: gbk --"></a>-<em>- coding: gbk -</em>-</h1><p>def replace_bytes_and_preceding(file_path, search_bytes, replace_byte, preceding_length):</p>
+<h1 id="读取二进制文件内容"><a href="#读取二进制文件内容" class="headerlink" title="读取二进制文件内容"></a>读取二进制文件内容</h1><p> with open(file_path, ‘rb’) as file:<br> data &#x3D; file.read()</p>
+<h1 id="将要查找的字节和替换的字节转换为字节类型"><a href="#将要查找的字节和替换的字节转换为字节类型" class="headerlink" title="将要查找的字节和替换的字节转换为字节类型"></a>将要查找的字节和替换的字节转换为字节类型</h1><p> search_bytes &#x3D; bytes.fromhex(search_bytes)<br> replace_byte &#x3D; bytes.fromhex(replace_byte)<br> replace_length &#x3D; len(search_bytes) + preceding_length # 替换的总长度</p>
+<h1 id="创建一个可变字节数组来进行操作"><a href="#创建一个可变字节数组来进行操作" class="headerlink" title="创建一个可变字节数组来进行操作"></a>创建一个可变字节数组来进行操作</h1><p> modified_data &#x3D; bytearray(data)</p>
+<h1 id="初始化搜索开始位置"><a href="#初始化搜索开始位置" class="headerlink" title="初始化搜索开始位置"></a>初始化搜索开始位置</h1><p> start &#x3D; 0</p>
+<p> while start &lt; len(modified_data):</p>
+<h1 id="查找字节序列的位置"><a href="#查找字节序列的位置" class="headerlink" title="查找字节序列的位置"></a>查找字节序列的位置</h1><p> index &#x3D; modified_data.find(search_bytes, start)<br> if index &#x3D;&#x3D; -1:<br> break</p>
+<h1 id="计算需要替换的起始位置"><a href="#计算需要替换的起始位置" class="headerlink" title="计算需要替换的起始位置"></a>计算需要替换的起始位置</h1><p> replace_start &#x3D; max(0, index - preceding_length)</p>
+<h1 id="将替换的范围全部设置为-replace-byte"><a href="#将替换的范围全部设置为-replace-byte" class="headerlink" title="将替换的范围全部设置为 replace_byte"></a>将替换的范围全部设置为 <code>replace_byte</code></h1><p> modified_data[replace_start:<br>index + len(search_bytes)] &#x3D; replace_byte * replace_length</p>
+<h1 id="更新搜索开始位置，跳过当前替换的位置"><a href="#更新搜索开始位置，跳过当前替换的位置" class="headerlink" title="更新搜索开始位置，跳过当前替换的位置"></a>更新搜索开始位置，跳过当前替换的位置</h1><p> start &#x3D; index + len(search_bytes)</p>
+<h1 id="将修改后的数据写回到文件中"><a href="#将修改后的数据写回到文件中" class="headerlink" title="将修改后的数据写回到文件中"></a>将修改后的数据写回到文件中</h1><p> with open(file_path, ‘wb’) as file:<br> file.write(modified_data)</p>
+<p> print(f”Replaced all occurrences of {search_bytes.hex()} and preceding {preceding_length} bytes with {replace_byte.hex()} in {file_path}.”)</p>
+<p>preceding_length &#x3D; 11 # 替换之前的字节数</p>
+<p>replace_bytes_and_preceding(‘test3.exe’, ‘FD EB 1F 3E 1C EB EB’, ‘90’, preceding_length)<br>replace_bytes_and_preceding(‘test3.exe’, ‘FF EB 15 3E 1D EB FB’, ‘90’, preceding_length)<br>replace_bytes_and_preceding(‘test3.exe’, ‘FE EB 18 3E 1C EB EB’, ‘90’, preceding_length)</p>
+<p>2.py，将0x2A还原成0x00。</p>
+<h1 id="coding-gbk-1"><a href="#coding-gbk-1" class="headerlink" title="-- coding: gbk --"></a>-<em>- coding: gbk -</em>-</h1><p>def replace_specific_byte_in_range(file_path, search_bytes, search_byte, replace_byte, offset_start, offset_end):</p>
+<h1 id="读取二进制文件内容-1"><a href="#读取二进制文件内容-1" class="headerlink" title="读取二进制文件内容"></a>读取二进制文件内容</h1><p> with open(file_path, ‘rb’) as file:<br> data &#x3D; file.read()</p>
+<h1 id="将要查找的字节和替换的字节转换为字节类型-1"><a href="#将要查找的字节和替换的字节转换为字节类型-1" class="headerlink" title="将要查找的字节和替换的字节转换为字节类型"></a>将要查找的字节和替换的字节转换为字节类型</h1><p> search_bytes &#x3D; bytes.fromhex(search_bytes)<br> search_byte &#x3D; bytes.fromhex(search_byte)<br> replace_byte &#x3D; bytes.fromhex(replace_byte)</p>
+<h1 id="创建一个可变字节数组来进行操作-1"><a href="#创建一个可变字节数组来进行操作-1" class="headerlink" title="创建一个可变字节数组来进行操作"></a>创建一个可变字节数组来进行操作</h1><p> modified_data &#x3D; bytearray(data)</p>
+<h1 id="初始化搜索开始位置-1"><a href="#初始化搜索开始位置-1" class="headerlink" title="初始化搜索开始位置"></a>初始化搜索开始位置</h1><p> start &#x3D; 0</p>
+<p> while start &lt; len(modified_data):</p>
+<h1 id="查找字节序列的位置-1"><a href="#查找字节序列的位置-1" class="headerlink" title="查找字节序列的位置"></a>查找字节序列的位置</h1><p> index &#x3D; modified_data.find(search_bytes, start)<br> if index &#x3D;&#x3D; -1:<br> break</p>
+<h1 id="计算替换范围的起始和结束位置"><a href="#计算替换范围的起始和结束位置" class="headerlink" title="计算替换范围的起始和结束位置"></a>计算替换范围的起始和结束位置</h1><p> range_start &#x3D; index + offset_start<br> range_end &#x3D; min(index + offset_end, len(modified_data))</p>
+<h1 id="替换范围内的所有指定字节"><a href="#替换范围内的所有指定字节" class="headerlink" title="替换范围内的所有指定字节"></a>替换范围内的所有指定字节</h1><p> for i in range(range_start, range_end):<br> if modified_data[i] &#x3D;&#x3D; search_byte[0]:<br> modified_data[i] &#x3D; replace_byte[0]</p>
+<h1 id="更新搜索开始位置，跳过当前查找的位置"><a href="#更新搜索开始位置，跳过当前查找的位置" class="headerlink" title="更新搜索开始位置，跳过当前查找的位置"></a>更新搜索开始位置，跳过当前查找的位置</h1><p> start &#x3D; index + len(search_bytes)</p>
+<h1 id="将修改后的数据写回到文件中-1"><a href="#将修改后的数据写回到文件中-1" class="headerlink" title="将修改后的数据写回到文件中"></a>将修改后的数据写回到文件中</h1><p> with open(file_path, ‘wb’) as file:<br> file.write(modified_data)</p>
+<p> print(f”Replaced all occurrences of {search_byte.hex()} with {replace_byte.hex()} in range [{offset_start:#X}, {offset_end:#X}] after each occurrence of {search_bytes.hex()} in {file_path}.”)</p>
+<p>replace_specific_byte_in_range(‘test3.exe’, ‘57 50 51 56 E8 FF FF FF FF C0’, ‘2A’, ‘00’, 0x2C, 0xEA7 + 0x2C)</p>
+<p>原始棋盘状态<br>0 1 3<br>5 2 6<br>4 7 8</p>
+<p>终点棋盘状态<br>1 2 3<br>4 5 6<br>7 8 0</p>
+<p>原始<br>0 1 3<br>5 2 6<br>4 7 8</p>
+<p>第一步往右(索引：1)，0和1交换，变化为<br>1 0 3<br>5 2 6<br>4 7 8</p>
+<p>第二步往下(索引：4)，0和2交换，变化为<br>1 2 3<br>5 0 6<br>4 7 8</p>
+<p>第三步往左(索引：3)，0和5交换，变化为<br>1 2 3<br>0 5 6<br>4 7 8</p>
+<p>第四步往下(索引：6)，0和4交换，变化为<br>1 2 3<br>4 5 6<br>0 7 8</p>
+<p>第五步往右(索引：7)，0和7交换，变化为<br>1 2 3<br>4 5 6<br>7 0 8</p>
+<p>第六步往右(索引：8)，0和8交换，变化为<br>1 2 3<br>4 5 6<br>7 8 0</p>
+<p>球分享</p>
+<p>球点赞</p>
+<p>球在看</p>
+<p>点击阅读原文查看更多</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line">&#123;0, 1, 3&#125;,</span><br><span class="line">&#123;5, 2, 6&#125;,</span><br><span class="line">&#123;4, 7, 8&#125;</span><br><span class="line">&#123;1, 2, 3&#125;,</span><br><span class="line">&#123;4, 5, 6&#125;,</span><br><span class="line">&#123;7, 8, 0&#125;</span><br><span class="line">011110202122</span><br><span class="line"># -*- coding: gbk -*-</span><br><span class="line"></span><br><span class="line">def replace_bytes_and_preceding(file_path, search_bytes, replace_byte, preceding_length):</span><br><span class="line"> # 读取二进制文件内容</span><br><span class="line"> with open(file_path, &#x27;rb&#x27;) as file:</span><br><span class="line"> data = file.read()</span><br><span class="line"></span><br><span class="line"> # 将要查找的字节和替换的字节转换为字节类型</span><br><span class="line"> search_bytes = bytes.fromhex(search_bytes)</span><br><span class="line"> replace_byte = bytes.fromhex(replace_byte)</span><br><span class="line"> replace_length = len(search_bytes) + preceding_length # 替换的总长度</span><br><span class="line"></span><br><span class="line"> # 创建一个可变字节数组来进行操作</span><br><span class="line"> modified_data = bytearray(data)</span><br><span class="line"></span><br><span class="line"> # 初始化搜索开始位置</span><br><span class="line"> start = 0</span><br><span class="line"></span><br><span class="line"> while start &lt; len(modified_data):</span><br><span class="line"> # 查找字节序列的位置</span><br><span class="line"> index = modified_data.find(search_bytes, start)</span><br><span class="line"> if index == -1:</span><br><span class="line"> break</span><br><span class="line"></span><br><span class="line"> # 计算需要替换的起始位置</span><br><span class="line"> replace_start = max(0, index - preceding_length)</span><br><span class="line"></span><br><span class="line"> # 将替换的范围全部设置为 `replace_byte`</span><br><span class="line"> modified_data[replace_start:</span><br><span class="line">index + len(search_bytes)] = replace_byte * replace_length</span><br><span class="line"></span><br><span class="line"> # 更新搜索开始位置，跳过当前替换的位置</span><br><span class="line"> start = index + len(search_bytes)</span><br><span class="line"></span><br><span class="line"> # 将修改后的数据写回到文件中</span><br><span class="line"> with open(file_path, &#x27;wb&#x27;) as file:</span><br><span class="line"> file.write(modified_data)</span><br><span class="line"></span><br><span class="line"> print(f&quot;Replaced all occurrences of &#123;search_bytes.hex()&#125; and preceding &#123;preceding_length&#125; bytes with &#123;replace_byte.hex()&#125; in &#123;file_path&#125;.&quot;)</span><br><span class="line"></span><br><span class="line">preceding_length = 11 # 替换之前的字节数</span><br><span class="line"></span><br><span class="line">replace_bytes_and_preceding(&#x27;test3.exe&#x27;, &#x27;FD EB 1F 3E 1C EB EB&#x27;, &#x27;90&#x27;, preceding_length)</span><br><span class="line">replace_bytes_and_preceding(&#x27;test3.exe&#x27;, &#x27;FF EB 15 3E 1D EB FB&#x27;, &#x27;90&#x27;, preceding_length)</span><br><span class="line">replace_bytes_and_preceding(&#x27;test3.exe&#x27;, &#x27;FE EB 18 3E 1C EB EB&#x27;, &#x27;90&#x27;, preceding_length)</span><br><span class="line"># -*- coding: gbk -*-</span><br><span class="line"></span><br><span class="line">def replace_specific_byte_in_range(file_path, search_bytes, search_byte, replace_byte, offset_start, offset_end):</span><br><span class="line"> # 读取二进制文件内容</span><br><span class="line"> with open(file_path, &#x27;rb&#x27;) as file:</span><br><span class="line"> data = file.read()</span><br><span class="line"></span><br><span class="line"> # 将要查找的字节和替换的字节转换为字节类型</span><br><span class="line"> search_bytes = bytes.fromhex(search_bytes)</span><br><span class="line"> search_byte = bytes.fromhex(search_byte)</span><br><span class="line"> replace_byte = bytes.fromhex(replace_byte)</span><br><span class="line"></span><br><span class="line"> # 创建一个可变字节数组来进行操作</span><br><span class="line"> modified_data = bytearray(data)</span><br><span class="line"></span><br><span class="line"> # 初始化搜索开始位置</span><br><span class="line"> start = 0</span><br><span class="line"></span><br><span class="line"> while start &lt; len(modified_data):</span><br><span class="line"> # 查找字节序列的位置</span><br><span class="line"> index = modified_data.find(search_bytes, start)</span><br><span class="line"> if index == -1:</span><br><span class="line"> break</span><br><span class="line"></span><br><span class="line"> # 计算替换范围的起始和结束位置</span><br><span class="line"> range_start = index + offset_start</span><br><span class="line"> range_end = min(index + offset_end, len(modified_data))</span><br><span class="line"></span><br><span class="line"> # 替换范围内的所有指定字节</span><br><span class="line"> for i in range(range_start, range_end):</span><br><span class="line"> if modified_data[i] == search_byte[0]:</span><br><span class="line"> modified_data[i] = replace_byte[0]</span><br><span class="line"></span><br><span class="line"> # 更新搜索开始位置，跳过当前查找的位置</span><br><span class="line"> start = index + len(search_bytes)</span><br><span class="line"></span><br><span class="line"> # 将修改后的数据写回到文件中</span><br><span class="line"> with open(file_path, &#x27;wb&#x27;) as file:</span><br><span class="line"> file.write(modified_data)</span><br><span class="line"></span><br><span class="line"> print(f&quot;Replaced all occurrences of &#123;search_byte.hex()&#125; with &#123;replace_byte.hex()&#125; in range [&#123;offset_start:#X&#125;, &#123;offset_end:#X&#125;] after each occurrence of &#123;search_bytes.hex()&#125; in &#123;file_path&#125;.&quot;)</span><br><span class="line"></span><br><span class="line">replace_specific_byte_in_range(&#x27;test3.exe&#x27;, &#x27;57 50 51 56 E8 FF FF FF FF C0&#x27;, &#x27;2A&#x27;, &#x27;00&#x27;, 0x2C, 0xEA7 + 0x2C)</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/203613.html">https://www.ctfiot.com/203613.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2024_KCTF_%E5%A4%A7%E8%B5%9B_-_%E7%AC%AC%E5%8D%81%E9%A2%98%E3%80%8A%E8%AF%95%E6%8E%A2%E3%80%8B%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90.full.md">CTF大赛WP集合&#x2F;articles&#x2F;2024_KCTF_大赛_-_第十题《试探》设计思路及解析.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%8B%BC%E5%9B%BE%E6%B8%B8%E6%88%8F/">拼图游戏</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Reverse/2024%E5%B9%B4%E7%AC%AC%E5%9B%9B%E5%B1%8A%E5%B1%B1%E7%9F%B3CTF%E6%8B%9B%E6%96%B0%E8%B5%9BWP_REVERSE-WEB%E7%AF%87/" title="山石CTF 2024 招新赛/REVERSE&amp;WEB 篇"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">山石CTF 2024 招新赛/REVERSE&amp;WEB 篇</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Reverse/2024%E5%B9%B4%E7%BE%8A%E5%9F%8E%E6%9D%AF%E7%B2%A4%E6%B8%AF%E6%BE%B3%E5%A4%A7%E6%B9%BE%E5%8C%BA%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9BWP-AI_AK%E7%AF%87/" title="2024 年羊城杯粤港澳大湾区网络安全大赛 WP - AI AK 篇"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2024 年羊城杯粤港澳大湾区网络安全大赛 WP - AI AK 篇</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#coding-gbk"><span class="toc-number">1.</span> <span class="toc-text">-- coding: gbk --</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9"><span class="toc-number">2.</span> <span class="toc-text">读取二进制文件内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%86%E8%A6%81%E6%9F%A5%E6%89%BE%E7%9A%84%E5%AD%97%E8%8A%82%E5%92%8C%E6%9B%BF%E6%8D%A2%E7%9A%84%E5%AD%97%E8%8A%82%E8%BD%AC%E6%8D%A2%E4%B8%BA%E5%AD%97%E8%8A%82%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">将要查找的字节和替换的字节转换为字节类型</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%8F%AF%E5%8F%98%E5%AD%97%E8%8A%82%E6%95%B0%E7%BB%84%E6%9D%A5%E8%BF%9B%E8%A1%8C%E6%93%8D%E4%BD%9C"><span class="toc-number">4.</span> <span class="toc-text">创建一个可变字节数组来进行操作</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E6%90%9C%E7%B4%A2%E5%BC%80%E5%A7%8B%E4%BD%8D%E7%BD%AE"><span class="toc-number">5.</span> <span class="toc-text">初始化搜索开始位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E5%AD%97%E8%8A%82%E5%BA%8F%E5%88%97%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-number">6.</span> <span class="toc-text">查找字节序列的位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E9%9C%80%E8%A6%81%E6%9B%BF%E6%8D%A2%E7%9A%84%E8%B5%B7%E5%A7%8B%E4%BD%8D%E7%BD%AE"><span class="toc-number">7.</span> <span class="toc-text">计算需要替换的起始位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%86%E6%9B%BF%E6%8D%A2%E7%9A%84%E8%8C%83%E5%9B%B4%E5%85%A8%E9%83%A8%E8%AE%BE%E7%BD%AE%E4%B8%BA-replace-byte"><span class="toc-number">8.</span> <span class="toc-text">将替换的范围全部设置为 replace_byte</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E6%90%9C%E7%B4%A2%E5%BC%80%E5%A7%8B%E4%BD%8D%E7%BD%AE%EF%BC%8C%E8%B7%B3%E8%BF%87%E5%BD%93%E5%89%8D%E6%9B%BF%E6%8D%A2%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-number">9.</span> <span class="toc-text">更新搜索开始位置，跳过当前替换的位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%86%E4%BF%AE%E6%94%B9%E5%90%8E%E7%9A%84%E6%95%B0%E6%8D%AE%E5%86%99%E5%9B%9E%E5%88%B0%E6%96%87%E4%BB%B6%E4%B8%AD"><span class="toc-number">10.</span> <span class="toc-text">将修改后的数据写回到文件中</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#coding-gbk-1"><span class="toc-number">11.</span> <span class="toc-text">-- coding: gbk --</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9-1"><span class="toc-number">12.</span> <span class="toc-text">读取二进制文件内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%86%E8%A6%81%E6%9F%A5%E6%89%BE%E7%9A%84%E5%AD%97%E8%8A%82%E5%92%8C%E6%9B%BF%E6%8D%A2%E7%9A%84%E5%AD%97%E8%8A%82%E8%BD%AC%E6%8D%A2%E4%B8%BA%E5%AD%97%E8%8A%82%E7%B1%BB%E5%9E%8B-1"><span class="toc-number">13.</span> <span class="toc-text">将要查找的字节和替换的字节转换为字节类型</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%8F%AF%E5%8F%98%E5%AD%97%E8%8A%82%E6%95%B0%E7%BB%84%E6%9D%A5%E8%BF%9B%E8%A1%8C%E6%93%8D%E4%BD%9C-1"><span class="toc-number">14.</span> <span class="toc-text">创建一个可变字节数组来进行操作</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E6%90%9C%E7%B4%A2%E5%BC%80%E5%A7%8B%E4%BD%8D%E7%BD%AE-1"><span class="toc-number">15.</span> <span class="toc-text">初始化搜索开始位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E5%AD%97%E8%8A%82%E5%BA%8F%E5%88%97%E7%9A%84%E4%BD%8D%E7%BD%AE-1"><span class="toc-number">16.</span> <span class="toc-text">查找字节序列的位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9B%BF%E6%8D%A2%E8%8C%83%E5%9B%B4%E7%9A%84%E8%B5%B7%E5%A7%8B%E5%92%8C%E7%BB%93%E6%9D%9F%E4%BD%8D%E7%BD%AE"><span class="toc-number">17.</span> <span class="toc-text">计算替换范围的起始和结束位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9B%BF%E6%8D%A2%E8%8C%83%E5%9B%B4%E5%86%85%E7%9A%84%E6%89%80%E6%9C%89%E6%8C%87%E5%AE%9A%E5%AD%97%E8%8A%82"><span class="toc-number">18.</span> <span class="toc-text">替换范围内的所有指定字节</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E6%90%9C%E7%B4%A2%E5%BC%80%E5%A7%8B%E4%BD%8D%E7%BD%AE%EF%BC%8C%E8%B7%B3%E8%BF%87%E5%BD%93%E5%89%8D%E6%9F%A5%E6%89%BE%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-number">19.</span> <span class="toc-text">更新搜索开始位置，跳过当前查找的位置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B0%86%E4%BF%AE%E6%94%B9%E5%90%8E%E7%9A%84%E6%95%B0%E6%8D%AE%E5%86%99%E5%9B%9E%E5%88%B0%E6%96%87%E4%BB%B6%E4%B8%AD-1"><span class="toc-number">20.</span> <span class="toc-text">将修改后的数据写回到文件中</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">20.1.</span> <span class="toc-text">附图</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

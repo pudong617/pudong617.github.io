@@ -1,0 +1,245 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>复盘第二期 | 解题思路详细分享，命题建议暗藏下期考点 – 赵剑 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="斟茶王者复盘 (赵剑) 15 题 + 命题建议：模糊查询&#x2F;不重置&#x2F;robots.txt 提示。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="复盘第二期 | 解题思路详细分享，命题建议暗藏下期考点 – 赵剑">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/%E5%A4%8D%E7%9B%98%E7%AC%AC%E4%BA%8C%E6%9C%9F_-_%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%E8%AF%A6%E7%BB%86%E5%88%86%E4%BA%AB-%E5%91%BD%E9%A2%98%E5%BB%BA%E8%AE%AE%E6%9A%97%E8%97%8F%E4%B8%8B%E6%9C%9F%E8%80%83%E7%82%B9_-_%E8%B5%B5%E5%89%91/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="斟茶王者复盘 (赵剑) 15 题 + 命题建议：模糊查询&#x2F;不重置&#x2F;robots.txt 提示。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="斟茶王者">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/%E5%A4%8D%E7%9B%98%E7%AC%AC%E4%BA%8C%E6%9C%9F_-_%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%E8%AF%A6%E7%BB%86%E5%88%86%E4%BA%AB-%E5%91%BD%E9%A2%98%E5%BB%BA%E8%AE%AE%E6%9A%97%E8%97%8F%E4%B8%8B%E6%9C%9F%E8%80%83%E7%82%B9_-_%E8%B5%B5%E5%89%91/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '复盘第二期 | 解题思路详细分享，命题建议暗藏下期考点 – 赵剑',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">复盘第二期 | 解题思路详细分享，命题建议暗藏下期考点 – 赵剑</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="复盘第二期 | 解题思路详细分享，命题建议暗藏下期考点 – 赵剑"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/199430.html">https://www.ctfiot.com/199430.html</a><br>ID: 199430</p>
+</blockquote>
+<p>写在前言</p>
+<p>本期发布的是来自吉林省公安厅网安总队，赵剑投递的复盘稿件，在答题过程中，他有着敏锐的洞察力和深刻的思考能力，每道题目给出清晰的解题思路，且不断提出建设性的建议，为我们的赛事增添的别样的精彩和深度，下一期会有所采纳哟。</p>
+<p>感谢无糖信息举办的竞赛活动，感谢无糖运营老师的耐心帮助，感谢二哥的细心指导。</p>
+<p>1、资金初探</p>
+<p>下载询问笔录并根据其内容，分析收取受害人资金的一级卡转账记录，统计其下级卡中接收受害人资金最多的账户。</p>
+<p>通过下载【案情报告】，在报告中锁定关键词【南河商业银行】，结合【知更-模拟调证平台】下载流水信息。</p>
+<p>建议：竞赛平台中【调证平台】建议增加模糊查询功能，如题目中给出【南河商业银行】，但是参赛选手通过搜索【银行】，结果可以有很多个银行调证，也可以对参赛选手增加难度，一是可以增加竞赛选手的体验感；二是可以让竞赛选手领略平台引导答题模式有更好的挖掘性。</p>
+<p>A：2025斟茶王者提升参赛者体验感也是考虑的重点之一哦，模糊查询功能的确有趣，既增加了答案的迷惑性，又让参赛者体会到答题的乐趣。</p>
+<p>2、运气爆棚</p>
+<p>银行卡 6226816246156978927 中找到了线索。用重明查一下看看，也许有意想不到的收获，请以搜索结果中的涉案群组 ID 作为答案</p>
+<p>通过访问【无糖浏览器-重明情报平台】，查询银行卡号【6226816246156978927】，挖掘相关信息的电报群 ID 值。</p>
+<p>3、黑词大闯关</p>
+<p>请启动下方的网站，帮助林风通过入群验证，以入群后的 FLAG 作为答案</p>
+<p>建议：在该题中建议可以直接显示全部需要答的题，一旦答错一道题，就需要全部重新来过，对答题体验感不是太好。</p>
+<p>A：可以看看我们上传到【知更实战训练】平台的复盘视频，出题人有告诉一个隐藏的解题方法呢？🤔</p>
+<p>4、转移阵地</p>
+<p>分析这个二维码，以二维码包含的链接末尾路径作为答案</p>
+<p>继续使用第三题中的靶场界面，利用二维码扫描工具，扫描靶场界面中的二维码信息，即可获取 FLAG 值。</p>
+<p>5、躲猫猫</p>
+<p>分析这个APP，锁定其API接口地址的获取地址，以获取地址的TOKEN作为答案</p>
+<p>该题运用了 APK 逆向分析的知识。解题可以有两种方法，一是使用逆向工具（jadx）打开目标 APK，然后找到 API 接口地址。二是直接修改APK扩展名.zip，然后解压，找到 API 接口地点。APK中重要的信息一般会保存在AndroidManifest.xml中，在查找线索时，可以先看看该APK配置文件，当然，这个题目设置也不例外。</p>
+<p>6、新的猫</p>
+<p>继续分析 Telefram APP，帮助林风找到新的 API 请求地址，以地址的末尾路径作为答案</p>
+<p><a target="_blank" rel="noopener" href="https://scene-nj1fhz2ri3gg7r77-oss-/">https://scene-nj1fhz2ri3gg7r77-oss-</a> 3000.zhigeng08.toolmao.com&#x2F;20240710.txt?token&#x3D;KQSLMXLFDOPS</p>
+<p>咱们活动比赛开始时间7月15日，直接将 20240710.txt 改成 20240715.txt。访问网站，获得BASE64 加密字符串，对该字符串进行 base64 解密，</p>
+<p>BASE64 加密字符串：</p>
+<p>NWZhaHR0cHM6Ly9zY2VuZS1yNTM0MnNtejAwM3lsOTRyLXRlbGVmcmFtYWRtaW4tMzAwMC56aGlnZW5nMDkudG9vbG1hby5jb20vP2ZsYWc9M0FKT0RGNzlORFZH&#x3D;vbS876A</p>
+<p>建议：在该题中建议可以给出一点提示，如增加一个robots.txt文件，做一个可以遍历文件的引导。</p>
+<p>A：在给斟茶王者出题时，要考虑不同题目的难度梯度建设以及实际案件场景中可能会遇到的情况，不一定所有题目都会有明显的提示或引导帮助大家答题哦。</p>
+<p>7、藏起来的钥匙</p>
+<p>解包 Telefram APP，找找看有没有新的线索，比如 SDK。以 SDK 的 KEY 值作为答案）。</p>
+<p>继续分析 APP，通过AndroidManifest.xml文件找到 SDK 值的答案【APPKEY】</p>
+<p>8、拔萝卜</p>
+<p>结合模拟调证，向星光推送的运营公司进行调证，以Telefram的开发者联系邮箱作为答案</p>
+<p>通过题目给的【星光推送】为关键词，继续访问【模拟调证平台】，找到调证公司，输入第六题的SDK 信息【XGHVARBP10T257DW】，获得调证文件下载后获得答案</p>
+<p>9、开门开门</p>
+<p>分析新的 API 请求地址，找到 Telefram 的后台访问地址并获取登录权限，以登录成功后的 FLAG 作为答案</p>
+<p>访问第10题解密得到的地址即为管理地址，使用调证信息的用户名和密码（手机号）登陆平台即可获得FLAG值。</p>
+<p>建议：从该题开始，竞赛平台会在1个小时内超时，超时后所有的操作需要全部重新开始，这样会增加竞赛答题中的时间浪费环节，每一次都要重新操作一遍不是很友好。建议在有这类比赛环节考虑答题到一定范围后要固定下来，减少答题时间消耗。</p>
+<p>A：🙈悄悄告诉你哦~镜像过期后，有捷径能获取最新网址的，就是重新生成后，替换一下这段随机生成的内容即可！！</p>
+<p>10、人真不少</p>
+<p>登录到 Telefram 管理后台后，分析聊天用户中最后登录 IP 为 67.98.23.12 的聊天用户数量</p>
+<p>该题目有两种解题思路，一是简单粗暴方法，登陆进入后台【聊天用户管理】，一页一页查询统计最后结果 615 条。二是结合【聊天用户管理】中【导出】功能，查看后台有哪些功能可以【导出】数据，重点分析【导出】功能的实现过程，利用该【导出】功能，将聊天内容全部导出，（通过导出A的功能来导出B）根据【开发配置】中备份功能，结合【聊天用户管理】中【导出】功能，使用 burp 抓包拦截的方法替换路径下载 sql文件， 通过文件内容导入到 excel 后筛选统计即可。</p>
+<p>11、数据拖拉机</p>
+<p>帮林风找到办法获取聊天消息内容，以聊天消息中的FLAG作为答案</p>
+<p>解码数据。将sql文件导入，其中有message表，查看message表，其中message字段是聊天内容。</p>
+<p>定位decrypt函数调用的地方，发现参数content就是数据表中的message字段内容，继续分析decrypt 函数，第三行getKey(context) 有个获取 key 的方法，发现此key函数就在此文件内，函数中写了获取字符串 com.nosugar.chatapp.key，猜测是key ，全局搜索 com.nosugar.chatapp.key ，找到了AndroidManifest.xml 文件中定义了，值为N5ELX992I2INT2QWWZ7LX6X70DPTTVJU</p>
+<p>继续分析decrypt函数，发现此key被截成了两段，第一段是key的前16位，第二段是key的后16位 ，根据源代码 Cipher.getInstance(“AES&#x2F;CBC&#x2F;PKCS5PADDING”); 确定，是用了aes的解密方式，在线使用aes解码，将第一段 key作为密码，第二段key作为偏移量，message字段的第二条聊天内容作为密文，cbc模式，PKCS5PADDING填充 ，编码base64，解密成功 <a target="_blank" rel="noopener" href="https://tool.lmeee.com/jiami/aes%E3%80%82">https://tool.lmeee.com/jiami/aes。</a></p>
+<p>12、动物乐园</p>
+<p>分析该群聊中的各个角色身份，锁定承担财务和洗钱职责的人员的用户名。</p>
+<p>13、黑蛇白了</p>
+<p>通过下方的 Telefram 后台管理地址，再次获取内部群的聊天记录，根据最新的群内消息，判断黑蛇死亡地所在市和区的名称</p>
+<p>然后通过搜索引擎中的图片功能，进行以图搜图，找到地址为【武汉市江夏区】。</p>
+<p>14、秘上加谜</p>
+<p>通过下方的文件下载地址，分析查找镜像内容中的可能线索。</p>
+<p>点击下载</p>
+<p>点击底部【阅读原文】，下载无糖浏览器，进入知更实战平台，了解更多详情！</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://scene-nj1fhz2ri3gg7r77-oss- 3000.zhigeng08.toolmao.com/20240710.txt?token=KQSLMXLFDOPS</span><br><span class="line">NWZhaHR0cHM6Ly9zY2VuZS1yNTM0MnNtejAwM3lsOTRyLXRlbGVmcmFtYWRtaW4tMzAwMC56aGlnZW5nMDkudG9vbG1hby5jb20vP2ZsYWc9M0FKT0RGNzlORFZH=vbS876A</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/199430.html">https://www.ctfiot.com/199430.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E5%A4%8D%E7%9B%98%E7%AC%AC%E4%BA%8C%E6%9C%9F_-_%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%E8%AF%A6%E7%BB%86%E5%88%86%E4%BA%AB%EF%BC%8C%E5%91%BD%E9%A2%98%E5%BB%BA%E8%AE%AE%E6%9A%97%E8%97%8F%E4%B8%8B%E6%9C%9F%E8%80%83%E7%82%B9_%E2%80%93_%E8%B5%B5%E5%89%91.full.md">CTF大赛WP集合&#x2F;articles&#x2F;复盘第二期_-_解题思路详细分享，命题建议暗藏下期考点_–_赵剑.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%96%9F%E8%8C%B6%E7%8E%8B%E8%80%85/">斟茶王者</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Web/%E5%A4%8D%E7%9B%98%E6%9C%AB%E6%9C%9F_-_%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%85%A8%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF-%E5%A4%9A%E7%A7%8D%E7%AD%94%E9%A2%98%E6%96%B9%E5%BC%8F%E5%B8%A6%E4%BD%A0%E7%8E%A9%E8%BD%AC-%E6%96%9F%E8%8C%B6%E7%8E%8B%E8%80%85-%E9%A9%AC%E7%8F%BA/" title="复盘末期 | 史上最全解题思路，多种答题方式带你玩转&quot;斟茶王者&quot;-马珺"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">复盘末期 | 史上最全解题思路，多种答题方式带你玩转&quot;斟茶王者&quot;-马珺</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Web/%E5%A4%8D%E7%9B%98%E7%AC%AC%E4%B8%80%E6%9C%9F_-_%E8%B6%85%E8%AF%A6%E7%BB%86%E7%9A%8415%E9%A2%98%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF-%E7%AB%8B%E5%8D%B3%E4%B8%8A%E6%89%8B%E5%AE%9E%E6%93%8D-%E5%BC%80%E5%BF%83%E7%9A%84%E8%83%96%E5%AD%90/" title="复盘第一期 | 超详细的15题解题思路，立即上手实操-开心的胖子"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">复盘第一期 | 超详细的15题解题思路，立即上手实操-开心的胖子</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/01/01/ctf-kb/wp/Web/%E5%A4%8D%E7%9B%98%E7%AC%AC%E4%B8%80%E6%9C%9F_-_%E8%B6%85%E8%AF%A6%E7%BB%86%E7%9A%8415%E9%A2%98%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF-%E7%AB%8B%E5%8D%B3%E4%B8%8A%E6%89%8B%E5%AE%9E%E6%93%8D-%E5%BC%80%E5%BF%83%E7%9A%84%E8%83%96%E5%AD%90/" title="复盘第一期 | 超详细的15题解题思路，立即上手实操-开心的胖子"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">复盘第一期 | 超详细的15题解题思路，立即上手实操-开心的胖子</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>解析Dancing Circle | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="Dancing Circle把&quot;加密题&quot;藏回数独与DLX,大整数生成数独初盘+DLX精确覆盖求解+5步×60次×4旋转&#x3D;1200次cover+6次字节查表合成净变换T_net,IDA+Python复现全流程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="解析Dancing Circle">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%90Dancing_Circle/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="Dancing Circle把&quot;加密题&quot;藏回数独与DLX,大整数生成数独初盘+DLX精确覆盖求解+5步×60次×4旋转&#x3D;1200次cover+6次字节查表合成净变换T_net,IDA+Python复现全流程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="sudoku">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Reverse/%E8%A7%A3%E6%9E%90Dancing_Circle/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '解析Dancing Circle',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">解析Dancing Circle</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="解析Dancing Circle"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/282475.html">https://www.ctfiot.com/282475.html</a><br>ID: 282475</p>
+</blockquote>
+<p>Dancing Circle：把”加密题”拽回数独与Dancing Links的一次完整复现</p>
+<p>TL;DR这是一个把数独 + DLX（Dancing Links）藏进”Crypto”壳里的逆向题。程序先用”大整数”算出数独初盘，再用 DLX 解出终盘；用户输入的 80 个十六进制字符在 DLX 的cover()过程中被分步交换、旋转与多次字节查表，最终与 DLX 解得的数独解逐位比较，匹配计数到达预设条件才会输出“Well Done!”。整套流程可以在调试器&#x2F;脚本里稳定复现。</p>
+<p>环境与工具</p>
+<p>系统：Windows（题目二进制在 Win7 x64 下验证可运行）</p>
+<p>调试器：x64dbg &#x2F; IDA（任选其一用于断点、内存转储）</p>
+<p>脚本环境：Python 3.10+（用于 DLX 解数独、旋转&#x2F;查表复刻与最终构造输入）</p>
+<p>样本：DancingCircle.exe（题目给出的可执行文件）</p>
+<p>参考事实：流程分解、旋转节拍、中心格约束、匹配计数阈值等（本文中出现的这些关键事实均与题目实现一致）</p>
+<p>双处数据校验 → 生成大数Num1；</p>
+<p>Num1× 固定大数Num2→ 得到数独初始化数据Data1；</p>
+<p>解析Data1→ 初始化 DLX；同时把用户输入的 80 位十六进制转成十进制填入 9×9（中心格不由用户输入），中心格由 9 个调试检查函数的返回值推得：必须为 7；</p>
+<p>DLX 起舞：在cover()中分 5 个小步骤做”交换+移位”；每 60 次交换得到一次向右 90° 旋转；共执行4 次旋转回到原位，但每一格经历了 6 次字节级查表变换，得到用户侧的净数据UserData2；</p>
+<p>对UserData2查表后与DLX 解逐位比较，计数cnt必须为 79（比较到正中心时cnt–）；</p>
+<p>用cnt解码 + 校验，成立则输出“Well Done!”。</p>
+<p>每个候选(r,c,n)表示在第r行第c列填入数字n</p>
+<p>共有9×9×9&#x3D;729个候选（行）</p>
+<p>格子约束：每格恰填一数（81 列）</p>
+<p>行约束：每行每个数字恰出现一次（81 列）</p>
+<p>列约束：每列每个数字恰出现一次（81 列）</p>
+<p>宫约束：每宫每个数字恰出现一次（81 列）</p>
+<p>构建 324 列约束矩阵</p>
+<p>递归调用cover()&#x2F;uncover()函数</p>
+<p>使用链表数据结构进行高效回溯</p>
+<p>题目说明明确提到使用 DancingLinks 算法</p>
+<p>机制：把一次位置交换拆为5 个小步骤，每调用一次cover()执行一个小步骤</p>
+<p>旋转：做满 60 次交换，正好让九宫格向右旋转 90°</p>
+<p>循环：共执行4 次旋转，位置回到起点</p>
+<p>次数：5（小步骤&#x2F;交换） × 60（交换&#x2F;次旋转） × 4（旋转） &#x3D; 1200次cover()</p>
+<p>D_i是用户输入的十六进制字符转十进制后的值（0..15）</p>
+<p>S_i是DLX 求得的数独解对应格位的数字（1..9）</p>
+<p>中心格固定为 7，不来自用户输入</p>
+<p>数据加载：读取提取的初盘和变换表</p>
+<p>数独求解：使用回溯算法求解 DLX 数独</p>
+<p>变换合成：将 6 张表合成为净变换T_net</p>
+<p>答案验证：验证 80 位十六进制答案的正确性</p>
+<p>“抓初盘”的时机：尽量在”DLX 矩阵填充前”断下；若晚于此时，可能只能拿到候选而非初盘。</p>
+<p>六张表的顺序：严格按调用顺序导出；换序会导致T_net错误。</p>
+<p>中心位处理：脚本与程序都把中心格固定为7，并在计数时对中心执行cnt–；两处都要一致。</p>
+<p>多解情况：单格可能存在多于一个x ∈ [0..15]使L[T_net(x)]&#x3D;&#x3D;S_i；任选其一即可（计数依然达标）。</p>
+<p>编码问题：在 Windows 环境下运行 Python 脚本时注意 Unicode 编码问题。</p>
+<p>题面骨架：大整数取数 → 数独初盘 → DLX 求解，这是”真值产生器”</p>
+<p>输入变换：在 DLX 的cover()中穿插分步交换 + 旋转 + 字节查表，四次 90° 右转回到原位，但每格经历 6 次查表形成净变换T_net</p>
+<p>判定逻辑：对UserData2查表L，与 DLX 解逐位比较，匹配计数cnt&#x3D;79为通过条件；中心&#x3D;7且不由用户输入</p>
+<p>复现策略：动态抓初盘与查表 → 合成T_net→ DLX 解数独 → 逐格穷举逆向 80 位 hex 输入 → 自检cnt</p>
+<p>算法伪装：将经典的数独求解算法包装成”Crypto”题目</p>
+<p>多重混淆：通过大整数运算、自校验、花指令增加静态分析难度</p>
+<p>变换叠加：位置旋转与字节变换结合，制造”加密”假象</p>
+<p>精确约束：79&#x2F;80 的匹配要求提供明确的验证目标</p>
+<p>看似复杂的加密题可能隐藏着经典算法</p>
+<p>动态分析比静态分析在某些情况下更有效</p>
+<p>理解算法本质比关注表面”加密”更重要</p>
+<p>数独问题的精确覆盖建模是算法设计的经典案例</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">数独初盘:┌───────────────────┐│ . . . 2 6 . 7 . 1 ││ 6 8 . . 7 . . 9 . ││ 1 9 . . . 4 5 . . │├───────────────────┤│ 8 2 . 1 . . . 4 . ││ . . 4 6 . 2 9 . . ││ . 5 . . . 3 . 2 8 │├───────────────────┤│ . . 9 3 . . . 7 4 ││ . 4 . . 5 . . 3 6 ││ 7 . 3 . 1 8 . . . │└───────────────────┘</span><br><span class="line">数独解:┌───────────────────┐│ 4 3 5 2 6 9 7 8 1 ││ 6 8 2 5 7 1 4 9 3 ││ 1 9 7 8 3 4 5 6 2 │├───────────────────┤│ 8 2 1 9 5 7 6 4 3 ││ 3 7 4 6 8 2 9 1 5 ││ 9 5 6 1 4 3 8 2 7 │├───────────────────┤│ 5 1 9 3 2 6 8 7 4 ││ 2 4 8 7 5 9 1 3 6 ││ 7 6 3 4 1 8 2 5 9 │└───────────────────┘</span><br><span class="line">defrotate_right_90(grid):# grid: 9x9 list n =9 return[[grid[n-1-c][r]forcinrange(n)]forrinrange(n)]# 连续旋转 4 次 → 回到原样g0 = [[(r*9+c)forcinrange(9)]forrinrange(9)]g = g0for_inrange(4): g = rotate_right_90(g)assertg == g0 # 位置回到起点</span><br><span class="line">T1: 256 bytesT2: 256 bytesT3: 256 bytesT4: 256 bytesT5: 256 bytesT6: 256 bytesL: 256 bytes # 最终比较查表</span><br><span class="line">defcompose_tables(tables): &quot;&quot;&quot;合成多个字节变换表为一个净变换表&quot;&quot;&quot; result = list(range(256)) fortableintables: result = [table[result[i]]foriinrange(256)] returnresult</span><br><span class="line"># 实际合成的 T_net[0-9] → [11, 181, 163, 154, 228, 232, 129, 94, 134, 151]</span><br><span class="line">L[T_net(D_i)] == S_i (∀ i ≠ center)</span><br><span class="line">验证结果: PASS匹配计数: 79/79</span><br><span class="line">32415867057146038208672345171508423626351804840632517408215763137846025652307148</span><br><span class="line"># 1. 重建用户数据user_data = [None] *81idx =0foriinrange(81): ifi == CENTER_INDEX: # 跳过中心格 user_data[i] = CENTER_VALUE else: user_data[i] = int(hex_answer[idx],16) idx +=1</span><br><span class="line"># 2. 计算匹配计数cnt =0foriinrange(81): ifi == CENTER_INDEX: cnt -=1</span><br><span class="line"># 中心位特殊处理 continue ud = user_data[i] transformed = T_net[ud] final = L_table[transformed] target = solution[i] iffinal == target: cnt +=1</span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/282475.html">https://www.ctfiot.com/282475.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E8%A7%A3%E6%9E%90Dancing_Circle.full.md">CTF大赛WP集合&#x2F;articles&#x2F;解析Dancing_Circle.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/sudoku/">sudoku</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Reverse/%E8%85%BE%E8%AE%AF%E6%B8%B8%E6%88%8F%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B2024%E5%86%B3%E8%B5%9B%E9%A2%98%E8%A7%A3/" title="腾讯游戏安全大赛2024决赛题解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">腾讯游戏安全大赛2024决赛题解</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Crypto/2023_N1CTF/" title="2023 N1CTF"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2023 N1CTF</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

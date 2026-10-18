@@ -1,0 +1,270 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>DIVER OSINT CTF 2025 Writeup | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="DIVER OSINT CTF 2025 复盘，作者 CLACKER 前田。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DIVER OSINT CTF 2025 Writeup">
+<meta property="og:url" content="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/DIVER_OSINT_CTF_2025_Writeup/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="DIVER OSINT CTF 2025 复盘，作者 CLACKER 前田。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-31T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="osint">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2025/01/01/ctf-kb/wp/Crypto/DIVER_OSINT_CTF_2025_Writeup/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'DIVER OSINT CTF 2025 Writeup',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2025-01-01 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">DIVER OSINT CTF 2025 Writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-12-31T16:00:00.000Z" title="发表于 2025-01-01 00:00:00">2025-01-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-12-31T16:00:00.000Z" title="更新于 2025-01-01 00:00:00">2025-01-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/WP/">WP</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/Crypto/">Crypto</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="DIVER OSINT CTF 2025 Writeup"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文: <a target="_blank" rel="noopener" href="https://www.ctfiot.com/255111.html">https://www.ctfiot.com/255111.html</a><br>ID: 255111</p>
+</blockquote>
+<p>まえがき</p>
+<p>まいどおおきに、CLACKER前田や！</p>
+<p>このwriteupは開催中のタイムライン順でサクッと書いとるで。</p>
+<p>調査前の仮説立てるときにメタ情報を使うてるのが分かりやすくなるかもという試みやで。</p>
+<p>ほな、楽しんでな！</p>
+<p>～CTF開始～</p>
+<p>もとよりhard問題でfirst blood狙いだったので、人物検索問題であるinternmentを手につける</p>
+<p>internment (hard&#x2F;48solve)</p>
+<p>著名な木曜島の真珠採りダイバーであった藤井富太郎氏は、第二次世界大戦中、強制収容されました。彼が釈放された収容所と釈放の年月日を明らかにしてください。</p>
+<p>Flag 形式: Diver25{YYYY-MM-DDキャンプ番号キャンプ地名_州名}</p>
+<p>人物検索ときたら初手国会図書館の検索</p>
+<p><a target="_blank" rel="noopener" href="https://id.ndl.go.jp/auth/ndlna/001236886">https://id.ndl.go.jp/auth/ndlna/001236886</a></p>
+<p>他伝の中にヘイ収容所での抑留という章がある</p>
+<p>まずはここに当たりをつけて詳細なweb検索へ</p>
+<p>書籍購入や国会図書館行くことも考えたが、あくまで最終手段として取っておく</p>
+<p>英語検索に切り替え、現地の銅像など見つかるが、なかなか釈放の記録が見つからない</p>
+<p>日付単位で分かるのは公な記録があるはずだと考え直し(メタ読み)、オーストラリアのオープンデータベースに行き着く</p>
+<p>公式記録を見つける(個人の記録なので切り取った一部を下に掲載する)</p>
+<p>走り書きが読み辛すぎるが、HayからtransferされてRuなんとかCamp4に行き着いて、Releaseされたことが分かる</p>
+<p>実際の地名と照らし合わせ正解を得る</p>
+<p>Diver25{1946-12-10_4_Rushworth_Victoria}</p>
+<p>コメント</p>
+<p>しょうもない打ち間違いで誤答ペナルティ食ろうたが、なんとかfirst blood取れたやで！</p>
+<p>～夕方くらいまで～</p>
+<p>hole, air2air, convenience等をどれも中途半端に解きすすめた状態で決定打を得られず</p>
+<p>回答可能回数に制限があったりで、確信持てるまで及び腰に…</p>
+<p>hole (medium&#x2F;72solve)</p>
+<p>この穴があった場所はどこか。</p>
+<p>CMを見つけ、撮影場所特定の問題に置き換え</p>
+<p>山西省大同市で撮影されているとCM中に説明書きがある</p>
+<p>Google Earthで検索するも同じ風景の滑走路が見つけられず中断(1敗)</p>
+<p>背景加工されてる？とか疑いだす始末</p>
+<p>中断の後、大同市の市域の南東方向に伸びた領域が未探索であることに気づく</p>
+<p>緑生い茂る夏場のSentinel－2の衛星画像(2024-08-27)で発見(霊丘県近辺)</p>
+<p>holeの正確な位置特定で1敗するも、チームメンバーとのダブルチェックでクリア</p>
+<p>コメント</p>
+<p>5回しかトライできないときの3度目トライに失敗したときは背筋凍るで！</p>
+<p>～夜：solve数から難易度傾向が可視化されるフェーズ～</p>
+<p>elevatorは夜の段階で1solveのままで、チームメンバーも苦戦している、という前提のもと取り組んだ</p>
+<p>elevator (hard&#x2F;12solve)</p>
+<p>これらの写真はあるホテルの客室内と、その窓からの景色を撮影したものである（撮影日は2024年）。このホテルに設置されたエレベーターには、2件の故障記録が存在しているものが1基ある。 故障日と、故障記録があるエレベーターの登録番号を答えよ。</p>
+<p>Flag形式: Diver25{YYYYMMDD_YYYYMMDD_1234567}</p>
+<p>昼間に軽く、国内の足場崩落事故を調べていたが、見つけられていなかった</p>
+<p>東横インの店舗一覧を確認する</p>
+<p>左端の瓦屋根から日本を前提にしていたが、韓国に13箇所ある</p>
+<p>→solve数が少ないことのメタ読みでほぼ確信を持って韓国ローラー</p>
+<p>特徴的な外灯をみつけ特定</p>
+<p>エレベータデータベースが見つかる</p>
+<p>あとは丁寧にデータベース探索し特定完了</p>
+<p>コメント</p>
+<p>故障頻発のエレベータは堪忍な🙏</p>
+<p>～残タスク回収～</p>
+<p>ある程度時間かければ解けるだろうな問題を回収</p>
+<p>詳細な解説は割愛</p>
+<p>air2air (medium&#x2F;24solve)</p>
+<p>飛行機の中から撮影した飛行機を特定する</p>
+<p>飛行機の便の候補: SJXの便のうち主翼デザインから機体はA-330ではなくA-350</p>
+<p>SJX823 関空　台北 1644着 AIRBUS A-350-900</p>
+<p>SJX801 成田　台北 1726着 AIRBUS A-350-900</p>
+<p>SJX803 成田　台北 1914着 AIRBUS A-350-900</p>
+<p>日中に到着し、1h3min前に同進行方向に他の飛行機がある(機種は遠くてわからない)</p>
+<p>ADS-Bで丁寧に探して特定(雑なので5敗くらいした)</p>
+<p>convenience (easy&#x2F;63solve)</p>
+<p>青森県内に、公園とコンビニ、スーパーマーケットが互いに約100m圏内に存在する場所がいくつかある。また、これはOpenStreetMapで確認可能である。</p>
+<p>この条件を満たす 公園 のうち、最南端 のものについて、OpenStreetMap上での Way Number を答えよ。</p>
+<p>敷地の中央基準に100mを探索するコードで3敗</p>
+<p>overpassでクエリ最適化</p>
+<p>目視で丁寧に調査し発見</p>
+<p>expense (medium&#x2F;13solve)</p>
+<p>2025年1月、São Miguel do Guamáの市長が、ある食品関連会社にクレジットカード決済で支払った金額（現地通貨）を答えよ。</p>
+<p>市長の名前は市の公式ページで<a target="_blank" rel="noopener" href="https://saomigueldoguama.pa.gov.br/o-governo/prefeito/">https://saomigueldoguama.pa.gov.br/o-governo/prefeito/</a></p>
+<p>決済情報データベースで翻訳しながら期間でフィルタリングしていくと市長の名前が見つかる</p>
+<p>UART (hard&#x2F;24solve)</p>
+<p>TP-Link Archer AX20 AX1800 V2 Dualband Wi-Fi 6 Router</p>
+<p>この商品のイーサネットスイッチコントローラに直接UARTでアクセスを試みたい。どの部品の、どのピンにアクセスすればいいだろうか。</p>
+<p>PCB上の部品番号 と、その部品の UART RX &#x2F; UART TX ピン番号 を答えよ。</p>
+<p>FCCのレポートを調査</p>
+<p>無線のチップを特定</p>
+<p>部品番号はU7と読める(自信なく回答したが0敗)</p>
+<p>チップを検索し、レポートが見つかる</p>
+<p>UARTのピン特定</p>
+<p>あとがき</p>
+<p>チームメンバが特定防止に創造性あふれる仮名を使っていたので、自分も謎ペルソナを生み出してしまった。不評だったら封印しよう… 実際のところ、上位プレイヤはリアルで知っている人も少なからずいるので、誰が解いたかはメタ情報になりますよね。</p>
+<p>DIVER OSINTは去年も参加したのですが、あれから1年、OSINTの調査に役立つサイトやツールの知識を会得し、万全を期して挑みました。結果に結びついたので良かったです。</p>
+<p>試行回数に制限ある問題はプレッシャがキツかったけども、残り少ないトライ時はチームで見守って行うなどヒヤヒヤかつ連帯感を味わえました。</p>
+<p>ラスボスのレポート問題が面白そうだっただけに挑む時間を確保できなかったのが心残りです。最後に、去年に引き続きワクワクするOSINT問題を提供してくれた運営の皆さんに感謝です！</p>
+<p>本篇文章来源于Zenn: DIVER OSINT CTF 2025 Writeup</p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>原文链接：<a target="_blank" rel="noopener" href="https://www.ctfiot.com/255111.html">https://www.ctfiot.com/255111.html</a><br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/CTF%E5%A4%A7%E8%B5%9BWP%E9%9B%86%E5%90%88/articles/DIVER_OSINT_CTF_2025_Writeup.full.md">CTF大赛WP集合&#x2F;articles&#x2F;DIVER_OSINT_CTF_2025_Writeup.full.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/osint/">osint</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2025/01/01/ctf-kb/wp/Crypto/DASCTF_2025%E4%B8%8A%E5%8D%8A%E5%B9%B4%E8%B5%9B_Writeup_by_Mini-Venom/" title="DASCTF 2025 上半年赛 Writeup by Mini-Venom"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">DASCTF 2025 上半年赛 Writeup by Mini-Venom</div></div></a></div><div class="next-post pull-right"><a href="/2025/01/01/ctf-kb/wp/Crypto/ISCTF2025_%E9%83%A8%E5%88%86_%E5%AF%86%E7%A0%81/" title="ISCTF 2025 部分密码题"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ISCTF 2025 部分密码题</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/01/01/ctf-kb/wp/Crypto/DIVER_OSINT_CTF_2024_writeup/" title="DIVER OSINT CTF 2024 writeup"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-01</div><div class="title">DIVER OSINT CTF 2024 writeup</div></div></a></div><div><a href="/2023/01/01/ctf-kb/wp/Misc/HECTF-2023_WriteUp/" title="HECTF-2023 WriteUp"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-01</div><div class="title">HECTF-2023 WriteUp</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>

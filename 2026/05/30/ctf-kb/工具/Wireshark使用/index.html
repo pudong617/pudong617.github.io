@@ -1,0 +1,332 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Wireshark使用 | PUDONG LAB</title><meta name="author" content="朴冬,2559874620@qq.com/tyjiang@stu.xjtu.edu.cn"><meta name="copyright" content="朴冬"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="Wireshark 是一个网络封包分析软件。网络封包分析软件的功能是提取网络封包，并尽可能显示出最为详细的网络封包资料。 Wireshark 的主界面包含 6 个部分：  菜单栏：用于调试、配置 工具栏：常用功能的快捷方式 过滤栏：指定过滤条件，过滤数据包 数据包列表：核心区域，每一行就是一个数据包 数据包详情：数据包的详细数据 数据包字节：数据包对应的字节流，二进制   注意，数据包详情面板中展">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Wireshark使用">
+<meta property="og:url" content="https://pudong617.github.io/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Wireshark%E4%BD%BF%E7%94%A8/">
+<meta property="og:site_name" content="PUDONG LAB">
+<meta property="og:description" content="Wireshark 是一个网络封包分析软件。网络封包分析软件的功能是提取网络封包，并尽可能显示出最为详细的网络封包资料。 Wireshark 的主界面包含 6 个部分：  菜单栏：用于调试、配置 工具栏：常用功能的快捷方式 过滤栏：指定过滤条件，过滤数据包 数据包列表：核心区域，每一行就是一个数据包 数据包详情：数据包的详细数据 数据包字节：数据包对应的字节流，二进制   注意，数据包详情面板中展">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pudong617.github.io/img/youli.png">
+<meta property="article:published_time" content="2026-05-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-05-29T16:00:00.000Z">
+<meta property="article:author" content="朴冬">
+<meta property="article:tag" content="工具">
+<meta property="article:tag" content="CTF">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pudong617.github.io/img/youli.png"><link rel="shortcut icon" href="/img/PU-LOGO.png"><link rel="canonical" href="https://pudong617.github.io/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Wireshark%E4%BD%BF%E7%94%A8/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Wireshark使用',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2026-05-30 00:00:00'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><style>
+  /* 冷色极光渐变背景：与主题主色 #49B1F5 / #00C4B6 同色系 */
+  html #web_bg {
+    background-color: #F5FAFF;
+    background-image:
+      radial-gradient(1200px 700px at 12% -10%, rgba(73, 177, 245, .55), transparent 60%),
+      radial-gradient(1000px 650px at 92% 15%, rgba(0, 196, 182, .40), transparent 60%),
+      radial-gradient(900px 560px at 68% 108%, rgba(255, 114, 66, .16), transparent 62%),
+      linear-gradient(155deg, #E3F2FF 0%, #F6FBFF 45%, #E4F8F2 100%);
+  }
+  /* 暗色模式：同构图，降低光斑强度 */
+  html[data-theme='dark'] #web_bg {
+    background-color: #0B121A;
+    background-image:
+      radial-gradient(1100px 700px at 10% -8%, rgba(73, 177, 245, .45), transparent 62%),
+      radial-gradient(1000px 620px at 92% 12%, rgba(0, 196, 182, .32), transparent 62%),
+      radial-gradient(800px 520px at 72% 105%, rgba(255, 114, 66, .10), transparent 60%),
+      linear-gradient(160deg, #0B121A 0%, #0C1A24 50%, #0A1E20 100%);
+  }
+</style>
+<link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/youli.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background: radial-gradient(1100px 620px at 18% 8%, rgba(73, 177, 245, .55), transparent 60%), radial-gradient(900px 520px at 82% 22%, rgba(0, 196, 182, .45), transparent 62%), radial-gradient(700px 460px at 55% 108%, rgba(255, 114, 66, .18), transparent 60%), linear-gradient(155deg, #0A1A2B 0%, #0E3049 48%, #083F45 100%)"><nav id="nav"><span id="blog-info"><a href="/" title="PUDONG LAB"><img class="site-icon" src="/img/pudong.png"/></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 文章</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 分享</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> LINK</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Wireshark使用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-05-29T16:00:00.000Z" title="更新于 2026-05-30 00:00:00">2026-05-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/">CTF知识库</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF%E7%9F%A5%E8%AF%86%E5%BA%93/%E5%B7%A5%E5%85%B7/">工具</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Wireshark使用"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>Wireshark 是一个网络封包分析软件。网络封包分析软件的功能是提取网络封包，并尽可能显示出最为详细的网络封包资料。</p>
+<p>Wireshark 的主界面包含 6 个部分：</p>
+<ol>
+<li>菜单栏：用于调试、配置</li>
+<li>工具栏：常用功能的快捷方式</li>
+<li>过滤栏：指定过滤条件，过滤数据包</li>
+<li>数据包列表：核心区域，每一行就是一个数据包</li>
+<li>数据包详情：数据包的详细数据</li>
+<li>数据包字节：数据包对应的字节流，二进制</li>
+</ol>
+<p><img src="/img/ctf-kb/mirror/e54427ce1fe5de56.png"></p>
+<p>注意，数据包详情面板中展示的信息是经过 Wireshark 解析并”格式化”过的，方便阅读。最下面的数据包字节面板里才是这个包的真实数据。</p>
+<h1 id="常见功能使用"><a href="#常见功能使用" class="headerlink" title="常见功能使用"></a>常见功能使用</h1><h3 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h3><p>过滤器是 Wireshark 的核心功能，也是我们平时使用最多的一个功能。</p>
+<p>Wireshark 提供了两个过滤器：抓包过滤器 和 显示过滤器。两个过滤器的过滤思路不同。</p>
+<p>抓包过滤器：重点在动作，需要的包我才抓，不需要的我就不抓。</p>
+<p>显示过滤器：重点在数据的展示，包已经抓了，只是不显示出来。</p>
+<p>抓包过滤器在抓包前使用，它的过滤有一个基本的语法格式：BPF 语法格式。</p>
+<p>BPF（全称 Berkeley Packet Filter），中文叫伯克利封包过滤器，它有四个核心元素：类型、方向、协议 和 逻辑运算符。</p>
+<h4 id="抓包过滤器"><a href="#抓包过滤器" class="headerlink" title="抓包过滤器"></a>抓包过滤器</h4><ol>
+<li>类型 Type：主机（host）、网段（net）、端口（port）</li>
+<li>方向 Dir：源地址（src）、目标地址（dst）</li>
+<li>协议 Proto：各种网络协议，比如：tcp、udp、http</li>
+<li>逻辑运算符：与（ &amp;&amp; ）、或（ || ）、非（ ！）</li>
+</ol>
+<p>四个元素可以自由组合，比如：</p>
+<ul>
+<li>src host 192.168.31.1：抓取源 IP 为 192.168.31.1 的数据包</li>
+<li>tcp || udp：抓取 TCP 或者 UDP 协议的数据包</li>
+</ul>
+<h4 id="显示过滤器"><a href="#显示过滤器" class="headerlink" title="显示过滤器"></a>显示过滤器</h4><ol>
+<li>IP 地址：ip.addr、ip.src、ip.dst</li>
+<li>端口：tcp.port、tcp.srcport、tcp.dstport</li>
+<li>协议：tcp、udp、http</li>
+<li>比较运算符：&gt; &lt; &#x3D;&#x3D; &gt;&#x3D; &lt;&#x3D; !&#x3D;</li>
+<li>逻辑运算符：and、or、not、xor（有且仅有一个条件被满足）</li>
+</ol>
+<p>5 个核心元素可以自由组合，比如：</p>
+<ul>
+<li>ip.addr &#x3D;&#x3D; 192.168.32.121：显示 IP 地址为 192.168.32.121 的数据包</li>
+<li>tcp.port &#x3D;&#x3D; 80 ：显示端口为 80 的数据包</li>
+</ul>
+<p>在过滤栏输入过滤语句，修改后立即生效。</p>
+<p><img src="/img/ctf-kb/mirror/4125dc4b86e01f70.png"></p>
+<h4 id="过滤器比较符号"><a href="#过滤器比较符号" class="headerlink" title="过滤器比较符号"></a>过滤器比较符号</h4><p><img src="/img/ctf-kb/mirror/2c5ea37c668fb10a.png"></p>
+<h4 id="常见过滤语法"><a href="#常见过滤语法" class="headerlink" title="常见过滤语法"></a>常见过滤语法</h4><ul>
+<li>对目的地址进行过滤</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip.dst == 192.168.0.1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果想排除以上的数据包，只需要将其用括号囊括，然后使用 “!” 即可</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">!(ip.addr == 192.168.0.1)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>对源地址进行过滤</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip.src == 192.168.0.1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>请求的 uri 中包含”user”关键字的</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http.request.uri matches <span class="string">&quot;user&quot;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>过滤 http 请求方法</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http.request.method==<span class="string">&quot;POST&quot;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>过滤 http 响应状态码</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http.response.code==302</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>过滤含有指定 cookie 的 http 数据包</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http.cookie contains <span class="string">&quot;userid&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="数据包搜索"><a href="#数据包搜索" class="headerlink" title="数据包搜索"></a>数据包搜索</h3><p>在 wireshark 界面按“Ctrl+F”，可以进行关键字搜索：</p>
+<p><img src="/img/ctf-kb/mirror/8c2a951604000629.png"></p>
+<p>Wireshark 的搜索功能支持正则表达式、字符串、十六进制等方式进行搜索，通常情况下直接使用字符串方式进行搜索。</p>
+<p><img src="/img/ctf-kb/mirror/0f0a46f382ba597f.png"></p>
+<p>搜索栏的左边下拉，有分组列表、分组详情、分组字节流三个选项，分别对应 wireshark 界面的三个部分，搜索时选择不同的选项以指定搜索区域：</p>
+<p><img src="/img/ctf-kb/mirror/6af0d772a9b77df0.png"></p>
+<p><img src="/img/ctf-kb/mirror/4824f3918ad5adb0.png"></p>
+<h3 id="数据包追踪"><a href="#数据包追踪" class="headerlink" title="数据包追踪"></a>数据包追踪</h3><p>在 Wireshark 中，数据流追踪功能可以帮助我们将一个 TCP 或 UDP 连接中传输的数据按照时间顺序重新组合起来，从而让我们更清晰地看到数据的传输过程。通过 Wireshark 的数据包列表区，我们可以发现 Wireshark 捕获的流量是一个个的数据包片段，如果单独拿出每一个数据包进行分析，里边的字节流等信息是很难读懂的，这个时候我们就需要数据流追踪功能，将数据包进行重组，并完整的展现出来。</p>
+<p>例如，在上传文件时，文件会被分割成多个数据包进行传输。通过数据流追踪，我们可以将这些分散的数据包重新组合起来，从而得到完整的文件内容。</p>
+<p>目前这五种流可以被跟踪。他们分别是 TCP、UDP、SSL、HTTP、QUIC。</p>
+<ul>
+<li>TCP 流</li>
+</ul>
+<p>重组使用 TCP 协议的数据，比如 HTTP 和 FTP。</p>
+<ul>
+<li>UDP 流</li>
+</ul>
+<p>重组使用 UDP 协议的数据，比如 DNS。</p>
+<ul>
+<li>SSL 流</li>
+</ul>
+<p>重组加密的协议，比如 HTTPS。你必须提供秘钥来解密流量。</p>
+<ul>
+<li>HTTP 流</li>
+</ul>
+<p>从 HTTP 协议中重组和解压数据，当使用 TCP 流跟踪但又没有完全解码出的 HTTP 数据时，这个功能就派上用场了。</p>
+<p>以一个简单的 HTTP 交互举例来说，在报文中单击一个 TCP 或者 HTTP 数据包:</p>
+<p><img src="/img/ctf-kb/mirror/dfd5efda6320fa06.png"></p>
+<p>右键单击这个文件并选择跟踪流。这时候 TCP 流就会在一个单独的窗口中显示出来。</p>
+<p><img src="/img/ctf-kb/mirror/11d2e76c6cf47b57.png"></p>
+<p>红色用来标明从源地址前往目标地址的流量。蓝色用来区分出相反方向，也就是从目标地址到源地址的流量。</p>
+<p>例如:</p>
+<p>以网站向服务器发送请求为例，首先浏览器会与服务器建立 TCP 连接。通过 TCP 三次握手进行连接。连接后通过 http 协议开始发送操作请求。首先浏览器所在的客户机向服务器发送请求报文 SYN，服务器接收到报文后，向客户机发送确认报文 SYN+ACK。客户机接收到确认报文后，再次向服务器发出 ACK 报文，确认已接收到确认报文，此时客户机与服务器之间的 TCP 连接建立完成，开始通信。发送 http 请求，如下图：</p>
+<p><img src="/img/ctf-kb/mirror/f07d2fcc11149802.png"></p>
+<p>Wireshark 中数据流追踪的操作步骤</p>
+<p>首先我们点击选择一条数据包，可以选择数据流，点击右键中的快捷键，追踪流-TCP 流。</p>
+<p><img src="/img/ctf-kb/mirror/f702b812da5dc1ea.png"></p>
+<p>在追踪数据流页面，红色代表请求信息（request）蓝色代表响应信息（response）。是将三个 TCP 数据包拼装成的可视化的展示。</p>
+<p><img src="/img/ctf-kb/mirror/126ddbbfeb825a2b.png"></p>
+<p>当然，对于 http 协议，也可以点击追踪流进行可视化的展示。点击 http 协议数据包，选择追踪流-http 流。</p>
+<p><img src="/img/ctf-kb/mirror/2f8c8fb4b3b4d00a.png"></p>
+<p>最后总结一下数据流追踪功能，那就是将 TCP、UDP、SSL 等数据流进行重组并完整呈现出来。</p>
+<p><img src="/img/ctf-kb/mirror/77d4941b82dfa98e.jpg"></p>
+<p>上行流为红色，下行流为蓝色。可以在下拉菜单中选择同时显示上下行，或只选择单向流。支持以 ASCII 码、原始 16 进制、Hex 转储等编码方式显示数据。可以使用<strong>查找栏</strong>查找关键的值，选择显示原始数据时可查找 16 进制值，显示 ASCII 码时可查找字符串类型值。</p>
+<h3 id="数据包提取"><a href="#数据包提取" class="headerlink" title="数据包提取"></a>数据包提取</h3><p>Wireshark 支持提取通过 http 传输（上传&#x2F;下载）、ftp、tcp 等协议传输的文件内容，方法如下：</p>
+<p>自动提取通过 http 传输的文件内容</p>
+<p>文件-&gt; 导出对象-&gt;HTTP</p>
+<p><img src="/img/ctf-kb/mirror/ef5b17ede499c7f7.png"></p>
+<p>在打开的对象列表中找到有价值的文件，如压缩文件、文本文件、音频文件、图片等，点击 <code>Save</code> 进行保存，或者 <code>Save All</code> 保存所有对象再进入文件夹进行分析。</p>
+<p><img src="/img/ctf-kb/mirror/b5c233dafbe1be96.png"></p>
+<p>将所有 http 请求和响应体的数据进行导出。</p>
+<h3 id="分组字节显示"><a href="#分组字节显示" class="headerlink" title="分组字节显示"></a><strong>分组字节显示</strong></h3><p>右键特定字段，选择导出分组字节，可调出分组字节窗口。《显示为》 选项可选择编码方式，可以根据需求选择，然后导出该字段的所有字节。明文数据可以导出 ASCII 码。部分压缩文件可导出原始数据。 开始和结束也可以控制字节的大小。</p>
+<p><img src="/img/ctf-kb/mirror/6546252ba404c257.jpg"></p>
+<h1 id="Tshark"><a href="#Tshark" class="headerlink" title="Tshark"></a>Tshark</h1><p>wireshark 是一个伟大的网络问题分析工具，当然它也是有终端命令行工具的。tshark 就是 wireshark 的命令行之一。WireShark 的功能基本都有，还能组合 grep&#x2F;awk 等编程处理分析抓包文件。</p>
+<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-r 提取如wireshark表格中显示的封包摘要信息</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/ctf-kb/mirror/245076a0359dde94.png"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Y 使用filter过滤器</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/ctf-kb/mirror/19d6bac7ee9d2b2d.png"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-T 指出解析时输出的格式 </span><br><span class="line">     默认text </span><br><span class="line">     fields (需要增加-e参数)</span><br><span class="line">     其他选项 ek|json|jsonraw|pdml|ps|psml|tabs</span><br><span class="line">-e 指定一个字段</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/ctf-kb/mirror/be7aa1c8be4413d9.png"></p>
+<p>字段名可以通过 apply as column 应用为列</p>
+<p><img src="/img/ctf-kb/mirror/ef7037739f3bfdf3.png"></p>
+<p>然后在列中右击，此时就可以看到我们想提取的字段对应的字段表达式<br><img src="/img/ctf-kb/mirror/139f0feef272a389.png"></p>
+<p>例如：我要提取 http 协议中每个请求的 uri。首先，找到 uri 的位置。</p>
+<p><img src="/img/ctf-kb/mirror/8ace76411640894f.png"></p>
+<p>右击应用为列</p>
+<p><img src="/img/ctf-kb/mirror/123fdc3a0ae0e6df.png"></p>
+<p>在分组列表右键，可以看到 request uri 对应的表达式字典为 http.request.uri</p>
+<p><img src="/img/ctf-kb/mirror/3de157265a486faa.png"></p>
+<hr>
+<blockquote>
+<p><strong>转载声明</strong>：本文转载自 <a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge">Des-CTF-Knowledge</a>（MIT License），版权归原作者所有，转载请注明出处；如原作者不希望被转载，请联系删除。<br>仓库原文：<a target="_blank" rel="noopener" href="https://github.com/Dest1ny-Sec/Des-CTF-Knowledge/blob/main/%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/Wireshark%E4%BD%BF%E7%94%A8.md">工具使用&#x2F;Wireshark使用.md</a></p>
+</blockquote>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%B7%A5%E5%85%B7/">工具</a><a class="post-meta__tags" href="/tags/CTF/">CTF</a></div><div class="post_share"><div class="social-share" data-image="/img/youli.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/sqlmap-Cheat-Sheet/" title="sqlmap-Cheat-Sheet"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">sqlmap-Cheat-Sheet</div></div></a></div><div class="next-post pull-right"><a href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/tshark%E4%BD%BF%E7%94%A8/" title="tshark使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">tshark使用</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-05-30</div><div class="title">Dirsearch</div></div></a></div><div><a href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-05-30</div><div class="title">ffuf的使用</div></div></a></div><div><a href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/sqlmap-Cheat-Sheet/" title="sqlmap-Cheat-Sheet"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-05-30</div><div class="title">sqlmap-Cheat-Sheet</div></div></a></div><div><a href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/tshark%E4%BD%BF%E7%94%A8/" title="tshark使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-05-30</div><div class="title">tshark使用</div></div></a></div><div><a href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/%E5%86%85%E5%AD%98%E5%8F%96%E8%AF%81%E7%A7%92%E6%9D%80%E6%89%80%E6%9C%89%E5%91%BD%E4%BB%A4/" title="内存取证秒杀所有命令"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-05-30</div><div class="title">内存取证秒杀所有命令</div></div></a></div><div><a href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2026-05-30</div><div class="title">CTF 常用脚本索引</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/youli.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">朴冬</div><div class="author-info__description">琐碎的学习记录</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1050</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">879</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">16</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/PUDONGGGGGG" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/2559874620@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://space.bilibili.com/242470829?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #1797cf;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E5%8A%9F%E8%83%BD%E4%BD%BF%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">常见功能使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-number">1.0.1.</span> <span class="toc-text">过滤器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8A%93%E5%8C%85%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-number">1.0.1.1.</span> <span class="toc-text">抓包过滤器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%98%BE%E7%A4%BA%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-number">1.0.1.2.</span> <span class="toc-text">显示过滤器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8%E6%AF%94%E8%BE%83%E7%AC%A6%E5%8F%B7"><span class="toc-number">1.0.1.3.</span> <span class="toc-text">过滤器比较符号</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E8%BF%87%E6%BB%A4%E8%AF%AD%E6%B3%95"><span class="toc-number">1.0.1.4.</span> <span class="toc-text">常见过滤语法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8C%85%E6%90%9C%E7%B4%A2"><span class="toc-number">1.0.2.</span> <span class="toc-text">数据包搜索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8C%85%E8%BF%BD%E8%B8%AA"><span class="toc-number">1.0.3.</span> <span class="toc-text">数据包追踪</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%8C%85%E6%8F%90%E5%8F%96"><span class="toc-number">1.0.4.</span> <span class="toc-text">数据包提取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E7%BB%84%E5%AD%97%E8%8A%82%E6%98%BE%E7%A4%BA"><span class="toc-number">1.0.5.</span> <span class="toc-text">分组字节显示</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Tshark"><span class="toc-number">2.</span> <span class="toc-text">Tshark</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">2.1.</span> <span class="toc-text">常用命令</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/Dirsearch/" title="Dirsearch">Dirsearch</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/SCRIPTS-INDEX/" title="CTF 常用脚本索引">CTF 常用脚本索引</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/30/ctf-kb/%E5%B7%A5%E5%85%B7/ffuf%E7%9A%84%E4%BD%BF%E7%94%A8/" title="ffuf的使用">ffuf的使用</a><time datetime="2026-05-29T16:00:00.000Z" title="发表于 2026-05-30 00:00:00">2026-05-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2026 By 朴冬</div><div class="footer_custom_text">Welcome</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="chat-btn" type="button" title="聊天"><i class="fas fa-sms"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="/js/tw_cn.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
